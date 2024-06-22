@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "format": "npx prettier --write .",
+    "format": "npx prettier --write . && npx prisma format",
+    "db:start": "docker run --name summer-postgres -p 5432:5432 -e POSTGRES_PASSWORD=summer -d postgres",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
