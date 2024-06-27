@@ -1,0 +1,68 @@
+.lessonsTable {
+
+  &__wrapper {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  &__container {
+    background-color: #f9fafb;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  &__desktop {
+    border-collapse: collapse;
+    width: 100%;
+    border: none; 
+
+  //   @media (min-width: 768px) {
+  //     display: table;
+  //     width: 100%;
+  //   }
+  }
+
+  &__head {
+    text-align: left;
+    font-weight: normal;
+  }
+
+  &__th {
+    padding: 0.5rem;
+    font-weight: medium;
+  }
+
+  &__body {
+    background-color: #ffffff;
+    font-size: 0.9rem;
+  }
+
+  &__row {
+    border-bottom: 1px solid #e5e7eb;
+    &:last-of-type {
+      border-bottom: none;
+    }
+  }
+
+  &__td {
+    padding: 0.75rem;
+  }
+
+  &__row:first-of-type &__td:first-of-type {
+    border-top-left-radius: 0.5rem;
+  }
+
+  &__row:first-of-type &__td:last-of-type {
+    border-top-right-radius: 0.5rem;
+  }
+
+  &__row:last-of-type &__td:first-of-type {
+    border-bottom-left-radius: 0.5rem;
+  }
+
+  &__row:last-of-type &__td:last-of-type {
+    border-bottom-right-radius: 0.5rem;
+  }
+
+}

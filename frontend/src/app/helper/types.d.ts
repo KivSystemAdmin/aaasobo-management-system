@@ -15,3 +15,18 @@ type Instructor = {
 };
 
 type Availability = { dateTime: string };
+
+type LessonType = {
+  id: number;
+  dateTime: string;
+  customer: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  instructor: {
+    id: number;
+    name: string;
+  };
+  status: "booked" | "completed" | "cancelled";
+};
