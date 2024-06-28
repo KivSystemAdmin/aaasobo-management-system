@@ -3,6 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 import { instructorsRouter } from "./routes/instructorsRouter";
 import { lessonsRouter } from "./routes/lessonsRouter";
+import { customersRouter } from "./routes/customersRouter";
 
 export const server = express();
 
@@ -16,3 +17,4 @@ server.use(cors(corsOptions)); // Allows requests from a different port (3000)
 
 server.use("/instructors", instructorsRouter);
 server.use("/lessons", lessonsRouter);
+server.use("/customers", customersRouter);
