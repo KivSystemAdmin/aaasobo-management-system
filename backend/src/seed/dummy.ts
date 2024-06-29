@@ -49,6 +49,18 @@ async function insertCustomers() {
   });
 }
 
+async function insertAdmins() {
+  await prisma.admins.createMany({
+    data: [
+      {
+        name: "Admin",
+        email: "admin@example.com",
+        password: "admin",
+      },
+    ],
+  });
+}
+
 async function insertLessons() {
   const alice = await prisma.customer.findFirst({ where: { name: "Alice" } });
   if (!alice) {
@@ -115,9 +127,11 @@ async function main() {
   await prisma.instructorAvailability.deleteMany({});
   await prisma.instructor.deleteMany({});
   await prisma.customer.deleteMany({});
+  await prisma.admins.deleteMany({});
 
   await insertInstructors();
   await insertCustomers();
+  await insertAdmins();
   await insertLessons();
 }
 
