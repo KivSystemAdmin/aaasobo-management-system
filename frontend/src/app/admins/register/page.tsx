@@ -41,10 +41,9 @@ function Register() {
     });
 
     if (!response.ok) {
-      throw new Error("Something went wrong");
+      alert("Something went wrong"); // Set alert message temporarily.
+      return;
     }
-
-    // const data = await response.json();
 
     // Set alert message temporarily.
     alert("Registered successfully");
