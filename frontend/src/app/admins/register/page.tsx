@@ -40,13 +40,14 @@ function Register() {
       body,
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      alert("Something went wrong"); // Set alert message temporarily.
+      alert(data.message); // Set alert message temporarily.
       return;
     }
 
-    // Set alert message temporarily.
-    alert("Registered successfully");
+    alert("Registered successfully"); // Set alert message temporarily.
   };
 
   return (
