@@ -1,16 +1,5 @@
 import { prisma } from "../../prisma/prismaClient";
-
-// Fetch duplicate count of the admin using the email
-export const getAdminDuplicateCount = async (email: string) => {
-  try {
-    return await prisma.admins.count({
-      where: { email },
-    });
-  } catch (error) {
-    console.error("Database Error:", error);
-    throw new Error("Failed to fetch admin duplicate count.");
-  }
-};
+import { Prisma } from "@prisma/client";
 
 // Create a new admin in the DB
 export const createAdmin = async (adminData: {
@@ -20,15 +9,18 @@ export const createAdmin = async (adminData: {
 }) => {
   try {
     return await prisma.admins.create({
-      data: {
-        name: adminData.name,
-        email: adminData.email,
-        password: adminData.password,
-      },
+      data: adminData,
     });
   } catch (error) {
-    console.error("Database Error:", error);
-    throw new Error("Failed to add admin.");
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      // P2002: Unique Constraint Violation
+      if (error.code === "P2002") {
+        throw new Error("Email is already registered");
+      } else {
+        console.error("Database Error:", error);
+        throw new Error("Failed to register admin");
+      }
+    }
   }
 };
 

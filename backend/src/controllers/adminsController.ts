@@ -1,9 +1,5 @@
 import { Request, Response } from "express";
-import {
-  getAdminDuplicateCount,
-  createAdmin,
-  getAdmin,
-} from "../services/adminsService";
+import { createAdmin, getAdmin } from "../services/adminsService";
 import bcrypt from "bcrypt";
 
 const saltRounds = 12;
@@ -12,15 +8,6 @@ export const registerAdmin = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
 
   try {
-    // Check if the email is already registered using count.
-    const duplicateCount = await getAdminDuplicateCount(email);
-
-    if (duplicateCount > 0) {
-      return res.status(400).json({
-        message: "Email is already registered",
-      });
-    }
-
     // Hash the password.
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -28,17 +15,25 @@ export const registerAdmin = async (req: Request, res: Response) => {
     const admin = await createAdmin({ name, email, password: hashedPassword });
 
     // Exclude the password from the response.
-    const { password: _, ...adminWithoutPassword } = admin;
-
-    res.status(200).json({
-      message: "Admin is registered successfully",
-      admin: adminWithoutPassword,
-    });
+    if (admin) {
+      const { password: _, ...adminWithoutPassword } = admin;
+      res.status(200).json({
+        message: "Admin is registered successfully",
+        admin: adminWithoutPassword,
+      });
+    }
   } catch (error) {
-    res.status(500).json({
-      message: "Internal error",
-      error,
-    });
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: error.message,
+        error,
+      });
+    } else {
+      res.status(500).json({
+        message: "Failed to register admin",
+        error,
+      });
+    }
   }
 };
 
