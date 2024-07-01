@@ -30,3 +30,20 @@ type LessonType = {
   };
   status: "booked" | "completed" | "cancelled";
 };
+
+type Customer = {
+  customer: {
+    id: number;
+    name: string;
+    email: string;
+    lesson: CustomersLesson[];
+  };
+};
+
+type CustomersLesson = {
+  id: number;
+  instructorId: number;
+  customerId: number;
+  dateTime: string;
+  status: "booked" | "completed" | "cancelled";
+};
