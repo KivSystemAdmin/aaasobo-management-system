@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import React, { FormEvent } from "react";
 import { useInput } from "@/app/hooks/useInput";
-import { checkLoginValidation } from "@/app/helper/validationUtils";
+import { isValidLogin } from "@/app/helper/validationUtils";
 
 function Login() {
   const [email, onEmailChange] = useInput();
@@ -14,7 +14,7 @@ function Login() {
     e.preventDefault();
 
     // Check the validation of the input values.
-    const checkResult = checkLoginValidation({
+    const checkResult = isValidLogin({
       email,
       password,
     });

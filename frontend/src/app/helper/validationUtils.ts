@@ -44,7 +44,7 @@ export const isValidRegister = ({
 };
 
 // Function to check if the values entered in the login form are valid
-export const checkLoginValidation = ({ email, password }: LoginProps) => {
+export const isValidLogin = ({ email, password }: LoginProps) => {
   // If the values are null, return false.
   if (!email || !password) {
     alert("Please fill in both fields"); // Set alert message temporarily.
