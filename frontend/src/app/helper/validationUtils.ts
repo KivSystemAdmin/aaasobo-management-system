@@ -11,7 +11,7 @@ type LoginProps = {
 };
 
 // Function to check if the values entered in the registration form are valid
-export const checkRegisterValidation = ({
+export const isValidRegister = ({
   name,
   email,
   password,

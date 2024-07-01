@@ -2,7 +2,7 @@
 
 import React, { FormEvent } from "react";
 import { useInput } from "@/app/hooks/useInput";
-import { checkRegisterValidation } from "@/app/helper/validationUtils";
+import { isValidRegister } from "@/app/helper/validationUtils";
 
 function Register() {
   const [name, onNameChange] = useInput();
@@ -14,7 +14,7 @@ function Register() {
     e.preventDefault();
 
     // Check the validation of the input values.
-    const checkResult = checkRegisterValidation({
+    const checkResult = isValidRegister({
       name,
       email,
       password,
@@ -64,18 +64,12 @@ function Register() {
         </label>
         <label>
           Password
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={onPasswordChange}
-          />
+          <input type="password" value={password} onChange={onPasswordChange} />
         </label>
         <label>
           Password Confirmation
           <input
             type="password"
-            id="password-confirmation"
             value={passConfirmation}
             onChange={onPassConfirmationChange}
           />
