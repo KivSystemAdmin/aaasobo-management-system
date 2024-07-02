@@ -50,7 +50,7 @@ export const loginCustomer = async (req: Request, res: Response) => {
     const { password: _, ...customerWithoutPassword } = customer;
 
     res.status(200).json({
-      redirectUrl: `/customers/${customer.id}`,
+      redirectUrl: `/customers/${customer.id}/dashboard/home`,
       message: "Customer logged in successfully",
       customer: customerWithoutPassword,
     });

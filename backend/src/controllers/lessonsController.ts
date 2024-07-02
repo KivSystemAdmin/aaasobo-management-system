@@ -3,13 +3,46 @@ import {
   createLesson,
   deleteLesson,
   getAllLessons,
+  getLessonsByCustomerId,
 } from "../services/lessonsService";
 import { prisma } from "../../prisma/prismaClient";
 
-// GET all lessons
+// GET all lessons along with related instructors and customers data
 export const getAllLessonsController = async (_: Request, res: Response) => {
   try {
     const lessons = await getAllLessons();
+
+    const lessonsData = lessons.map((lesson) => ({
+      id: lesson.id,
+      dateTime: lesson.dateTime,
+      customer: {
+        id: lesson.customer.id,
+        name: lesson.customer.name,
+        email: lesson.customer.email,
+      },
+      instructor: {
+        id: lesson.instructor.id,
+        name: lesson.instructor.name,
+      },
+      status: lesson.status,
+    }));
+
+    res.json({ lessons: lessonsData });
+  } catch (error) {
+    console.error("Controller Error:", error);
+    res.status(500).json({ error: "Failed to fetch lessons." });
+  }
+};
+
+// GET lessons by customer id along with related instructors and customers data
+export const getLessonsByCustomerIdController = async (
+  req: Request,
+  res: Response
+) => {
+  const id = Number(req.params.id);
+
+  try {
+    const lessons = await getLessonsByCustomerId(id);
 
     const lessonsData = lessons.map((lesson) => ({
       id: lesson.id,

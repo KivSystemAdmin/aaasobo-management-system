@@ -39,7 +39,8 @@ function Login() {
     const data = await response.json();
 
     // Redirect to the customer page
-    const redirectUrl = data.redirectUrl || `/customers/${data.customer.id}`;
+    const redirectUrl =
+      data.redirectUrl || `/customers/${data.customer.id}/dashboard/home`;
     router.push(redirectUrl);
   };
   return (

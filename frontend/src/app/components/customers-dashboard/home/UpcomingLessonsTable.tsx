@@ -1,28 +1,37 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import styles from "./LessonsTable.module.scss";
+import styles from "./UpcomingLessonsTable.module.scss";
 import { formatDate, formatTime } from "@/app/helper/dateUtils";
+import { deleteLesson, getLessonsByCustomerId } from "@/app/helper/lessonsApi";
 
-function LessonsTable() {
+function UpcomingLessonsTable({ customerId }: { customerId: string }) {
   const [lessons, setLessons] = useState<LessonType[] | undefined>();
 
   useEffect(() => {
-    const getLessons = async () => {
+    const fetchLessons = async () => {
       try {
-        const response = await fetch("http://localhost:4000/lessons");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const { lessons } = await response.json();
+        const lessons = await getLessonsByCustomerId(customerId);
         setLessons(lessons);
       } catch (error) {
         console.error(error);
       }
     };
 
-    getLessons();
-  }, []);
+    fetchLessons();
+  }, [customerId]);
+
+  async function handleCancel(lessonId: number) {
+    try {
+      await deleteLesson(lessonId);
+
+      setLessons((prevLessons) =>
+        prevLessons?.filter((lesson) => lesson.id !== lessonId)
+      );
+    } catch (error) {
+      console.error("Failed to delete lesson:", error);
+    }
+  }
 
   return (
     <div className={styles.lessonsTable}>
@@ -61,12 +70,14 @@ function LessonsTable() {
                       {lesson.customer.name}
                     </td>
                     <td className={styles.lessonsTable__td}>{lesson.status}</td>
-                    {/* <td className={styles.lessonsTable__td}>
-                    <div className={styles.lessonsTable__actions}>
-                      <UpdateLesson id={lesson.id} />
-                      <DeleteLesson id={lesson.id} />
-                    </div>
-                  </td> */}
+                    <td className={styles.lessonsTable__td}>
+                      <button
+                        className={styles.lessonsTable__cancelBtn}
+                        onClick={() => handleCancel(lesson.id)}
+                      >
+                        Cancel Lesson
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
@@ -78,4 +89,4 @@ function LessonsTable() {
   );
 }
 
-export default LessonsTable;
+export default UpcomingLessonsTable;
