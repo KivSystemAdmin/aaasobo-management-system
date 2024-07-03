@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import React, { FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { useInput } from "@/app/hooks/useInput";
 import { isValidLogin } from "@/app/helper/validationUtils";
 
@@ -33,21 +33,21 @@ function Login() {
 
     const response = await fetch(loginURL, {
       method: "POST",
+      credentials: "include",
       headers,
       body,
     });
 
     const data = await response.json();
+    console.log("admins/login data:", data);
+    const { message, redirectUrl } = data;
 
     if (!response.ok) {
-      alert(data.message); // Set alert message temporarily.
+      alert(message); // Set alert message temporarily.
       return;
     }
 
     alert("Logged in successfully"); // Set alert message temporarily.
-
-    // Redirect to admin page
-    const redirectUrl = data.redirectUrl || `/admins`;
     router.push(redirectUrl);
   };
 
@@ -61,12 +61,7 @@ function Login() {
         </label>
         <label>
           Password
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={onPasswordChange}
-          />
+          <input type="password" value={password} onChange={onPasswordChange} />
         </label>
         <button type="submit">Login</button>
       </form>

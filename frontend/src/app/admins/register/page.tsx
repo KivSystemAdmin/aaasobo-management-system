@@ -1,7 +1,9 @@
 "use client";
 
 import React, { FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { useInput } from "@/app/hooks/useInput";
+import { useAuth } from "@/app/hooks/useAuth";
 import { isValidRegister } from "@/app/helper/validationUtils";
 
 function Register() {
@@ -9,7 +11,12 @@ function Register() {
   const [email, onEmailChange] = useInput();
   const [password, onPasswordChange] = useInput();
   const [passConfirmation, onPassConfirmationChange] = useInput();
+  const router = useRouter();
 
+  const endpoint = "http://localhost:4000/admins/register";
+  useAuth(endpoint);
+
+  // Register the admin.
   const registerHandler = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -36,6 +43,7 @@ function Register() {
 
     const response = await fetch(registerURL, {
       method: "POST",
+      credentials: "include",
       headers,
       body,
     });
@@ -44,6 +52,11 @@ function Register() {
 
     if (!response.ok) {
       alert(data.message); // Set alert message temporarily.
+      if (data.redirectUrl) {
+        // Without session, redirect to the login page.
+        const redirectUrl = data.redirectUrl;
+        router.push(redirectUrl);
+      }
       return;
     }
 
