@@ -55,13 +55,14 @@ async function insertAdmins() {
       {
         name: "Admin",
         email: "admin@example.com",
-        password: "admin",
+        password:
+          "$2b$12$QdrIpwz5heeLTgrJOfHr0ejPtoj9.CBiOZiZh7YjvZh9R0xgytX.e", // password: admin
       },
       {
         name: "aaa",
         email: "aaa@aaa.com",
         password:
-          "$2b$12$99tn47qTel2SzphZnyvWsutiFGk35qQWTd8rB8KQjPRHEn.h63Gf.",
+          "$2b$12$99tn47qTel2SzphZnyvWsutiFGk35qQWTd8rB8KQjPRHEn.h63Gf.", // password: aaa
       },
     ],
   });
