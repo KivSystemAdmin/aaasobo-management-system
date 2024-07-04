@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 export function useAuth(endpoint: string) {
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const messageShownRef = useRef(false);
   const router = useRouter();
 
@@ -13,15 +14,18 @@ export function useAuth(endpoint: string) {
       });
 
       const data = await response.json();
-      const { message, redirectUrl } = data;
+      const isAuthenticated = data.isAuthenticated;
 
-      if (response.status === 401 && !messageShownRef.current) {
-        alert(message); // Set alert message temporarily.
+      if (!isAuthenticated && !messageShownRef.current) {
+        alert("Unauthorized"); // Set alert message temporarily.
         messageShownRef.current = true;
-        router.push(redirectUrl);
+        setIsAuthenticated(false);
       }
     };
 
     authenticateSession();
   }, [endpoint, router]);
+
+  console.log("useAuth.ts isAuthenticated:", isAuthenticated);
+  return isAuthenticated;
 }

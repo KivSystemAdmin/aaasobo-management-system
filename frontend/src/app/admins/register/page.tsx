@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent } from "react";
+import React, { useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useInput } from "@/app/hooks/useInput";
 import { useAuth } from "@/app/hooks/useAuth";
@@ -13,8 +13,14 @@ function Register() {
   const [passConfirmation, onPassConfirmationChange] = useInput();
   const router = useRouter();
 
-  const endpoint = "http://localhost:4000/admins/register";
-  useAuth(endpoint);
+  const endpoint = "http://localhost:4000/admins/authentication";
+  const isAuthenticated = useAuth(endpoint);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/admins/login");
+    }
+  }, [isAuthenticated, router]);
 
   // Register the admin.
   const registerHandler = async (e: FormEvent) => {
@@ -49,14 +55,10 @@ function Register() {
     });
 
     const data = await response.json();
+    const message = data.message;
 
     if (!response.ok) {
-      alert(data.message); // Set alert message temporarily.
-      if (data.redirectUrl) {
-        // Without session, redirect to the login page.
-        const redirectUrl = data.redirectUrl;
-        router.push(redirectUrl);
-      }
+      alert(message); // Set alert message temporarily.
       return;
     }
 

@@ -1,119 +1,57 @@
-import { Request, Response } from "express";
-import { prisma } from "../../prisma/prismaClient";
+import { NextFunction, Request, Response } from "express";
 
-interface UserSession {
-  id: string;
-  userId: number;
-  isAdmin: boolean;
-  isCustomer: boolean;
-  isInstructor: boolean;
-}
-
-// Create a session for login
-export const createSession = async (req: Request, _: Response) => {
-  if (!req.session) {
-    return;
-  }
-  const { userId, isAdmin, isCustomer, isInstructor } = req.session;
-  const session = await prisma.userSession.create({
-    data: {
-      userId: userId,
-      isAdmin: isAdmin,
-      isCustomer: isCustomer,
-      isInstructor: isInstructor,
-    },
-  });
-
-  req.session = session;
-  return session;
-};
-
-export const authenticateSession = async (req: Request, res: Response) => {
-  const requestUrl = req.originalUrl;
-  let redirectUrl: string | undefined;
-
-  if (req.session && req.session.id) {
-    const sessionId = req.session.id;
-    const session: UserSession | null = await prisma.userSession.findUnique({
-      where: {
-        id: sessionId,
-      },
-    });
-    redirectUrl = manageRedirectUrl(requestUrl, session || undefined);
-  } else {
-    redirectUrl = manageRedirectUrl(requestUrl, undefined);
-  }
-
-  const isAuthenticated = redirectUrl ? !redirectUrl.includes("login") : false;
-
-  if (isAuthenticated) {
-    res.status(200).json({
-      message: "Authenticated",
-      redirectUrl: redirectUrl,
-      session: req.session,
-    });
-  } else {
-    res.status(401).json({
-      message: "Unauthorized",
-      redirectUrl: redirectUrl,
-    });
-  }
-};
-
-// Manage redirect URL.
-const manageRedirectUrl = (
-  requestUrl: string,
-  session: UserSession | undefined
+// Check if the user is authenticated or not.
+export const requireAuthentication = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
-  const adminsUrl = "/admins/";
-  const customersUrl = "/customers/";
-  const instructorsUrl = "/instructors/";
-
-  let userId = 0;
-  let isAdmin = false;
-  let isCustomer = false;
-  let isInstructor = false;
-
-  if (session) {
-    ({ userId, isAdmin, isCustomer, isInstructor } = session);
+  if (!req.session?.isAdmin) {
+    return res.status(401).json({
+      message: "Unauthorized",
+    });
   }
+  next();
+};
 
-  // Redirect to the admin's URL.
-  if (requestUrl.includes(adminsUrl)) {
-    if (isAdmin) {
-      return requestUrl;
-    } else {
-      return "/admins/login";
-    }
+// Check if the admin session is authenticated or not.
+export const authenticateAdminSession = async (req: Request, res: Response) => {
+  res.status(200).json({
+    isAuthenticated: req.session?.userType === "admin" || false,
+  });
+};
 
-    // Redirect to the customer's URL.
-  } else if (requestUrl.includes(customersUrl)) {
-    if (isAdmin || isCustomer) {
-      const condition1 = requestUrl.includes(customersUrl + userId);
-      const condition2 = !requestUrl.match(/\d/);
-
-      if (condition1 || condition2) {
-        return requestUrl;
-      } else {
-        return "/customers/login";
-      }
-    } else {
-      return "/customers/login";
-    }
-
-    // Redirect to the instructor's URL.
-  } else if (requestUrl.includes(instructorsUrl)) {
-    if (isAdmin || isInstructor) {
-      const condition1 = requestUrl.includes(instructorsUrl + userId);
-      const condition2 = !requestUrl.match(/\d/);
-
-      if (condition1 || condition2) {
-        return requestUrl;
-      } else {
-        return "/instructors/login";
-      }
-    } else {
-      return "/instructors/login";
-    }
+// Check if the customer session is authenticated or not.
+export const authenticateCustomerSession = async (
+  req: Request,
+  res: Response
+) => {
+  const customerId = parseInt(req.params.id);
+  if (isNaN(customerId)) {
+    return res.status(400).json({ message: "Invalid customer ID" });
   }
+  if (req.session?.isAdmin) {
+    return res.status(200).json({ isAuthenticated: true });
+  }
+  const isAuthenticated =
+    req.session?.userType === "customer" && req.session?.userId === customerId;
+  res.status(200).json({ isAuthenticated });
+};
+
+// Check if the instructor session is authenticated or not.
+export const authenticateInstructorSession = async (
+  req: Request,
+  res: Response
+) => {
+  const instructorId = parseInt(req.params.id);
+  if (isNaN(instructorId)) {
+    return res.status(400).json({ message: "Invalid customer ID" });
+  }
+  if (req.session?.isAdmin) {
+    return res.status(200).json({ isAuthenticated: true });
+  }
+  const isAuthenticated =
+    req.session?.userType === "instructor" &&
+    req.session?.userId === instructorId;
+  res.status(200).json({ isAuthenticated });
 };

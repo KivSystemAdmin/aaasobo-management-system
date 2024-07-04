@@ -13,14 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model UserSession {
-  id           String  @id @default(uuid())
-  userId       Int
-  isAdmin      Boolean
-  isCustomer   Boolean
-  isInstructor Boolean
-}
-
 model Instructor {
   id                     Int                      @id @default(autoincrement())
   name                   String

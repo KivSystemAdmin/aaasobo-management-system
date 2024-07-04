@@ -39,8 +39,7 @@ function Login() {
     });
 
     const data = await response.json();
-    console.log("admins/login data:", data);
-    const { message, redirectUrl } = data;
+    const message = data.message;
 
     if (!response.ok) {
       alert(message); // Set alert message temporarily.
@@ -48,7 +47,7 @@ function Login() {
     }
 
     alert("Logged in successfully"); // Set alert message temporarily.
-    router.push(redirectUrl);
+    router.push("/admins/dashboard");
   };
 
   return (

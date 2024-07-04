@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { createAdmin, getAdmin } from "../services/adminsService";
-import { createSession } from "../middlewares/auth.middleware";
 import bcrypt from "bcrypt";
 
 const saltRounds = 12;
@@ -32,19 +31,12 @@ export const loginAdmin = async (req: Request, res: Response) => {
     req.session = {
       id: "",
       userId: admin.id,
-      isAdmin: true,
-      isCustomer: false,
-      isInstructor: false,
+      userType: "admin",
     };
 
-    const session = await createSession(req, res);
-
-    if (session) {
-      res.status(200).json({
-        redirectUrl: "/admins",
-        message: "Admin logged in successfully",
-      });
-    }
+    res.status(200).json({
+      message: "Admin logged in successfully",
+    });
   } catch (error) {
     res.status(500).json({ error });
   }
