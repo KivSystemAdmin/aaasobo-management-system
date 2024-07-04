@@ -129,17 +129,47 @@ async function insertLessons() {
   });
 }
 
+async function insertChildren() {
+  const alice = await prisma.customer.findFirst({ where: { name: "Alice" } });
+  if (!alice) {
+    throw new Error("Customer not found");
+  }
+  const bob = await prisma.customer.findFirst({ where: { name: "Bob" } });
+  if (!bob) {
+    throw new Error("Customer not found");
+  }
+
+  await prisma.children.createMany({
+    data: [
+      {
+        name: "Peppa",
+        customerId: alice.id,
+      },
+      {
+        name: "Suzy",
+        customerId: alice.id,
+      },
+      {
+        name: "Emily",
+        customerId: bob.id,
+      },
+    ],
+  });
+}
+
 async function main() {
   await prisma.lesson.deleteMany({});
   await prisma.instructorAvailability.deleteMany({});
   await prisma.instructor.deleteMany({});
   await prisma.customer.deleteMany({});
   await prisma.admins.deleteMany({});
+  await prisma.children.deleteMany({});
 
   await insertInstructors();
   await insertCustomers();
   await insertAdmins();
   await insertLessons();
+  await insertChildren();
 }
 
 main();
