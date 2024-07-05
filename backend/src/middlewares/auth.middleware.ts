@@ -6,7 +6,7 @@ export const requireAuthentication = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.session?.isAdmin) {
+  if (req.session?.userType !== "admin") {
     return res.status(401).json({
       message: "Unauthorized",
     });
