@@ -1,12 +1,14 @@
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import momentTimezonePlugin from "@fullcalendar/moment-timezone";
+import interactionPlugin from "@fullcalendar/interaction";
+import { CalendarOptions } from "@fullcalendar/core";
 
 type CalendarProp = {
   instructor: Instructor;
-};
+} & CalendarOptions;
 
-function Calendar({ instructor }: CalendarProp) {
+function Calendar({ instructor, ...options }: CalendarProp) {
   // If instructor's data is undefined, return it.
   if (instructor === undefined) {
     return;
@@ -17,7 +19,7 @@ function Calendar({ instructor }: CalendarProp) {
     ? instructor.availabilities.map((availability, index) => {
         const start = availability.dateTime;
         const end = new Date(
-          new Date(start).getTime() + 25 * 60000
+          new Date(start).getTime() + 25 * 60000,
         ).toISOString();
         return {
           id: index.toString(),
@@ -29,7 +31,8 @@ function Calendar({ instructor }: CalendarProp) {
 
   return (
     <FullCalendar
-      plugins={[timeGridPlugin, momentTimezonePlugin]}
+      {...options}
+      plugins={[timeGridPlugin, momentTimezonePlugin, interactionPlugin]}
       initialView="timeGridWeek"
       headerToolbar={{
         left: "prev,next today",

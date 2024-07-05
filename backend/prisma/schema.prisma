@@ -14,16 +14,27 @@ datasource db {
 }
 
 model Instructor {
+  id                              Int                               @id @default(autoincrement())
+  name                            String
+  instructorAvailability          InstructorAvailability[]
+  lesson                          Lesson[]
+  instructorRecurringAvailability InstructorRecurringAvailability[]
+}
+
+model InstructorRecurringAvailability {
   id                     Int                      @id @default(autoincrement())
-  name                   String
+  instructorId           Int
+  rrule                  String
+  instructor             Instructor               @relation(fields: [instructorId], references: [id])
   instructorAvailability InstructorAvailability[]
-  lesson                 Lesson[]
 }
 
 model InstructorAvailability {
-  instructorId Int
-  dateTime     DateTime
-  instructor   Instructor @relation(fields: [instructorId], references: [id])
+  instructorId                      Int
+  instructorRecurringAvailabilityId Int?
+  dateTime                          DateTime
+  instructor                        Instructor                       @relation(fields: [instructorId], references: [id])
+  instructorRecurringAvailability   InstructorRecurringAvailability? @relation(fields: [instructorRecurringAvailabilityId], references: [id])
 
   @@id([instructorId, dateTime])
 }

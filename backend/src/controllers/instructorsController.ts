@@ -1,5 +1,12 @@
 import { Request, Response } from "express";
+import { RRule } from "rrule";
 import { prisma } from "../../prisma/prismaClient";
+import {
+  getInstructorById,
+  addInstructorAvailability,
+  addInstructorRecurringAvailability,
+  deleteInstructorRecurringAvailability,
+} from "../services/instructorsService";
 
 export const getAllInstructors = async (_: Request, res: Response) => {
   try {
@@ -22,3 +29,164 @@ export const getAllInstructors = async (_: Request, res: Response) => {
     res.status(500).json({ error });
   }
 };
+
+function setErrorResponse(res: Response, error: unknown) {
+  return res
+    .status(500)
+    .json({ message: error instanceof Error ? error.message : `${error}` });
+}
+
+export const getInstructor = async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    return res.status(400).json({ message: "Invalid ID provided." });
+  }
+  try {
+    const instructor = await getInstructorById(id);
+    if (!instructor) {
+      return res.status(404).json({ message: "Instructor not found." });
+    }
+    return res.status(200).json({
+      instructor: {
+        id: instructor.id,
+        name: instructor.name,
+        availabilities: instructor.instructorAvailability,
+      },
+    });
+  } catch (error) {
+    return setErrorResponse(res, error);
+  }
+};
+
+export const addAvailability = async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    return res.status(400).json({ message: "Invalid ID provided." });
+  }
+  const { type, dateTime } = req.body;
+  if (!dateTime) {
+    return res.status(400).json({ message: "Invalid dateTime provided." });
+  }
+  switch (type) {
+    case "slot":
+      return addSlotAvailability(res, id, dateTime);
+    case "recurring":
+      return addRecurringAvailability(res, id, dateTime);
+    default:
+      return res.status(400).json({ message: "Invalid type provided." });
+  }
+};
+
+export const deleteAvailability = async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    return res.status(400).json({ message: "Invalid ID provided." });
+  }
+  const { type, dateTime } = req.body;
+  if (!dateTime) {
+    return res.status(400).json({ message: "Invalid dateTime provided." });
+  }
+  switch (type) {
+    case "slot":
+      return deleteSlotAvailability(res, id, dateTime);
+    case "recurring":
+      return deleteRecurringAvailability(res, id, dateTime);
+    default:
+      return res.status(400).json({ message: "Invalid type provided." });
+  }
+};
+
+async function addSlotAvailability(
+  res: Response,
+  instructorId: number,
+  dateTime: string,
+) {
+  try {
+    const availability = await addInstructorAvailability(
+      instructorId,
+      null,
+      dateTime,
+    );
+    if (!availability) {
+      return res.status(404).json({ message: "Instructor not found." });
+    }
+    return res.status(200).json({ availability });
+  } catch (error) {
+    return setErrorResponse(res, error);
+  }
+}
+
+async function addRecurringAvailability(
+  res: Response,
+  instructorId: number,
+  dateTime: string,
+) {
+  const date = new Date(dateTime);
+  const rrule = new RRule({
+    freq: RRule.WEEKLY,
+    dtstart: date,
+  });
+
+  // Generate the recurring availabilities until the next month based on the current business workflow.
+  const dateTimes = rrule.between(date, getEndOfNextMonth(date), true);
+  try {
+    const availability = await addInstructorRecurringAvailability(
+      instructorId,
+      rrule.toString(),
+      dateTimes,
+    );
+    return res.status(200).json({ availability });
+  } catch (error) {
+    return setErrorResponse(res, error);
+  }
+}
+
+function getEndOfNextMonth(date: Date): Date {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + 2);
+  d.setDate(-1);
+  d.setUTCHours(23, 59, 59);
+  return d;
+}
+
+async function deleteSlotAvailability(
+  res: Response,
+  instructorId: number,
+  dateTime: string,
+) {
+  try {
+    const availability = await prisma.instructorAvailability.delete({
+      where: { instructorId_dateTime: { instructorId, dateTime } },
+    });
+    return res.status(200).json({ availability });
+  } catch (error) {
+    return setErrorResponse(res, error);
+  }
+}
+
+// Delete `dateTime` and following availabilities.
+async function deleteRecurringAvailability(
+  res: Response,
+  instructorId: number,
+  dateTime: string,
+) {
+  try {
+    const recurring = await deleteInstructorRecurringAvailability(
+      instructorId,
+      dateTime,
+      (rrule: string) => {
+        // Set UNTIL property to indicate this recrring availability has ended.
+        const prev = RRule.fromString(rrule);
+        const r = new RRule({
+          freq: prev.options.freq,
+          dtstart: prev.options.dtstart,
+          until: new Date(new Date(dateTime).getTime() - 1),
+        });
+        return r.toString();
+      },
+    );
+    return res.status(200).json({ recurring });
+  } catch (error) {
+    return setErrorResponse(res, error);
+  }
+}
