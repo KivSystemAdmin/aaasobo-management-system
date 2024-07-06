@@ -29,7 +29,6 @@ export const loginAdmin = async (req: Request, res: Response) => {
 
     // Set the session.
     req.session = {
-      id: "",
       userId: admin.id,
       userType: "admin",
     };

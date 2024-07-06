@@ -26,6 +26,5 @@ export function useAuth(endpoint: string) {
     authenticateSession();
   }, [endpoint, router]);
 
-  console.log("useAuth.ts isAuthenticated:", isAuthenticated);
   return isAuthenticated;
 }
