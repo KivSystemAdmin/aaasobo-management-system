@@ -12,20 +12,24 @@ export const getAllLessonsController = async (_: Request, res: Response) => {
   try {
     const lessons = await getAllLessons();
 
-    const lessonsData = lessons.map((lesson) => ({
-      id: lesson.id,
-      dateTime: lesson.dateTime,
-      customer: {
-        id: lesson.customer.id,
-        name: lesson.customer.name,
-        email: lesson.customer.email,
-      },
-      instructor: {
-        id: lesson.instructor.id,
-        name: lesson.instructor.name,
-      },
-      status: lesson.status,
-    }));
+    const lessonsData = lessons.map((lesson) => {
+      const { id, dateTime, customer, instructor, status } = lesson;
+
+      return {
+        id,
+        dateTime,
+        customer: {
+          id: customer.id,
+          name: customer.name,
+          email: customer.email,
+        },
+        instructor: {
+          id: instructor.id,
+          name: instructor.name,
+        },
+        status,
+      };
+    });
 
     res.json({ lessons: lessonsData });
   } catch (error) {
@@ -44,20 +48,30 @@ export const getLessonsByCustomerIdController = async (
   try {
     const lessons = await getLessonsByCustomerId(id);
 
-    const lessonsData = lessons.map((lesson) => ({
-      id: lesson.id,
-      dateTime: lesson.dateTime,
-      customer: {
-        id: lesson.customer.id,
-        name: lesson.customer.name,
-        email: lesson.customer.email,
-      },
-      instructor: {
-        id: lesson.instructor.id,
-        name: lesson.instructor.name,
-      },
-      status: lesson.status,
-    }));
+    const lessonsData = lessons.map((lesson) => {
+      const { id, dateTime, customer, instructor, status, lessonAttendance } =
+        lesson;
+
+      return {
+        id,
+        dateTime,
+        customer: {
+          id: customer.id,
+          name: customer.name,
+          email: customer.email,
+        },
+        instructor: {
+          id: instructor.id,
+          name: instructor.name,
+        },
+        lessonAttendance: {
+          name: lessonAttendance.map(
+            (lessonAttendance) => lessonAttendance.children.name
+          ),
+        },
+        status,
+      };
+    });
 
     res.json({ lessons: lessonsData });
   } catch (error) {
@@ -68,22 +82,25 @@ export const getLessonsByCustomerIdController = async (
 
 // POST a new lesson
 export const createLessonController = async (req: Request, res: Response) => {
-  const { dateTime, instructorId, customerId, status } = req.body;
+  const { dateTime, instructorId, customerId, childrenIds, status } = req.body;
 
   // Validation for req.body
-  if (!dateTime || !instructorId || !customerId || !status) {
+  if (!dateTime || !instructorId || !customerId || !childrenIds || !status) {
     return res
       .status(400)
       .json({ error: "There is a missing required field." });
   }
 
   try {
-    const newLesson = await createLesson({
-      dateTime,
-      instructorId,
-      customerId,
-      status,
-    });
+    const newLesson = await createLesson(
+      {
+        dateTime,
+        instructorId,
+        customerId,
+        status,
+      },
+      childrenIds
+    );
 
     res.status(201).json(newLesson);
   } catch (error) {
