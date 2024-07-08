@@ -6,6 +6,7 @@ export const getChildren = async (customerId: string) => {
     const children = await prisma.children.findMany({
       where: { customerId: parseInt(customerId) },
       include: { customer: true },
+      orderBy: { id: "asc" },
     });
 
     return children;
@@ -67,5 +68,18 @@ export const deleteChild = async (id: number) => {
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to delete a child.");
+  }
+};
+
+export const getChildById = async (id: number) => {
+  try {
+    const child = await prisma.children.findUnique({
+      where: { id },
+    });
+
+    return child;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch child.");
   }
 };

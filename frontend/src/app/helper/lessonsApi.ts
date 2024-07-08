@@ -39,6 +39,7 @@ export const addLesson = async (lessonData: {
   dateTime: string;
   instructorId: number;
   customerId: number;
+  childrenIds: Set<number>;
   status: string;
 }) => {
   try {

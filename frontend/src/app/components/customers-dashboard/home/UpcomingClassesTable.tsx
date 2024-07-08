@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import styles from "./UpcomingLessonsTable.module.scss";
+import styles from "./UpcomingClassesTable.module.scss";
 import { formatDate, formatTime } from "@/app/helper/dateUtils";
 import { deleteLesson, getLessonsByCustomerId } from "@/app/helper/lessonsApi";
 
-function UpcomingLessonsTable({ customerId }: { customerId: string }) {
+function UpcomingClassesTable({ customerId }: { customerId: string }) {
   const [lessons, setLessons] = useState<LessonType[] | undefined>();
 
   useEffect(() => {
@@ -43,7 +43,7 @@ function UpcomingLessonsTable({ customerId }: { customerId: string }) {
                 <th className={styles.lessonsTable__th}>Date</th>
                 <th className={styles.lessonsTable__th}>Time</th>
                 <th className={styles.lessonsTable__th}>Instructor</th>
-                <th className={styles.lessonsTable__th}>Customer</th>
+                <th className={styles.lessonsTable__th}>Children</th>
                 <th className={styles.lessonsTable__th}>Status</th>
                 <th className={styles.lessonsTable__th}></th>
               </tr>
@@ -67,15 +67,22 @@ function UpcomingLessonsTable({ customerId }: { customerId: string }) {
                       {lesson.instructor.name}
                     </td>
                     <td className={styles.lessonsTable__td}>
-                      {lesson.customer.name}
+                      {lesson.lessonAttendance.name.join(", ")}
                     </td>
                     <td className={styles.lessonsTable__td}>{lesson.status}</td>
                     <td className={styles.lessonsTable__td}>
+                      {/* If the customer is strictly required to report attending childrend before every class, the Edit functionality will be added.  */}
+                      {/* <button
+                        className={styles.lessonsTable__editBtn}
+                        onClick={() => handleEdit(lesson.id)}
+                      >
+                        Edit
+                      </button> */}
                       <button
                         className={styles.lessonsTable__cancelBtn}
                         onClick={() => handleCancel(lesson.id)}
                       >
-                        Cancel Lesson
+                        Cancel
                       </button>
                     </td>
                   </tr>
@@ -89,4 +96,4 @@ function UpcomingLessonsTable({ customerId }: { customerId: string }) {
   );
 }
 
-export default UpcomingLessonsTable;
+export default UpcomingClassesTable;

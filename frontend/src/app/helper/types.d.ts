@@ -28,6 +28,7 @@ type LessonType = {
     id: number;
     name: string;
   };
+  lessonAttendance: { name: string[] };
   status: "booked" | "completed" | "cancelled";
 };
 
@@ -46,4 +47,10 @@ type CustomersLesson = {
   customerId: number;
   dateTime: string;
   status: "booked" | "completed" | "cancelled";
+};
+
+type Child = {
+  id: number;
+  customerId: number;
+  name: string;
 };

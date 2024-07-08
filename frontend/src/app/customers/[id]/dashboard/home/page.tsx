@@ -1,19 +1,21 @@
-import styles from "./page.module.scss";
-import UpcomingLessonsTable from "../../../../components/customers-dashboard/home/UpcomingLessonsTable";
-import AddLessonButton from "@/app/components/customers-dashboard/home/AddLessonButton";
+import UpcomingClassesTable from "../../../../components/customers-dashboard/home/UpcomingClassesTable";
+import AddButton from "@/app/components/customers-dashboard/AddButton";
 
-async function page({ params }: { params: { id: string } }) {
+async function Page({ params }: { params: { id: string } }) {
   const customerId = params.id;
 
   return (
-    <div className={styles.page}>
-      <div className={styles.page__header}>
-        <h1 className={styles.page__title}>Lessons</h1>
+    <div>
+      <div>
+        <h1>Upcoming Classes</h1>
       </div>
-      <AddLessonButton customerId={customerId} />
-      <UpcomingLessonsTable customerId={customerId} />
+      <AddButton
+        linkURL={`/customers/${customerId}/dashboard/home/add-class`}
+        btnText="Add Class"
+      />
+      <UpcomingClassesTable customerId={customerId} />
     </div>
   );
 }
 
-export default page;
+export default Page;

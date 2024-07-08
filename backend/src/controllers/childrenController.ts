@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import {
   deleteChild,
+  getChildById,
   getChildren,
   registerChild,
   updateChild,
@@ -64,5 +65,18 @@ export const deleteChildController = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({ error: `${error}` });
+  }
+};
+
+export const getChildByIdController = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+
+  try {
+    const child = await getChildById(id);
+
+    res.json(child);
+  } catch (error) {
+    console.error("Controller Error:", error);
+    res.status(500).json({ error: "Failed to fetch child data." });
   }
 };
