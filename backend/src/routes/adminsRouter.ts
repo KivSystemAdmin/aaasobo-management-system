@@ -1,8 +1,8 @@
 import express from "express";
 import {
-  loginAdmin,
-  logoutAdmin,
-  registerAdmin,
+  loginAdminController,
+  logoutAdminController,
+  registerAdminController,
 } from "../controllers/adminsController";
 import {
   requireAuthentication,
@@ -13,7 +13,7 @@ export const adminsRouter = express.Router();
 
 // http://localhost:4000/admins
 
-adminsRouter.post("/login", loginAdmin);
-adminsRouter.post("/register", requireAuthentication, registerAdmin);
+adminsRouter.post("/login", loginAdminController);
+adminsRouter.get("/logout", logoutAdminController);
+adminsRouter.post("/register", requireAuthentication, registerAdminController);
 adminsRouter.get("/authentication", authenticateAdminSession);
-adminsRouter.get("/logout", logoutAdmin);

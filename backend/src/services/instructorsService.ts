@@ -1,4 +1,50 @@
 import { prisma } from "../../prisma/prismaClient";
+import { Prisma } from "@prisma/client";
+
+// Create a new instructor account in the DB
+export const createInstructor = async (instructorData: {
+  name: string;
+  email: string;
+  password: string;
+}) => {
+  try {
+    return await prisma.instructor.create({
+      data: instructorData,
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      // P2002: Unique Constraint Violation
+      if (error.code === "P2002") {
+        throw new Error("Email is already registered");
+      } else {
+        console.error("Database Error:", error);
+        throw new Error("Failed to register instructor");
+      }
+    }
+  }
+};
+
+// Fetch all instructors information
+export const getAllInstructors = async () => {
+  try {
+    return await prisma.instructor.findMany();
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch instructors.");
+  }
+};
+
+// Fetch all the availabilities of the instructors
+export const getAllInstructorsAvailabilities = async () => {
+  try {
+    return await prisma.instructor.findMany({
+      include: { instructorAvailability: true },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch instructors' availabilities.");
+  }
+};
 
 export async function getInstructorById(id: number) {
   try {
@@ -15,7 +61,7 @@ export async function getInstructorById(id: number) {
 export async function addInstructorAvailability(
   instructorId: number,
   instructorRecurringAvailabilityId: number | null,
-  dateTime: string,
+  dateTime: string
 ) {
   try {
     return prisma.instructorAvailability.create({
@@ -34,7 +80,7 @@ export async function addInstructorAvailability(
 export async function addInstructorRecurringAvailability(
   instructorId: number,
   rrule: string,
-  dateTimes: Date[],
+  dateTimes: Date[]
 ) {
   try {
     // A transaction is used to create both recurring and individual availabilities
@@ -62,7 +108,7 @@ export async function addInstructorRecurringAvailability(
 
 export async function deleteInstructorAvailability(
   instructorId: number,
-  dateTime: string,
+  dateTime: string
 ) {
   try {
     return prisma.instructorAvailability.delete({
@@ -77,7 +123,7 @@ export async function deleteInstructorAvailability(
 export async function deleteInstructorRecurringAvailability(
   instructorId: number,
   dateTime: string,
-  createNewRRule: (rrule: string) => string,
+  createNewRRule: (rrule: string) => string
 ) {
   try {
     // A transaction is used to delete both recurring and individual availabilities
@@ -91,7 +137,7 @@ export async function deleteInstructorRecurringAvailability(
       }
 
       const rrule = createNewRRule(
-        slotAvailability.instructorRecurringAvailability.rrule,
+        slotAvailability.instructorRecurringAvailability.rrule
       );
       await tx.instructorRecurringAvailability.update({
         where: { id: slotAvailability.instructorRecurringAvailability.id },

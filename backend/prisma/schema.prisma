@@ -16,6 +16,8 @@ datasource db {
 model Instructor {
   id                              Int                               @id @default(autoincrement())
   name                            String
+  email                           String                            @unique
+  password                        String
   instructorAvailability          InstructorAvailability[]
   lesson                          Lesson[]
   instructorRecurringAvailability InstructorRecurringAvailability[]
@@ -40,22 +42,22 @@ model InstructorAvailability {
 }
 
 model Customer {
-  id       Int      @id @default(autoincrement())
+  id       Int        @id @default(autoincrement())
   name     String
-  email    String   @unique
+  email    String     @unique
   password String
   lesson   Lesson[]
-  children  Children[]
+  children Children[]
 }
 
 model Lesson {
-  id           Int        @id @default(autoincrement())
-  instructorId Int
-  customerId   Int
-  dateTime     DateTime
-  status       Status
-  instructor   Instructor @relation(fields: [instructorId], references: [id])
-  customer     Customer   @relation(fields: [customerId], references: [id])
+  id               Int                @id @default(autoincrement())
+  instructorId     Int
+  customerId       Int
+  dateTime         DateTime
+  status           Status
+  instructor       Instructor         @relation(fields: [instructorId], references: [id])
+  customer         Customer           @relation(fields: [customerId], references: [id])
   lessonAttendance LessonAttendance[]
 }
 
@@ -73,18 +75,18 @@ model Admins {
 }
 
 model Children {
-  id                Int                 @id @default(autoincrement())
-  customerId        Int
-  name              String
-  customer          Customer            @relation(fields: [customerId], references: [id])
-  lessonAttendance  LessonAttendance[]
+  id               Int                @id @default(autoincrement())
+  customerId       Int
+  name             String
+  customer         Customer           @relation(fields: [customerId], references: [id])
+  lessonAttendance LessonAttendance[]
 }
 
 model LessonAttendance {
   lessonId   Int
-  childrenId  Int
+  childrenId Int
   lesson     Lesson   @relation(fields: [lessonId], references: [id])
-  children    Children  @relation(fields: [childrenId], references: [id])
+  children   Children @relation(fields: [childrenId], references: [id])
 
   @@id([lessonId, childrenId])
 }

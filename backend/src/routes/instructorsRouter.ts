@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  getAllInstructors,
+  getAllInstructorsAvailabilitiesController,
   getInstructor,
   addAvailability,
   deleteAvailability,
@@ -10,7 +10,7 @@ export const instructorsRouter = express.Router();
 
 // http://localhost:4000/instructors
 
-instructorsRouter.get("/", getAllInstructors);
+instructorsRouter.get("/", getAllInstructorsAvailabilitiesController);
 instructorsRouter.get("/:id", getInstructor);
 instructorsRouter.post("/:id/availability", addAvailability);
 instructorsRouter.delete("/:id/availability", deleteAvailability);

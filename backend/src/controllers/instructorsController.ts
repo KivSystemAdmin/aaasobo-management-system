@@ -1,28 +1,36 @@
 import { Request, Response } from "express";
 import { RRule } from "rrule";
 import { prisma } from "../../prisma/prismaClient";
+import { pickProperties } from "../helper/commonUtils";
 import {
+  getAllInstructorsAvailabilities,
   getInstructorById,
   addInstructorAvailability,
   addInstructorRecurringAvailability,
   deleteInstructorRecurringAvailability,
 } from "../services/instructorsService";
 
-export const getAllInstructors = async (_: Request, res: Response) => {
+// Fetch all the instructors and their availabilities
+export const getAllInstructorsAvailabilitiesController = async (
+  _: Request,
+  res: Response
+) => {
   try {
     // Fetch the instructors and their availabilities data from the DB
-    const instructors = await prisma.instructor.findMany({
-      include: { instructorAvailability: true },
-    });
+    const instructors = await getAllInstructorsAvailabilities();
 
-    // Transform the data structure
-    const data = instructors.map(({ id, name, instructorAvailability }) => {
-      return {
-        id,
-        name,
-        availabilities: instructorAvailability,
-      };
-    });
+    // Define the properties to pick.
+    const selectedProperties = ["id", "name", "instructorAvailability"];
+
+    // Define the property name mapping.
+    const propertyMapping = {
+      instructorAvailability: "availabilities",
+    };
+
+    // Transform the data structure.
+    const data = instructors.map((instructor) =>
+      pickProperties(instructor, selectedProperties, propertyMapping)
+    );
 
     res.json({ data });
   } catch (error) {
@@ -99,13 +107,13 @@ export const deleteAvailability = async (req: Request, res: Response) => {
 async function addSlotAvailability(
   res: Response,
   instructorId: number,
-  dateTime: string,
+  dateTime: string
 ) {
   try {
     const availability = await addInstructorAvailability(
       instructorId,
       null,
-      dateTime,
+      dateTime
     );
     if (!availability) {
       return res.status(404).json({ message: "Instructor not found." });
@@ -119,7 +127,7 @@ async function addSlotAvailability(
 async function addRecurringAvailability(
   res: Response,
   instructorId: number,
-  dateTime: string,
+  dateTime: string
 ) {
   const date = new Date(dateTime);
   const rrule = new RRule({
@@ -133,7 +141,7 @@ async function addRecurringAvailability(
     const availability = await addInstructorRecurringAvailability(
       instructorId,
       rrule.toString(),
-      dateTimes,
+      dateTimes
     );
     return res.status(200).json({ availability });
   } catch (error) {
@@ -152,7 +160,7 @@ function getEndOfNextMonth(date: Date): Date {
 async function deleteSlotAvailability(
   res: Response,
   instructorId: number,
-  dateTime: string,
+  dateTime: string
 ) {
   try {
     const availability = await prisma.instructorAvailability.delete({
@@ -168,7 +176,7 @@ async function deleteSlotAvailability(
 async function deleteRecurringAvailability(
   res: Response,
   instructorId: number,
-  dateTime: string,
+  dateTime: string
 ) {
   try {
     const recurring = await deleteInstructorRecurringAvailability(
@@ -183,7 +191,7 @@ async function deleteRecurringAvailability(
           until: new Date(new Date(dateTime).getTime() - 1),
         });
         return r.toString();
-      },
+      }
     );
     return res.status(200).json({ recurring });
   } catch (error) {

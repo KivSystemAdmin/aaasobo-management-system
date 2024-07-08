@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 const saltRounds = 12;
 
 // Login Admin
-export const loginAdmin = async (req: Request, res: Response) => {
+export const loginAdminController = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
@@ -42,7 +42,7 @@ export const loginAdmin = async (req: Request, res: Response) => {
 };
 
 // Logout Admin
-export const logoutAdmin = async (req: Request, res: Response) => {
+export const logoutAdminController = async (req: Request, res: Response) => {
   req.session = null;
   res.status(200).json({
     message: "Admin logged out successfully",
@@ -50,7 +50,7 @@ export const logoutAdmin = async (req: Request, res: Response) => {
 };
 
 // Register Admin
-export const registerAdmin = async (req: Request, res: Response) => {
+export const registerAdminController = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
 
   try {
@@ -72,7 +72,6 @@ export const registerAdmin = async (req: Request, res: Response) => {
     if (error instanceof Error) {
       res.status(500).json({
         message: error.message,
-        error,
       });
     } else {
       res.status(500).json({

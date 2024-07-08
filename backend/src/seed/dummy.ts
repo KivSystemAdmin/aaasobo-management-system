@@ -6,7 +6,9 @@ const prisma = new PrismaClient();
 async function insertInstructors() {
   await prisma.instructor.create({
     data: {
+      email: "helen@example.com",
       name: "Helen",
+      password: "$2b$12$lzg9z2HDTl/dwd8DSnGHJOdPIYiFvn40fwEzRtimoty5VtOugaTfa", // password: helen
       instructorAvailability: {
         create: [
           { dateTime: "2024-06-01T11:00:00+09:00" },
@@ -19,7 +21,9 @@ async function insertInstructors() {
   });
   await prisma.instructor.create({
     data: {
+      email: "ed@example.com",
       name: "Ed",
+      password: "$2b$12$R6tfoOzHAHCC2NgD7HZVtutBQsoWysLtdpWEKGYlkHbeGvMa.WSUe", // password: ed
       instructorAvailability: {
         create: [
           { dateTime: "2024-06-01T11:00:00+09:00" },
