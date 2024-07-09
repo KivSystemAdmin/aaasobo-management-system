@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieSession from "cookie-session";
 import "dotenv/config";
 import { instructorsRouter } from "./routes/instructorsRouter";
-import { lessonsRouter } from "./routes/lessonsRouter";
+import { classesRouter } from "./routes/classesRouter";
 import { customersRouter } from "./routes/customersRouter";
 import { adminsRouter } from "./routes/adminsRouter";
 import { adminsDashboardRouter } from "./routes/adminsDashboardRouter";
@@ -35,7 +35,7 @@ server.use(
 
 // Routes
 server.use("/instructors", instructorsRouter);
-server.use("/lessons", lessonsRouter);
+server.use("/classes", classesRouter);
 server.use("/customers", customersRouter);
 server.use("/admins", adminsRouter);
 server.use("/admins/dashboard", adminsDashboardRouter);

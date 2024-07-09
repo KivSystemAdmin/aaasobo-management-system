@@ -73,7 +73,7 @@ async function insertAdmins() {
   });
 }
 
-async function insertLessons() {
+async function insertClasses() {
   const alice = await prisma.customer.findFirst({ where: { name: "Alice" } });
   if (!alice) {
     throw new Error("Customer not found");
@@ -92,7 +92,7 @@ async function insertLessons() {
     throw new Error("Instructor not found");
   }
 
-  await prisma.lesson.createMany({
+  await prisma.class.createMany({
     data: [
       {
         instructorId: helen.id,
@@ -162,28 +162,28 @@ async function insertChildren() {
   });
 }
 
-async function insertLessonAttendance() {
-  const lessons = await prisma.lesson.findMany();
+async function insertClassAttendance() {
+  const classes = await prisma.class.findMany();
   const children = await prisma.children.findMany();
 
-  if (lessons.length < 6 || children.length < 3) {
-    throw new Error("Not enough lessons or children found");
+  if (classes.length < 6 || children.length < 3) {
+    throw new Error("Not enough classes or children found");
   }
 
-  await prisma.lessonAttendance.createMany({
+  await prisma.classAttendance.createMany({
     data: [
-      { lessonId: lessons[0].id, childrenId: children[0].id },
-      { lessonId: lessons[0].id, childrenId: children[1].id },
-      { lessonId: lessons[1].id, childrenId: children[0].id },
-      { lessonId: lessons[2].id, childrenId: children[2].id },
-      { lessonId: lessons[3].id, childrenId: children[2].id },
+      { classId: classes[0].id, childrenId: children[0].id },
+      { classId: classes[0].id, childrenId: children[1].id },
+      { classId: classes[1].id, childrenId: children[0].id },
+      { classId: classes[2].id, childrenId: children[2].id },
+      { classId: classes[3].id, childrenId: children[2].id },
     ],
   });
 }
 
 async function main() {
-  await prisma.lessonAttendance.deleteMany({});
-  await prisma.lesson.deleteMany({});
+  await prisma.classAttendance.deleteMany({});
+  await prisma.class.deleteMany({});
   await prisma.instructorAvailability.deleteMany({});
   await prisma.instructor.deleteMany({});
   await prisma.admins.deleteMany({});
@@ -193,9 +193,9 @@ async function main() {
   await insertInstructors();
   await insertCustomers();
   await insertAdmins();
-  await insertLessons();
+  await insertClasses();
   await insertChildren();
-  await insertLessonAttendance();
+  await insertClassAttendance();
 }
 
 main();

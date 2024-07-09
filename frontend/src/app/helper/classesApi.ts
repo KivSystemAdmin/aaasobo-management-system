@@ -1,22 +1,22 @@
-// GET lessons by customer id
-export const getLessonsByCustomerId = async (customerId: string) => {
+// GET classes by customer id
+export const getClassesByCustomerId = async (customerId: string) => {
   try {
-    const response = await fetch(`http://localhost:4000/lessons/${customerId}`);
+    const response = await fetch(`http://localhost:4000/classes/${customerId}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const { lessons } = await response.json();
-    return lessons;
+    const { classes } = await response.json();
+    return classes;
   } catch (error) {
-    console.error("Failed to fetch lessons:", error);
+    console.error("Failed to fetch classes:", error);
     throw error;
   }
 };
 
-// DELETE a lesson with lesson id
-export const deleteLesson = async (lessonId: number) => {
+// DELETE a class with class id
+export const deleteClass = async (classId: number) => {
   try {
-    const response = await fetch(`http://localhost:4000/lessons/${lessonId}`, {
+    const response = await fetch(`http://localhost:4000/classes/${classId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -29,24 +29,24 @@ export const deleteLesson = async (lessonId: number) => {
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error("Failed to delete lesson:", error);
+    console.error("Failed to delete class:", error);
     throw error;
   }
 };
 
-// POST lesson
-export const addLesson = async (lessonData: {
+// POST class
+export const addClass = async (classData: {
   dateTime: string;
   instructorId: number;
   customerId: number;
-  childrenIds: Set<number>;
+  childrenIds: Array<number>;
   status: string;
 }) => {
   try {
-    const response = await fetch("http://localhost:4000/lessons", {
+    const response = await fetch("http://localhost:4000/classes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(lessonData),
+      body: JSON.stringify(classData),
     });
 
     if (!response.ok) {
@@ -54,9 +54,10 @@ export const addLesson = async (lessonData: {
     }
 
     const result = await response.json();
+    console.log(result);
     return result;
   } catch (error) {
-    console.error("Failed to add lesson:", error);
+    console.error("Failed to add class:", error);
     throw error;
   }
 };

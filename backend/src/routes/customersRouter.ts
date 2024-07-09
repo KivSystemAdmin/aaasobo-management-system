@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  getCustomersLessons,
+  getCustomersClasses,
   loginCustomer,
   registerCustomer,
 } from "../controllers/customersController";
@@ -11,4 +11,4 @@ export const customersRouter = express.Router();
 
 customersRouter.post("/register", registerCustomer);
 customersRouter.post("/login", loginCustomer);
-customersRouter.get("/:id", getCustomersLessons);
+customersRouter.get("/:id", getCustomersClasses);

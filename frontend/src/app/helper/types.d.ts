@@ -16,7 +16,7 @@ type Instructor = {
 
 type Availability = { dateTime: string };
 
-type LessonType = {
+type ClassType = {
   id: number;
   dateTime: string;
   customer: {
@@ -28,7 +28,7 @@ type LessonType = {
     id: number;
     name: string;
   };
-  lessonAttendance: { name: string[] };
+  classAttendance: { name: string[] };
   status: "booked" | "completed" | "cancelled";
 };
 
@@ -37,11 +37,11 @@ type Customer = {
     id: number;
     name: string;
     email: string;
-    lesson: CustomersLesson[];
+    class: CustomersClass[];
   };
 };
 
-type CustomersLesson = {
+type CustomersClass = {
   id: number;
   instructorId: number;
   customerId: number;

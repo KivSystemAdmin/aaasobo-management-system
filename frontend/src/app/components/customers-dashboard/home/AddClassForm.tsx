@@ -3,7 +3,7 @@ import styles from "./AddClassForm.module.scss";
 import { useState } from "react";
 import Link from "next/link";
 import { formatDateTime } from "@/app/helper/dateUtils";
-import { addLesson } from "@/app/helper/lessonsApi";
+import { addClass } from "@/app/helper/classesApi";
 import { useRouter } from "next/navigation";
 
 function AddClassForm({
@@ -67,18 +67,20 @@ function AddClassForm({
       return;
     }
 
+    const selectedChildrenIdsArray = Array.from(selectedChildrenIds)
+
     try {
-      await addLesson({
+      await addClass({
         dateTime: selectedDateTime,
         instructorId: selectedInstructorId,
         customerId: parseInt(customerId, 10),
         status: "booked",
-        childrenIds: selectedChildrenIds,
+        childrenIds: selectedChildrenIdsArray,
       });
 
       router.push(`/customers/${customerId}/dashboard/home`);
     } catch (error) {
-      console.error("Failed to add lesson:", error);
+      console.error("Failed to add class:", error);
     }
   };
 
@@ -111,7 +113,7 @@ function AddClassForm({
           </label>
         </div>
 
-        {/* Lesson date and time */}
+        {/* class date and time */}
         <div className={styles.field}>
           <label className={styles.label}>
             Choose date & time
@@ -124,7 +126,7 @@ function AddClassForm({
                 required
               >
                 <option value="" disabled>
-                  Select a lesson date and time
+                  Select a class date and time
                 </option>
                 {selectedInstructorAvailabilities.map((availability, index) => (
                   <option key={index} value={availability.dateTime}>

@@ -3,84 +3,86 @@
 import { useState, useEffect } from "react";
 import styles from "./UpcomingClassesTable.module.scss";
 import { formatDate, formatTime } from "@/app/helper/dateUtils";
-import { deleteLesson, getLessonsByCustomerId } from "@/app/helper/lessonsApi";
+import { deleteClass, getClassesByCustomerId } from "@/app/helper/classesApi";
 
 function UpcomingClassesTable({ customerId }: { customerId: string }) {
-  const [lessons, setLessons] = useState<LessonType[] | undefined>();
+  const [classes, setClasses] = useState<ClassType[] | undefined>();
 
   useEffect(() => {
-    const fetchLessons = async () => {
+    const fetchClasses = async () => {
       try {
-        const lessons = await getLessonsByCustomerId(customerId);
-        setLessons(lessons);
+        const classes = await getClassesByCustomerId(customerId);
+        setClasses(classes);
       } catch (error) {
         console.error(error);
       }
     };
 
-    fetchLessons();
+    fetchClasses();
   }, [customerId]);
 
-  async function handleCancel(lessonId: number) {
+  async function handleCancel(classId: number) {
     try {
-      await deleteLesson(lessonId);
+      await deleteClass(classId);
 
-      setLessons((prevLessons) =>
-        prevLessons?.filter((lesson) => lesson.id !== lessonId)
+      setClasses((prevClasses) =>
+        prevClasses?.filter((eachClass) => eachClass.id !== classId)
       );
     } catch (error) {
-      console.error("Failed to delete lesson:", error);
+      console.error("Failed to delete class:", error);
     }
   }
 
   return (
-    <div className={styles.lessonsTable}>
-      <div className={styles.lessonsTable__wrapper}>
-        <div className={styles.lessonsTable__container}>
-          <table className={styles.lessonsTable__desktop}>
-            <thead className={styles.lessonsTable__head}>
+    <div className={styles.classesTable}>
+      <div className={styles.classesTable__wrapper}>
+        <div className={styles.classesTable__container}>
+          <table className={styles.classesTable__desktop}>
+            <thead className={styles.classesTable__head}>
               <tr>
-                <th className={styles.lessonsTable__th}>Date</th>
-                <th className={styles.lessonsTable__th}>Time</th>
-                <th className={styles.lessonsTable__th}>Instructor</th>
-                <th className={styles.lessonsTable__th}>Children</th>
-                <th className={styles.lessonsTable__th}>Status</th>
-                <th className={styles.lessonsTable__th}></th>
+                <th className={styles.classesTable__th}>Date</th>
+                <th className={styles.classesTable__th}>Time</th>
+                <th className={styles.classesTable__th}>Instructor</th>
+                <th className={styles.classesTable__th}>Children</th>
+                <th className={styles.classesTable__th}>Status</th>
+                <th className={styles.classesTable__th}></th>
               </tr>
             </thead>
-            <tbody className={styles.lessonsTable__body}>
-              {lessons?.map((lesson) => {
-                const dateTime = new Date(lesson.dateTime);
+            <tbody className={styles.classesTable__body}>
+              {classes?.map((eachClass) => {
+                const dateTime = new Date(eachClass.dateTime);
 
                 const date = formatDate(dateTime, "Asia/Tokyo");
                 const japanTime = formatTime(dateTime, "Asia/Tokyo");
 
                 return (
-                  <tr key={lesson.id} className={styles.lessonsTable__row}>
-                    <td className={styles.lessonsTable__td}>{date}</td>
-                    <td className={styles.lessonsTable__td}>
-                      <div className={styles.lessonsTable__time}>
+                  <tr key={eachClass.id} className={styles.classesTable__row}>
+                    <td className={styles.classesTable__td}>{date}</td>
+                    <td className={styles.classesTable__td}>
+                      <div className={styles.classesTable__time}>
                         <p>{japanTime}</p>
                       </div>
                     </td>
-                    <td className={styles.lessonsTable__td}>
-                      {lesson.instructor.name}
+                    <td className={styles.classesTable__td}>
+                      {eachClass.instructor.name}
                     </td>
-                    <td className={styles.lessonsTable__td}>
-                      {lesson.lessonAttendance.name.join(", ")}
+                    <td className={styles.classesTable__td}>
+                      {eachClass.classAttendance.name.join(", ")}
                     </td>
-                    <td className={styles.lessonsTable__td}>{lesson.status}</td>
-                    <td className={styles.lessonsTable__td}>
-                      {/* If the customer is strictly required to report attending childrend before every class, the Edit functionality will be added.  */}
+                    <td className={styles.classesTable__td}>
+                      {eachClass.status}
+                    </td>
+                    <td className={styles.classesTable__td}>
+                      {/* If the customer is strictly required to report attending children before every class, the Edit functionality will be added.  */}
                       {/* <button
-                        className={styles.lessonsTable__editBtn}
-                        onClick={() => handleEdit(lesson.id)}
+                        className={styles.classesTable__editBtn}
+                        onClick={() => handleEdit(eachClass.id)}
                       >
                         Edit
                       </button> */}
                       <button
-                        className={styles.lessonsTable__cancelBtn}
-                        onClick={() => handleCancel(lesson.id)}
+                        className={styles.classesTable__cancelBtn}
+                        onClick={() => handleCancel(eachClass.id)}
                       >
                         Cancel
                       </button>

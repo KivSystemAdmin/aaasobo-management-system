@@ -59,14 +59,14 @@ export const loginCustomer = async (req: Request, res: Response) => {
   }
 };
 
-export const getCustomersLessons = async (req: Request, res: Response) => {
+export const getCustomersClasses = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
 
   try {
     // Fetch the Customer data from the DB
     const customer = await prisma.customer.findUnique({
       where: { id },
-      include: { lesson: true },
+      include: { classes: true },
     });
 
     if (!customer) {

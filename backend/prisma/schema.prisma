@@ -19,7 +19,7 @@ model Instructor {
   email                           String                            @unique
   password                        String
   instructorAvailability          InstructorAvailability[]
-  lesson                          Lesson[]
+  classes                         Class[]
   instructorRecurringAvailability InstructorRecurringAvailability[]
 }
 
@@ -46,11 +46,11 @@ model Customer {
   name     String
   email    String     @unique
   password String
-  lesson   Lesson[]
+  classes  Class[]
   children Children[]
 }
 
-model Lesson {
+model Class {
   id               Int                @id @default(autoincrement())
   instructorId     Int
   customerId       Int
@@ -58,7 +58,7 @@ model Lesson {
   status           Status
   instructor       Instructor         @relation(fields: [instructorId], references: [id])
   customer         Customer           @relation(fields: [customerId], references: [id])
-  lessonAttendance LessonAttendance[]
+  classAttendance ClassAttendance[]
 }
 
 enum Status {
@@ -79,14 +79,14 @@ model Children {
   customerId       Int
   name             String
   customer         Customer           @relation(fields: [customerId], references: [id])
-  lessonAttendance LessonAttendance[]
+  classAttendance  ClassAttendance[]
 }
 
-model LessonAttendance {
-  lessonId   Int
+model ClassAttendance {
+  classId   Int
   childrenId Int
-  lesson     Lesson   @relation(fields: [lessonId], references: [id])
+  class     Class   @relation(fields: [classId], references: [id])
   children   Children @relation(fields: [childrenId], references: [id])
 
-  @@id([lessonId, childrenId])
+  @@id([classId, childrenId])
 }
