@@ -4,6 +4,7 @@ import {
   getInstructor,
   addAvailability,
   deleteAvailability,
+  extendAvailability,
 } from "../controllers/instructorsController";
 
 export const instructorsRouter = express.Router();
@@ -14,3 +15,4 @@ instructorsRouter.get("/", getAllInstructorsAvailabilitiesController);
 instructorsRouter.get("/:id", getInstructor);
 instructorsRouter.post("/:id/availability", addAvailability);
 instructorsRouter.delete("/:id/availability", deleteAvailability);
+instructorsRouter.put("/:id/availability/extend", extendAvailability);

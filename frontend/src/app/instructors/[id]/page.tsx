@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback, forwardRef } from "react";
 import { useParams } from "next/navigation";
 import { formatDateTime } from "@/app/helper/dateUtils";
+import { useInput } from "@/app/hooks/useInput";
 import Calendar from "@/app/components/Calendar";
 import {
   type Response,
@@ -11,6 +12,7 @@ import {
   addRecurringAvailability,
   deleteAvailability,
   deleteRecurringAvailability,
+  extendRecurringAvailability,
 } from "@/app/helper/instructorsApi";
 
 type Availability = {
@@ -83,6 +85,10 @@ export default function Page() {
             setClickedEvent({ dateTime: info.event.start });
           }
         }}
+      />
+      <ExtendRecurringAvailabilityButton
+        instructorId={instructor.id}
+        refresh={fetchInstructors}
       />
       {selectedDateTime && (
         <>
@@ -256,4 +262,38 @@ function DeleteRecurringAvailabilityButton({
   };
 
   return <button onClick={submit}>Delete Recurring</button>;
+}
+
+function ExtendRecurringAvailabilityButton({
+  instructorId,
+  refresh,
+}: {
+  instructorId: number;
+  refresh: () => Promise<void>;
+}) {
+  const [until, onUntilChange] = useInput();
+  const submit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (!until) {
+      return;
+    }
+    const res = await extendRecurringAvailability(
+      instructorId,
+      `${until}T23:59:59+09:00`,
+    );
+    if (showErrorMessage(res)) {
+      return;
+    }
+    await refresh();
+  };
+
+  return (
+    <>
+      <label>
+        until
+        <input type="date" value={until} onChange={onUntilChange} />
+      </label>
+      <button onClick={submit}>Extend Recurring Availability</button>
+    </>
+  );
 }

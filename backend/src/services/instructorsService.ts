@@ -157,3 +157,39 @@ export async function deleteInstructorRecurringAvailability(
     throw new Error("Failed to delete instructor recurring availability.");
   }
 }
+
+export async function getActiveRecurringAvailabilities(instructorId: number) {
+  try {
+    return await prisma.instructorRecurringAvailability.findMany({
+      where: {
+        instructorId,
+        rrule: { not: { contains: "UNTIL" } },
+      },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch recurring availabilities.");
+  }
+}
+
+export async function insertInstructorAvailabilityIfNotExist(
+  instructorId: number,
+  dateTime: Date,
+  instructorRecurringAvailabilityId: number,
+) {
+  const data = {
+    instructorId,
+    dateTime,
+    instructorRecurringAvailabilityId,
+  };
+  try {
+    return await prisma.instructorAvailability.upsert({
+      where: { instructorId_dateTime: { instructorId, dateTime } },
+      update: data,
+      create: data,
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to insert instructor availability.");
+  }
+}

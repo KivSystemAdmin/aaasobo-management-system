@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { RRule } from "rrule";
+import { type InstructorRecurringAvailability } from "@prisma/client";
 import { prisma } from "../../prisma/prismaClient";
 import { pickProperties } from "../helper/commonUtils";
 import {
@@ -8,6 +9,8 @@ import {
   addInstructorAvailability,
   addInstructorRecurringAvailability,
   deleteInstructorRecurringAvailability,
+  getActiveRecurringAvailabilities,
+  insertInstructorAvailabilityIfNotExist,
 } from "../services/instructorsService";
 
 // Fetch all the instructors and their availabilities
@@ -101,6 +104,43 @@ export const deleteAvailability = async (req: Request, res: Response) => {
       return deleteRecurringAvailability(res, id, dateTime);
     default:
       return res.status(400).json({ message: "Invalid type provided." });
+  }
+};
+
+export const extendAvailability = async (req: Request, res: Response) => {
+  const instructorId = parseInt(req.params.id);
+  if (isNaN(instructorId)) {
+    return res.status(400).json({ message: "Invalid ID provided." });
+  }
+  const { until } = req.body;
+  if (!until) {
+    return res.status(400).json({ message: "Invalid until provided." });
+  }
+
+  const extend = async (recurring: InstructorRecurringAvailability) => {
+    const rrule = RRule.fromString(recurring.rrule);
+    const dateTimes = rrule.between(
+      rrule.options.dtstart,
+      new Date(until),
+      true,
+    );
+    return await Promise.all(
+      dateTimes.map(async (dateTime) => {
+        return await insertInstructorAvailabilityIfNotExist(
+          instructorId,
+          dateTime,
+          recurring.id,
+        );
+      }),
+    );
+  };
+
+  try {
+    const recurrings = await getActiveRecurringAvailabilities(instructorId);
+    await Promise.all(recurrings.map(extend));
+    res.status(200).json({ recurringAvailabilities: recurrings });
+  } catch (error) {
+    return setErrorResponse(res, error);
   }
 };
 
