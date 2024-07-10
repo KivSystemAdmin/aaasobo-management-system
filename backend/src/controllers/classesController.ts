@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import {
+  countClassesOfSubscription,
   createClass,
   deleteClass,
   getAllClasses,
   getClassesByCustomerId,
 } from "../services/classesService";
+import { getActiveSubscription } from "../services/subscriptionsService";
 import { prisma } from "../../prisma/prismaClient";
 
 // GET all classes along with related instructors and customers data
@@ -92,12 +94,31 @@ export const createClassController = async (req: Request, res: Response) => {
   }
 
   try {
+    const remainingTokens = await calculateRemainingTokens(
+      customerId,
+      new Date(dateTime),
+    );
+    if (remainingTokens < 1) {
+      return res.status(400).json({ error: "Not enough tokens." });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "Failed to calculate remaining tokens." });
+  }
+
+  try {
+    const subscription = await getActiveSubscription(customerId);
+    if (!subscription) {
+      return res.status(400).json({ error: "No active subscription found." });
+    }
     const newClass = await createClass(
       {
         dateTime,
         instructorId,
         customerId,
         status,
+        subscriptionId: subscription.id,
       },
       childrenIds
     );
@@ -108,6 +129,41 @@ export const createClassController = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to add class." });
   }
 };
+
+const calculateTotalTokens = async (customerId: number, now: Date) => {
+  const subscription = await getActiveSubscription(customerId);
+  if (!subscription) {
+    return 0;
+  }
+  // New tokens are added every month.
+  return (
+    (now.getUTCMonth() - subscription.startAt.getUTCMonth() + 1) *
+    subscription.plan.tokens
+  );
+};
+
+const calculateRemainingTokens = async (
+  customerId: number,
+  baseDateTime: Date,
+) => {
+  const subscription = await getActiveSubscription(customerId);
+  if (!subscription) {
+    return 0;
+  }
+  const classesCount = await countClassesOfSubscription(
+    subscription.id,
+    getEndOfThisMonth(baseDateTime),
+  );
+  return (await calculateTotalTokens(customerId, baseDateTime)) - classesCount;
+};
+
+function getEndOfThisMonth(date: Date): Date {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + 1);
+  d.setDate(-1);
+  d.setUTCHours(23, 59, 59);
+  return d;
+}
 
 // DELETE a class
 export const deleteClassController = async (req: Request, res: Response) => {

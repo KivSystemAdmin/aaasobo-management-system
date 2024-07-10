@@ -78,9 +78,21 @@ async function insertClasses() {
   if (!alice) {
     throw new Error("Customer not found");
   }
+  const aliceSubscription = await prisma.subscription.findFirst({
+    where: { customerId: alice.id, endAt: null },
+  });
+  if (!aliceSubscription) {
+    throw new Error("Subscription not found");
+  }
   const bob = await prisma.customer.findFirst({ where: { name: "Bob" } });
   if (!bob) {
     throw new Error("Customer not found");
+  }
+  const bobSubscription = await prisma.subscription.findFirst({
+    where: { customerId: bob.id, endAt: null },
+  });
+  if (!bobSubscription) {
+    throw new Error("Subscription not found");
   }
 
   const helen = await prisma.instructor.findFirst({ where: { name: "Helen" } });
@@ -99,36 +111,42 @@ async function insertClasses() {
         customerId: alice.id,
         dateTime: "2024-06-01T11:00:00+09:00",
         status: "completed",
+        subscriptionId: aliceSubscription.id,
       },
       {
         instructorId: helen.id,
         customerId: alice.id,
         dateTime: "2024-06-01T11:30:00+09:00",
         status: "completed",
+        subscriptionId: aliceSubscription.id,
       },
       {
         instructorId: helen.id,
         customerId: bob.id,
         dateTime: "2024-06-03T15:00:00+09:00",
         status: "canceled",
+        subscriptionId: bobSubscription.id,
       },
       {
         instructorId: helen.id,
         customerId: bob.id,
         dateTime: "2024-06-03T15:30:00+09:00",
         status: "completed",
+        subscriptionId: bobSubscription.id,
       },
       {
         instructorId: ed.id,
         customerId: bob.id,
         dateTime: "2024-06-03T16:00:00+09:00",
         status: "completed",
+        subscriptionId: bobSubscription.id,
       },
       {
         instructorId: ed.id,
         customerId: bob.id,
         dateTime: "2024-06-29T11:00:00+09:00",
         status: "booked",
+        subscriptionId: bobSubscription.id,
       },
     ],
   });
@@ -181,9 +199,63 @@ async function insertClassAttendance() {
   });
 }
 
+async function insertPlans() {
+  await prisma.plan.createMany({
+    data: [
+      {
+        name: "Once a Week",
+        tokens: 4,
+      },
+      {
+        name: "Twice a Week",
+        tokens: 8,
+      },
+    ],
+  });
+}
+
+async function insertSubscriptions() {
+  const alice = await prisma.customer.findFirst({ where: { name: "Alice" } });
+  if (!alice) {
+    throw new Error("Customer not found");
+  }
+  const bob = await prisma.customer.findFirst({ where: { name: "Bob" } });
+  if (!bob) {
+    throw new Error("Customer not found");
+  }
+  const plan1 = await prisma.plan.findFirst({ where: { name: "Once a Week" } });
+  if (!plan1) {
+    throw new Error("Plan not found");
+  }
+  const plan2 = await prisma.plan.findFirst({
+    where: { name: "Twice a Week" },
+  });
+  if (!plan2) {
+    throw new Error("Plan not found");
+  }
+  await prisma.subscription.createMany({
+    data: [
+      {
+        customerId: alice.id,
+        planId: plan1.id,
+        startAt: new Date("2024-06-01"),
+        endAt: null,
+      },
+      {
+        customerId: bob.id,
+        planId: plan2.id,
+        startAt: new Date("2024-06-01"),
+        endAt: null,
+      },
+    ],
+  });
+}
+
 async function main() {
   await prisma.classAttendance.deleteMany({});
   await prisma.class.deleteMany({});
+  await prisma.subscription.deleteMany({});
+  await prisma.plan.deleteMany({});
   await prisma.instructorAvailability.deleteMany({});
   await prisma.instructor.deleteMany({});
   await prisma.admins.deleteMany({});
@@ -193,6 +265,8 @@ async function main() {
   await insertInstructors();
   await insertCustomers();
   await insertAdmins();
+  await insertPlans();
+  await insertSubscriptions();
   await insertClasses();
   await insertChildren();
   await insertClassAttendance();

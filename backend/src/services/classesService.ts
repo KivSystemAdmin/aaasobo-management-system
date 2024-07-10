@@ -43,6 +43,7 @@ export const createClass = async (
     instructorId: number;
     customerId: number;
     status: Status;
+    subscriptionId: number;
   },
   childrenIds: number[]
 ) => {
@@ -83,3 +84,21 @@ export const deleteClass = async (classId: number) => {
     throw new Error("Failed to delete class.");
   }
 };
+
+export async function countClassesOfSubscription(
+  subscriptionId: number,
+  until: Date,
+) {
+  try {
+    return await prisma.class.count({
+      where: {
+        subscriptionId,
+        OR: [{ status: "booked" }, { status: "completed" }],
+        dateTime: { lte: until },
+      },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to count lessons.");
+  }
+}

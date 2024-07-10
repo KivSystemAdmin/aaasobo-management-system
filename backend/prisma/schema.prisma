@@ -42,23 +42,26 @@ model InstructorAvailability {
 }
 
 model Customer {
-  id       Int        @id @default(autoincrement())
-  name     String
-  email    String     @unique
-  password String
-  classes  Class[]
-  children Children[]
+  id           Int            @id @default(autoincrement())
+  name         String
+  email        String         @unique
+  password     String
+  classes      Class[]
+  children     Children[]
+  subscription Subscription[]
 }
 
 model Class {
-  id               Int                @id @default(autoincrement())
-  instructorId     Int
-  customerId       Int
-  dateTime         DateTime
-  status           Status
-  instructor       Instructor         @relation(fields: [instructorId], references: [id])
-  customer         Customer           @relation(fields: [customerId], references: [id])
+  id              Int               @id @default(autoincrement())
+  instructorId    Int
+  customerId      Int
+  dateTime        DateTime
+  status          Status
+  instructor      Instructor        @relation(fields: [instructorId], references: [id])
+  customer        Customer          @relation(fields: [customerId], references: [id])
   classAttendance ClassAttendance[]
+  subscriptionId  Int
+  subscription    Subscription      @relation(fields: [subscriptionId], references: [id])
 }
 
 enum Status {
@@ -75,18 +78,36 @@ model Admins {
 }
 
 model Children {
-  id               Int                @id @default(autoincrement())
-  customerId       Int
-  name             String
-  customer         Customer           @relation(fields: [customerId], references: [id])
-  classAttendance  ClassAttendance[]
+  id              Int               @id @default(autoincrement())
+  customerId      Int
+  name            String
+  customer        Customer          @relation(fields: [customerId], references: [id])
+  classAttendance ClassAttendance[]
 }
 
 model ClassAttendance {
-  classId   Int
+  classId    Int
   childrenId Int
-  class     Class   @relation(fields: [classId], references: [id])
+  class      Class    @relation(fields: [classId], references: [id])
   children   Children @relation(fields: [childrenId], references: [id])
 
   @@id([classId, childrenId])
+}
+
+model Plan {
+  id           Int            @id @default(autoincrement())
+  name         String
+  tokens       Int
+  subscription Subscription[]
+}
+
+model Subscription {
+  id         Int       @id @default(autoincrement())
+  planId     Int
+  customerId Int
+  startAt    DateTime
+  endAt      DateTime?
+  plan       Plan      @relation(fields: [planId], references: [id])
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  class      Class[]
 }
