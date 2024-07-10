@@ -40,7 +40,8 @@ function Register() {
     }
 
     // Define the data to be sent to the server side.
-    const registerURL = "http://localhost:4000/admins/register";
+    const registerURL =
+      "http://localhost:4000/admins/dashboard/instructors/register";
     const headers = { "Content-Type": "application/json" };
     const body = JSON.stringify({
       name,
@@ -69,40 +70,35 @@ function Register() {
   // Display a loading message while checking authentication
   if (isLoading) {
     return <div>Loading...</div>;
-  } else {
-    return (
-      <div>
-        <h2>Register</h2>
-        <form onSubmit={registerHandler}>
-          <label>
-            Name
-            <input type="text" value={name} onChange={onNameChange} />
-          </label>
-          <label>
-            Email
-            <input type="email" value={email} onChange={onEmailChange} />
-          </label>
-          <label>
-            Password
-            <input
-              type="password"
-              value={password}
-              onChange={onPasswordChange}
-            />
-          </label>
-          <label>
-            Password Confirmation
-            <input
-              type="password"
-              value={passConfirmation}
-              onChange={onPassConfirmationChange}
-            />
-          </label>
-          <button type="submit">Register</button>
-        </form>
-      </div>
-    );
   }
+  return (
+    <div>
+      <h2>Register</h2>
+      <form onSubmit={registerHandler}>
+        <label>
+          Name
+          <input type="text" value={name} onChange={onNameChange} />
+        </label>
+        <label>
+          Email
+          <input type="email" value={email} onChange={onEmailChange} />
+        </label>
+        <label>
+          Password
+          <input type="password" value={password} onChange={onPasswordChange} />
+        </label>
+        <label>
+          Password Confirmation
+          <input
+            type="password"
+            value={passConfirmation}
+            onChange={onPassConfirmationChange}
+          />
+        </label>
+        <button type="submit">Register</button>
+      </form>
+    </div>
+  );
 }
 
 export default Register;

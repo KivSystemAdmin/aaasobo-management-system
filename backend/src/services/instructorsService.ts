@@ -20,6 +20,8 @@ export const createInstructor = async (instructorData: {
         console.error("Database Error:", error);
         throw new Error("Failed to register instructor");
       }
+    } else {
+      throw error;
     }
   }
 };
