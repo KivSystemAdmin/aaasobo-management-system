@@ -4,7 +4,9 @@ import {
   createClass,
   deleteClass,
   getAllClasses,
+  getClassById,
   getClassesByCustomerId,
+  updateClass,
 } from "../services/classesService";
 import { getActiveSubscription } from "../services/subscriptionsService";
 import { prisma } from "../../prisma/prismaClient";
@@ -67,9 +69,10 @@ export const getClassesByCustomerIdController = async (
           name: instructor.name,
         },
         classAttendance: {
-          name: classAttendance.map(
-            (classAttendance) => classAttendance.children.name
-          ),
+          children: classAttendance.map((classAttendance) => ({
+            id: classAttendance.children.id,
+            name: classAttendance.children.name,
+          })),
         },
         status,
       };
@@ -183,5 +186,70 @@ export const deleteClassController = async (req: Request, res: Response) => {
     return res.status(500).json({
       error: "Failed to delete class. Please try again later.",
     });
+  }
+};
+
+// GET a class by class id along with related instructors, customers, and children data
+export const getClassByIdController = async (req: Request, res: Response) => {
+  const classId = Number(req.params.id);
+
+  if (isNaN(classId)) {
+    return res.status(400).json({ error: "Invalid class ID" });
+  }
+
+  try {
+    const classData = await getClassById(classId);
+
+    if (!classData) {
+      return res.status(404).json({ error: "Class not found" });
+    }
+
+    const formattedClassData = {
+      id: classData.id,
+      dateTime: classData.dateTime,
+      customer: {
+        id: classData.customer.id,
+        name: classData.customer.name,
+        email: classData.customer.email,
+      },
+      instructor: {
+        id: classData.instructor.id,
+        name: classData.instructor.name,
+      },
+      classAttendance: {
+        children: classData.classAttendance.map((classAttendance) => ({
+          id: classAttendance.children.id,
+          name: classAttendance.children.name,
+        })),
+      },
+      status: classData.status,
+    };
+
+    res.json(formattedClassData);
+  } catch (error) {
+    console.error("Controller Error:", error);
+    res.status(500).json({ error: "Failed to fetch a class." });
+  }
+};
+
+// Update[Edit] a class
+export const updateClassController = async (req: Request, res: Response) => {
+  const classId = Number(req.params.id);
+  const { dateTime, instructorId, childrenIds } = req.body;
+
+  try {
+    const updatedClass = await updateClass(
+      classId,
+      dateTime,
+      instructorId,
+      childrenIds
+    );
+
+    res.status(200).json({
+      message: "Class is updated successfully",
+      updatedClass,
+    });
+  } catch (error) {
+    res.status(500).json({ error: `${error}` });
   }
 };

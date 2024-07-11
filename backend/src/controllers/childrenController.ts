@@ -6,6 +6,9 @@ import {
   registerChild,
   updateChild,
 } from "../services/childrenService";
+import { deleteAttendancesByChildId } from "../services/classAttendancesService";
+import { checkIfChildHasBookedClass } from "../services/classesService";
+import { prisma } from "../../prisma/prismaClient";
 
 export const getChildrenController = async (req: Request, res: Response) => {
   const customerId = req.query.customerId as string;
@@ -54,17 +57,38 @@ export const updateChildController = async (req: Request, res: Response) => {
 };
 
 export const deleteChildController = async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
+  const childId = parseInt(req.params.id);
+
+  if (isNaN(childId)) {
+    return res.status(400).json({ error: "Invalid child ID." });
+  }
 
   try {
-    const child = await deleteChild(id);
+    const result = await prisma.$transaction(async (prisma) => {
+      const hasBookedClass = await checkIfChildHasBookedClass(childId);
+      if (hasBookedClass) {
+        throw new Error("This child cannot be deleted due to booked classes.");
+      }
+
+      await deleteAttendancesByChildId(childId);
+
+      const deletedChild = await deleteChild(childId);
+
+      return deletedChild;
+    });
 
     res.status(200).json({
-      message: "Child is deleted successfully",
-      child,
+      message: "Child and his/her class attendances were deleted successfully",
+      deletedChild: result,
     });
   } catch (error) {
-    res.status(500).json({ error: `${error}` });
+    console.error(
+      "Failed to delete child and his/her class attendances:",
+      error
+    );
+    res
+      .status(500)
+      .json({ error: "Failed to delete child and his/her class attendances." });
   }
 };
 

@@ -28,7 +28,8 @@ type ClassType = {
     id: number;
     name: string;
   };
-  classAttendance: { name: string[] };
+  classAttendance: { children: { id: number; name: string }[] };
+
   status: "booked" | "completed" | "cancelled";
 };
 

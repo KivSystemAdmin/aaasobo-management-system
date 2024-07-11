@@ -3,24 +3,30 @@ import styles from "./AddClassForm.module.scss";
 import { useState } from "react";
 import Link from "next/link";
 import { formatDateTime } from "@/app/helper/dateUtils";
-import { addClass } from "@/app/helper/classesApi";
+import { editClass } from "@/app/helper/classesApi";
 import { useRouter } from "next/navigation";
+import { useSelect } from "@/app/hooks/useSelect";
 
-function AddClassForm({
+function EditClassForm({
   customerId,
   instructors,
   children,
+  editedClass,
 }: {
   customerId: string;
   instructors: Instructor[];
   children: Child[];
+  editedClass: ClassType;
 }) {
   const [selectedInstructorId, setSelectedInstructorId] = useState<
     number | null
-  >(null);
-  const [selectedDateTime, setSelectedDateTime] = useState<string>("");
+  >(editedClass.instructor.id);
+
+  const [selectedDateTime, setSelectedDateTime, onSelectedDateTimeChange] =
+    useSelect(editedClass.dateTime);
+
   const [selectedChildrenIds, setSelectedChildrenIds] = useState<Set<number>>(
-    new Set()
+    new Set(editedClass.classAttendance.children.map((child) => child.id))
   );
   const router = useRouter();
 
@@ -35,12 +41,6 @@ function AddClassForm({
     setSelectedInstructorId(selectedInstructorId);
 
     setSelectedDateTime("");
-  };
-
-  const handleDateTimeChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setSelectedDateTime(event.target.value);
   };
 
   const handleChildChange = (
@@ -70,17 +70,16 @@ function AddClassForm({
     const selectedChildrenIdsArray = Array.from(selectedChildrenIds);
 
     try {
-      await addClass({
+      await editClass({
+        classId: editedClass.id,
         dateTime: selectedDateTime,
         instructorId: selectedInstructorId,
-        customerId: parseInt(customerId, 10),
-        status: "booked",
         childrenIds: selectedChildrenIdsArray,
       });
 
       router.push(`/customers/${customerId}/dashboard/home`);
     } catch (error) {
-      console.error("Failed to add class:", error);
+      console.error("Failed to edit class:", error);
     }
   };
 
@@ -121,7 +120,7 @@ function AddClassForm({
               <select
                 className={styles.select}
                 value={selectedDateTime}
-                onChange={handleDateTimeChange}
+                onChange={onSelectedDateTimeChange}
                 aria-required="true"
                 required
               >
@@ -151,6 +150,7 @@ function AddClassForm({
                 <label>
                   <input
                     type="checkbox"
+                    checked={selectedChildrenIds.has(child.id)}
                     onChange={(event) => handleChildChange(event, child.id)}
                   />
                   {child.name}
@@ -169,11 +169,11 @@ function AddClassForm({
           Cancel
         </Link>
         <button type="submit" className={styles.submitButton}>
-          Add Class
+          Edit Class
         </button>
       </div>
     </form>
   );
 }
 
-export default AddClassForm;
+export default EditClassForm;

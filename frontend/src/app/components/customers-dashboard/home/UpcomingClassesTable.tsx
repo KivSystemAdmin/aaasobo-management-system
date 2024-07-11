@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import styles from "./UpcomingClassesTable.module.scss";
 import { formatDate, formatTime } from "@/app/helper/dateUtils";
 import { deleteClass, getClassesByCustomerId } from "@/app/helper/classesApi";
+import EditButton from "../EditButton";
 
 function UpcomingClassesTable({ customerId }: { customerId: string }) {
   const [classes, setClasses] = useState<ClassType[] | undefined>();
@@ -67,19 +68,18 @@ function UpcomingClassesTable({ customerId }: { customerId: string }) {
                       {eachClass.instructor.name}
                     </td>
                     <td className={styles.classesTable__td}>
-                      {eachClass.classAttendance.name.join(", ")}
+                      {eachClass.classAttendance.children
+                        .map((child) => child.name)
+                        .join(", ")}
                     </td>
                     <td className={styles.classesTable__td}>
                       {eachClass.status}
                     </td>
                     <td className={styles.classesTable__td}>
-                      {/* If the customer is strictly required to report attending children before every class, the Edit functionality will be added.  */}
-                      {/* <button
-                        className={styles.classesTable__editBtn}
-                        onClick={() => handleEdit(eachClass.id)}
-                      >
-                        Edit
-                      </button> */}
+                      <EditButton
+                        linkURL={`/customers/${customerId}/dashboard/home/${eachClass.id}/edit`}
+                        btnText="Edit Class"
+                      />
                       <button
                         className={styles.classesTable__cancelBtn}
                         onClick={() => handleCancel(eachClass.id)}
