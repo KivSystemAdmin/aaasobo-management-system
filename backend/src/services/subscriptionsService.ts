@@ -17,3 +17,18 @@ export async function getActiveSubscription(customerId: number) {
     throw new Error("Failed to fetch subscription.");
   }
 }
+
+export const getAllSubscriptions = async () => {
+  // Fetch all subscriptions data from the DB
+  try {
+    const subscriptions = await prisma.subscription.findMany({
+      include: { plan: true, customer: { include: { children: true } } },
+      orderBy: { customer: { id: "asc" } },
+    });
+
+    return subscriptions;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch subscriptions.");
+  }
+};

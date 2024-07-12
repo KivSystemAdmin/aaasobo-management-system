@@ -2,6 +2,7 @@ import express from "express";
 import {
   registerInstructorController,
   getAllInstructorsController,
+  getAllCustomersController,
 } from "../controllers/adminsDashboardController";
 import { requireAuthentication } from "../middlewares/auth.middleware";
 
@@ -15,3 +16,4 @@ adminsDashboardRouter.post(
   registerInstructorController
 );
 adminsDashboardRouter.get("/instructors", getAllInstructorsController);
+adminsDashboardRouter.get("/customers", getAllCustomersController);

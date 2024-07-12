@@ -4,9 +4,85 @@ import {
   getAllInstructors,
   createInstructor,
 } from "../services/instructorsService";
+import { getAllSubscriptions } from "../services/subscriptionsService";
 import bcrypt from "bcrypt";
 
 const saltRounds = 12;
+
+interface Subscription {
+  id: number;
+  planId: number;
+  customerId: number;
+  startAt: Date;
+  endAt: Date | null;
+  plan: {
+    id: number;
+    name: string;
+    tokens: number;
+  };
+  customer: {
+    id: number;
+    name: string;
+    email: string;
+    password: string;
+    children: {
+      id: number;
+      customerId: number;
+      name: string;
+    }[];
+  };
+}
+
+interface SingleChildSubscription extends Omit<Subscription, "customer"> {
+  customer: Omit<Subscription["customer"], "children"> & {
+    children: {
+      id: number;
+      customerId: number;
+      name: string;
+    };
+  };
+}
+
+// Fetching customers' information
+export const getAllCustomersController = async (_: Request, res: Response) => {
+  try {
+    // Fetch the customers data using the email.
+    const subscriptions = await getAllSubscriptions();
+
+    // flatten the subscriptions so that each subscription has a single child
+    const flattenedSubscriptions: SingleChildSubscription[] =
+      subscriptions.flatMap((subscription) =>
+        subscription.customer.children.map((child) => ({
+          ...subscription,
+          customer: {
+            ...subscription.customer,
+            children: child,
+          },
+        }))
+      );
+
+    // Transform the data structure.
+    const transformedSubscriptions = flattenedSubscriptions.map(
+      (subscription) => {
+        const { customerId, customer, plan, startAt, endAt } = subscription;
+
+        return {
+          id: customerId,
+          name: customer.name,
+          email: customer.email,
+          childName: customer.children.name,
+          plan: plan.name,
+          startDate: startAt.toISOString().slice(0, 10),
+          endDate: endAt,
+        };
+      }
+    );
+
+    res.json({ transformedSubscriptions });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+};
 
 // Admin dashboard for displaying instructors' information
 export const getAllInstructorsController = async (
