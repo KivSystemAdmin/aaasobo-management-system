@@ -7,7 +7,10 @@ import {
   updateChild,
 } from "../services/childrenService";
 import { deleteAttendancesByChildId } from "../services/classAttendancesService";
-import { checkIfChildHasBookedClass } from "../services/classesService";
+import {
+  checkIfChildHasBookedClass,
+  checkIfChildHasCompletedClass,
+} from "../services/classesService";
 import { prisma } from "../../prisma/prismaClient";
 
 export const getChildrenController = async (req: Request, res: Response) => {
@@ -56,6 +59,14 @@ export const updateChildController = async (req: Request, res: Response) => {
   }
 };
 
+// DELETE a child profile by the child's id
+const ERROR_MESSAGES = {
+  completedClass:
+    "Cannot delete this child's profile because the child has attended a class before.",
+  bookedClass:
+    "Cannot delete this child's profile because the child is currently enrolled in booked classes.",
+};
+
 export const deleteChildController = async (req: Request, res: Response) => {
   const childId = parseInt(req.params.id);
 
@@ -65,9 +76,13 @@ export const deleteChildController = async (req: Request, res: Response) => {
 
   try {
     const result = await prisma.$transaction(async (prisma) => {
+      const hasCompletedClass = await checkIfChildHasCompletedClass(childId);
+      if (hasCompletedClass) {
+        throw new Error(ERROR_MESSAGES.completedClass);
+      }
       const hasBookedClass = await checkIfChildHasBookedClass(childId);
       if (hasBookedClass) {
-        throw new Error("This child cannot be deleted due to booked classes.");
+        throw new Error(ERROR_MESSAGES.bookedClass);
       }
 
       await deleteAttendancesByChildId(childId);
@@ -78,17 +93,20 @@ export const deleteChildController = async (req: Request, res: Response) => {
     });
 
     res.status(200).json({
-      message: "Child and his/her class attendances were deleted successfully",
+      message: "The child profile was deleted successfully",
       deletedChild: result,
     });
   } catch (error) {
-    console.error(
-      "Failed to delete child and his/her class attendances:",
-      error
-    );
-    res
-      .status(500)
-      .json({ error: "Failed to delete child and his/her class attendances." });
+    console.error("Failed to delete the child profile:", error);
+
+    if (
+      error instanceof Error &&
+      Object.values(ERROR_MESSAGES).includes(error.message)
+    ) {
+      return res.status(409).json({ error: error.message });
+    }
+
+    res.status(500).json({ error: "Failed to delete the child profile." });
   }
 };
 

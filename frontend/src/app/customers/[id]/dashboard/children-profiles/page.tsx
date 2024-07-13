@@ -25,19 +25,19 @@ function Page({ params }: { params: { id: string } }) {
   }, [customerId]);
 
   async function handleDelete(childId: number) {
-    const deletedChild = children?.find((child) => child.id === childId);
-    const deletedChildName = deletedChild?.name;
-
     try {
-      await deleteChild(childId);
+      const deletedChildData = await deleteChild(childId);
       setChildren((prevChildren) =>
         prevChildren?.filter((child) => child.id !== childId)
       );
+      alert(deletedChildData.message);
     } catch (error) {
-      console.error("Failed to delete child data:", error);
-      alert(
-        `${deletedChildName} has booked classes. Please cancel them or remove ${deletedChildName} from them before deleting the profile.`
-      );
+      console.error("Failed to delete the child profile:", error);
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("An unknown error occurred.");
+      }
     }
   }
 

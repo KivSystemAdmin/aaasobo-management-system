@@ -103,6 +103,24 @@ export const checkIfChildHasBookedClass = async (
   }
 };
 
+// Check if a child has a completed class by the child's id
+export const checkIfChildHasCompletedClass = async (
+  childId: number
+): Promise<boolean> => {
+  try {
+    const completedClass = await prisma.classAttendance.findFirst({
+      where: { childrenId: childId, class: { status: "completed" } },
+      include: { class: true },
+    });
+
+    // Return true if a completed class was found, otherwise false
+    return completedClass !== null;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to check if a child has a completed class.");
+  }
+};
+
 // Fetch a class by class id along with related instructors, customers, and children data
 export const getClassById = async (classId: number) => {
   try {

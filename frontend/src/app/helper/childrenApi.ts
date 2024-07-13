@@ -97,15 +97,14 @@ export const deleteChild = async (childId: number) => {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to delete child. HTTP error! status: ${response.status}`
-      );
+      const errorData = await response.json();
+      throw new Error(errorData.error);
     }
     const result = await response.json();
 
     return result;
   } catch (error) {
-    console.error("Failed to delete child data:", error);
+    console.error("Failed to delete the child profile:", error);
     throw error;
   }
 };
