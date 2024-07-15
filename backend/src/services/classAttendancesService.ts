@@ -1,10 +1,14 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../prisma/prismaClient";
 
-export const deleteAttendancesByChildId = async (id: number) => {
+export const deleteAttendancesByChildId = async (
+  tx: Prisma.TransactionClient,
+  childId: number
+) => {
   try {
     // Delete the Child data.
-    const deletedAttendances = await prisma.classAttendance.deleteMany({
-      where: { childrenId: id },
+    const deletedAttendances = await tx.classAttendance.deleteMany({
+      where: { childrenId: childId },
     });
 
     return deletedAttendances;

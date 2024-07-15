@@ -60,12 +60,10 @@ export const updateChildController = async (req: Request, res: Response) => {
 };
 
 // DELETE a child profile by the child's id
-const ERROR_MESSAGES = {
-  completedClass:
-    "Cannot delete this child's profile because the child has attended a class before.",
-  bookedClass:
-    "Cannot delete this child's profile because the child is currently enrolled in booked classes.",
-};
+enum ErrorMessages {
+  completedClass = "Cannot delete this child's profile because the child has attended a class before.",
+  bookedClass = "Cannot delete this child's profile because the child is currently enrolled in booked classes.",
+}
 
 export const deleteChildController = async (req: Request, res: Response) => {
   const childId = parseInt(req.params.id);
@@ -75,19 +73,22 @@ export const deleteChildController = async (req: Request, res: Response) => {
   }
 
   try {
-    const result = await prisma.$transaction(async (prisma) => {
-      const hasCompletedClass = await checkIfChildHasCompletedClass(childId);
+    const result = await prisma.$transaction(async (tx) => {
+      const hasCompletedClass = await checkIfChildHasCompletedClass(
+        tx,
+        childId
+      );
       if (hasCompletedClass) {
-        throw new Error(ERROR_MESSAGES.completedClass);
+        throw new Error(ErrorMessages.completedClass);
       }
-      const hasBookedClass = await checkIfChildHasBookedClass(childId);
+      const hasBookedClass = await checkIfChildHasBookedClass(tx, childId);
       if (hasBookedClass) {
-        throw new Error(ERROR_MESSAGES.bookedClass);
+        throw new Error(ErrorMessages.bookedClass);
       }
 
-      await deleteAttendancesByChildId(childId);
+      await deleteAttendancesByChildId(tx, childId);
 
-      const deletedChild = await deleteChild(childId);
+      const deletedChild = await deleteChild(tx, childId);
 
       return deletedChild;
     });
@@ -101,7 +102,7 @@ export const deleteChildController = async (req: Request, res: Response) => {
 
     if (
       error instanceof Error &&
-      Object.values(ERROR_MESSAGES).includes(error.message)
+      Object.values(ErrorMessages).includes(error.message as ErrorMessages)
     ) {
       return res.status(409).json({ error: error.message });
     }

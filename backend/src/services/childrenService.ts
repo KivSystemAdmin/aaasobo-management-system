@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../prisma/prismaClient";
 
 export const getChildren = async (customerId: string) => {
@@ -57,11 +58,14 @@ export const updateChild = async (
   }
 };
 
-export const deleteChild = async (id: number) => {
+export const deleteChild = async (
+  tx: Prisma.TransactionClient,
+  childId: number
+) => {
   try {
     // Delete the Child data.
-    const child = await prisma.children.delete({
-      where: { id },
+    const child = await tx.children.delete({
+      where: { id: childId },
     });
 
     return child;

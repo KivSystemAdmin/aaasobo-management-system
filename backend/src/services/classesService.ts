@@ -1,4 +1,4 @@
-import { Status } from "@prisma/client";
+import { Prisma, Status } from "@prisma/client";
 import { prisma } from "../../prisma/prismaClient";
 
 // Fetch all the classes with related instructors and customers data
@@ -87,12 +87,12 @@ export const deleteClass = async (classId: number) => {
 
 // Check if a child has a booked class by the child's id
 export const checkIfChildHasBookedClass = async (
+  tx: Prisma.TransactionClient,
   childId: number
 ): Promise<boolean> => {
   try {
-    const bookedClass = await prisma.classAttendance.findFirst({
+    const bookedClass = await tx.classAttendance.findFirst({
       where: { childrenId: childId, class: { status: "booked" } },
-      include: { class: true },
     });
 
     // Return true if a booked class was found, otherwise false
@@ -105,12 +105,12 @@ export const checkIfChildHasBookedClass = async (
 
 // Check if a child has a completed class by the child's id
 export const checkIfChildHasCompletedClass = async (
+  tx: Prisma.TransactionClient,
   childId: number
 ): Promise<boolean> => {
   try {
-    const completedClass = await prisma.classAttendance.findFirst({
+    const completedClass = await tx.classAttendance.findFirst({
       where: { childrenId: childId, class: { status: "completed" } },
-      include: { class: true },
     });
 
     // Return true if a completed class was found, otherwise false
