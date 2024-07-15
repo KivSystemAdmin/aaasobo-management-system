@@ -58,7 +58,7 @@ export const getAllCustomersController = async (_: Request, res: Response) => {
             ...subscription.customer,
             children: child,
           },
-        }))
+        })),
       );
 
     // Transform the data structure.
@@ -75,7 +75,7 @@ export const getAllCustomersController = async (_: Request, res: Response) => {
           startDate: startAt.toISOString().slice(0, 10),
           endDate: endAt,
         };
-      }
+      },
     );
 
     res.json({ transformedSubscriptions });
@@ -87,7 +87,7 @@ export const getAllCustomersController = async (_: Request, res: Response) => {
 // Admin dashboard for displaying instructors' information
 export const getAllInstructorsController = async (
   _: Request,
-  res: Response
+  res: Response,
 ) => {
   try {
     // Fetch the admin data using the email.
@@ -98,7 +98,7 @@ export const getAllInstructorsController = async (
 
     // Transform the data structure.
     const data = instructors.map((instructor) =>
-      pickProperties(instructor, selectedProperties)
+      pickProperties(instructor, selectedProperties),
     );
 
     res.json({ data });
@@ -110,7 +110,7 @@ export const getAllInstructorsController = async (
 // Register instructor by admin
 export const registerInstructorController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const { name, email, password } = req.body;
 

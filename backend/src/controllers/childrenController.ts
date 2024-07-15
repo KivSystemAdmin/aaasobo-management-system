@@ -76,7 +76,7 @@ export const deleteChildController = async (req: Request, res: Response) => {
     const result = await prisma.$transaction(async (tx) => {
       const hasCompletedClass = await checkIfChildHasCompletedClass(
         tx,
-        childId
+        childId,
       );
       if (hasCompletedClass) {
         throw new Error(ErrorMessages.completedClass);

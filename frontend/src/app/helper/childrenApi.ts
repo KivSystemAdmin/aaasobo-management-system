@@ -2,7 +2,7 @@
 export const getChildrenByCustomerId = async (customerId: string) => {
   try {
     const response = await fetch(
-      `http://localhost:4000/children?customerId=${customerId}`
+      `http://localhost:4000/children?customerId=${customerId}`,
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -59,7 +59,7 @@ export const addChild = async (childName: string, customerId: string) => {
 export const editChild = async (
   childId: number,
   childName: string,
-  customerId: string
+  customerId: string,
 ) => {
   // Define the data to be sent to the server side.
   const childrenURL = `http://localhost:4000/children/${childId}`;

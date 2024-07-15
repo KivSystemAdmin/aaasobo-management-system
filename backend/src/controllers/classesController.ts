@@ -45,7 +45,7 @@ export const getAllClassesController = async (_: Request, res: Response) => {
 // GET classes by customer id along with related instructors and customers data
 export const getClassesByCustomerIdController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const id = Number(req.params.id);
 
@@ -123,7 +123,7 @@ export const createClassController = async (req: Request, res: Response) => {
         status,
         subscriptionId: subscription.id,
       },
-      childrenIds
+      childrenIds,
     );
 
     res.status(201).json(newClass);
@@ -242,7 +242,7 @@ export const updateClassController = async (req: Request, res: Response) => {
       classId,
       dateTime,
       instructorId,
-      childrenIds
+      childrenIds,
     );
 
     res.status(200).json({

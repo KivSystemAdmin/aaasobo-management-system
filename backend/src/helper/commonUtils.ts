@@ -4,7 +4,7 @@
 export const pickProperties = (
   dBData: any,
   properties: string[],
-  mapping?: { [key: string]: string }
+  mapping?: { [key: string]: string },
 ) => {
   const pickedProperties: any = {};
   properties.forEach((property) => {

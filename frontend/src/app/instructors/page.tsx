@@ -34,7 +34,7 @@ const Instructor = () => {
       return;
     }
     const findInstructor = instructorsData.data.find(
-      (instructor) => instructor.id === Number(e.target.value)
+      (instructor) => instructor.id === Number(e.target.value),
     );
     setSelectedInstructor(findInstructor);
   };

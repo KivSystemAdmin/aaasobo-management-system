@@ -20,7 +20,7 @@ function AddClassForm({
   >(null);
   const [selectedDateTime, setSelectedDateTime] = useState<string>("");
   const [selectedChildrenIds, setSelectedChildrenIds] = useState<Set<number>>(
-    new Set()
+    new Set(),
   );
   const router = useRouter();
 
@@ -29,7 +29,7 @@ function AddClassForm({
       ?.availabilities || [];
 
   const handleInstructorChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
+    event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const selectedInstructorId = parseInt(event.target.value, 10);
     setSelectedInstructorId(selectedInstructorId);
@@ -38,14 +38,14 @@ function AddClassForm({
   };
 
   const handleDateTimeChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
+    event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     setSelectedDateTime(event.target.value);
   };
 
   const handleChildChange = (
     event: React.ChangeEvent<HTMLInputElement>,
-    changedChildId: number
+    changedChildId: number,
   ) => {
     const isChecked = event.target.checked;
 
@@ -132,7 +132,7 @@ function AddClassForm({
                   <option key={index} value={availability.dateTime}>
                     {formatDateTime(
                       new Date(availability.dateTime),
-                      "Asia/Tokyo"
+                      "Asia/Tokyo",
                     )}
                   </option>
                 ))}

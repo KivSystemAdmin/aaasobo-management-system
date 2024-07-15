@@ -28,7 +28,7 @@ function Page({ params }: { params: { id: string } }) {
     try {
       const deletedChildData = await deleteChild(childId);
       setChildren((prevChildren) =>
-        prevChildren?.filter((child) => child.id !== childId)
+        prevChildren?.filter((child) => child.id !== childId),
       );
       alert(deletedChildData.message);
     } catch (error) {

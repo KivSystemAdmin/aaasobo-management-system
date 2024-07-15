@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from "express";
 export const requireAuthentication = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (req.session?.userType !== "admin") {
     return res.status(401).json({
@@ -24,7 +24,7 @@ export const authenticateAdminSession = async (req: Request, res: Response) => {
 // Check if the customer session is authenticated or not.
 export const authenticateCustomerSession = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const customerId = parseInt(req.params.id);
   if (isNaN(customerId)) {
@@ -41,7 +41,7 @@ export const authenticateCustomerSession = async (
 // Check if the instructor session is authenticated or not.
 export const authenticateInstructorSession = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const instructorId = parseInt(req.params.id);
   if (isNaN(instructorId)) {

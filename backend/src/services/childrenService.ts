@@ -37,7 +37,7 @@ export const registerChild = async (name: string, customerId: number) => {
 export const updateChild = async (
   id: number,
   name: string,
-  customerId: number
+  customerId: number,
 ) => {
   try {
     // Update the Child data.
@@ -60,7 +60,7 @@ export const updateChild = async (
 
 export const deleteChild = async (
   tx: Prisma.TransactionClient,
-  childId: number
+  childId: number,
 ) => {
   try {
     // Delete the Child data.

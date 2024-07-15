@@ -3,7 +3,7 @@ import { prisma } from "../../prisma/prismaClient";
 
 export const deleteAttendancesByChildId = async (
   tx: Prisma.TransactionClient,
-  childId: number
+  childId: number,
 ) => {
   try {
     // Delete the Child data.

@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from "react";
 
 export function useSelect(
-  initialValue: string = ""
+  initialValue: string = "",
 ): [
   string,
   (newValue: string) => void,

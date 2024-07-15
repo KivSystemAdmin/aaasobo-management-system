@@ -65,7 +65,7 @@ export const addClass = async (classData: {
 export const getClassById = async (classId: string) => {
   try {
     const response = await fetch(
-      `http://localhost:4000/classes/class/${classId}`
+      `http://localhost:4000/classes/class/${classId}`,
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

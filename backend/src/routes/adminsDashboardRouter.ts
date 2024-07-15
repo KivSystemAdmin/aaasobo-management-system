@@ -13,7 +13,7 @@ export const adminsDashboardRouter = express.Router();
 adminsDashboardRouter.post(
   "/instructors/register",
   requireAuthentication,
-  registerInstructorController
+  registerInstructorController,
 );
 adminsDashboardRouter.get("/instructors", getAllInstructorsController);
 adminsDashboardRouter.get("/customers", getAllCustomersController);

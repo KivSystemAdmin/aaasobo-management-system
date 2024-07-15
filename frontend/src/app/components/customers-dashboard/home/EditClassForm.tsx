@@ -26,7 +26,7 @@ function EditClassForm({
     useSelect(editedClass.dateTime);
 
   const [selectedChildrenIds, setSelectedChildrenIds] = useState<Set<number>>(
-    new Set(editedClass.classAttendance.children.map((child) => child.id))
+    new Set(editedClass.classAttendance.children.map((child) => child.id)),
   );
   const router = useRouter();
 
@@ -35,7 +35,7 @@ function EditClassForm({
       ?.availabilities || [];
 
   const handleInstructorChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
+    event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const selectedInstructorId = parseInt(event.target.value, 10);
     setSelectedInstructorId(selectedInstructorId);
@@ -45,7 +45,7 @@ function EditClassForm({
 
   const handleChildChange = (
     event: React.ChangeEvent<HTMLInputElement>,
-    changedChildId: number
+    changedChildId: number,
   ) => {
     const isChecked = event.target.checked;
 
@@ -131,7 +131,7 @@ function EditClassForm({
                   <option key={index} value={availability.dateTime}>
                     {formatDateTime(
                       new Date(availability.dateTime),
-                      "Asia/Tokyo"
+                      "Asia/Tokyo",
                     )}
                   </option>
                 ))}

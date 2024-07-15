@@ -63,7 +63,7 @@ export async function getInstructorById(id: number) {
 export async function addInstructorAvailability(
   instructorId: number,
   instructorRecurringAvailabilityId: number | null,
-  dateTime: string
+  dateTime: string,
 ) {
   try {
     return prisma.instructorAvailability.create({
@@ -82,7 +82,7 @@ export async function addInstructorAvailability(
 export async function addInstructorRecurringAvailability(
   instructorId: number,
   rrule: string,
-  dateTimes: Date[]
+  dateTimes: Date[],
 ) {
   try {
     // A transaction is used to create both recurring and individual availabilities
@@ -110,7 +110,7 @@ export async function addInstructorRecurringAvailability(
 
 export async function deleteInstructorAvailability(
   instructorId: number,
-  dateTime: string
+  dateTime: string,
 ) {
   try {
     return prisma.instructorAvailability.delete({
@@ -125,7 +125,7 @@ export async function deleteInstructorAvailability(
 export async function deleteInstructorRecurringAvailability(
   instructorId: number,
   dateTime: string,
-  createNewRRule: (rrule: string) => string
+  createNewRRule: (rrule: string) => string,
 ) {
   try {
     // A transaction is used to delete both recurring and individual availabilities
@@ -139,7 +139,7 @@ export async function deleteInstructorRecurringAvailability(
       }
 
       const rrule = createNewRRule(
-        slotAvailability.instructorRecurringAvailability.rrule
+        slotAvailability.instructorRecurringAvailability.rrule,
       );
       await tx.instructorRecurringAvailability.update({
         where: { id: slotAvailability.instructorRecurringAvailability.id },

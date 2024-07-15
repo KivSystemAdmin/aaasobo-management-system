@@ -45,7 +45,7 @@ export const createClass = async (
     status: Status;
     subscriptionId: number;
   },
-  childrenIds: number[]
+  childrenIds: number[],
 ) => {
   try {
     const CreatedClass = await prisma.class.create({
@@ -88,7 +88,7 @@ export const deleteClass = async (classId: number) => {
 // Check if a child has a booked class by the child's id
 export const checkIfChildHasBookedClass = async (
   tx: Prisma.TransactionClient,
-  childId: number
+  childId: number,
 ): Promise<boolean> => {
   try {
     const bookedClass = await tx.classAttendance.findFirst({
@@ -106,7 +106,7 @@ export const checkIfChildHasBookedClass = async (
 // Check if a child has a completed class by the child's id
 export const checkIfChildHasCompletedClass = async (
   tx: Prisma.TransactionClient,
-  childId: number
+  childId: number,
 ): Promise<boolean> => {
   try {
     const completedClass = await tx.classAttendance.findFirst({
@@ -145,7 +145,7 @@ export const updateClass = async (
   classId: number,
   dateTime: string,
   instructorId: number,
-  childrenIds: number[]
+  childrenIds: number[],
 ) => {
   try {
     const updatedClass = await prisma.$transaction(async (prisma) => {
@@ -180,7 +180,7 @@ export const updateClass = async (
 
 export async function countClassesOfSubscription(
   subscriptionId: number,
-  until: Date
+  until: Date,
 ) {
   try {
     return await prisma.class.count({

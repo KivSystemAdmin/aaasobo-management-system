@@ -27,7 +27,7 @@ function UpcomingClassesTable({ customerId }: { customerId: string }) {
       await deleteClass(classId);
 
       setClasses((prevClasses) =>
-        prevClasses?.filter((eachClass) => eachClass.id !== classId)
+        prevClasses?.filter((eachClass) => eachClass.id !== classId),
       );
     } catch (error) {
       console.error("Failed to delete class:", error);
