@@ -21,6 +21,7 @@ model Instructor {
   instructorAvailability          InstructorAvailability[]
   classes                         Class[]
   instructorRecurringAvailability InstructorRecurringAvailability[]
+  recurringClasses                RecurringClass[]
 }
 
 model InstructorRecurringAvailability {
@@ -52,16 +53,18 @@ model Customer {
 }
 
 model Class {
-  id              Int               @id @default(autoincrement())
-  instructorId    Int
-  customerId      Int
-  dateTime        DateTime
-  status          Status
-  instructor      Instructor        @relation(fields: [instructorId], references: [id])
-  customer        Customer          @relation(fields: [customerId], references: [id])
-  classAttendance ClassAttendance[]
-  subscriptionId  Int
-  subscription    Subscription      @relation(fields: [subscriptionId], references: [id])
+  id               Int               @id @default(autoincrement())
+  instructorId     Int
+  customerId       Int
+  recurringClassId Int?
+  dateTime         DateTime
+  status           Status
+  instructor       Instructor        @relation(fields: [instructorId], references: [id])
+  customer         Customer          @relation(fields: [customerId], references: [id])
+  recurringClass   RecurringClass?   @relation(fields: [recurringClassId], references: [id])
+  classAttendance  ClassAttendance[]
+  subscriptionId   Int
+  subscription     Subscription      @relation(fields: [subscriptionId], references: [id])
 }
 
 enum Status {
@@ -78,11 +81,12 @@ model Admins {
 }
 
 model Children {
-  id              Int               @id @default(autoincrement())
-  customerId      Int
-  name            String
-  customer        Customer          @relation(fields: [customerId], references: [id])
-  classAttendance ClassAttendance[]
+  id                       Int                        @id @default(autoincrement())
+  customerId               Int
+  name                     String
+  customer                 Customer                   @relation(fields: [customerId], references: [id])
+  classAttendance          ClassAttendance[]
+  recurringClassAttendance RecurringClassAttendance[]
 }
 
 model ClassAttendance {
@@ -110,4 +114,22 @@ model Subscription {
   plan       Plan      @relation(fields: [planId], references: [id])
   customer   Customer  @relation(fields: [customerId], references: [id])
   class      Class[]
+}
+
+model RecurringClass {
+  id                       Int                        @id @default(autoincrement())
+  instructorId             Int
+  rrule                    String
+  instructor               Instructor                 @relation(fields: [instructorId], references: [id])
+  recurringClassAttendance RecurringClassAttendance[]
+  classes                  Class[]
+}
+
+model RecurringClassAttendance {
+  recurringClassId Int
+  childrenId       Int
+  recurringClass   RecurringClass @relation(fields: [recurringClassId], references: [id])
+  children         Children       @relation(fields: [childrenId], references: [id])
+
+  @@id([recurringClassId, childrenId])
 }

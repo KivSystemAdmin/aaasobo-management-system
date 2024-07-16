@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { RRule } from "rrule";
 import { type InstructorRecurringAvailability } from "@prisma/client";
 import { prisma } from "../../prisma/prismaClient";
-import { pickProperties } from "../helper/commonUtils";
+import { getEndOfNextMonth, pickProperties } from "../helper/commonUtils";
 import {
   getAllInstructorsAvailabilities,
   getInstructorById,
@@ -187,14 +187,6 @@ async function addRecurringAvailability(
   } catch (error) {
     return setErrorResponse(res, error);
   }
-}
-
-function getEndOfNextMonth(date: Date): Date {
-  const d = new Date(date);
-  d.setMonth(d.getMonth() + 2);
-  d.setDate(-1);
-  d.setUTCHours(23, 59, 59);
-  return d;
 }
 
 async function deleteSlotAvailability(

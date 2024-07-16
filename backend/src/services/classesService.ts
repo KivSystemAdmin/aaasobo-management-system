@@ -195,3 +195,58 @@ export async function countClassesOfSubscription(
     throw new Error("Failed to count lessons.");
   }
 }
+
+// Create a new recurring class in the DB
+export const addRecurringClass = async (
+  instructorId: number,
+  customerId: number,
+  childrenIds: number[],
+  subscriptionId: number,
+  rrule: string,
+  dateTimes: Date[],
+) => {
+  try {
+    return await prisma.$transaction(async (tx) => {
+      // Add the regular class to the RecurringClass table.
+      const recurring = await tx.recurringClass.create({
+        data: {
+          instructorId,
+          rrule,
+        },
+      });
+      // Add the classes to the Class table based on the Recurring Class ID.
+      const createdClasses = await tx.class.createManyAndReturn({
+        data: dateTimes.map((dateTime) => ({
+          instructorId,
+          customerId,
+          recurringClassId: recurring.id,
+          subscriptionId,
+          dateTime: dateTime.toISOString(),
+          status: "booked",
+        })),
+      });
+      // Add the Class Attendance to the ClassAttendance Table based on the Class ID.
+      await tx.classAttendance.createMany({
+        data: createdClasses
+          .map((createdClass) => {
+            return childrenIds.map((childrenId) => ({
+              classId: createdClass.id,
+              childrenId,
+            }));
+          })
+          .flat(),
+      });
+      // Add the children with recurring class to the RecurringClassAttendance table.
+      await tx.recurringClassAttendance.createMany({
+        data: childrenIds.map((childrenId) => ({
+          recurringClassId: recurring.id,
+          childrenId,
+        })),
+      });
+      return recurring;
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to add recurring class.");
+  }
+};

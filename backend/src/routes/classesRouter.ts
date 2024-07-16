@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  addRecurringClassController,
   createClassController,
   deleteClassController,
   getAllClassesController,
@@ -21,3 +22,4 @@ classesRouter.post("/", createClassController);
 classesRouter.delete("/:id", deleteClassController);
 
 classesRouter.patch("/:id", updateClassController);
+classesRouter.post("/recurring-class", addRecurringClassController);
