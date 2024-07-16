@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "format": "npx prettier --write . && npx prisma format",
+    "format-check": "npx prettier --check .",
     "db:start": "docker run --name summer-postgres -p 5432:5432 -e POSTGRES_PASSWORD=summer -d postgres",
     "dev": "nodemon --exec ts-node ./src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
