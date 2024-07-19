@@ -12,6 +12,10 @@ type Instructor = {
   id: number;
   name: string;
   availabilities: Availability[];
+  email: string;
+  nickname: string;
+  classLink: string;
+  icon: string;
 };
 
 type Availability = { dateTime: string };

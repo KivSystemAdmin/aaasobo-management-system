@@ -22,6 +22,9 @@ model Instructor {
   classes                         Class[]
   instructorRecurringAvailability InstructorRecurringAvailability[]
   recurringClasses                RecurringClass[]
+  classLink                       String                            @unique
+  icon                            String                            @unique
+  nickname                        String                            @unique
 }
 
 model InstructorRecurringAvailability {

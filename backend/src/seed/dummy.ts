@@ -7,7 +7,10 @@ async function insertInstructors() {
   await prisma.instructor.create({
     data: {
       email: "helen@example.com",
-      name: "Helen",
+      name: "Helene Gay Santos",
+      nickname: "Helen",
+      icon: "helen-1.jpg",
+      classLink: "https://zoom.us/j/12345?pwd=ABCde",
       password: "$2b$12$lzg9z2HDTl/dwd8DSnGHJOdPIYiFvn40fwEzRtimoty5VtOugaTfa", // password: helen
       instructorAvailability: {
         create: [
@@ -21,9 +24,12 @@ async function insertInstructors() {
   });
   await prisma.instructor.create({
     data: {
-      email: "ed@example.com",
-      name: "Ed",
-      password: "$2b$12$R6tfoOzHAHCC2NgD7HZVtutBQsoWysLtdpWEKGYlkHbeGvMa.WSUe", // password: ed
+      email: "elian@example.com",
+      name: "Elian P.Quilisadio",
+      nickname: "Elian",
+      icon: "elian-1.jpg",
+      classLink: "https://zoom.us/j/67890?pwd=FGHij",
+      password: "$2b$12$R6tfoOzHAHCC2NgD7HZVtutBQsoWysLtdpWEKGYlkHbeGvMa.WSUe", // password: Elian
       instructorAvailability: {
         create: [
           { dateTime: "2024-06-01T11:00:00+09:00" },
@@ -95,12 +101,16 @@ async function insertClasses() {
     throw new Error("Subscription not found");
   }
 
-  const helen = await prisma.instructor.findFirst({ where: { name: "Helen" } });
+  const helen = await prisma.instructor.findFirst({
+    where: { name: "Helene Gay Santos" },
+  });
   if (!helen) {
     throw new Error("Instructor not found");
   }
-  const ed = await prisma.instructor.findFirst({ where: { name: "Ed" } });
-  if (!ed) {
+  const elian = await prisma.instructor.findFirst({
+    where: { name: "Elian P.Quilisadio" },
+  });
+  if (!elian) {
     throw new Error("Instructor not found");
   }
 
@@ -135,14 +145,14 @@ async function insertClasses() {
         subscriptionId: bobSubscription.id,
       },
       {
-        instructorId: ed.id,
+        instructorId: elian.id,
         customerId: bob.id,
         dateTime: "2024-06-03T16:00:00+09:00",
         status: "completed",
         subscriptionId: bobSubscription.id,
       },
       {
-        instructorId: ed.id,
+        instructorId: elian.id,
         customerId: bob.id,
         dateTime: "2024-06-29T11:00:00+09:00",
         status: "booked",

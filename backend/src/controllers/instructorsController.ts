@@ -62,6 +62,10 @@ export const getInstructor = async (req: Request, res: Response) => {
         id: instructor.id,
         name: instructor.name,
         availabilities: instructor.instructorAvailability,
+        nickname: instructor.nickname,
+        email: instructor.email,
+        icon: instructor.icon,
+        classLink: instructor.classLink,
       },
     });
   } catch (error) {
