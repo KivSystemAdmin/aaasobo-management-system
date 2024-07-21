@@ -30,14 +30,15 @@ model Instructor {
 model InstructorRecurringAvailability {
   id                     Int                      @id @default(autoincrement())
   instructorId           Int
-  rrule                  String
+  startAt                DateTime
+  endAt                  DateTime?
   instructor             Instructor               @relation(fields: [instructorId], references: [id])
   instructorAvailability InstructorAvailability[]
 }
 
 model InstructorAvailability {
   instructorId                      Int
-  instructorRecurringAvailabilityId Int?
+  instructorRecurringAvailabilityId Int
   dateTime                          DateTime
   instructor                        Instructor                       @relation(fields: [instructorId], references: [id])
   instructorRecurringAvailability   InstructorRecurringAvailability? @relation(fields: [instructorRecurringAvailabilityId], references: [id])

@@ -6,7 +6,7 @@ export type Availability = {
   dateTime: string;
 };
 
-export type RecurringAvailability = {
+export type RecurringInstructorAvailability = {
   rrule: string;
 };
 
@@ -42,29 +42,32 @@ export const getInstructor = async (
 
 export const addAvailability = async (
   id: number,
-  dateTime: string,
+  from: string,
+  until: string,
 ): Promise<Response<{ availability: Availability }>> => {
   return await fetch(`${BASE_URL}/${id}/availability`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      type: "slot",
-      dateTime,
-    }),
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ from, until }),
   }).then((res) => res.json());
 };
 
 export const addRecurringAvailability = async (
   id: number,
-  dateTime: string,
-): Promise<Response<{ recurringAvailability: RecurringAvailability }>> => {
-  return await fetch(`${BASE_URL}/${id}/availability`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      type: "recurring",
-      dateTime,
-    }),
+  day: number,
+  time: string,
+  startDate: string,
+): Promise<
+  Response<{ recurringInstructorAvailability: RecurringInstructorAvailability }>
+> => {
+  return await fetch(`${BASE_URL}/${id}/recurringAvailability`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ day, time, startDate }),
   }).then((res) => res.json());
 };
 
@@ -82,7 +85,9 @@ export const deleteAvailability = async (
 export const deleteRecurringAvailability = async (
   id: number,
   dateTime: string,
-): Promise<Response<{ recurringAvailability: RecurringAvailability }>> => {
+): Promise<
+  Response<{ recurringAvailability: RecurringInstructorAvailability }>
+> => {
   return await fetch(`${BASE_URL}/${id}/availability`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
@@ -93,7 +98,9 @@ export const deleteRecurringAvailability = async (
 export const extendRecurringAvailability = async (
   id: number,
   until: string,
-): Promise<Response<{ recurringAvailabilities: RecurringAvailability[] }>> => {
+): Promise<
+  Response<{ recurringAvailabilities: RecurringInstructorAvailability[] }>
+> => {
   return await fetch(`${BASE_URL}/${id}/availability/extend`, {
     method: "PUT",
     headers: {

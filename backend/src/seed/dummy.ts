@@ -12,14 +12,6 @@ async function insertInstructors() {
       icon: "helen-1.jpg",
       classLink: "https://zoom.us/j/12345?pwd=ABCde",
       password: "$2b$12$lzg9z2HDTl/dwd8DSnGHJOdPIYiFvn40fwEzRtimoty5VtOugaTfa", // password: helen
-      instructorAvailability: {
-        create: [
-          { dateTime: "2024-06-01T11:00:00+09:00" },
-          { dateTime: "2024-06-01T11:30:00+09:00" },
-          { dateTime: "2024-06-03T15:00:00+09:00" },
-          { dateTime: "2024-06-03T15:30:00+09:00" },
-        ],
-      },
     },
   });
   await prisma.instructor.create({
@@ -30,17 +22,91 @@ async function insertInstructors() {
       icon: "elian-1.jpg",
       classLink: "https://zoom.us/j/67890?pwd=FGHij",
       password: "$2b$12$R6tfoOzHAHCC2NgD7HZVtutBQsoWysLtdpWEKGYlkHbeGvMa.WSUe", // password: Elian
-      instructorAvailability: {
-        create: [
-          { dateTime: "2024-06-01T11:00:00+09:00" },
-          { dateTime: "2024-06-01T12:00:00+09:00" },
-          { dateTime: "2024-06-03T15:00:00+09:00" },
-          { dateTime: "2024-06-03T16:00:00+09:00" },
-          { dateTime: "2024-06-29T15:00:00+09:00" },
-        ],
-      },
     },
   });
+}
+
+async function insertInstructorAvailabilities() {
+  const helen = await prisma.instructor.findFirst({
+    where: { nickname: "Helen" },
+  });
+  if (!helen) {
+    throw new Error("Instructor not found");
+  }
+  const ed = await prisma.instructor.findFirst({
+    where: { nickname: "Elian" },
+  });
+  if (!ed) {
+    throw new Error("Instructor not found");
+  }
+  await prisma.instructorRecurringAvailability.createMany({
+    data: [
+      { startAt: "2024-07-01T00:00:00Z", instructorId: helen.id }, // 09:00 in Japan
+      { startAt: "2024-07-01T00:30:00Z", instructorId: helen.id }, // 09:30 in Japan
+      { startAt: "2024-07-01T01:00:00Z", instructorId: ed.id }, // 10:00 in Japan
+      { startAt: "2024-07-02T01:00:00Z", instructorId: ed.id }, // 10:00 in Japan
+      {
+        startAt: "2024-07-02T01:30:00Z",
+        instructorId: ed.id,
+        endAt: "2024-07-23T23:59:59Z",
+      }, // 10:30 in Japan
+    ],
+  });
+
+  const insertAvailabilities = async (
+    instructorId: number,
+    startAt: string,
+    dateTimes: string[],
+  ) => {
+    const r = await prisma.instructorRecurringAvailability.findFirst({
+      where: { instructorId, startAt },
+    });
+    if (!r) {
+      throw new Error("Recurring availability not found");
+    }
+    await prisma.instructorAvailability.createMany({
+      data: dateTimes.map((dateTime) => ({
+        dateTime,
+        instructorId,
+        instructorRecurringAvailabilityId: r!.id,
+      })),
+    });
+  };
+
+  await insertAvailabilities(helen.id, "2024-07-01T00:00:00Z", [
+    "2024-07-01T00:00:00Z",
+    "2024-07-08T00:00:00Z",
+    "2024-07-15T00:00:00Z",
+    "2024-07-22T00:00:00Z",
+    "2024-07-29T00:00:00Z",
+  ]);
+  await insertAvailabilities(helen.id, "2024-07-01T00:30:00Z", [
+    "2024-07-01T00:30:00Z",
+    "2024-07-08T00:30:00Z",
+    "2024-07-15T00:30:00Z",
+    "2024-07-22T00:30:00Z",
+    "2024-07-29T00:30:00Z",
+  ]);
+  await insertAvailabilities(ed.id, "2024-07-01T01:00:00Z", [
+    "2024-07-01T01:00:00Z",
+    "2024-07-08T01:00:00Z",
+    "2024-07-15T01:00:00Z",
+    "2024-07-22T01:00:00Z",
+    "2024-07-29T01:00:00Z",
+  ]);
+  await insertAvailabilities(ed.id, "2024-07-02T01:00:00Z", [
+    "2024-07-02T01:00:00Z",
+    "2024-07-09T01:00:00Z",
+    "2024-07-16T01:00:00Z",
+    "2024-07-23T01:00:00Z",
+    "2024-07-30T01:00:00Z",
+  ]);
+  await insertAvailabilities(ed.id, "2024-07-02T01:30:00Z", [
+    "2024-07-02T01:30:00Z",
+    "2024-07-09T01:30:00Z",
+    "2024-07-16T01:30:00Z",
+    "2024-07-23T01:30:00Z",
+  ]);
 }
 
 async function insertCustomers() {
@@ -267,12 +333,14 @@ async function main() {
   await prisma.subscription.deleteMany({});
   await prisma.plan.deleteMany({});
   await prisma.instructorAvailability.deleteMany({});
+  await prisma.instructorRecurringAvailability.deleteMany({});
   await prisma.instructor.deleteMany({});
   await prisma.admins.deleteMany({});
   await prisma.children.deleteMany({});
   await prisma.customer.deleteMany({});
 
   await insertInstructors();
+  await insertInstructorAvailabilities();
   await insertCustomers();
   await insertAdmins();
   await insertPlans();

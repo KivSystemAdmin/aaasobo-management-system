@@ -3,9 +3,10 @@ import {
   getAllInstructorsAvailabilitiesController,
   getInstructor,
   addAvailability,
+  addRecurringAvailability,
   deleteAvailability,
-  extendAvailability,
 } from "../controllers/instructorsController";
+import { type RequestWithId, parseId } from "../middlewares/parseId.middleware";
 
 export const instructorsRouter = express.Router();
 
@@ -13,6 +14,12 @@ export const instructorsRouter = express.Router();
 
 instructorsRouter.get("/", getAllInstructorsAvailabilitiesController);
 instructorsRouter.get("/:id", getInstructor);
-instructorsRouter.post("/:id/availability", addAvailability);
-instructorsRouter.delete("/:id/availability", deleteAvailability);
-instructorsRouter.put("/:id/availability/extend", extendAvailability);
+instructorsRouter.put("/:id/recurringAvailability", parseId, (req, res) =>
+  addRecurringAvailability(req as RequestWithId, res),
+);
+instructorsRouter.put("/:id/availability", parseId, (req, res) =>
+  addAvailability(req as RequestWithId, res),
+);
+instructorsRouter.delete("/:id/availability", parseId, (req, res) =>
+  deleteAvailability(req as RequestWithId, res),
+);
