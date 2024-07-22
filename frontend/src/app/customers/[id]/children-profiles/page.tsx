@@ -47,7 +47,7 @@ function Page({ params }: { params: { id: string } }) {
         <h1 className={styles.page__title}>Children's Profiles</h1>
       </div>
       <AddButton
-        linkURL={`/customers/${customerId}/dashboard/children-profiles/add-child`}
+        linkURL={`/customers/${customerId}/children-profiles/add-child`}
         btnText="Add Child"
       />
       <div>
@@ -56,7 +56,7 @@ function Page({ params }: { params: { id: string } }) {
             <li key={child.id}>
               {child.name}
               <EditButton
-                linkURL={`/customers/${customerId}/dashboard/children-profiles/${child.id}/edit`}
+                linkURL={`/customers/${customerId}/children-profiles/${child.id}/edit`}
                 btnText="Edit Child"
               />
               <button onClick={() => handleDelete(child.id)}>Delete</button>

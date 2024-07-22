@@ -100,7 +100,7 @@ function AddRegularClassForm({
       alert(data.message);
 
       // Redirect the user to regular-classes page
-      router.push(`/customers/${customerId}/dashboard/regular-classes`);
+      router.push(`/customers/${customerId}/regular-classes`);
     } catch (error) {
       console.error("Failed to add a new recurring class data:", error);
     }
@@ -160,9 +160,7 @@ function AddRegularClassForm({
       </div>
 
       <div>
-        <Link href={`/customers/${customerId}/dashboard/regular-classes`}>
-          Cancel
-        </Link>
+        <Link href={`/customers/${customerId}/regular-classes`}>Cancel</Link>
         <button type="submit">Add Regular Class</button>
       </div>
     </form>

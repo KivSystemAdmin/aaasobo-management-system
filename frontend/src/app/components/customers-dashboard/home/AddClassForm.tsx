@@ -78,7 +78,7 @@ function AddClassForm({
         childrenIds: selectedChildrenIdsArray,
       });
 
-      router.push(`/customers/${customerId}/dashboard/home`);
+      router.push(`/customers/${customerId}/home`);
     } catch (error) {
       console.error("Failed to add class:", error);
     }
@@ -163,7 +163,7 @@ function AddClassForm({
 
       <div className={styles.actions}>
         <Link
-          href={`/customers/${customerId}/dashboard/home`}
+          href={`/customers/${customerId}/home`}
           className={styles.cancelButton}
         >
           Cancel

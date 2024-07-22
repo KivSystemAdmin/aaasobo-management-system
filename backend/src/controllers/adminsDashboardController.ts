@@ -18,7 +18,6 @@ interface Subscription {
   plan: {
     id: number;
     name: string;
-    tokens: number;
   };
   customer: {
     id: number;

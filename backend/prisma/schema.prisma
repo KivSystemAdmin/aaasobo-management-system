@@ -105,26 +105,29 @@ model ClassAttendance {
 model Plan {
   id           Int            @id @default(autoincrement())
   name         String
-  tokens       Int
+  description  String
   subscription Subscription[]
 }
 
 model Subscription {
-  id         Int       @id @default(autoincrement())
-  planId     Int
-  customerId Int
-  startAt    DateTime
-  endAt      DateTime?
-  plan       Plan      @relation(fields: [planId], references: [id])
-  customer   Customer  @relation(fields: [customerId], references: [id])
-  class      Class[]
+  id             Int              @id @default(autoincrement())
+  planId         Int
+  customerId     Int
+  startAt        DateTime
+  endAt          DateTime?
+  plan           Plan             @relation(fields: [planId], references: [id])
+  customer       Customer         @relation(fields: [customerId], references: [id])
+  class          Class[]
+  recurringClass RecurringClass[]
 }
 
 model RecurringClass {
   id                       Int                        @id @default(autoincrement())
   instructorId             Int
+  subscriptionId           Int
   rrule                    String
   instructor               Instructor                 @relation(fields: [instructorId], references: [id])
+  subscription             Subscription               @relation(fields: [subscriptionId], references: [id])
   recurringClassAttendance RecurringClassAttendance[]
   classes                  Class[]
 }

@@ -59,3 +59,39 @@ type Child = {
   customerId: number;
   name: string;
 };
+
+type Plan = {
+  id: number;
+  name: string;
+  description: string;
+};
+
+type Subscriptions = {
+  subscriptions: Subscription[];
+};
+
+type Subscription = {
+  id: number;
+  planId: number;
+  customerId: number;
+  startAt: string;
+  endAt: string;
+  plan: Plan;
+};
+
+type RecurringClasses = {
+  recurringClasses: RecurringClass[];
+};
+
+type RecurringClass = {
+  id: number;
+  instructorId: number;
+  subscription: Subscriptions;
+  instructor: Instructor;
+  recurringClassAttendance: RecurringClassAttendance[];
+};
+
+type RecurringClassAttendance = {
+  childrenId: number;
+  children: Child;
+};

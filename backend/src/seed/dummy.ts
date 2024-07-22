@@ -279,12 +279,12 @@ async function insertPlans() {
   await prisma.plan.createMany({
     data: [
       {
-        name: "Once a Week",
-        tokens: 4,
+        name: "3,180 yen/month",
+        description: "twice a week",
       },
       {
-        name: "Twice a Week",
-        tokens: 8,
+        name: "7,980 yen/month",
+        description: "5 times a week",
       },
     ],
   });
@@ -299,12 +299,14 @@ async function insertSubscriptions() {
   if (!bob) {
     throw new Error("Customer not found");
   }
-  const plan1 = await prisma.plan.findFirst({ where: { name: "Once a Week" } });
+  const plan1 = await prisma.plan.findFirst({
+    where: { name: "3,180 yen/month" },
+  });
   if (!plan1) {
     throw new Error("Plan not found");
   }
   const plan2 = await prisma.plan.findFirst({
-    where: { name: "Twice a Week" },
+    where: { name: "7,980 yen/month" },
   });
   if (!plan2) {
     throw new Error("Plan not found");
@@ -327,9 +329,68 @@ async function insertSubscriptions() {
   });
 }
 
+async function insertRecurringClasses() {
+  const alice = await prisma.customer.findFirst({ where: { name: "Alice" } });
+  if (!alice) {
+    throw new Error("Customer not found");
+  }
+  const subscription = await prisma.subscription.findFirst({
+    where: { customerId: alice.id, endAt: null },
+  });
+  if (!subscription) {
+    throw new Error("Subscription not found");
+  }
+  const children = await prisma.children.findMany({
+    where: { customerId: alice.id },
+  });
+  if (!children || children.length < 2) {
+    throw new Error("Children not found");
+  }
+  const helen = await prisma.instructor.findFirst({ where: { name: "Helen" } });
+  const ed = await prisma.instructor.findFirst({ where: { name: "Ed" } });
+  if (!helen || !ed) {
+    throw new Error("Instructor not found");
+  }
+
+  await prisma.recurringClass.create({
+    data: {
+      subscriptionId: subscription.id,
+      instructorId: helen.id,
+      rrule: "DTSTART:20240701T000000Z\nRRULE:FREQ=WEEKLY",
+      recurringClassAttendance: {
+        create: [
+          {
+            childrenId: children[0].id,
+          },
+          {
+            childrenId: children[1].id,
+          },
+        ],
+      },
+    },
+  });
+  await prisma.recurringClass.create({
+    data: {
+      subscriptionId: subscription.id,
+      instructorId: ed.id,
+      rrule: "DTSTART:20240703T000000Z\nRRULE:FREQ=WEEKLY",
+      recurringClassAttendance: {
+        create: [
+          {
+            childrenId: children[0].id,
+          },
+        ],
+      },
+    },
+  });
+}
+
 async function main() {
   await prisma.classAttendance.deleteMany({});
   await prisma.class.deleteMany({});
+  await prisma.instructorAvailability.deleteMany({});
+  await prisma.recurringClassAttendance.deleteMany({});
+  await prisma.recurringClass.deleteMany({});
   await prisma.subscription.deleteMany({});
   await prisma.plan.deleteMany({});
   await prisma.instructorAvailability.deleteMany({});
@@ -347,6 +408,7 @@ async function main() {
   await insertSubscriptions();
   await insertClasses();
   await insertChildren();
+  await insertRecurringClasses();
   await insertClassAttendance();
 }
 

@@ -8,6 +8,7 @@ import {
   getClassById,
   getClassesByCustomerId,
   updateClass,
+  getRecurringClassesBySubscriptionId,
 } from "../services/classesService";
 import { getActiveSubscription } from "../services/subscriptionsService";
 import { RRule } from "rrule";
@@ -99,20 +100,6 @@ export const createClassController = async (req: Request, res: Response) => {
   }
 
   try {
-    const remainingTokens = await calculateRemainingTokens(
-      customerId,
-      new Date(dateTime),
-    );
-    if (remainingTokens < 1) {
-      return res.status(400).json({ error: "Not enough tokens." });
-    }
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "Failed to calculate remaining tokens." });
-  }
-
-  try {
     const subscription = await getActiveSubscription(customerId);
     if (!subscription) {
       return res.status(400).json({ error: "No active subscription found." });
@@ -133,33 +120,6 @@ export const createClassController = async (req: Request, res: Response) => {
     console.error("Controller Error:", error);
     res.status(500).json({ error: "Failed to add class." });
   }
-};
-
-const calculateTotalTokens = async (customerId: number, now: Date) => {
-  const subscription = await getActiveSubscription(customerId);
-  if (!subscription) {
-    return 0;
-  }
-  // New tokens are added every month.
-  return (
-    (now.getUTCMonth() - subscription.startAt.getUTCMonth() + 1) *
-    subscription.plan.tokens
-  );
-};
-
-const calculateRemainingTokens = async (
-  customerId: number,
-  baseDateTime: Date,
-) => {
-  const subscription = await getActiveSubscription(customerId);
-  if (!subscription) {
-    return 0;
-  }
-  const classesCount = await countClassesOfSubscription(
-    subscription.id,
-    getEndOfThisMonth(baseDateTime),
-  );
-  return (await calculateTotalTokens(customerId, baseDateTime)) - classesCount;
 };
 
 function getEndOfThisMonth(date: Date): Date {
@@ -296,6 +256,27 @@ export const addRecurringClassController = async (
       message: "Recurring class is created successfully",
       recurringClass,
     });
+  } catch (error) {
+    res.status(500).json({ error: `${error}` });
+  }
+};
+
+// GET recurring classes by customer id along with related subscriptions, customers and instructors data
+export const getRecurringClassesBySubscriptionIdController = async (
+  req: Request,
+  res: Response,
+) => {
+  const subscriptionId = parseInt(req.query.subscriptionId as string);
+  if (isNaN(subscriptionId)) {
+    res.status(400).json({ error: "Invalid customer ID" });
+    return;
+  }
+
+  try {
+    const recurringClasses =
+      await getRecurringClassesBySubscriptionId(subscriptionId);
+
+    res.json({ recurringClasses });
   } catch (error) {
     res.status(500).json({ error: `${error}` });
   }

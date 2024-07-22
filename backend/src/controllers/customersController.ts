@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../../prisma/prismaClient";
+import { getSubscriptionsById } from "../services/subscriptionsService";
 
 export const registerCustomer = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
@@ -50,7 +51,7 @@ export const loginCustomer = async (req: Request, res: Response) => {
     const { password: _, ...customerWithoutPassword } = customer;
 
     res.status(200).json({
-      redirectUrl: `/customers/${customer.id}/dashboard/home`,
+      redirectUrl: `/customers/${customer.id}/home`,
       message: "Customer logged in successfully",
       customer: customerWithoutPassword,
     });
@@ -79,5 +80,20 @@ export const getCustomersClasses = async (req: Request, res: Response) => {
     res.json({ customer: customerWithoutPassword });
   } catch (error) {
     res.status(500).json({ error });
+  }
+};
+
+export const getSubscriptionsByIdController = async (
+  req: Request,
+  res: Response,
+) => {
+  const customerId = parseInt(req.params.id);
+
+  try {
+    const subscriptions = await getSubscriptionsById(customerId);
+
+    res.json({ subscriptions });
+  } catch (error) {
+    res.status(500).json({ error: `${error}` });
   }
 };

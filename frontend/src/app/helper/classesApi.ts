@@ -133,3 +133,22 @@ export const addRecurringClass = async (recurringClassData: {
     throw error;
   }
 };
+
+// GET recurring classes by subscription id
+export const getRecurringClassesBySubscriptionId = async (
+  subscriptionId: number,
+) => {
+  try {
+    const response = await fetch(
+      `http://localhost:4000/classes/recurring-classes?subscriptionId=${subscriptionId}`,
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const recurringClasses = await response.json();
+    return recurringClasses;
+  } catch (error) {
+    console.error("Failed to fetch recurring classes:", error);
+    throw error;
+  }
+};

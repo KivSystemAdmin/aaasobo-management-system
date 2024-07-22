@@ -77,7 +77,7 @@ function EditClassForm({
         childrenIds: selectedChildrenIdsArray,
       });
 
-      router.push(`/customers/${customerId}/dashboard/home`);
+      router.push(`/customers/${customerId}/home`);
     } catch (error) {
       console.error("Failed to edit class:", error);
     }
@@ -163,7 +163,7 @@ function EditClassForm({
 
       <div className={styles.actions}>
         <Link
-          href={`/customers/${customerId}/dashboard/home`}
+          href={`/customers/${customerId}/home`}
           className={styles.cancelButton}
         >
           Cancel

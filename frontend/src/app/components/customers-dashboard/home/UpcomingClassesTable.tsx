@@ -77,7 +77,7 @@ function UpcomingClassesTable({ customerId }: { customerId: string }) {
                     </td>
                     <td className={styles.classesTable__td}>
                       <EditButton
-                        linkURL={`/customers/${customerId}/dashboard/home/${eachClass.id}/edit`}
+                        linkURL={`/customers/${customerId}/home/${eachClass.id}/edit`}
                         btnText="Edit Class"
                       />
                       <button

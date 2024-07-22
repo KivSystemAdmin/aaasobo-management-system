@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getCustomersClasses,
+  getSubscriptionsByIdController,
   loginCustomer,
   registerCustomer,
 } from "../controllers/customersController";
@@ -12,3 +13,4 @@ export const customersRouter = express.Router();
 customersRouter.post("/register", registerCustomer);
 customersRouter.post("/login", loginCustomer);
 customersRouter.get("/:id", getCustomersClasses);
+customersRouter.get("/:id/subscriptions", getSubscriptionsByIdController);

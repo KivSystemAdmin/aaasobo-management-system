@@ -30,7 +30,7 @@ function EditChildForm({
       alert(data.message); // Set alert message temporarily.
 
       // Redirect the user to children-profiles page
-      router.push(`/customers/${customerId}/dashboard/children-profiles`);
+      router.push(`/customers/${customerId}/children-profiles`);
     } catch (error) {
       console.error("Failed to add a new child data:", error);
     }
@@ -58,7 +58,7 @@ function EditChildForm({
 
       <div className={styles.actions}>
         <Link
-          href={`/customers/${customerId}/dashboard/children-profiles`}
+          href={`/customers/${customerId}/children-profiles`}
           className={styles.cancelButton}
         >
           Cancel
