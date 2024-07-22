@@ -4,6 +4,8 @@ import { FormEvent, ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import UsersTable from "@/app/components/admins-dashboard/UsersTable";
+import InstructorScheduleCalendar from "@/app/components/admins-dashboard/InstructorScheduleCalendar";
+
 import {
   addAvailability,
   addRecurringAvailability,
@@ -44,6 +46,9 @@ function Page() {
       <UsersTable userType={userType} />
       <AddScheduleForm />
       <CreateCalendarForm />
+      <hr />
+      <h2>Instructor Schedule Calendar</h2>
+      <InstructorScheduleCalendar />
     </div>
   );
 }

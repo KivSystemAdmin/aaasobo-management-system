@@ -1,0 +1,31 @@
+.root {
+  --time-width: 100px;
+  --time-height: 24px;
+
+  display: flex;
+
+  @mixin cell {
+    width: var(--time-width);
+    height: var(--time-height);
+    border: 1px solid black;
+  }
+
+  .time {
+    @include cell;
+    background-color: lightgray;
+  }
+
+  .emptyCell {
+    @include cell;
+  }
+
+  .selectedCell {
+    @include cell;
+    background-color: lightgreen;
+  }
+
+  .disabledCell {
+    @include cell;
+    background-color: gray;
+  }
+}
