@@ -80,6 +80,20 @@ export async function addInstructorRecurringAvailability(
   }
 }
 
+export async function getInstructorWithRecurringAvailability(
+  instructorId: number,
+) {
+  try {
+    return await prisma.instructor.findUnique({
+      where: { id: instructorId },
+      include: { instructorRecurringAvailability: true },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch instructor with recurring availability.");
+  }
+}
+
 export async function getInstructorRecurringAvailabilities(
   tx: Prisma.TransactionClient,
   instructorId: number,
