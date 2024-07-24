@@ -278,7 +278,7 @@ async function insertRecurringClasses() {
     data: {
       subscriptionId: alice.subscription[0].id,
       instructorId: helen.id,
-      rrule: "DTSTART:20240701T000000Z\nRRULE:FREQ=WEEKLY",
+      startAt: "2024-07-01T00:00:00Z",
       recurringClassAttendance: {
         create: [
           {
@@ -295,7 +295,8 @@ async function insertRecurringClasses() {
     data: {
       subscriptionId: alice.subscription[0].id,
       instructorId: elian.id,
-      rrule: "DTSTART:20240703T000000Z\nRRULE:FREQ=WEEKLY",
+      startAt: "2024-07-03T02:00:00Z",
+      endAt: "2024-07-31T23:59:59Z",
       recurringClassAttendance: {
         create: [
           {

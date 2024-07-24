@@ -125,7 +125,8 @@ model RecurringClass {
   id                       Int                        @id @default(autoincrement())
   instructorId             Int
   subscriptionId           Int
-  rrule                    String
+  startAt                  DateTime
+  endAt                    DateTime?
   instructor               Instructor                 @relation(fields: [instructorId], references: [id])
   subscription             Subscription               @relation(fields: [subscriptionId], references: [id])
   recurringClassAttendance RecurringClassAttendance[]

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../../prisma/prismaClient";
-import { pickProperties } from "../helper/commonUtils";
+import { createDatesBetween, pickProperties } from "../helper/commonUtils";
 import {
   getAllInstructorsAvailabilities,
   getInstructorById,
@@ -239,16 +239,6 @@ export const addAvailability = async (req: RequestWithId, res: Response) => {
   });
   return res.status(200);
 };
-
-// Generate the data between `from` and `until` dates including `until`.
-function createDatesBetween(start: Date, end: Date): Date[] {
-  const dates = [];
-  while (start <= end) {
-    dates.push(new Date(start));
-    start.setUTCDate(start.getUTCDate() + 7);
-  }
-  return dates;
-}
 
 export const deleteAvailability = async (req: RequestWithId, res: Response) => {
   const { dateTime } = req.body;
