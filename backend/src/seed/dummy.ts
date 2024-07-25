@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -27,27 +27,17 @@ async function insertInstructors() {
 }
 
 async function insertInstructorAvailabilities() {
-  const helen = await prisma.instructor.findFirst({
-    where: { nickname: "Helen" },
-  });
-  if (!helen) {
-    throw new Error("Instructor not found");
-  }
-  const ed = await prisma.instructor.findFirst({
-    where: { nickname: "Elian" },
-  });
-  if (!ed) {
-    throw new Error("Instructor not found");
-  }
+  const helen = await getInstructor("Helen");
+  const elian = await getInstructor("Elian");
   await prisma.instructorRecurringAvailability.createMany({
     data: [
       { startAt: "2024-07-01T00:00:00Z", instructorId: helen.id }, // 09:00 in Japan
       { startAt: "2024-07-01T00:30:00Z", instructorId: helen.id }, // 09:30 in Japan
-      { startAt: "2024-07-01T01:00:00Z", instructorId: ed.id }, // 10:00 in Japan
-      { startAt: "2024-07-02T01:00:00Z", instructorId: ed.id }, // 10:00 in Japan
+      { startAt: "2024-07-01T01:00:00Z", instructorId: elian.id }, // 10:00 in Japan
+      { startAt: "2024-07-02T01:00:00Z", instructorId: elian.id }, // 10:00 in Japan
       {
         startAt: "2024-07-02T01:30:00Z",
-        instructorId: ed.id,
+        instructorId: elian.id,
         endAt: "2024-07-23T23:59:59Z",
       }, // 10:30 in Japan
     ],
@@ -87,21 +77,21 @@ async function insertInstructorAvailabilities() {
     "2024-07-22T00:30:00Z",
     "2024-07-29T00:30:00Z",
   ]);
-  await insertAvailabilities(ed.id, "2024-07-01T01:00:00Z", [
+  await insertAvailabilities(elian.id, "2024-07-01T01:00:00Z", [
     "2024-07-01T01:00:00Z",
     "2024-07-08T01:00:00Z",
     "2024-07-15T01:00:00Z",
     "2024-07-22T01:00:00Z",
     "2024-07-29T01:00:00Z",
   ]);
-  await insertAvailabilities(ed.id, "2024-07-02T01:00:00Z", [
+  await insertAvailabilities(elian.id, "2024-07-02T01:00:00Z", [
     "2024-07-02T01:00:00Z",
     "2024-07-09T01:00:00Z",
     "2024-07-16T01:00:00Z",
     "2024-07-23T01:00:00Z",
     "2024-07-30T01:00:00Z",
   ]);
-  await insertAvailabilities(ed.id, "2024-07-02T01:30:00Z", [
+  await insertAvailabilities(elian.id, "2024-07-02T01:30:00Z", [
     "2024-07-02T01:30:00Z",
     "2024-07-09T01:30:00Z",
     "2024-07-16T01:30:00Z",
@@ -146,39 +136,10 @@ async function insertAdmins() {
 }
 
 async function insertClasses() {
-  const alice = await prisma.customer.findFirst({ where: { name: "Alice" } });
-  if (!alice) {
-    throw new Error("Customer not found");
-  }
-  const aliceSubscription = await prisma.subscription.findFirst({
-    where: { customerId: alice.id, endAt: null },
-  });
-  if (!aliceSubscription) {
-    throw new Error("Subscription not found");
-  }
-  const bob = await prisma.customer.findFirst({ where: { name: "Bob" } });
-  if (!bob) {
-    throw new Error("Customer not found");
-  }
-  const bobSubscription = await prisma.subscription.findFirst({
-    where: { customerId: bob.id, endAt: null },
-  });
-  if (!bobSubscription) {
-    throw new Error("Subscription not found");
-  }
-
-  const helen = await prisma.instructor.findFirst({
-    where: { name: "Helene Gay Santos" },
-  });
-  if (!helen) {
-    throw new Error("Instructor not found");
-  }
-  const elian = await prisma.instructor.findFirst({
-    where: { name: "Elian P.Quilisadio" },
-  });
-  if (!elian) {
-    throw new Error("Instructor not found");
-  }
+  const alice = await getCustomer("Alice");
+  const bob = await getCustomer("Bob");
+  const helen = await getInstructor("Helen");
+  const elian = await getInstructor("Elian");
 
   await prisma.class.createMany({
     data: [
@@ -187,56 +148,50 @@ async function insertClasses() {
         customerId: alice.id,
         dateTime: "2024-06-01T11:00:00+09:00",
         status: "completed",
-        subscriptionId: aliceSubscription.id,
+        subscriptionId: alice.subscription[0].id,
       },
       {
         instructorId: helen.id,
         customerId: alice.id,
         dateTime: "2024-06-01T11:30:00+09:00",
         status: "completed",
-        subscriptionId: aliceSubscription.id,
+        subscriptionId: alice.subscription[0].id,
       },
       {
         instructorId: helen.id,
         customerId: bob.id,
         dateTime: "2024-06-03T15:00:00+09:00",
         status: "canceled",
-        subscriptionId: bobSubscription.id,
+        subscriptionId: bob.subscription[0].id,
       },
       {
         instructorId: helen.id,
         customerId: bob.id,
         dateTime: "2024-06-03T15:30:00+09:00",
         status: "completed",
-        subscriptionId: bobSubscription.id,
+        subscriptionId: bob.subscription[0].id,
       },
       {
         instructorId: elian.id,
         customerId: bob.id,
         dateTime: "2024-06-03T16:00:00+09:00",
         status: "completed",
-        subscriptionId: bobSubscription.id,
+        subscriptionId: bob.subscription[0].id,
       },
       {
         instructorId: elian.id,
         customerId: bob.id,
         dateTime: "2024-06-29T11:00:00+09:00",
         status: "booked",
-        subscriptionId: bobSubscription.id,
+        subscriptionId: bob.subscription[0].id,
       },
     ],
   });
 }
 
 async function insertChildren() {
-  const alice = await prisma.customer.findFirst({ where: { name: "Alice" } });
-  if (!alice) {
-    throw new Error("Customer not found");
-  }
-  const bob = await prisma.customer.findFirst({ where: { name: "Bob" } });
-  if (!bob) {
-    throw new Error("Customer not found");
-  }
+  const alice = await getCustomer("Alice");
+  const bob = await getCustomer("Bob");
 
   await prisma.children.createMany({
     data: [
@@ -291,26 +246,11 @@ async function insertPlans() {
 }
 
 async function insertSubscriptions() {
-  const alice = await prisma.customer.findFirst({ where: { name: "Alice" } });
-  if (!alice) {
-    throw new Error("Customer not found");
-  }
-  const bob = await prisma.customer.findFirst({ where: { name: "Bob" } });
-  if (!bob) {
-    throw new Error("Customer not found");
-  }
-  const plan1 = await prisma.plan.findFirst({
-    where: { name: "3,180 yen/month" },
-  });
-  if (!plan1) {
-    throw new Error("Plan not found");
-  }
-  const plan2 = await prisma.plan.findFirst({
-    where: { name: "7,980 yen/month" },
-  });
-  if (!plan2) {
-    throw new Error("Plan not found");
-  }
+  const alice = await getCustomer("Alice");
+  const bob = await getCustomer("Bob");
+  const plan1 = await getPlan("3,180 yen/month");
+  const plan2 = await getPlan("7,980 yen/month");
+
   await prisma.subscription.createMany({
     data: [
       {
@@ -330,40 +270,22 @@ async function insertSubscriptions() {
 }
 
 async function insertRecurringClasses() {
-  const alice = await prisma.customer.findFirst({ where: { name: "Alice" } });
-  if (!alice) {
-    throw new Error("Customer not found");
-  }
-  const subscription = await prisma.subscription.findFirst({
-    where: { customerId: alice.id, endAt: null },
-  });
-  if (!subscription) {
-    throw new Error("Subscription not found");
-  }
-  const children = await prisma.children.findMany({
-    where: { customerId: alice.id },
-  });
-  if (!children || children.length < 2) {
-    throw new Error("Children not found");
-  }
-  const helen = await prisma.instructor.findFirst({ where: { name: "Helen" } });
-  const ed = await prisma.instructor.findFirst({ where: { name: "Ed" } });
-  if (!helen || !ed) {
-    throw new Error("Instructor not found");
-  }
+  const alice = await getCustomer("Alice");
+  const helen = await getInstructor("Helen");
+  const elian = await getInstructor("Elian");
 
   await prisma.recurringClass.create({
     data: {
-      subscriptionId: subscription.id,
+      subscriptionId: alice.subscription[0].id,
       instructorId: helen.id,
       rrule: "DTSTART:20240701T000000Z\nRRULE:FREQ=WEEKLY",
       recurringClassAttendance: {
         create: [
           {
-            childrenId: children[0].id,
+            childrenId: alice.children[0].id,
           },
           {
-            childrenId: children[1].id,
+            childrenId: alice.children[1].id,
           },
         ],
       },
@@ -371,13 +293,13 @@ async function insertRecurringClasses() {
   });
   await prisma.recurringClass.create({
     data: {
-      subscriptionId: subscription.id,
-      instructorId: ed.id,
+      subscriptionId: alice.subscription[0].id,
+      instructorId: elian.id,
       rrule: "DTSTART:20240703T000000Z\nRRULE:FREQ=WEEKLY",
       recurringClassAttendance: {
         create: [
           {
-            childrenId: children[0].id,
+            childrenId: alice.children[0].id,
           },
         ],
       },
@@ -385,31 +307,84 @@ async function insertRecurringClasses() {
   });
 }
 
-async function main() {
-  await prisma.classAttendance.deleteMany({});
-  await prisma.class.deleteMany({});
-  await prisma.instructorAvailability.deleteMany({});
-  await prisma.recurringClassAttendance.deleteMany({});
-  await prisma.recurringClass.deleteMany({});
-  await prisma.subscription.deleteMany({});
-  await prisma.plan.deleteMany({});
-  await prisma.instructorAvailability.deleteMany({});
-  await prisma.instructorRecurringAvailability.deleteMany({});
-  await prisma.instructor.deleteMany({});
-  await prisma.admins.deleteMany({});
-  await prisma.children.deleteMany({});
-  await prisma.customer.deleteMany({});
+async function getCustomer(name: "Alice" | "Bob") {
+  const customer = await prisma.customer.findFirst({
+    where: { name },
+    include: { children: true, subscription: true },
+  });
+  if (!customer) {
+    throw new Error(`Customer ${name} not found`);
+  }
+  // Include only active subscriptions.
+  customer.subscription = customer.subscription.filter(
+    ({ endAt }) => endAt === null,
+  );
+  return customer;
+}
 
-  await insertInstructors();
-  await insertInstructorAvailabilities();
-  await insertCustomers();
-  await insertAdmins();
-  await insertPlans();
-  await insertSubscriptions();
-  await insertClasses();
-  await insertChildren();
-  await insertRecurringClasses();
-  await insertClassAttendance();
+async function getInstructor(nickname: "Helen" | "Elian") {
+  const customer = await prisma.instructor.findFirst({ where: { nickname } });
+  if (!customer) {
+    throw new Error(`Customer ${nickname} not found`);
+  }
+  return customer;
+}
+
+async function getPlan(name: "3,180 yen/month" | "7,980 yen/month") {
+  const plan = await prisma.plan.findFirst({ where: { name } });
+  if (!plan) {
+    throw new Error(`Plan ${name} not found`);
+  }
+  return plan;
+}
+
+async function deleteAll(table: Uncapitalize<Prisma.ModelName>) {
+  // @ts-ignore
+  await prisma[table].deleteMany({});
+}
+
+async function main() {
+  {
+    // Dependent on the below
+    await deleteAll("classAttendance");
+    await deleteAll("recurringClassAttendance");
+
+    // Dependent on the below
+    await deleteAll("class");
+    await deleteAll("recurringClass");
+    await deleteAll("instructorAvailability");
+
+    // Dependent on the below
+    await deleteAll("children");
+    await deleteAll("subscription");
+    await deleteAll("instructorRecurringAvailability");
+
+    // Independent
+    await deleteAll("admins");
+    await deleteAll("instructor");
+    await deleteAll("customer");
+    await deleteAll("plan");
+  }
+
+  {
+    // Independent
+    await insertPlans();
+    await insertCustomers();
+    await insertInstructors();
+    await insertAdmins();
+
+    // Dependant on the above
+    await insertInstructorAvailabilities();
+    await insertSubscriptions();
+    await insertChildren();
+
+    // Dependant on the above
+    await insertRecurringClasses();
+    await insertClasses();
+
+    // Dependant on the above
+    await insertClassAttendance();
+  }
 }
 
 main();

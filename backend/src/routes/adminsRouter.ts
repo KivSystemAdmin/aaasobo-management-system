@@ -3,6 +3,9 @@ import {
   loginAdminController,
   logoutAdminController,
   registerAdminController,
+  registerInstructorController,
+  getAllInstructorsController,
+  getAllCustomersController,
 } from "../controllers/adminsController";
 import {
   requireAuthentication,
@@ -17,3 +20,10 @@ adminsRouter.post("/login", loginAdminController);
 adminsRouter.get("/logout", logoutAdminController);
 adminsRouter.post("/register", requireAuthentication, registerAdminController);
 adminsRouter.get("/authentication", authenticateAdminSession);
+adminsRouter.post(
+  "/instructors/register",
+  requireAuthentication,
+  registerInstructorController,
+);
+adminsRouter.get("/instructors", getAllInstructorsController);
+adminsRouter.get("/customers", getAllCustomersController);

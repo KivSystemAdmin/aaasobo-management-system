@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:4000/admins/dashboard";
+const BASE_URL = "http://localhost:4000/admins";
 
 // GET all instructors data
 export const getAllInstructors = async () => {

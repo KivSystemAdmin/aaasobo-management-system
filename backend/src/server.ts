@@ -6,7 +6,6 @@ import { instructorsRouter } from "./routes/instructorsRouter";
 import { classesRouter } from "./routes/classesRouter";
 import { customersRouter } from "./routes/customersRouter";
 import { adminsRouter } from "./routes/adminsRouter";
-import { adminsDashboardRouter } from "./routes/adminsDashboardRouter";
 import { childrenRouter } from "./routes/childrenRouter";
 
 export const server = express();
@@ -38,5 +37,4 @@ server.use("/instructors", instructorsRouter);
 server.use("/classes", classesRouter);
 server.use("/customers", customersRouter);
 server.use("/admins", adminsRouter);
-server.use("/admins/dashboard", adminsDashboardRouter);
 server.use("/children", childrenRouter);

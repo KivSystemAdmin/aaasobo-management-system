@@ -44,9 +44,6 @@ function UsersTable({
           case "customer":
             usersData = await getAllCustomers();
             break;
-          case "customer":
-            usersData = await getAllCustomers();
-            break;
           default:
             usersData = [];
         }
