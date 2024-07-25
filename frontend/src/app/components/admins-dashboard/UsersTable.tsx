@@ -1,12 +1,37 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { getAllInstructors } from "@/app/helper/adminsApi";
+import { useState, useEffect, useMemo } from "react";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  flexRender,
+  ColumnDef,
+  SortingState,
+} from "@tanstack/react-table";
+import Link from "next/link";
+import { getAllInstructors, getAllCustomers } from "@/app/helper/adminsApi";
 
-function UsersTable({ userType }: { userType: string }) {
+interface UsersTableProps {
+  userType: string;
+  omitItems: string[];
+  linkItems: string[];
+  linkUrls: string[];
+  replaceItems: string[];
+}
+
+function UsersTable({
+  userType,
+  omitItems,
+  linkItems,
+  linkUrls,
+  replaceItems,
+}: UsersTableProps) {
   const [users, setUsers] = useState<any[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   useEffect(() => {
+    // Fetch the users based on the user type
     const fetchUsers = async () => {
       try {
         let usersData;
@@ -14,9 +39,9 @@ function UsersTable({ userType }: { userType: string }) {
           case "instructor":
             usersData = await getAllInstructors();
             break;
-          // case "customer":
-          //   usersData = await getAllCustomers();
-          //   break;
+          case "customer":
+            usersData = await getAllCustomers();
+            break;
           default:
             usersData = [];
         }
@@ -29,30 +54,89 @@ function UsersTable({ userType }: { userType: string }) {
     fetchUsers();
   }, [userType]);
 
-  const userKeys = users.length > 0 ? Object.keys(users[0]) : [];
+  // Define the displays of the table
+  const columns = useMemo<ColumnDef<any>[]>(
+    () =>
+      users.length > 0
+        ? Object.keys(users[0])
+            // Omit the item from the table
+            .filter((key) => !omitItems.includes(key))
+            // Set the item to be a link
+            .map((key) => ({
+              accessorKey: key,
+              header: key,
+              cell: (data) => {
+                const value = data.getValue();
+                // If the item is not a link item, return the value
+                if (!linkItems.includes(key)) {
+                  return value;
+                }
+                // Set the link URL
+                let linkUrl = linkUrls[linkItems.indexOf(key)];
+                // Replace the item with the value(e.g., ID -> 1,2,3...)
+                replaceItems.forEach((replaceItem) => {
+                  linkUrl = linkUrl.replace(
+                    `[${replaceItem}]`,
+                    data.row.original[replaceItem],
+                  );
+                });
+                return <Link href={linkUrl}>{value}</Link>;
+              },
+            }))
+        : [],
+    [users, omitItems, linkItems, linkUrls, replaceItems],
+  );
+
+  // Define the table configuration
+  const table = useReactTable({
+    data: users,
+    columns,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(), //provide a core row model
+    getSortedRowModel: getSortedRowModel(), //provide a sorting row model
+  });
 
   return (
-    <div>
+    <>
       <h1>{userType}</h1>
       <table>
         <thead>
-          <tr>
-            {userKeys.map((key) => (
-              <th key={key}>{key}</th>
-            ))}
-          </tr>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <th
+                  key={header.id}
+                  onClick={header.column.getToggleSortingHandler()}
+                >
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext(),
+                  )}
+                  {{
+                    asc: "▲",
+                    desc: "▼",
+                  }[header.column.getIsSorted() as string] ?? ""}
+                </th>
+              ))}
+            </tr>
+          ))}
         </thead>
         <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              {userKeys.map((key) => (
-                <td key={key}>{user[key]}</td>
+          {table.getRowModel().rows.map((row) => (
+            <tr key={row.id}>
+              {row.getVisibleCells().map((cell) => (
+                <td key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
               ))}
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
+    </>
   );
 }
 

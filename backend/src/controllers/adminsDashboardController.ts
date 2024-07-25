@@ -61,23 +61,23 @@ export const getAllCustomersController = async (_: Request, res: Response) => {
       );
 
     // Transform the data structure.
-    const transformedSubscriptions = flattenedSubscriptions.map(
-      (subscription) => {
-        const { customerId, customer, plan, startAt, endAt } = subscription;
+    const data = flattenedSubscriptions.map((subscription, number) => {
+      const { customerId, customer, plan, startAt, endAt } = subscription;
 
-        return {
-          id: customerId,
-          name: customer.name,
-          email: customer.email,
-          childName: customer.children.name,
-          plan: plan.name,
-          startDate: startAt.toISOString().slice(0, 10),
-          endDate: endAt,
-        };
-      },
-    );
+      return {
+        No: number + 1,
+        ID: customerId,
+        Name: customer.name,
+        Email: customer.email,
+        "Child ID": customer.children.id,
+        "Child name": customer.children.name,
+        Plan: plan.name,
+        "Start date": startAt.toISOString().slice(0, 10),
+        "End date": endAt ? endAt.toISOString().slice(0, 10) : null,
+      };
+    });
 
-    res.json({ transformedSubscriptions });
+    res.json({ data });
   } catch (error) {
     res.status(500).json({ error });
   }
@@ -111,7 +111,7 @@ export const registerInstructorController = async (
   req: Request,
   res: Response,
 ) => {
-  const { name, email, password, nickname, icon, classLink } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     // Hash the password.
@@ -122,9 +122,9 @@ export const registerInstructorController = async (
       name,
       email,
       password: hashedPassword,
-      nickname,
-      icon,
-      classLink,
+      nickname: "",
+      icon: "",
+      classLink: "",
     });
 
     // Exclude the password from the response.

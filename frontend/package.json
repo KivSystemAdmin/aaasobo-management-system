@@ -17,6 +17,7 @@
     "@fullcalendar/react": "^6.1.14",
     "@fullcalendar/timegrid": "^6.1.14",
     "@heroicons/react": "^2.1.4",
+    "@tanstack/react-table": "^8.19.3",
     "clsx": "^2.1.1",
     "next": "14.2.4",
     "react": "^18",
