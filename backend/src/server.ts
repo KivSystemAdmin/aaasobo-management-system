@@ -8,7 +8,6 @@ import { customersRouter } from "./routes/customersRouter";
 import { adminsRouter } from "./routes/adminsRouter";
 import { adminsDashboardRouter } from "./routes/adminsDashboardRouter";
 import { childrenRouter } from "./routes/childrenRouter";
-import { recurringClassesRouter } from "./routes/recurringClassesRouter";
 
 export const server = express();
 
@@ -41,4 +40,3 @@ server.use("/customers", customersRouter);
 server.use("/admins", adminsRouter);
 server.use("/admins/dashboard", adminsDashboardRouter);
 server.use("/children", childrenRouter);
-server.use("/recurring-classes", recurringClassesRouter);

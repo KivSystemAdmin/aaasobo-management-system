@@ -30,19 +30,3 @@ export const formatDateTime = (date: Date, timeZone: string) => {
     timeZone,
   }).format(date);
 };
-
-// Function to calculate the class start and end times in Philippine Time from an ISO date string
-// and format the times as "YYYY-MM-DDTHH:MM:SS" to use them directly in events on the calendar
-export function getPhilippineClassStartAndEndTimes(isoDateStr: string) {
-  const timeZoneOffset = 8 * 60 * 60 * 1000;
-  const date = new Date(isoDateStr);
-  const philippineStartDate = new Date(date.getTime() + timeZoneOffset);
-  const philippineEndDate = new Date(
-    philippineStartDate.getTime() + 25 * 60 * 1000,
-  );
-
-  return {
-    start: philippineStartDate.toISOString().replace(".000Z", ""),
-    end: philippineEndDate.toISOString().replace(".000Z", ""),
-  };
-}

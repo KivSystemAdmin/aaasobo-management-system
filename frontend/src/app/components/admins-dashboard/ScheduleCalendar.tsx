@@ -1,5 +1,11 @@
 import styles from "./ScheduleCalendar.module.scss";
-import { Day, SlotsOfDays } from "@/app/helper/instructorsApi";
+
+type Day = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
+
+export type SlotsOfDays = {
+  // time must be in 24 format: "HH:MM"
+  [day in Day]: string[];
+};
 
 export default function ScheduleCalendar({
   slotsOfDays,

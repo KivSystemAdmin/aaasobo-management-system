@@ -29,6 +29,8 @@ function UsersTable({
 }: UsersTableProps) {
   const [users, setUsers] = useState<any[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [filterColumn, setFilterColumn] = useState<string>("");
+  const [filterValue, setFilterValue] = useState<string>("");
 
   useEffect(() => {
     // Fetch the users based on the user type
@@ -38,6 +40,9 @@ function UsersTable({
         switch (userType) {
           case "instructor":
             usersData = await getAllInstructors();
+            break;
+          case "customer":
+            usersData = await getAllCustomers();
             break;
           case "customer":
             usersData = await getAllCustomers();
@@ -73,7 +78,7 @@ function UsersTable({
                 }
                 // Set the link URL
                 let linkUrl = linkUrls[linkItems.indexOf(key)];
-                // Replace the item with the value(e.g., ID -> 1,2,3...)
+                // Replace the item with the value(e.g.,[ID] -> 1,2,3...)
                 replaceItems.forEach((replaceItem) => {
                   linkUrl = linkUrl.replace(
                     `[${replaceItem}]`,
@@ -87,9 +92,22 @@ function UsersTable({
     [users, omitItems, linkItems, linkUrls, replaceItems],
   );
 
+  // Configure the filter
+  const filteredData = useMemo(
+    () =>
+      users.filter((user) =>
+        filterColumn && filterValue
+          ? String(user[filterColumn])
+              .toLowerCase()
+              .includes(filterValue.toLowerCase())
+          : true,
+      ),
+    [users, filterColumn, filterValue],
+  );
+
   // Define the table configuration
   const table = useReactTable({
-    data: users,
+    data: filteredData,
     columns,
     state: {
       sorting,
@@ -102,6 +120,28 @@ function UsersTable({
   return (
     <>
       <h1>{userType}</h1>
+      <select
+        value={filterColumn}
+        onChange={(e) => setFilterColumn(e.target.value)}
+      >
+        <option disabled value="">
+          --- Select a column ---
+        </option>
+        {users.length > 0 &&
+          Object.keys(users[0])
+            .filter((key) => !omitItems.includes(key))
+            .map((key) => (
+              <option key={key} value={key}>
+                {key}
+              </option>
+            ))}
+      </select>
+      <input
+        type="text"
+        placeholder="Enter filter value..."
+        value={filterValue}
+        onChange={(e) => setFilterValue(e.target.value)}
+      />
       <table>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (

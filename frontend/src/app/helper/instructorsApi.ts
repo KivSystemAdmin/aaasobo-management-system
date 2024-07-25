@@ -1,12 +1,5 @@
 const BASE_URL = "http://localhost:4000/instructors";
 
-export type Day = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
-
-export type SlotsOfDays = {
-  // time must be in 24 format: "HH:MM"
-  [day in Day]: string[];
-};
-
 export type Response<T> = T | { message: string };
 
 export type Availability = {
@@ -15,12 +8,6 @@ export type Availability = {
 
 export type RecurringInstructorAvailability = {
   rrule: string;
-};
-
-export type InstructorWithRecurringAvailability = {
-  id: number;
-  name: string;
-  recurringAvailabilities: SlotsOfDays;
 };
 
 // GET instructors data
@@ -50,16 +37,6 @@ export const getInstructor = async (
       (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime(),
     );
   }
-  return data;
-};
-
-export const getInstructorRecurringAvailability = async (
-  id: number,
-  date: string,
-): Promise<Response<InstructorWithRecurringAvailability>> => {
-  const data: Response<InstructorWithRecurringAvailability> = await fetch(
-    `${BASE_URL}/${id}/recurringAvailability?date=${date}`,
-  ).then((res) => res.json());
   return data;
 };
 
@@ -130,19 +107,5 @@ export const extendRecurringAvailability = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ until }),
-  }).then((res) => res.json());
-};
-
-export const addRecurringAvailabilities = async (
-  instructorId: number,
-  slotsOfDays: SlotsOfDays,
-  startDate: string,
-) => {
-  return await fetch(`${BASE_URL}/${instructorId}/recurringAvailability`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ slotsOfDays, startDate }),
   }).then((res) => res.json());
 };

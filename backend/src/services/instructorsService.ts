@@ -66,10 +66,9 @@ export async function getInstructorById(id: number) {
 export async function addInstructorRecurringAvailability(
   instructorId: number,
   startAt: Date,
-  tx: Prisma.TransactionClient = prisma,
 ) {
   try {
-    await tx.instructorRecurringAvailability.create({
+    await prisma.instructorRecurringAvailability.create({
       data: {
         instructorId,
         startAt,
@@ -151,92 +150,5 @@ export async function deleteInstructorAvailability(
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to delete instructor availability.");
-  }
-}
-
-export async function getInstructorWithRecurringAvailabilityDay(
-  instructorId: number,
-  tx: Prisma.TransactionClient,
-) {
-  try {
-    // Prisma doesnt' suppport EXTRACT function, so $queryRaw is used.
-    return await tx.$queryRaw`
-        SELECT
-          *,
-          to_char("startAt" AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo', 'Dy') AS day,
-          LPAD(EXTRACT(HOUR FROM "startAt" AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo')::TEXT, 2, '0')
-            || ':'
-            || LPAD(EXTRACT(MINUTE FROM "startAt")::TEXT, 2, '0') as time
-        FROM
-          "InstructorRecurringAvailability"
-        WHERE "instructorId" = ${instructorId}
-      `;
-  } catch (error) {
-    console.error("Database Error:", error);
-    throw new Error("Failed to fetch recurring availabilities.");
-  }
-}
-
-export async function terminateRecurringAvailability(
-  instructorId: number,
-  instructorRecurringAvailabilityId: number,
-  endAt: Date,
-  tx: Prisma.TransactionClient,
-) {
-  try {
-    const availabilitiesToDelete = await tx.instructorAvailability.findMany({
-      where: {
-        instructorRecurringAvailabilityId,
-        dateTime: { gt: endAt },
-      },
-    });
-
-    const associatedClass = await tx.class.findFirst({
-      where: {
-        instructorId,
-        dateTime: { in: availabilitiesToDelete.map((slot) => slot.dateTime) },
-      },
-    });
-    if (associatedClass) {
-      // TODO: Consider how to handle conflicts.
-      // e.g., set the status of the class to "canceledByInstructor".
-      throw Error(
-        "Cannot delete a recurring availability with associated class.",
-      );
-    }
-
-    await tx.instructorAvailability.deleteMany({
-      where: {
-        instructorRecurringAvailabilityId,
-        dateTime: { gt: endAt },
-      },
-    });
-
-    await tx.instructorRecurringAvailability.update({
-      where: { id: instructorRecurringAvailabilityId },
-      data: { endAt },
-    });
-  } catch (error) {
-    console.error("Database Error:", error);
-    throw new Error("Failed to terminate recurring availability.");
-  }
-}
-
-export async function updateRecurringAvailabilityInterval(
-  instructorRecurringAvailabilityId: number,
-  startAt: Date,
-  endAt: Date | null,
-  tx: Prisma.TransactionClient,
-) {
-  try {
-    await tx.instructorRecurringAvailability.update({
-      where: { id: instructorRecurringAvailabilityId },
-      data: { startAt, endAt },
-    });
-  } catch (error) {
-    console.error("Database Error:", error);
-    throw new Error(
-      "Failed to update instructor recurring availability interval.",
-    );
   }
 }

@@ -1,13 +1,18 @@
 import { Request, Response } from "express";
 import {
+  countClassesOfSubscription,
+  addRecurringClass,
   createClass,
   deleteClass,
   getAllClasses,
   getClassById,
   getClassesByCustomerId,
   updateClass,
+  getRecurringClassesBySubscriptionId,
 } from "../services/classesService";
 import { getActiveSubscription } from "../services/subscriptionsService";
+import { RRule } from "rrule";
+import { getEndOfNextMonth } from "../helper/commonUtils";
 
 // GET all classes along with related instructors and customers data
 export const getAllClassesController = async (_: Request, res: Response) => {
@@ -206,6 +211,72 @@ export const updateClassController = async (req: Request, res: Response) => {
       message: "Class is updated successfully",
       updatedClass,
     });
+  } catch (error) {
+    res.status(500).json({ error: `${error}` });
+  }
+};
+
+// POST a recurring class
+export const addRecurringClassController = async (
+  req: Request,
+  res: Response,
+) => {
+  const { instructorId, customerId, childrenIds, subscriptionId, dateTime } =
+    req.body;
+  if (
+    !instructorId ||
+    !customerId ||
+    !childrenIds ||
+    !subscriptionId ||
+    !dateTime
+  ) {
+    return res.status(400).json({ message: "Values are not found" });
+  }
+
+  const date = new Date(dateTime);
+  const rrule = new RRule({
+    freq: RRule.WEEKLY,
+    dtstart: date,
+  });
+
+  // Generate the recurring class until the end of next month
+  const dateTimes = rrule.between(date, getEndOfNextMonth(date), true);
+
+  try {
+    const recurringClass = await addRecurringClass(
+      instructorId,
+      customerId,
+      childrenIds,
+      subscriptionId,
+      rrule.toString(),
+      dateTimes,
+    );
+
+    res.status(200).json({
+      message: "Recurring class is created successfully",
+      recurringClass,
+    });
+  } catch (error) {
+    res.status(500).json({ error: `${error}` });
+  }
+};
+
+// GET recurring classes by customer id along with related subscriptions, customers and instructors data
+export const getRecurringClassesBySubscriptionIdController = async (
+  req: Request,
+  res: Response,
+) => {
+  const subscriptionId = parseInt(req.query.subscriptionId as string);
+  if (isNaN(subscriptionId)) {
+    res.status(400).json({ error: "Invalid customer ID" });
+    return;
+  }
+
+  try {
+    const recurringClasses =
+      await getRecurringClassesBySubscriptionId(subscriptionId);
+
+    res.json({ recurringClasses });
   } catch (error) {
     res.status(500).json({ error: `${error}` });
   }
