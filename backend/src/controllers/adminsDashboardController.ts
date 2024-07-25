@@ -92,13 +92,19 @@ export const getAllInstructorsController = async (
     // Fetch the admin data using the email.
     const instructors = await getAllInstructors();
 
-    // Define the properties to pick.
-    const selectedProperties = ["id", "name"];
-
     // Transform the data structure.
-    const data = instructors.map((instructor) =>
-      pickProperties(instructor, selectedProperties),
-    );
+    const data = instructors.map((instructor, number) => {
+      const { id, name, nickname, email, classLink } = instructor;
+
+      return {
+        No: number + 1,
+        ID: id,
+        Name: name,
+        Nickname: nickname,
+        Email: email,
+        "Class link": classLink,
+      };
+    });
 
     res.json({ data });
   } catch (error) {

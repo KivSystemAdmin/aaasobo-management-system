@@ -20,6 +20,10 @@ function useNumberInput(
 
 function Page() {
   const userType = "instructor";
+  const omitItems = [""]; // Omit the item from the table
+  const linkItems = ["ID"]; // Set the item to be a link
+  const replaceItems = ["ID"]; // Replace the item with the value(e.g., ID -> 1,2,3...)
+  const linkUrls = ["/instructors/[ID]/profile"]; // Set the link URL
   const router = useRouter();
 
   // Check the authentication of the admin.
@@ -40,7 +44,15 @@ function Page() {
 
   return (
     <div>
-      <UsersTable userType={userType} />
+      <UsersTable
+        userType={userType}
+        omitItems={omitItems}
+        linkItems={linkItems}
+        linkUrls={linkUrls}
+        replaceItems={replaceItems}
+      />
+      <AddScheduleForm />
+
       <CreateCalendarForm />
       <hr />
       <h2>Instructor Schedule Calendar</h2>
