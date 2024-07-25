@@ -5,7 +5,12 @@ import {
   terminateRecurringClass,
 } from "../services/recurringClassesService";
 import { RequestWithId } from "../middlewares/parseId.middleware";
-import { createDatesBetween, getEndOfNextMonth } from "../helper/commonUtils";
+import {
+  getFirstDateInMonths,
+  createDatesBetween,
+  calculateFirstDate,
+  JAPAN_TIME_DIFF,
+} from "../helper/dateUtils";
 
 // POST a recurring class
 export const addRecurringClassController = async (
@@ -101,25 +106,15 @@ export const updateRecurringClassesController = async (
   }
 
   try {
-    // TODO: Something is wrong. "endAt" should be fixed.
-    // Get the end date of the recurring class to be edited.
     const endAt = new Date(startDate);
-    endAt.setDate(endAt.getDate() - 1);
-    endAt.setUTCHours(23, 59, 59);
 
     // Add endAt to the current recurring class
     await terminateRecurringClass(req.id, endAt);
 
-    // Request and response are in Japanese time.
-    const JAPAN_TIME_DIFF = 9;
-
-    // The following calculation for setDate works only for after 09:00 in Japanese time.
-    // Japanese time is UTC+9. Thus, after 09:00, date.getUTCDay() returns the same day as in Japan.
-    const date = new Date(startDate);
-    date.setDate(date.getDate() + ((day - date.getUTCDay() + 7) % 7));
+    const date = calculateFirstDate(new Date(startDate), day, time);
 
     // Define the end date for the recurring classes.
-    const until = getEndOfNextMonth(date);
+    const until = getFirstDateInMonths(date, 2);
 
     const [hour, minute] = time.split(":");
     date.setUTCHours(hour - JAPAN_TIME_DIFF);

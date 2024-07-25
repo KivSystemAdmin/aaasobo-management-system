@@ -31,15 +31,15 @@ async function insertInstructorAvailabilities() {
   const elian = await getInstructor("Elian");
   await prisma.instructorRecurringAvailability.createMany({
     data: [
-      { startAt: "2024-07-01T00:00:00Z", instructorId: helen.id }, // 09:00 in Japan
-      { startAt: "2024-07-01T00:30:00Z", instructorId: helen.id }, // 09:30 in Japan
-      { startAt: "2024-07-01T01:00:00Z", instructorId: elian.id }, // 10:00 in Japan
-      { startAt: "2024-07-02T01:00:00Z", instructorId: elian.id }, // 10:00 in Japan
+      { startAt: "2024-07-01T07:00:00Z", instructorId: helen.id }, // 16:00 in Japan
+      { startAt: "2024-07-01T07:30:00Z", instructorId: helen.id }, // 16:30 in Japan
+      { startAt: "2024-07-01T08:00:00Z", instructorId: elian.id }, // 17:00 in Japan
+      { startAt: "2024-07-02T08:00:00Z", instructorId: elian.id }, // 17:00 in Japan
       {
-        startAt: "2024-07-02T01:30:00Z",
+        startAt: "2024-07-02T08:30:00Z",
         instructorId: elian.id,
-        endAt: "2024-07-23T23:59:59Z",
-      }, // 10:30 in Japan
+        endAt: "2024-07-24T00:00:00Z",
+      }, // 17:30 in Japan
     ],
   });
 
@@ -63,39 +63,39 @@ async function insertInstructorAvailabilities() {
     });
   };
 
-  await insertAvailabilities(helen.id, "2024-07-01T00:00:00Z", [
-    "2024-07-01T00:00:00Z",
-    "2024-07-08T00:00:00Z",
-    "2024-07-15T00:00:00Z",
-    "2024-07-22T00:00:00Z",
-    "2024-07-29T00:00:00Z",
+  await insertAvailabilities(helen.id, "2024-07-01T07:00:00Z", [
+    "2024-07-01T07:00:00Z",
+    "2024-07-08T07:00:00Z",
+    "2024-07-15T07:00:00Z",
+    "2024-07-22T07:00:00Z",
+    "2024-07-29T07:00:00Z",
   ]);
-  await insertAvailabilities(helen.id, "2024-07-01T00:30:00Z", [
-    "2024-07-01T00:30:00Z",
-    "2024-07-08T00:30:00Z",
-    "2024-07-15T00:30:00Z",
-    "2024-07-22T00:30:00Z",
-    "2024-07-29T00:30:00Z",
+  await insertAvailabilities(helen.id, "2024-07-01T07:30:00Z", [
+    "2024-07-01T07:30:00Z",
+    "2024-07-08T07:30:00Z",
+    "2024-07-15T07:30:00Z",
+    "2024-07-22T07:30:00Z",
+    "2024-07-29T07:30:00Z",
   ]);
-  await insertAvailabilities(elian.id, "2024-07-01T01:00:00Z", [
-    "2024-07-01T01:00:00Z",
-    "2024-07-08T01:00:00Z",
-    "2024-07-15T01:00:00Z",
-    "2024-07-22T01:00:00Z",
-    "2024-07-29T01:00:00Z",
+  await insertAvailabilities(elian.id, "2024-07-01T08:00:00Z", [
+    "2024-07-01T08:00:00Z",
+    "2024-07-08T08:00:00Z",
+    "2024-07-15T08:00:00Z",
+    "2024-07-22T08:00:00Z",
+    "2024-07-29T08:00:00Z",
   ]);
-  await insertAvailabilities(elian.id, "2024-07-02T01:00:00Z", [
-    "2024-07-02T01:00:00Z",
-    "2024-07-09T01:00:00Z",
-    "2024-07-16T01:00:00Z",
-    "2024-07-23T01:00:00Z",
-    "2024-07-30T01:00:00Z",
+  await insertAvailabilities(elian.id, "2024-07-02T08:00:00Z", [
+    "2024-07-02T08:00:00Z",
+    "2024-07-09T08:00:00Z",
+    "2024-07-16T08:00:00Z",
+    "2024-07-23T08:00:00Z",
+    "2024-07-30T08:00:00Z",
   ]);
-  await insertAvailabilities(elian.id, "2024-07-02T01:30:00Z", [
-    "2024-07-02T01:30:00Z",
-    "2024-07-09T01:30:00Z",
-    "2024-07-16T01:30:00Z",
-    "2024-07-23T01:30:00Z",
+  await insertAvailabilities(elian.id, "2024-07-02T08:30:00Z", [
+    "2024-07-02T08:30:00Z",
+    "2024-07-09T08:30:00Z",
+    "2024-07-16T08:30:00Z",
+    "2024-07-23T08:30:00Z",
   ]);
 }
 
@@ -296,7 +296,7 @@ async function insertRecurringClasses() {
       subscriptionId: alice.subscription[0].id,
       instructorId: elian.id,
       startAt: "2024-07-03T02:00:00Z",
-      endAt: "2024-07-31T23:59:59Z",
+      endAt: "2024-08-01T00:00:00Z",
       recurringClassAttendance: {
         create: [
           {

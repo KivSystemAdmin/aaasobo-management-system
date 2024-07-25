@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ScheduleCalendar from "@/app/components/admins-dashboard/ScheduleCalendar";
 import { SlotsOfDays } from "@/app/helper/instructorsApi";
+import { addRecurringAvailabilities } from "@/app/helper/instructorsApi";
 
 import {
   getInstructorRecurringAvailability,
@@ -17,6 +18,7 @@ export default function InstructorScheduleCalendar() {
   const [selectedInstructorId, setSelectedInstructorId] = useState(1);
   // TODO: set an appropriate default value.
   const [selectedDate, setSelectedDate] = useState("2024-07-01");
+  const [startFrom, setStartFrom] = useState("2024-08-01");
   const [slots, setSlots] = useState<SlotsOfDays>({
     Mon: [],
     Tue: [],
@@ -57,7 +59,7 @@ export default function InstructorScheduleCalendar() {
   };
 
   const save = async () => {
-    // TODO: Call API to save the schedule.
+    await addRecurringAvailabilities(selectedInstructorId, slots, startFrom);
   };
 
   return (
@@ -78,7 +80,11 @@ export default function InstructorScheduleCalendar() {
       <ScheduleCalendar slotsOfDays={slots} setSlotsOfDays={setSlots} />
       <label>
         Start From
-        <input type="date" />
+        <input
+          type="date"
+          value={startFrom}
+          onChange={(e) => setStartFrom(e.target.value)}
+        />
       </label>
       <button onClick={save}>Save</button>
     </>

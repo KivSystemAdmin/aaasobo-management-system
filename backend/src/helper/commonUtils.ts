@@ -19,21 +19,3 @@ export const pickProperties = (
   });
   return pickedProperties;
 };
-
-export function getEndOfNextMonth(date: Date): Date {
-  const d = new Date(date);
-  d.setMonth(d.getMonth() + 2);
-  d.setUTCDate(0);
-  d.setUTCHours(23, 59, 59);
-  return d;
-}
-
-// Generate the data between `from` and `until` dates including `until`.
-export function createDatesBetween(start: Date, end: Date): Date[] {
-  const dates = [];
-  while (start <= end) {
-    dates.push(new Date(start));
-    start.setUTCDate(start.getUTCDate() + 7);
-  }
-  return dates;
-}
