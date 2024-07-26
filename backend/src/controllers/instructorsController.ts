@@ -14,9 +14,19 @@ import { type RequestWithId } from "../middlewares/parseId.middleware";
 
 // Fetch all the instructors and their availabilities
 export const getAllInstructorsAvailabilitiesController = async (
-  _: Request,
+  req: Request,
   res: Response,
 ) => {
+  const { day, time, from } = req.query;
+  if (day && time && from) {
+    const instructors = await searchInstructorsUsingRecurringAvailability(
+      day as Day,
+      time as string,
+      from as string,
+    );
+    return res.status(200).json({ instructors });
+  }
+
   try {
     // Fetch the instructors and their availabilities data from the DB
     const instructors = await getAllInstructorsAvailabilities();
@@ -39,6 +49,41 @@ export const getAllInstructorsAvailabilitiesController = async (
     res.status(500).json({ error });
   }
 };
+
+// Return instructors who are available on the specific day and time after the `from` date.
+// This function is expected to be used to find instructors for a regular class,
+// so availability that is supposed to end is not included.
+// Example:
+// Elian has a recurring availability with `startAt` = 2024-07-02T08:00:00.000Z = Tue 17:00.
+// With parameters day = "Tue", time = "17:00", and from = "2024-07-01", Elian should be included.
+async function searchInstructorsUsingRecurringAvailability(
+  day: Day,
+  time: string,
+  from: string,
+) {
+  const firstDate = calculateFirstDate(new Date(from), day, time);
+  const nextDay = new Date(firstDate);
+  nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+  nextDay.setUTCHours(0, 0, 0);
+
+  const [hour, minute] = time.split(":").map(Number);
+
+  // queryRaw is used to use EXTRACT function.
+  const instructors = await prisma.$queryRaw`
+      SELECT
+        "Instructor".*
+      FROM
+        "InstructorRecurringAvailability"
+        INNER JOIN "Instructor"
+          ON "Instructor".id = "InstructorRecurringAvailability"."instructorId"
+      WHERE
+        to_char("startAt" AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo', 'Dy') = ${day}
+        AND EXTRACT(HOUR FROM "startAt" AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo') = ${hour}
+        AND EXTRACT(MINUTE FROM "startAt" AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo') = ${minute}
+        AND ("startAt" < ${nextDay} AND "endAt" IS NULL)
+    `;
+  return instructors;
+}
 
 function setErrorResponse(res: Response, error: unknown) {
   return res
