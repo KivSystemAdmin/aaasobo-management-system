@@ -7,6 +7,10 @@ import {
   RecurringAvailability,
 } from "../controllers/instructorsController";
 import { type RequestWithId, parseId } from "../middlewares/parseId.middleware";
+import {
+  createInstructorUnavailability,
+  getInstructorUnavailabilities,
+} from "../controllers/instructorsUnavailabilityController";
 
 export const instructorsRouter = express.Router();
 
@@ -26,3 +30,10 @@ instructorsRouter.put("/:id/availability", parseId, (req, res) =>
 instructorsRouter.delete("/:id/availability", parseId, (req, res) =>
   deleteAvailability(req as RequestWithId, res),
 );
+
+instructorsRouter.get("/:id/unavailability", parseId, (req, res) => {
+  getInstructorUnavailabilities(req as RequestWithId, res);
+});
+instructorsRouter.put("/:id/unavailability", parseId, (req, res) => {
+  createInstructorUnavailability(req as RequestWithId, res);
+});

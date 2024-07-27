@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ChangeEvent, useEffect, useState } from "react";
-import Calendar from "../components/Calendar";
+import Link from "next/link";
 
 const Instructor = () => {
   const [instructorsData, setInstructorsData] = useState<
@@ -57,7 +57,11 @@ const Instructor = () => {
             );
           })}
       </select>
-      {selectedInstructor && <Calendar instructor={selectedInstructor} />}
+      {selectedInstructor && (
+        <Link href={`/instructors-old/${selectedInstructor.id}`}>
+          Instructor Page
+        </Link>
+      )}
     </div>
   );
 };

@@ -2,19 +2,16 @@ import { useEffect, useState } from "react";
 import ScheduleCalendar from "@/app/components/admins-dashboard/ScheduleCalendar";
 import { SlotsOfDays } from "@/app/helper/instructorsApi";
 
+import { getInstructorRecurringAvailability } from "@/app/helper/instructorsApi";
+
 import {
-  getInstructorRecurringAvailability,
-  getInstructors,
-} from "@/app/helper/instructorsApi";
-type Instructor = {
-  id: number;
-  name: string;
-  recurringAvailabilities: SlotsOfDays;
-};
+  InstructorSelect,
+  useInstructorSelect,
+} from "@/app/components/admins-dashboard/InstructorSelect";
 
 export default function InstructorScheduleCalendar() {
-  const [instructors, setInstructors] = useState<Instructor[]>([]);
-  const [selectedInstructorId, setSelectedInstructorId] = useState(1);
+  const [instructors, selectedInstructorId, onSelectedInstructorIdChange] =
+    useInstructorSelect();
   // TODO: set an appropriate default value.
   const [selectedDate, setSelectedDate] = useState("2024-07-01");
   const [slots, setSlots] = useState<SlotsOfDays>({
@@ -26,17 +23,6 @@ export default function InstructorScheduleCalendar() {
     Sat: [],
     Sun: [],
   });
-
-  useEffect(() => {
-    (async () => {
-      const instructors = await getInstructors();
-      if (instructors.length === 0) {
-        throw new Error("No instructors found.");
-      }
-      setInstructors(instructors);
-      setSelectedInstructorId(instructors[0].id);
-    })();
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -52,10 +38,6 @@ export default function InstructorScheduleCalendar() {
     })();
   }, [selectedInstructorId, selectedDate]);
 
-  const selectInstructor = (id: number) => {
-    setSelectedInstructorId(id);
-  };
-
   const save = async () => {
     // TODO: Call API to save the schedule.
   };
@@ -65,7 +47,7 @@ export default function InstructorScheduleCalendar() {
       <InstructorSelect
         instructors={instructors}
         id={selectedInstructorId}
-        onChange={selectInstructor}
+        onChange={onSelectedInstructorIdChange}
       />
       <label>
         Date
@@ -81,28 +63,6 @@ export default function InstructorScheduleCalendar() {
         <input type="date" />
       </label>
       <button onClick={save}>Save</button>
-    </>
-  );
-}
-
-function InstructorSelect({
-  instructors,
-  id,
-  onChange,
-}: {
-  instructors: Instructor[];
-  id: number;
-  onChange: (id: number) => void;
-}) {
-  return (
-    <>
-      <select value={id} onChange={(e) => onChange(parseInt(e.target.value))}>
-        {instructors.map(({ id, name }) => (
-          <option key={id} value={id}>
-            {name}
-          </option>
-        ))}
-      </select>
     </>
   );
 }

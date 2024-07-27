@@ -5,10 +5,16 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import UsersTable from "@/app/components/admins-dashboard/UsersTable";
 import InstructorScheduleCalendar from "@/app/components/admins-dashboard/InstructorScheduleCalendar";
+import Calendar from "@/app/components/Calendar";
+import {
+  Instructor,
+  InstructorSelect,
+  useInstructorSelect,
+} from "@/app/components/admins-dashboard/InstructorSelect";
 
 import {
   addAvailability,
-  addRecurringAvailability,
+  registerUnavailability,
 } from "@/app/helper/instructorsApi";
 
 function useNumberInput(
@@ -54,70 +60,80 @@ function Page() {
         linkUrls={linkUrls}
         replaceItems={replaceItems}
       />
-      <AddScheduleForm />
       <CreateCalendarForm />
       <hr />
       <h2>Instructor Schedule Calendar</h2>
       <InstructorScheduleCalendar />
+      <hr />
+      <h2>Availability Calendar</h2>
+      <AvailabilityCalendar />
     </div>
   );
 }
 
-function AddScheduleForm() {
-  const [instructorId, onInstructorIdChange] = useNumberInput(1);
-  const [day, setDay] = useState("1");
-  const [time, setTime] = useState("09:00");
-  const [startDate, setDate] = useState("2024-07-01");
+function AvailabilityCalendar() {
+  const [
+    instructors,
+    selectedInstructorId,
+    onSelectedInstructorIdChange,
+    refresh,
+  ] = useInstructorSelect();
+  const [selectedEvent, setSelectedEvent] = useState("");
 
-  const submit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const res = await addRecurringAvailability(
-      instructorId,
-      parseInt(day),
-      time,
-      startDate,
+  const events = buildEvents(
+    instructors.find((i) => i.id === selectedInstructorId),
+  );
+
+  const submit = async () => {
+    const res = await registerUnavailability(
+      selectedInstructorId,
+      selectedEvent,
     );
     if ("message" in res) {
       alert(res.message);
+      return;
     }
+    await refresh();
   };
 
   return (
-    <form onSubmit={submit}>
-      Add Instructor Schedule
-      <br />
-      <label>
-        Instructor ID:
-        <input
-          type="number"
-          value={instructorId}
-          onChange={onInstructorIdChange}
-        />
-      </label>
-      <select value={day} onChange={(e) => setDay(e.target.value)}>
-        <option value="1">Monday</option>
-        <option value="2">Tuesday</option>
-        <option value="3">Wednesday</option>
-        <option value="4">Thursday</option>
-        <option value="5">Friday</option>
-        <option value="6">Saturday</option>
-      </select>
-      <input
-        type="time"
-        value={time}
-        onChange={(e) => setTime(e.target.value)}
+    <>
+      <InstructorSelect
+        instructors={instructors}
+        id={selectedInstructorId}
+        onChange={onSelectedInstructorIdChange}
       />
-      <label>
-        Start Date
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setDate(e.target.value)}
-        />
-      </label>
-      <button type="submit">Submit</button>
-    </form>
+      <Calendar
+        events={events}
+        selectable={true}
+        select={(info) => setSelectedEvent(info.startStr)}
+      />
+      <>
+        {/* Show dummy date to stabilize the position of those elements. */}
+        <p>{selectedEvent ? selectedEvent : "0000-00-00T00:00:00+09:00"}</p>
+        <button onClick={submit}>Register Unavailability</button>
+      </>
+    </>
   );
+}
+
+function buildEvents(instructor: Instructor | undefined) {
+  const toEvents = (availabilities: { dateTime: string }[], color?: string) =>
+    availabilities.map((dateTime) => {
+      const start = dateTime.dateTime;
+      const end = new Date(
+        new Date(start).getTime() + 25 * 60000,
+      ).toISOString();
+      return {
+        id: start,
+        start,
+        end,
+        color,
+      };
+    });
+  const availabilities = toEvents(instructor?.availabilities ?? []);
+  const unavailabilities = toEvents(instructor?.unavailabilities ?? [], "gray");
+  return [...availabilities, ...unavailabilities];
 }
 
 function CreateCalendarForm() {

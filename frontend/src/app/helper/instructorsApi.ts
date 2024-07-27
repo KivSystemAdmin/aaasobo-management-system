@@ -132,3 +132,30 @@ export const extendRecurringAvailability = async (
     body: JSON.stringify({ until }),
   }).then((res) => res.json());
 };
+
+export const addRecurringAvailabilities = async (
+  instructorId: number,
+  slotsOfDays: SlotsOfDays,
+  startDate: string,
+) => {
+  return await fetch(`${BASE_URL}/${instructorId}/recurringAvailability`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ slotsOfDays, startDate }),
+  }).then((res) => res.json());
+};
+
+export const registerUnavailability = async (
+  id: number,
+  dateTime: string,
+): Promise<Response<{ unavailability: Availability }>> => {
+  return await fetch(`${BASE_URL}/${id}/unavailability`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ dateTime }),
+  }).then((res) => res.json());
+};

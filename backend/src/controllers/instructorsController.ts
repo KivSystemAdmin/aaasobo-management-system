@@ -32,11 +32,17 @@ export const getAllInstructorsAvailabilitiesController = async (
     const instructors = await getAllInstructorsAvailabilities();
 
     // Define the properties to pick.
-    const selectedProperties = ["id", "name", "instructorAvailability"];
+    const selectedProperties = [
+      "id",
+      "name",
+      "instructorAvailability",
+      "instructorUnavailability",
+    ];
 
     // Define the property name mapping.
     const propertyMapping = {
       instructorAvailability: "availabilities",
+      instructorUnavailability: "unavailabilities",
     };
 
     // Transform the data structure.

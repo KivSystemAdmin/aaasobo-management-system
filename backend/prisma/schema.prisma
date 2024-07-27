@@ -25,6 +25,7 @@ model Instructor {
   classLink                       String                            @unique
   icon                            String                            @unique
   nickname                        String                            @unique
+  instructorUnavailability        InstructorUnavailability[]
 }
 
 model InstructorRecurringAvailability {
@@ -42,6 +43,14 @@ model InstructorAvailability {
   dateTime                          DateTime
   instructor                        Instructor                       @relation(fields: [instructorId], references: [id])
   instructorRecurringAvailability   InstructorRecurringAvailability? @relation(fields: [instructorRecurringAvailabilityId], references: [id])
+
+  @@id([instructorId, dateTime])
+}
+
+model InstructorUnavailability {
+  instructorId Int
+  dateTime     DateTime
+  instructor   Instructor @relation(fields: [instructorId], references: [id])
 
   @@id([instructorId, dateTime])
 }

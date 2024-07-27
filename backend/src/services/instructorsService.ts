@@ -43,7 +43,7 @@ export const getAllInstructors = async () => {
 export const getAllInstructorsAvailabilities = async () => {
   try {
     return await prisma.instructor.findMany({
-      include: { instructorAvailability: true },
+      include: { instructorAvailability: true, instructorUnavailability: true },
     });
   } catch (error) {
     console.error("Database Error:", error);
@@ -117,10 +117,20 @@ export async function addInstructorAvailabilities(
   }[],
 ) {
   try {
+    const unavailabilities = await tx.instructorUnavailability.findMany({
+      where: { instructorId },
+    });
+    const excludeDateTimes = new Set(
+      unavailabilities.map(({ dateTime }) => dateTime.toISOString()),
+    );
+
     for (const recurringAvailability of recurringAvailabilities) {
       const { instructorRecurringAvailabilityId, dateTimes } =
         recurringAvailability;
       for (const dateTime of dateTimes) {
+        if (excludeDateTimes.has(dateTime.toISOString())) {
+          continue;
+        }
         const data = {
           instructorId,
           instructorRecurringAvailabilityId,

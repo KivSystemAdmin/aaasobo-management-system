@@ -4,31 +4,18 @@ import momentTimezonePlugin from "@fullcalendar/moment-timezone";
 import interactionPlugin from "@fullcalendar/interaction";
 import { CalendarOptions } from "@fullcalendar/core";
 
+type Event = {
+  id: string;
+  start: string;
+  end: string;
+  color?: string;
+};
+
 type CalendarProp = {
-  instructor: Instructor;
+  events: Event[];
 } & CalendarOptions;
 
-function Calendar({ instructor, ...options }: CalendarProp) {
-  // If instructor's data is undefined, return it.
-  if (instructor === undefined) {
-    return;
-  }
-
-  // Otherwise, create the events based on that data.
-  const events = instructor
-    ? instructor.availabilities.map((availability, index) => {
-        const start = availability.dateTime;
-        const end = new Date(
-          new Date(start).getTime() + 25 * 60000,
-        ).toISOString();
-        return {
-          id: index.toString(),
-          start,
-          end,
-        };
-      })
-    : [];
-
+function Calendar({ events, ...options }: CalendarProp) {
   return (
     <FullCalendar
       {...options}

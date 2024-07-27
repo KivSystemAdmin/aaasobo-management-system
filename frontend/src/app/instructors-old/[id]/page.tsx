@@ -58,11 +58,21 @@ export default function Page() {
     return <h2>Loading...</h2>;
   }
 
+  const events = instructor.availabilities.map((availability, index) => {
+    const start = availability.dateTime;
+    const end = new Date(new Date(start).getTime() + 25 * 60000).toISOString();
+    return {
+      id: index.toString(),
+      start,
+      end,
+    };
+  });
+
   return (
     <>
       <h1>{instructor.name}</h1>
       <Calendar
-        instructor={instructor}
+        events={events}
         selectable={true}
         select={(info) => {
           setClickedEvent(null);
