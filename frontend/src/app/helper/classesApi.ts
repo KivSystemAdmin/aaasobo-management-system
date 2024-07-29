@@ -113,14 +113,11 @@ export const addRecurringClass = async (recurringClassData: {
   dateTime: string;
 }) => {
   try {
-    const response = await fetch(
-      `http://localhost:4000/classes/recurring-class`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(recurringClassData),
-      },
-    );
+    const response = await fetch(`http://localhost:4000/recurring-class`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(recurringClassData),
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error. status ${response.status}`);
@@ -139,8 +136,9 @@ export const getRecurringClassesBySubscriptionId = async (
   subscriptionId: number,
 ) => {
   try {
+    console.log({ x: "getRecurringClassesBySubscriptionId", subscriptionId });
     const response = await fetch(
-      `http://localhost:4000/classes/recurring-classes?subscriptionId=${subscriptionId}`,
+      `http://localhost:4000/recurring-classes?subscriptionId=${subscriptionId}`,
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

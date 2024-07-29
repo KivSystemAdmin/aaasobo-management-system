@@ -19,11 +19,3 @@ export const pickProperties = (
   });
   return pickedProperties;
 };
-
-export function getEndOfNextMonth(date: Date): Date {
-  const d = new Date(date);
-  d.setMonth(d.getMonth() + 2);
-  d.setDate(-1);
-  d.setUTCHours(23, 59, 59);
-  return d;
-}

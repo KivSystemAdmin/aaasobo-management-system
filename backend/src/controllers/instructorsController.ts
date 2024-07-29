@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../../prisma/prismaClient";
 import { pickProperties } from "../helper/commonUtils";
+import { Day, calculateFirstDate } from "../helper/dateUtils";
 import {
   getAllInstructorsAvailabilities,
   getInstructorById,
