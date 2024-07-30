@@ -8,12 +8,9 @@ import UsersTable from "@/app/components/admins-dashboard/UsersTable";
 function Page() {
   const userType = "customer";
   const omitItems = ["Child ID"]; // Omit the item from the table
-  const linkItems = ["ID", "Child name"]; // Set the item to be a link
-  const replaceItems = ["ID", "Child ID"]; // Replace the item with the value(e.g., ID -> 1,2,3...)
-  const linkUrls = [
-    "/customers/[ID]/home",
-    "/customers/[ID]/children-profiles/[Child ID]/edit",
-  ]; // Set the link URL
+  const linkItems = ["ID"]; // Set the item to be a link
+  const replaceItems = ["ID"]; // Replace the item with the value(e.g., ID -> 1,2,3...)
+  const linkUrls = ["/admins/customer-list/[ID]"]; // Set the link URL
   const router = useRouter();
 
   // Check the authentication of the admin.
