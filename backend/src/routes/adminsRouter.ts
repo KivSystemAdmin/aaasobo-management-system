@@ -21,9 +21,9 @@ adminsRouter.get("/logout", logoutAdminController);
 adminsRouter.post("/register", requireAuthentication, registerAdminController);
 adminsRouter.get("/authentication", authenticateAdminSession);
 adminsRouter.post(
-  "/instructors/register",
+  "/instructor-list/register",
   requireAuthentication,
   registerInstructorController,
 );
-adminsRouter.get("/instructors", getAllInstructorsController);
-adminsRouter.get("/customers", getAllCustomersController);
+adminsRouter.get("/instructor-list", getAllInstructorsController);
+adminsRouter.get("/customer-list", getAllCustomersController);

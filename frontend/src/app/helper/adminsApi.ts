@@ -3,7 +3,7 @@ const BASE_URL = "http://localhost:4000/admins";
 // GET all instructors data
 export const getAllInstructors = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/instructors`);
+    const response = await fetch(`${BASE_URL}/instructor-list`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -18,7 +18,7 @@ export const getAllInstructors = async () => {
 // GET all customers data
 export const getAllCustomers = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/customers`);
+    const response = await fetch(`${BASE_URL}/customer-list`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
