@@ -6,7 +6,12 @@ import { useEffect, useState } from "react";
 import { deleteChild, getChildrenByCustomerId } from "@/app/helper/childrenApi";
 import EditButton from "@/app/components/customers-dashboard/EditButton";
 
-function ChildrenProfiles({ customerId }: { customerId: string }) {
+function ChildrenProfiles({
+  customerId,
+}: {
+  customerId: string;
+  isAdminAuthenticated?: boolean;
+}) {
   const [children, setChildren] = useState<Child[] | undefined>([]);
 
   useEffect(() => {

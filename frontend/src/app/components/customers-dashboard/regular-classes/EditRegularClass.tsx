@@ -1,11 +1,10 @@
 "use client";
 
-import EditButton from "@/app/components/customers-dashboard/EditButton";
+import EditRegularClassForm from "@/app/components/customers-dashboard/regular-classes/EditRegularClassForm";
 import { getSubscriptionsByCustomerId } from "@/app/helper/subscriptionsApi";
-import RegularClassesTable from "../../../components/customers-dashboard/regular-classes/RegularClassesTable";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-function RegularClasses({
+function EditRegularClass({
   customerId,
   isAdminAuthenticated,
 }: {
@@ -29,6 +28,9 @@ function RegularClasses({
 
   return (
     <div>
+      <div>
+        <h1>Regular Classes Editing Page </h1>
+      </div>
       {subscriptionsData &&
         subscriptionsData.subscriptions.map((subscription) => {
           return (
@@ -41,18 +43,11 @@ function RegularClasses({
                 <p>{subscription.plan.description}</p>
               </div>
               <div>
-                <RegularClassesTable subscriptionId={subscription.id} />
-                {isAdminAuthenticated ? (
-                  <EditButton
-                    linkURL={`/admins/customer-list/${customerId}/regular-classes/edit`}
-                    btnText="Edit Regular Classes"
-                  />
-                ) : (
-                  <EditButton
-                    linkURL={`/customers/${customerId}/regular-classes/edit`}
-                    btnText="Edit Regular Classes"
-                  />
-                )}
+                <EditRegularClassForm
+                  customerId={customerId}
+                  subscriptionId={subscription.id}
+                  isAdminAuthenticated={isAdminAuthenticated}
+                />
               </div>
             </div>
           );
@@ -61,4 +56,4 @@ function RegularClasses({
   );
 }
 
-export default RegularClasses;
+export default EditRegularClass;

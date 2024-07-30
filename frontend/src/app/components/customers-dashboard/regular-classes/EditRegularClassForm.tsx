@@ -11,9 +11,11 @@ import { useMultipleSelect } from "@/app/hooks/useSelect";
 function EditRegularClassForm({
   customerId,
   subscriptionId,
+  isAdminAuthenticated,
 }: {
   customerId: string;
   subscriptionId: number;
+  isAdminAuthenticated?: boolean;
 }) {
   const [instructorsData, setInstructorsData] = useState<Instructor[]>([]);
   const [children, setChildren] = useState<Child[] | undefined>([]);
@@ -118,7 +120,13 @@ function EditRegularClassForm({
     event.preventDefault();
 
     try {
-      // Redirect the user to regular-classes page
+      if (isAdminAuthenticated) {
+        // Redirect the user to regular-classes page of admin dashboard
+        router.push(`/admins/customer-list/${customerId}`);
+        return;
+      }
+
+      // Redirect the user to regular-classes page of customer dashboard
       router.push(`/customers/${customerId}/regular-classes`);
     } catch (error) {
       console.error("Failed to add a new recurring class data:", error);
@@ -230,7 +238,11 @@ function EditRegularClassForm({
         </table>
       </div>
       <div>
-        <Link href={`/customers/${customerId}/regular-classes`}>Back</Link>
+        {isAdminAuthenticated ? (
+          <Link href={`/admins/customer-list/${customerId}`}>Back</Link>
+        ) : (
+          <Link href={`/customers/${customerId}/regular-classes`}>Back</Link>
+        )}
         <button type="submit">Confirm</button>
       </div>
     </form>
