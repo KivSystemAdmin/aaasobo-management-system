@@ -1,10 +1,10 @@
 "use client";
 
-import EditClassForm from "@/app/components/customers-dashboard/home/EditClassForm";
 import { getChildrenByCustomerId } from "@/app/helper/childrenApi";
 import { getInstructors } from "@/app/helper/instructorsApi";
 import { getClassById } from "@/app/helper/classesApi";
 import { useEffect, useState } from "react";
+import EditClassForm from "@/app/components/customers-dashboard/classes/EditClassForm";
 
 function Page({ params }: { params: { id: string; classId: string } }) {
   const customerId = params.id;

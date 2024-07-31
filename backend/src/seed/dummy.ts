@@ -10,7 +10,9 @@ async function insertInstructors() {
       name: "Helene Gay Santos",
       nickname: "Helen",
       icon: "helen-1.jpg",
-      classLink: "https://zoom.us/j/12345?pwd=ABCde",
+      classURL: "https://zoom.us/j/12345?pwd=ABCde",
+      meetingId: "123 456 7890",
+      passcode: "helen",
       password: "$2b$12$lzg9z2HDTl/dwd8DSnGHJOdPIYiFvn40fwEzRtimoty5VtOugaTfa", // password: helen
     },
   });
@@ -20,7 +22,9 @@ async function insertInstructors() {
       name: "Elian P.Quilisadio",
       nickname: "Elian",
       icon: "elian-1.jpg",
-      classLink: "https://zoom.us/j/67890?pwd=FGHij",
+      classURL: "https://zoom.us/j/67890?pwd=FGHij",
+      meetingId: "234 567 8901",
+      passcode: "elian",
       password: "$2b$12$R6tfoOzHAHCC2NgD7HZVtutBQsoWysLtdpWEKGYlkHbeGvMa.WSUe", // password: Elian
     },
   });
@@ -75,7 +79,14 @@ async function insertInstructorAvailabilities() {
     "2024-07-08T07:30:00Z",
     "2024-07-15T07:30:00Z",
     "2024-07-22T07:30:00Z",
+    "2024-07-27T07:30:00Z",
+    "2024-07-28T07:30:00Z",
     "2024-07-29T07:30:00Z",
+    "2024-07-30T07:30:00Z",
+    "2024-07-31T07:30:00Z",
+    "2024-08-01T07:30:00Z",
+    "2024-08-02T07:30:00Z",
+    "2024-08-03T07:30:00Z",
   ]);
   await insertAvailabilities(elian.id, "2024-07-01T08:00:00Z", [
     "2024-07-01T08:00:00Z",
@@ -148,6 +159,7 @@ async function insertClasses() {
         customerId: alice.id,
         dateTime: "2024-06-01T11:00:00+09:00",
         status: "completed",
+        isRebookable: false,
         subscriptionId: alice.subscription[0].id,
       },
       {
@@ -155,13 +167,14 @@ async function insertClasses() {
         customerId: alice.id,
         dateTime: "2024-06-01T11:30:00+09:00",
         status: "completed",
+        isRebookable: false,
         subscriptionId: alice.subscription[0].id,
       },
       {
         instructorId: helen.id,
         customerId: bob.id,
         dateTime: "2024-06-03T15:00:00+09:00",
-        status: "canceled",
+        status: "canceledByCustomer",
         subscriptionId: bob.subscription[0].id,
       },
       {
@@ -169,6 +182,7 @@ async function insertClasses() {
         customerId: bob.id,
         dateTime: "2024-06-03T15:30:00+09:00",
         status: "completed",
+        isRebookable: false,
         subscriptionId: bob.subscription[0].id,
       },
       {
@@ -176,6 +190,7 @@ async function insertClasses() {
         customerId: bob.id,
         dateTime: "2024-06-03T16:00:00+09:00",
         status: "completed",
+        isRebookable: false,
         subscriptionId: bob.subscription[0].id,
       },
       {

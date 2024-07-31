@@ -40,7 +40,7 @@ function Login() {
 
     // Redirect to the customer page
     const redirectUrl =
-      data.redirectUrl || `/customers/${data.customer.id}/home`;
+      data.redirectUrl || `/customers/${data.customer.id}/classes`;
     router.push(redirectUrl);
   };
   return (

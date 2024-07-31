@@ -2,7 +2,11 @@
 
 import SideNav from "@/app/components/SideNav";
 import styles from "./layout.module.scss";
-import { HomeIcon, UsersIcon, CalendarIcon } from "@heroicons/react/24/outline";
+import {
+  UsersIcon,
+  CalendarDaysIcon,
+  ClipboardDocumentListIcon,
+} from "@heroicons/react/24/outline";
 import { FC, SVGProps } from "react";
 
 type Link = {
@@ -21,9 +25,9 @@ export default function Layout({
   const customerId = params.id;
   const links: Link[] = [
     {
-      name: "Home",
-      href: `/customers/${customerId}/home`,
-      icon: HomeIcon,
+      name: "Class Calendar",
+      href: `/customers/${customerId}/classes`,
+      icon: CalendarDaysIcon,
     },
     {
       name: "Children's Profiles",
@@ -33,7 +37,7 @@ export default function Layout({
     {
       name: "Regular Classes",
       href: `/customers/${customerId}/regular-classes`,
-      icon: CalendarIcon,
+      icon: ClipboardDocumentListIcon,
     },
   ];
 

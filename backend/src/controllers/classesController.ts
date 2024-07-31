@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import {
+  cancelClassById,
   createClass,
   deleteClass,
   getAllClasses,
@@ -15,7 +16,8 @@ export const getAllClassesController = async (_: Request, res: Response) => {
     const classes = await getAllClasses();
 
     const classesData = classes.map((eachClass) => {
-      const { id, dateTime, customer, instructor, status } = eachClass;
+      const { id, dateTime, customer, instructor, status, isRebookable } =
+        eachClass;
 
       return {
         id,
@@ -30,6 +32,7 @@ export const getAllClassesController = async (_: Request, res: Response) => {
           name: instructor.name,
         },
         status,
+        isRebookable,
       };
     });
 
@@ -51,8 +54,15 @@ export const getClassesByCustomerIdController = async (
     const classes = await getClassesByCustomerId(id);
 
     const classesData = classes.map((eachClass) => {
-      const { id, dateTime, customer, instructor, status, classAttendance } =
-        eachClass;
+      const {
+        id,
+        dateTime,
+        customer,
+        instructor,
+        status,
+        classAttendance,
+        isRebookable,
+      } = eachClass;
 
       return {
         id,
@@ -65,6 +75,11 @@ export const getClassesByCustomerIdController = async (
         instructor: {
           id: instructor.id,
           name: instructor.name,
+          icon: instructor.icon,
+          classURL: instructor.classURL,
+          nickname: instructor.nickname,
+          meetingId: instructor.meetingId,
+          passcode: instructor.passcode,
         },
         classAttendance: {
           children: classAttendance.map((classAttendance) => ({
@@ -73,6 +88,7 @@ export const getClassesByCustomerIdController = async (
           })),
         },
         status,
+        isRebookable,
       };
     });
 
@@ -172,6 +188,8 @@ export const getClassByIdController = async (req: Request, res: Response) => {
       instructor: {
         id: classData.instructor.id,
         name: classData.instructor.name,
+        icon: classData.instructor.icon,
+        classURL: classData.instructor.classURL,
       },
       classAttendance: {
         children: classData.classAttendance.map((classAttendance) => ({
@@ -208,5 +226,34 @@ export const updateClassController = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({ error: `${error}` });
+  }
+};
+
+// Cancel a class
+export const cancelClassController = async (req: Request, res: Response) => {
+  const classId = parseInt(req.params.id);
+  const isPastPrevDayDeadline = false;
+
+  try {
+    await cancelClassById(classId, isPastPrevDayDeadline);
+    res.status(200).json({ message: "Class canceled successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "An unknown error occurred" });
+  }
+};
+
+// Cancel a class on the same day of the class
+export const nonRebookableCancelController = async (
+  req: Request,
+  res: Response,
+) => {
+  const classId = parseInt(req.params.id);
+  const isPastPrevDayDeadline = true;
+
+  try {
+    await cancelClassById(classId, isPastPrevDayDeadline);
+    res.status(200).json({ message: "Class canceled successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "An unknown error occurred" });
   }
 };

@@ -22,9 +22,11 @@ model Instructor {
   classes                         Class[]
   instructorRecurringAvailability InstructorRecurringAvailability[]
   recurringClasses                RecurringClass[]
-  classLink                       String                            @unique
+  classURL                        String                            @unique
   icon                            String                            @unique
   nickname                        String                            @unique
+  meetingId                       String                            @unique
+  passcode                        String                            @unique
   instructorUnavailability        InstructorUnavailability[]
 }
 
@@ -78,12 +80,14 @@ model Class {
   classAttendance  ClassAttendance[]
   subscriptionId   Int
   subscription     Subscription      @relation(fields: [subscriptionId], references: [id])
+  isRebookable     Boolean           @default(true)
 }
 
 enum Status {
   booked
   completed
-  canceled
+  canceledByCustomer
+  canceledByInstructor
 }
 
 model Admins {

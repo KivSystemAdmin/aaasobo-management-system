@@ -1,12 +1,12 @@
 import { UserCircleIcon, CalendarIcon } from "@heroicons/react/24/outline";
-import styles from "./AddClassForm.module.scss";
+import styles from "./BookClassForm.module.scss";
 import { useState } from "react";
 import Link from "next/link";
 import { formatDateTime } from "@/app/helper/dateUtils";
-import { addClass } from "@/app/helper/classesApi";
+import { bookClass } from "@/app/helper/classesApi";
 import { useRouter } from "next/navigation";
 
-function AddClassForm({
+function BookClassForm({
   customerId,
   instructors,
   children,
@@ -70,7 +70,7 @@ function AddClassForm({
     const selectedChildrenIdsArray = Array.from(selectedChildrenIds);
 
     try {
-      await addClass({
+      await bookClass({
         dateTime: selectedDateTime,
         instructorId: selectedInstructorId,
         customerId: parseInt(customerId, 10),
@@ -78,7 +78,7 @@ function AddClassForm({
         childrenIds: selectedChildrenIdsArray,
       });
 
-      router.push(`/customers/${customerId}/home`);
+      router.push(`/customers/${customerId}/classes`);
     } catch (error) {
       console.error("Failed to add class:", error);
     }
@@ -163,17 +163,17 @@ function AddClassForm({
 
       <div className={styles.actions}>
         <Link
-          href={`/customers/${customerId}/home`}
+          href={`/customers/${customerId}/classes`}
           className={styles.cancelButton}
         >
           Cancel
         </Link>
         <button type="submit" className={styles.submitButton}>
-          Add Class
+          Book Class
         </button>
       </div>
     </form>
   );
 }
 
-export default AddClassForm;
+export default BookClassForm;

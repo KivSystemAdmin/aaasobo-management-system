@@ -116,7 +116,7 @@ export const getInstructor = async (req: Request, res: Response) => {
         nickname: instructor.nickname,
         email: instructor.email,
         icon: instructor.icon,
-        classLink: instructor.classLink,
+        classURL: instructor.classURL,
       },
     });
   } catch (error) {

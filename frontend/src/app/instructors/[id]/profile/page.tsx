@@ -40,7 +40,7 @@ const Page = ({ params }: { params: { id: string } }) => {
           <h3>Name</h3> <p>{instructor.name}</p>
           <h3>Nick Name</h3> <p>{instructor.nickname}</p>
           <h3>Email</h3> <p>{instructor.email}</p>
-          <h3>Class Link</h3> <p>{instructor.classLink}</p>
+          <h3>Class URL</h3> <p>{instructor.classURL}</p>
         </>
       ) : (
         <div>Loading ...</div>

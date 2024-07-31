@@ -1,10 +1,12 @@
 import express from "express";
 import {
+  cancelClassController,
   createClassController,
   deleteClassController,
   getAllClassesController,
   getClassByIdController,
   getClassesByCustomerIdController,
+  nonRebookableCancelController,
   updateClassController,
 } from "../controllers/classesController";
 
@@ -21,3 +23,8 @@ classesRouter.post("/", createClassController);
 classesRouter.delete("/:id", deleteClassController);
 
 classesRouter.patch("/:id", updateClassController);
+classesRouter.patch("/:id/cancel", cancelClassController);
+classesRouter.patch(
+  "/:id/non-rebookable-cancel",
+  nonRebookableCancelController,
+);

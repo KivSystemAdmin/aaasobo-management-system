@@ -1,5 +1,5 @@
 import { UserCircleIcon, CalendarIcon } from "@heroicons/react/24/outline";
-import styles from "./AddClassForm.module.scss";
+import styles from "./BookClassForm.module.scss";
 import { useState } from "react";
 import Link from "next/link";
 import { formatDateTime } from "@/app/helper/dateUtils";
@@ -77,7 +77,7 @@ function EditClassForm({
         childrenIds: selectedChildrenIdsArray,
       });
 
-      router.push(`/customers/${customerId}/home`);
+      router.push(`/customers/${customerId}/classes`);
     } catch (error) {
       console.error("Failed to edit class:", error);
     }
@@ -163,13 +163,13 @@ function EditClassForm({
 
       <div className={styles.actions}>
         <Link
-          href={`/customers/${customerId}/home`}
+          href={`/customers/${customerId}/classes/${editedClass.id}`}
           className={styles.cancelButton}
         >
-          Cancel
+          Back
         </Link>
         <button type="submit" className={styles.submitButton}>
-          Edit Class
+          Reschedule
         </button>
       </div>
     </form>

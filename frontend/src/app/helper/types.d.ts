@@ -14,7 +14,7 @@ type Instructor = {
   availabilities: Availability[];
   email: string;
   nickname: string;
-  classLink: string;
+  classURL: string;
   icon: string;
 };
 
@@ -31,10 +31,16 @@ type ClassType = {
   instructor: {
     id: number;
     name: string;
+    icon: string;
+    classURL: string;
+    nickname: string;
+    meetingId: string;
+    passcode: string;
   };
   classAttendance: { children: { id: number; name: string }[] };
 
   status: "booked" | "completed" | "cancelled";
+  isRebookable: boolean;
 };
 
 type Customer = {
@@ -56,7 +62,7 @@ type CustomersClass = {
 
 type Child = {
   id: number;
-  customerId: number;
+  customerId?: number;
   name: string;
 };
 

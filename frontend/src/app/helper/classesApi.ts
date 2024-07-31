@@ -35,7 +35,7 @@ export const deleteClass = async (classId: number) => {
 };
 
 // POST class
-export const addClass = async (classData: {
+export const bookClass = async (classData: {
   dateTime: string;
   instructorId: number;
   customerId: number;
@@ -147,6 +147,31 @@ export const getRecurringClassesBySubscriptionId = async (
     return recurringClasses;
   } catch (error) {
     console.error("Failed to fetch recurring classes:", error);
+    throw error;
+  }
+};
+
+// Cancel a class: Change the state of the class from 'booked' to 'canceledByCustomer'
+export const cancelClass = async (classId: number) => {
+  const classURL = `http://localhost:4000/classes/${classId}/cancel`;
+
+  try {
+    const response = await fetch(classURL, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Error ${response.status}: ${errorData.message}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(
+      "Failed to cancel class:",
+      error instanceof Error ? error.message : "Unknown error",
+    );
     throw error;
   }
 };

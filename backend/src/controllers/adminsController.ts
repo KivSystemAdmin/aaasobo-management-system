@@ -173,7 +173,7 @@ export const getAllInstructorsController = async (
 
     // Transform the data structure.
     const data = instructors.map((instructor, number) => {
-      const { id, name, nickname, email, classLink } = instructor;
+      const { id, name, nickname, email, classURL } = instructor;
 
       return {
         No: number + 1,
@@ -181,7 +181,7 @@ export const getAllInstructorsController = async (
         Name: name,
         Nickname: nickname,
         Email: email,
-        "Class link": classLink,
+        "Class link": classURL,
       };
     });
 
@@ -209,7 +209,9 @@ export const registerInstructorController = async (
       password: hashedPassword,
       nickname: "",
       icon: "",
-      classLink: "",
+      classURL: "",
+      meetingId: "",
+      passcode: "",
     });
 
     // Exclude the password from the response.

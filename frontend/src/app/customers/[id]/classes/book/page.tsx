@@ -1,9 +1,9 @@
 "use client";
 
-import AddClassForm from "@/app/components/customers-dashboard/home/AddClassForm";
 import { useEffect, useState } from "react";
 import { getInstructors } from "@/app/helper/instructorsApi";
 import { getChildrenByCustomerId } from "@/app/helper/childrenApi";
+import BookClassForm from "@/app/components/customers-dashboard/classes/BookClassForm";
 
 function Page({ params }: { params: { id: string } }) {
   const customerId = params.id;
@@ -39,10 +39,10 @@ function Page({ params }: { params: { id: string } }) {
   return (
     <div>
       <div>
-        <h1>Add Class</h1>
+        <h1>Book Class</h1>
       </div>
       {instructors && children ? (
-        <AddClassForm
+        <BookClassForm
           customerId={customerId}
           instructors={instructors}
           children={children}
