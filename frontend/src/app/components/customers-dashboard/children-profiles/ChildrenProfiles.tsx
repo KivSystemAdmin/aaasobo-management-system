@@ -8,6 +8,7 @@ import EditButton from "@/app/components/customers-dashboard/EditButton";
 
 function ChildrenProfiles({
   customerId,
+  isAdminAuthenticated,
 }: {
   customerId: string;
   isAdminAuthenticated?: boolean;
@@ -49,19 +50,33 @@ function ChildrenProfiles({
       <div className={styles.page__header}>
         <h1 className={styles.page__title}>Children's Profiles</h1>
       </div>
-      <AddButton
-        linkURL={`/customers/${customerId}/children-profiles/add-child`}
-        btnText="Add Child"
-      />
+      {isAdminAuthenticated ? (
+        <AddButton
+          linkURL={`/admins/customer-list/${customerId}/children-profiles/add-child`}
+          btnText="Add Child"
+        />
+      ) : (
+        <AddButton
+          linkURL={`/customers/${customerId}/children-profiles/add-child`}
+          btnText="Add Child"
+        />
+      )}
       <div>
         <ul>
           {children?.map((child) => (
             <li key={child.id}>
               {child.name}
-              <EditButton
-                linkURL={`/customers/${customerId}/children-profiles/${child.id}/edit`}
-                btnText="Edit Child"
-              />
+              {isAdminAuthenticated ? (
+                <EditButton
+                  linkURL={`/admins/customer-list/${customerId}/children-profiles/${child.id}/edit`}
+                  btnText="Edit Child"
+                />
+              ) : (
+                <EditButton
+                  linkURL={`/customers/${customerId}/children-profiles/${child.id}/edit`}
+                  btnText="Edit Child"
+                />
+              )}
               <button onClick={() => handleDelete(child.id)}>Delete</button>
             </li>
           ))}

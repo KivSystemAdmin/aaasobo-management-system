@@ -6,7 +6,13 @@ import { useRouter } from "next/navigation";
 import { useInput } from "@/app/hooks/useInput";
 import { addChild } from "@/app/helper/childrenApi";
 
-function AddChildForm({ customerId }: { customerId: string }) {
+function AddChildForm({
+  customerId,
+  isAdminAuthenticated,
+}: {
+  customerId: string;
+  isAdminAuthenticated?: boolean;
+}) {
   const [childName, onChildNameChange] = useInput();
   const router = useRouter();
 
@@ -16,6 +22,12 @@ function AddChildForm({ customerId }: { customerId: string }) {
     try {
       const data = await addChild(childName, customerId);
       alert(data.message); // Set alert message temporarily.
+
+      if (isAdminAuthenticated) {
+        // Redirect the admin to children-profiles page
+        router.push(`/admins/customer-list/${customerId}`);
+        return;
+      }
 
       // Redirect the user to children-profiles page
       router.push(`/customers/${customerId}/children-profiles`);
@@ -46,12 +58,21 @@ function AddChildForm({ customerId }: { customerId: string }) {
       </div>
 
       <div className={styles.actions}>
-        <Link
-          href={`/customers/${customerId}/children-profiles`}
-          className={styles.cancelButton}
-        >
-          Cancel
-        </Link>
+        {isAdminAuthenticated ? (
+          <Link
+            href={`/admins/customer-list/${customerId}`}
+            className={styles.cancelButton}
+          >
+            Cancel
+          </Link>
+        ) : (
+          <Link
+            href={`/customers/${customerId}/children-profiles`}
+            className={styles.cancelButton}
+          >
+            Cancel
+          </Link>
+        )}
         <button type="submit" className={styles.submitButton}>
           Add Child
         </button>

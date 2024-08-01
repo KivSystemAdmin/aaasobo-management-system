@@ -9,9 +9,11 @@ import { editChild } from "@/app/helper/childrenApi";
 function EditChildForm({
   customerId,
   child,
+  isAdminAuthenticated,
 }: {
   customerId: string;
   child: Child;
+  isAdminAuthenticated?: boolean;
 }) {
   const [inputChildName, onInputChildNameChange] = useInput();
 
@@ -28,6 +30,12 @@ function EditChildForm({
     try {
       const data = await editChild(child.id, inputChildName, customerId);
       alert(data.message); // Set alert message temporarily.
+
+      if (isAdminAuthenticated) {
+        // Redirect the user to children-profiles page
+        router.push(`/admins/customer-list/${customerId}`);
+        return;
+      }
 
       // Redirect the user to children-profiles page
       router.push(`/customers/${customerId}/children-profiles`);
@@ -57,12 +65,21 @@ function EditChildForm({
       </div>
 
       <div className={styles.actions}>
-        <Link
-          href={`/customers/${customerId}/children-profiles`}
-          className={styles.cancelButton}
-        >
-          Cancel
-        </Link>
+        {isAdminAuthenticated ? (
+          <Link
+            href={`/admins/customer-list/${customerId}`}
+            className={styles.cancelButton}
+          >
+            Cancel
+          </Link>
+        ) : (
+          <Link
+            href={`/customers/${customerId}/children-profiles`}
+            className={styles.cancelButton}
+          >
+            Cancel
+          </Link>
+        )}
         <button type="submit" className={styles.submitButton}>
           Edit Child
         </button>
