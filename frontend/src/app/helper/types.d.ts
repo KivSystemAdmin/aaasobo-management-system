@@ -91,14 +91,16 @@ type RecurringClasses = {
 
 type RecurringClass = {
   id: number;
+  dateTime: string;
   instructorId: number;
-  subscription: Subscriptions;
   instructor: Instructor;
-  recurringClassAttendance: RecurringClassAttendance[];
+  childrenIds: Set<number>;
+  subscription: Subscriptions;
+  recurringClassAttendance: Attendance[];
+  endAt: Date;
 };
 
-type RecurringClassAttendance = {
-  childrenId: number;
+type Attendance = {
   children: Child;
 };
 
@@ -118,4 +120,12 @@ type ClassForCalendar = {
     children: Child[];
   };
   status: string;
+};
+
+type RecurringClassState = {
+  id: number;
+  day: string;
+  time: string;
+  instructorId: number;
+  childrenIds: Set<number>;
 };

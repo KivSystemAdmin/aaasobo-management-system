@@ -157,3 +157,16 @@ export const isPastClassDateTime = (
     return false;
   }
 };
+
+// Function to calculate the end time of a class.
+export function getEndTime(date: Date): Date {
+  return new Date(date.getTime() + 25 * 60 * 1000);
+}
+
+// Function to return short form of the day of the week.
+export function getWeekday(date: Date, timeZone: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    timeZone,
+  }).format(date);
+}

@@ -4,7 +4,7 @@ import {
   addRecurringClassController,
   getRecurringClassesBySubscriptionIdController,
   updateRecurringClassesController,
-} from "../controllers/RecurringClassesController";
+} from "../controllers/recurringClassesController";
 
 export const recurringClassesRouter = express.Router();
 

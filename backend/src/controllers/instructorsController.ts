@@ -11,6 +11,7 @@ import {
   deleteInstructorAvailability,
   getInstructorWithRecurringAvailability,
   fetchInstructorAvailabilities,
+  getAllInstructors,
 } from "../services/instructorsService";
 import { type RequestWithId } from "../middlewares/parseId.middleware";
 
@@ -329,6 +330,21 @@ export const getInstructorAvailabilities = async (
     return res.status(200).json({
       instructorAvailabilities,
     });
+  } catch (error) {
+    return setErrorResponse(res, error);
+  }
+};
+
+export const getAllInstructorsController = async (
+  _: Request,
+  res: Response,
+) => {
+  try {
+    const instructors = await getAllInstructors();
+    if (!instructors) {
+      return res.status(404).json({ message: "Instructors not found." });
+    }
+    return res.status(200).json({ instructors });
   } catch (error) {
     return setErrorResponse(res, error);
   }

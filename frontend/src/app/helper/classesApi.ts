@@ -105,52 +105,6 @@ export const editClass = async (editedClass: {
   return data;
 };
 
-export const addRecurringClass = async (recurringClassData: {
-  instructorId: number;
-  customerId: number;
-  childrenIds: Array<number>;
-  subscriptionId: number;
-  dateTime: string;
-}) => {
-  try {
-    const response = await fetch(`http://localhost:4000/recurring-class`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(recurringClassData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error. status ${response.status}`);
-    }
-
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error("Failed to add recurring class:", error);
-    throw error;
-  }
-};
-
-// GET recurring classes by subscription id
-export const getRecurringClassesBySubscriptionId = async (
-  subscriptionId: number,
-) => {
-  try {
-    console.log({ x: "getRecurringClassesBySubscriptionId", subscriptionId });
-    const response = await fetch(
-      `http://localhost:4000/recurring-classes?subscriptionId=${subscriptionId}`,
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const recurringClasses = await response.json();
-    return recurringClasses;
-  } catch (error) {
-    console.error("Failed to fetch recurring classes:", error);
-    throw error;
-  }
-};
-
 // Fetch classes data for displaying on a calendar using userId
 export const fetchClassesForCalendar = async (
   userId: number,

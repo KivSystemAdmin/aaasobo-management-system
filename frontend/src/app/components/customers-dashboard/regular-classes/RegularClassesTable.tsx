@@ -1,17 +1,19 @@
 "use client";
 
-import { getRecurringClassesBySubscriptionId } from "@/app/helper/classesApi";
+import { formatTime, getEndTime, getWeekday } from "@/app/helper/dateUtils";
+import { getRecurringClassesBySubscriptionId } from "@/app/helper/recurringClassesApi";
 import React, { useEffect, useState } from "react";
 
 function RegularClassesTable({ subscriptionId }: { subscriptionId: number }) {
-  const [recurringClassesData, setRecurringClassesData] =
-    useState<RecurringClasses | null>(null);
+  const [recurringClassesData, setRecurringClassesData] = useState<
+    RecurringClass[] | null
+  >(null);
 
   useEffect(() => {
     const fetchRecurringClassesBySubscriptionId = async () => {
       try {
         const data = await getRecurringClassesBySubscriptionId(subscriptionId);
-        setRecurringClassesData(data);
+        setRecurringClassesData(data.recurringClasses);
       } catch (error) {
         console.error(error);
       }
@@ -29,31 +31,48 @@ function RegularClassesTable({ subscriptionId }: { subscriptionId: number }) {
             <th>Time</th>
             <th>Instructor</th>
             <th>Children</th>
-            <th>Class Link</th>
+            <th>Class URL</th>
+            <th>End Date</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          {recurringClassesData?.recurringClasses.map(
-            (recurringClass, index) => {
-              // TODO: Set the day and time based on the recurring classes.
+          {recurringClassesData?.map((recurringClass, index) => {
+            const startTime = formatTime(
+              new Date(recurringClass.dateTime),
+              "Asia/Tokyo",
+            );
+            const endTime = formatTime(
+              getEndTime(new Date(recurringClass.dateTime)),
+              "Asia/Tokyo",
+            );
+            const day = getWeekday(
+              new Date(recurringClass.dateTime),
+              "Asia/Tokyo",
+            );
 
-              return (
-                <tr key={recurringClass.id}>
-                  <td>{index + 1}</td>
-                  <td>Wed</td>
-                  <td>16:00-16:30</td>
-                  <td>{recurringClass.instructor.name}</td>
-                  <td>
-                    {recurringClass.recurringClassAttendance
-                      .map((child) => child.children.name)
-                      .join(", ")}
-                  </td>
-                  {/* <td>{recurringClass.instructor.class_link}</td> */}
-                </tr>
-              );
-            },
-          )}
+            return (
+              <tr key={recurringClass.id}>
+                <td>{index + 1}</td>
+                <td>{day}</td>
+                <td>
+                  {startTime}-{endTime}
+                </td>
+                <td>{recurringClass.instructor.nickname}</td>
+                <td>
+                  {recurringClass.recurringClassAttendance
+                    .map((attendance) => attendance.children.name)
+                    .join(", ")}
+                </td>
+                <td>{recurringClass.instructor.classURL}</td>
+                <td>
+                  {recurringClass.endAt
+                    ? recurringClass.endAt.toString().split("T")[0]
+                    : "-"}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
