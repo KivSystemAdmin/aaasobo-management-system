@@ -196,6 +196,35 @@ export async function countClassesOfSubscription(
   }
 }
 
+// Fetches class data for the calendar based on user type (instructor or customer), including/excluding related details as needed.
+export const getClassesForCalendar = async (
+  userId: number,
+  userType: "instructor" | "customer",
+) => {
+  try {
+    const includeOptions = {
+      instructor: userType === "customer",
+      classAttendance: { include: { children: true } },
+    };
+
+    const whereCondition =
+      userType === "instructor"
+        ? { instructorId: userId }
+        : { customerId: userId };
+
+    const classes = await prisma.class.findMany({
+      where: whereCondition,
+      include: includeOptions,
+      orderBy: { dateTime: "desc" },
+    });
+
+    return classes;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch classes.");
+  }
+};
+
 // Cancel a class
 export const cancelClassById = async (
   classId: number,

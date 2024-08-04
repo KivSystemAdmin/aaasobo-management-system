@@ -5,6 +5,7 @@ import {
   addAvailability,
   deleteAvailability,
   RecurringAvailability,
+  getInstructorAvailabilities,
 } from "../controllers/instructorsController";
 import { type RequestWithId, parseId } from "../middlewares/parseId.middleware";
 import {
@@ -36,4 +37,8 @@ instructorsRouter.get("/:id/unavailability", parseId, (req, res) => {
 });
 instructorsRouter.put("/:id/unavailability", parseId, (req, res) => {
   createInstructorUnavailability(req as RequestWithId, res);
+});
+
+instructorsRouter.get("/:id/availability", parseId, (req, res) => {
+  getInstructorAvailabilities(req as RequestWithId, res);
 });

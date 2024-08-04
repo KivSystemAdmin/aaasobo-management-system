@@ -101,3 +101,21 @@ type RecurringClassAttendance = {
   childrenId: number;
   children: Child;
 };
+
+type EventType = {
+  classId?: number;
+  start: string;
+  end: string;
+  title: string;
+  color: string;
+};
+
+type ClassForCalendar = {
+  id: number;
+  dateTime: string;
+  instructor?: Instructor;
+  classAttendance: {
+    children: Child[];
+  };
+  status: string;
+};

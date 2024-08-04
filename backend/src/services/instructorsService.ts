@@ -164,3 +164,24 @@ export async function deleteInstructorAvailability(
     throw new Error("Failed to delete instructor availability.");
   }
 }
+
+export async function fetchInstructorAvailabilities(instructorId: number) {
+  try {
+    const availabilities = await prisma.instructorAvailability.findMany({
+      where: {
+        instructorId,
+      },
+      select: {
+        dateTime: true,
+      },
+    });
+
+    const availableDateTimes = availabilities.map(
+      (availability) => availability.dateTime,
+    );
+    return availableDateTimes;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to get instructor availabilities.");
+  }
+}

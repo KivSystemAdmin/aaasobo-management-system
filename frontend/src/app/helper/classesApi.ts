@@ -151,6 +151,28 @@ export const getRecurringClassesBySubscriptionId = async (
   }
 };
 
+// Fetch classes data for displaying on a calendar using userId
+export const fetchClassesForCalendar = async (
+  userId: number,
+  userType: "instructor" | "customer",
+) => {
+  try {
+    const response = await fetch(
+      `http://localhost:4000/classes/calendar/${userType}/${userId}`,
+    );
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    return data.classes;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};
+
 // Cancel a class: Change the state of the class from 'booked' to 'canceledByCustomer'
 export const cancelClass = async (classId: number) => {
   const classURL = `http://localhost:4000/classes/${classId}/cancel`;

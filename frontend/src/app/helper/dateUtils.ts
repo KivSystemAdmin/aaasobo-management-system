@@ -1,5 +1,5 @@
-import { toZonedTime } from "date-fns-tz";
-import { startOfDay, isAfter } from "date-fns";
+import { addMinutes, startOfDay, isAfter } from "date-fns";
+import { format, toZonedTime } from "date-fns-tz";
 
 // Function to format date for a given time zone (e.g., Jun 29, 2024)
 export const formatDate = (date: Date, timeZone: string) => {
@@ -34,6 +34,21 @@ export const formatDateTime = (date: Date, timeZone: string) => {
   }).format(date);
 };
 
+// Converts a UTC ISO date string to the specified time zone, calculates the end time by adding 25 minutes,
+// and formats both start and end times as "YYYY-MM-DDTHH:MM:SS" for use in calendar events.
+export function getClassStartAndEndTimes(isoDateStr: string, timeZone: string) {
+  const utcDate = new Date(isoDateStr);
+  const zonedStartDate = toZonedTime(utcDate, timeZone);
+
+  const start = zonedStartDate;
+  const end = addMinutes(start, 25);
+
+  return {
+    start: format(start, "yyyy-MM-dd'T'HH:mm:ssXXX"),
+    end: format(end, "yyyy-MM-dd'T'HH:mm:ssXXX"),
+  };
+}
+
 // Function to format day and date for a given time zone (e.g., Mon, July 23, 2024)
 export const formatDayDate = (date: Date, timeZone: string) => {
   return new Intl.DateTimeFormat("en-US", {
@@ -42,12 +57,6 @@ export const formatDayDate = (date: Date, timeZone: string) => {
     day: "2-digit",
     timeZone,
   }).format(date);
-};
-
-const addMinutes = (date: Date, minutes: number): Date => {
-  const result = new Date(date.getTime());
-  result.setMinutes(result.getMinutes() + minutes);
-  return result;
 };
 
 // Function to format time with added minutes for a given time zone (e.g., 19:25)
@@ -64,21 +73,6 @@ export const formatTimeWithAddedMinutes = (
     timeZone,
   }).format(updatedDate);
 };
-// Function to calculate the class start and end times in Philippine Time from an ISO date string
-// and format the times as "YYYY-MM-DDTHH:MM:SS" to use them directly in events on the calendar
-export function getPhilippineClassStartAndEndTimes(isoDateStr: string) {
-  const timeZoneOffset = 8 * 60 * 60 * 1000;
-  const date = new Date(isoDateStr);
-  const philippineStartDate = new Date(date.getTime() + timeZoneOffset);
-  const philippineEndDate = new Date(
-    philippineStartDate.getTime() + 25 * 60 * 1000,
-  );
-
-  return {
-    start: philippineStartDate.toISOString().replace(".000Z", ""),
-    end: philippineEndDate.toISOString().replace(".000Z", ""),
-  };
-}
 
 // Function to format the previous day for a given time zone (e.g., Jun 28, 2024)
 export const formatPreviousDay = (date: Date, timeZone: string) => {

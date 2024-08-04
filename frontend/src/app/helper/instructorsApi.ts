@@ -159,3 +159,20 @@ export const registerUnavailability = async (
     body: JSON.stringify({ dateTime }),
   }).then((res) => res.json());
 };
+
+export const fetchInstructorAvailabilities = async (instructorId: number) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${instructorId}/availability`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.instructorAvailabilities;
+  } catch (error) {
+    console.error(
+      "Failed to fetch instructor availability date and times:",
+      error,
+    );
+    throw error;
+  }
+};

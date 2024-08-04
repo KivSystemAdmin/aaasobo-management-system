@@ -6,6 +6,7 @@ import {
   getAllClasses,
   getClassById,
   getClassesByCustomerId,
+  getClassesForCalendar,
   updateClass,
 } from "../services/classesService";
 import { getActiveSubscription } from "../services/subscriptionsService";
@@ -226,6 +227,86 @@ export const updateClassController = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({ error: `${error}` });
+  }
+};
+
+// GET class data for the calendar by an instructor id
+export const getClassesForInstructorCalendar = async (
+  req: Request,
+  res: Response,
+) => {
+  const instructorId = parseInt(req.params.instructorId);
+
+  if (!instructorId) {
+    return res.status(400).json({ error: "instructorId is required" });
+  }
+
+  try {
+    const classes = await getClassesForCalendar(instructorId, "instructor");
+
+    const classesData = classes.map((eachClass) => {
+      const { id, dateTime, status, classAttendance } = eachClass;
+
+      return {
+        id,
+        dateTime,
+        classAttendance: {
+          children: classAttendance.map((classAttendance) => ({
+            id: classAttendance.children.id,
+            name: classAttendance.children.name,
+          })),
+        },
+        status,
+      };
+    });
+
+    res.json({ classes: classesData });
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    res.status(500).json({ error: "Failed to fetch classes" });
+  }
+};
+
+// GET class data for the calendar by a customer id
+export const getClassesForCustomerCalendar = async (
+  req: Request,
+  res: Response,
+) => {
+  const customerId = parseInt(req.params.customerId);
+
+  if (!customerId) {
+    return res.status(400).json({ error: "customerIdId is required" });
+  }
+
+  try {
+    const classes = await getClassesForCalendar(customerId, "customer");
+
+    const classesData = classes.map((eachClass) => {
+      const { id, dateTime, instructor, status, classAttendance } = eachClass;
+
+      return {
+        id,
+        dateTime,
+        instructor: {
+          id: instructor.id,
+          name: instructor.name,
+          nickname: instructor.nickname,
+          icon: instructor.icon,
+        },
+        classAttendance: {
+          children: classAttendance.map((classAttendance) => ({
+            id: classAttendance.children.id,
+            name: classAttendance.children.name,
+          })),
+        },
+        status,
+      };
+    });
+
+    res.json({ classes: classesData });
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    res.status(500).json({ error: "Failed to fetch classes" });
   }
 };
 

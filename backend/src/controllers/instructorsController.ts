@@ -10,6 +10,7 @@ import {
   getInstructorRecurringAvailabilities,
   deleteInstructorAvailability,
   getInstructorWithRecurringAvailability,
+  fetchInstructorAvailabilities,
 } from "../services/instructorsService";
 import { type RequestWithId } from "../middlewares/parseId.middleware";
 
@@ -309,4 +310,26 @@ export const deleteAvailability = async (req: RequestWithId, res: Response) => {
   }
   const availability = await deleteInstructorAvailability(req.id, dateTime);
   return res.status(200).json({ availability });
+};
+
+export const getInstructorAvailabilities = async (
+  req: RequestWithId,
+  res: Response,
+) => {
+  try {
+    const instructorAvailabilities = await fetchInstructorAvailabilities(
+      req.id,
+    );
+
+    if (!instructorAvailabilities) {
+      return res
+        .status(404)
+        .json({ message: "Instructor availabilities not found." });
+    }
+    return res.status(200).json({
+      instructorAvailabilities,
+    });
+  } catch (error) {
+    return setErrorResponse(res, error);
+  }
 };

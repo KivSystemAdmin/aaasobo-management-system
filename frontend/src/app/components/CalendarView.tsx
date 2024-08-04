@@ -18,11 +18,6 @@ type InstructorCalendarViewProps = {
     start: string;
     end: string;
     color: string;
-    childrendData?: {
-      id: number;
-      name: string;
-      birthdate: string;
-    }[];
   }>;
   holidays: string[];
 };
@@ -141,7 +136,7 @@ const CalendarView = forwardRef<
       locale="en"
       contentHeight="auto"
       dayMaxEvents={true}
-      editable={true}
+      editable={false}
       selectable={false}
       eventDisplay="block"
       allDaySlot={false}

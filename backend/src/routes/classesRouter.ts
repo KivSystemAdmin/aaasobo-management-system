@@ -6,6 +6,8 @@ import {
   getAllClassesController,
   getClassByIdController,
   getClassesByCustomerIdController,
+  getClassesForCustomerCalendar,
+  getClassesForInstructorCalendar,
   nonRebookableCancelController,
   updateClassController,
 } from "../controllers/classesController";
@@ -17,6 +19,14 @@ export const classesRouter = express.Router();
 classesRouter.get("/", getAllClassesController);
 classesRouter.get("/:id", getClassesByCustomerIdController);
 classesRouter.get("/class/:id", getClassByIdController);
+classesRouter.get(
+  "/calendar/instructor/:instructorId",
+  getClassesForInstructorCalendar,
+);
+classesRouter.get(
+  "/calendar/customer/:customerId",
+  getClassesForCustomerCalendar,
+);
 
 classesRouter.post("/", createClassController);
 
