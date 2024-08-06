@@ -188,3 +188,21 @@ export const deleteRecurringClass = async (
     throw new Error("Failed to delete the recurring class.");
   }
 };
+
+// Fetch recurring classes After endAt or endAt is null
+export const getValidRecurringClasses = async (
+  tx: Prisma.TransactionClient,
+  date: Date,
+) => {
+  try {
+    const recurringClasses = await tx.recurringClass.findMany({
+      where: { OR: [{ endAt: { gte: date } }, { endAt: null }] },
+      include: { subscription: true, recurringClassAttendance: true },
+    });
+
+    return recurringClasses;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch recurring classes.");
+  }
+};

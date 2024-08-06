@@ -3,6 +3,35 @@ export type Day = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 export const days: Day[] = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export const JAPAN_TIME_DIFF = 9;
 
+export type Month =
+  | "January"
+  | "February"
+  | "March"
+  | "April"
+  | "May"
+  | "June"
+  | "July"
+  | "August"
+  | "September"
+  | "October"
+  | "November"
+  | "December";
+
+export const months: Month[] = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 // Get the first Date of the month after `months` months from `date`.
 export function getFirstDateInMonths(date: Date, months: number): Date {
   const d = new Date(date);
@@ -41,3 +70,7 @@ export function calculateFirstDate(from: Date, day: Day, time: string): Date {
   date.setUTCMinutes(parseInt(minute));
   return date;
 }
+
+export const getMonthNumber = (month: Month): number => {
+  return months.indexOf(month);
+};
