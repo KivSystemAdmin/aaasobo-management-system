@@ -54,7 +54,13 @@ const ClassDetail = ({
           <h3>
             Class URL:{" "}
             <span style={{ fontSize: "0.8em", fontWeight: "normal" }}>
-              {classDetail.instructor.classURL}
+              <a
+                href={classDetail.instructor.classURL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {classDetail.instructor.classURL}
+              </a>
             </span>
           </h3>
           <h3>

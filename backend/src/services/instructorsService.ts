@@ -11,6 +11,7 @@ export const createInstructor = async (instructorData: {
   classURL: string;
   meetingId: string;
   passcode: string;
+  introductionURL: string;
 }) => {
   try {
     return await prisma.instructor.create({

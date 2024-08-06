@@ -16,6 +16,9 @@ type Instructor = {
   nickname: string;
   classURL: string;
   icon: string;
+  meetingId: string;
+  passcode: string;
+  introductionURL: string;
 };
 
 type Availability = { dateTime: string };

@@ -2,7 +2,7 @@
 
 import SideNav from "@/app/components/SideNav";
 import styles from "./layout.module.scss";
-import { UserIcon, CalendarIcon } from "@heroicons/react/24/outline";
+import { UserIcon, CalendarIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { FC, SVGProps } from "react";
 
 type Link = {
@@ -29,6 +29,11 @@ export default function Layout({
       name: "Profile",
       href: `/instructors/${instructorId}/profile`,
       icon: UserIcon,
+    },
+    {
+      name: "Availability Schedule",
+      href: `/instructors/${instructorId}/availability`,
+      icon: ClockIcon,
     },
   ];
 

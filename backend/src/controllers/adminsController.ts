@@ -212,6 +212,7 @@ export const registerInstructorController = async (
       classURL: "",
       meetingId: "",
       passcode: "",
+      introductionURL: "",
     });
 
     // Exclude the password from the response.

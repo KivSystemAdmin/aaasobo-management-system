@@ -43,9 +43,35 @@ function InstructorProfile({
             priority
           />
           <h3>Name</h3> <p>{instructor.name}</p>
-          <h3>Nick Name</h3> <p>{instructor.nickname}</p>
+          <h3>Nickname</h3> <p>{instructor.nickname}</p>
           <h3>Email</h3> <p>{instructor.email}</p>
-          <h3>Class URL</h3> <p>{instructor.classURL}</p>
+          <h3>Class URL</h3>{" "}
+          <p>
+            <a
+              href={instructor.classURL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {instructor.classURL}
+            </a>
+          </p>
+          <h3>Meeting ID</h3> <p>{instructor.meetingId}</p>
+          <h3>Passcode</h3> <p>{instructor.passcode}</p>
+          <h3>Self Introduction URL</h3>{" "}
+          <p>
+            <a
+              href={instructor.introductionURL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {instructor.introductionURL}
+            </a>
+          </p>
+          <br />
+          <p>
+            ■ If you wish to update the profile information above, please
+            contact the staff via Facebook.
+          </p>
         </>
       ) : (
         <div>Loading ...</div>

@@ -119,6 +119,9 @@ export const getInstructor = async (req: Request, res: Response) => {
         email: instructor.email,
         icon: instructor.icon,
         classURL: instructor.classURL,
+        meetingId: instructor.meetingId,
+        passcode: instructor.passcode,
+        introductionURL: instructor.introductionURL,
       },
     });
   } catch (error) {

@@ -28,6 +28,7 @@ model Instructor {
   meetingId                       String                            @unique
   passcode                        String                            @unique
   instructorUnavailability        InstructorUnavailability[]
+  introductionURL                 String                            @unique
 }
 
 model InstructorRecurringAvailability {

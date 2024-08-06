@@ -14,6 +14,8 @@ async function insertInstructors() {
       meetingId: "123 456 7890",
       passcode: "helen",
       password: "$2b$12$lzg9z2HDTl/dwd8DSnGHJOdPIYiFvn40fwEzRtimoty5VtOugaTfa", // password: helen
+      introductionURL:
+        "https://select-type.com/rsv/?id=9krPgyM7znE&c_id=129259",
     },
   });
   await prisma.instructor.create({
@@ -26,6 +28,8 @@ async function insertInstructors() {
       meetingId: "234 567 8901",
       passcode: "elian",
       password: "$2b$12$R6tfoOzHAHCC2NgD7HZVtutBQsoWysLtdpWEKGYlkHbeGvMa.WSUe", // password: Elian
+      introductionURL:
+        "https://select-type.com/rsv/?id=9krPgyM7znE&c_id=127929",
     },
   });
 }
@@ -87,6 +91,9 @@ async function insertInstructorAvailabilities() {
     "2024-08-01T07:30:00Z",
     "2024-08-02T07:30:00Z",
     "2024-08-03T07:30:00Z",
+    "2024-08-04T07:30:00Z",
+    "2024-08-05T07:30:00Z",
+    "2024-08-06T07:30:00Z",
   ]);
   await insertAvailabilities(elian.id, "2024-07-01T08:00:00Z", [
     "2024-07-01T08:00:00Z",
@@ -94,6 +101,10 @@ async function insertInstructorAvailabilities() {
     "2024-07-15T08:00:00Z",
     "2024-07-22T08:00:00Z",
     "2024-07-29T08:00:00Z",
+    "2024-08-03T07:30:00Z",
+    "2024-08-04T07:30:00Z",
+    "2024-08-05T07:30:00Z",
+    "2024-08-06T07:30:00Z",
   ]);
   await insertAvailabilities(elian.id, "2024-07-02T08:00:00Z", [
     "2024-07-02T08:00:00Z",
