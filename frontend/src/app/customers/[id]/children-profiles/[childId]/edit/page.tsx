@@ -11,7 +11,7 @@ function Page({ params }: { params: { id: string; childId: string } }) {
       <div>
         <h1>Edit Child</h1>
       </div>
-      <EditChildProfile customerId={customerId} childId={childId} />;
+      <EditChildProfile customerId={customerId} childId={childId} />
     </>
   );
 }

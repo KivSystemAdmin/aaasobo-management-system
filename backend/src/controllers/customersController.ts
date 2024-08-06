@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { prisma } from "../../prisma/prismaClient";
 import {
+  fetchCustomerById,
+  updateCustomer,
+} from "../services/customersService";
+import {
   getSubscriptionsById,
   createNewSubscription,
 } from "../services/subscriptionsService";
@@ -8,7 +12,7 @@ import { getWeeklyClassTimes } from "../services/plansService";
 import { createNewRecurringClass } from "../services/recurringClassesService";
 
 export const registerCustomer = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, prefecture } = req.body;
 
   // TODO: Validate an email and the password.
   // TODO: Hash the password.
@@ -20,6 +24,7 @@ export const registerCustomer = async (req: Request, res: Response) => {
         name,
         email,
         password,
+        prefecture,
       },
     });
 
@@ -98,6 +103,48 @@ export const getSubscriptionsByIdController = async (
     const subscriptions = await getSubscriptionsById(customerId);
 
     res.json({ subscriptions });
+  } catch (error) {
+    res.status(500).json({ error: `${error}` });
+  }
+};
+
+export const getCustomerById = async (req: Request, res: Response) => {
+  const customerId = parseInt(req.params.id);
+
+  if (isNaN(customerId)) {
+    return res.status(400).json({ error: "Invalid customer ID." });
+  }
+
+  try {
+    const customer = await fetchCustomerById(customerId);
+
+    if (!customer) {
+      return res.status(404).json({ error: "Customer not found." });
+    }
+
+    res.json({ customer });
+  } catch (error) {
+    console.error("Error fetching customer:", error);
+    res.status(500).json({
+      error:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred.",
+    });
+  }
+};
+
+export const updateCustomerProfile = async (req: Request, res: Response) => {
+  const customerId = parseInt(req.params.id);
+  const { name, email, prefecture } = req.body;
+
+  try {
+    const customer = await updateCustomer(customerId, name, email, prefecture);
+
+    res.status(200).json({
+      message: "Customer is updated successfully",
+      customer,
+    });
   } catch (error) {
     res.status(500).json({ error: `${error}` });
   }

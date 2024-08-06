@@ -47,12 +47,11 @@ type ClassType = {
 };
 
 type Customer = {
-  customer: {
-    id: number;
-    name: string;
-    email: string;
-    class: CustomersClass[];
-  };
+  id: number;
+  name: string;
+  email: string;
+  class: CustomersClass[];
+  prefecture: string;
 };
 
 type CustomersClass = {

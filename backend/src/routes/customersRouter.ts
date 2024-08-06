@@ -1,9 +1,11 @@
 import express from "express";
 import {
+  getCustomerById,
   getCustomersClasses,
   getSubscriptionsByIdController,
   loginCustomer,
   registerCustomer,
+  updateCustomerProfile,
   registerSubscriptionController,
 } from "../controllers/customersController";
 
@@ -13,6 +15,10 @@ export const customersRouter = express.Router();
 
 customersRouter.post("/register", registerCustomer);
 customersRouter.post("/login", loginCustomer);
+
 customersRouter.get("/:id", getCustomersClasses);
 customersRouter.get("/:id/subscriptions", getSubscriptionsByIdController);
+customersRouter.get("/:id/customer", getCustomerById);
+
+customersRouter.patch("/:id", updateCustomerProfile);
 customersRouter.post("/:id/subscription", registerSubscriptionController);

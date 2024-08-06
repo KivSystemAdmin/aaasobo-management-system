@@ -6,6 +6,7 @@ import {
   UsersIcon,
   CalendarDaysIcon,
   ClipboardDocumentListIcon,
+  UserIcon,
 } from "@heroicons/react/24/outline";
 import { FC, SVGProps } from "react";
 
@@ -28,6 +29,11 @@ export default function Layout({
       name: "Class Calendar",
       href: `/customers/${customerId}/classes`,
       icon: CalendarDaysIcon,
+    },
+    {
+      name: "Customer Profile",
+      href: `/customers/${customerId}/profile`,
+      icon: UserIcon,
     },
     {
       name: "Children's Profiles",

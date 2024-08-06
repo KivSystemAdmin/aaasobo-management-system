@@ -128,11 +128,13 @@ async function insertCustomers() {
         name: "Alice",
         email: "alice@example.com",
         password: "alice",
+        prefecture: "Aomori",
       },
       {
         name: "Bob",
         email: "bob@example.com",
         password: "bob",
+        prefecture: "Hokkaido",
       },
     ],
   });

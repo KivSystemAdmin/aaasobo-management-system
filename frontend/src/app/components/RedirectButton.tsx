@@ -19,22 +19,26 @@ const RedirectButton: React.FC<RedirectButtonProps> = ({
 }) => {
   if (disabled) {
     return (
-      <span
-        className={`${styles.link} ${className ? styles[className] : ""} ${styles.disabled}`}
+      <div
+        className={`${styles.btnComponent} ${className ? styles[className] : ""} ${styles.disabled}`}
       >
-        <span className={styles.text}>{btnText}</span>
-        {Icon && <Icon className={styles.icon} />}
-      </span>
+        <div className={styles.content}>
+          <div className={styles.text}>{btnText}</div>
+          {Icon && <Icon className={styles.icon} />}
+        </div>
+      </div>
     );
   }
 
   return (
     <Link
       href={linkURL}
-      className={`${styles.link} ${className ? styles[className] : ""}`}
+      className={`${styles.btnComponent} ${className ? styles[className] : ""}`}
     >
-      <span className={styles.text}>{btnText}</span>
-      {Icon && <Icon className={styles.icon} />}
+      <div className={styles.content}>
+        <div className={styles.text}>{btnText}</div>
+        {Icon && <Icon className={styles.icon} />}
+      </div>
     </Link>
   );
 };

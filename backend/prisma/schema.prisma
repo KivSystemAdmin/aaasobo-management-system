@@ -66,6 +66,7 @@ model Customer {
   classes      Class[]
   children     Children[]
   subscription Subscription[]
+  prefecture   String
 }
 
 model Class {

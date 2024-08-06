@@ -1,14 +1,16 @@
-.link {
-  display: flex;
-  height: 2.5rem;
+.btnComponent {
+  display: inline-block;
   align-items: center;
   border-radius: 0.375rem;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   font-size: 0.875rem;
   font-weight: 500;
   color: #ffffff;
   text-decoration: none;
-  width: 160px;
+
+  &:hover {
+    cursor: pointer;
+  }
 
   &.disabled {
     color: gray;
@@ -24,17 +26,24 @@
   }
 }
 
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .icon {
   height: 1.25rem;
   margin-left: 0.75rem;
 }
 
-.backBtn {
+.backBtn,
+.cancelBtn {
   background-color: #f3f4f6;
   transition:
     background-color 0.3s ease,
     transform 0.3s ease;
-  border: 1px solid transparent;
+  border: 1px solid #6b7280;
   color: #6b7280;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
@@ -50,7 +59,9 @@
   }
 }
 
-.rescheduleBtn {
+.rescheduleBtn,
+.editBtn,
+.saveBtn {
   background-color: #28a745;
   transition:
     background-color 0.3s ease,
