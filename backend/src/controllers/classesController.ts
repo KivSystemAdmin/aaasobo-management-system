@@ -2,25 +2,14 @@ import { Request, Response } from "express";
 import {
   cancelClassById,
   createClass,
-  createClassesUsingRecurringClassId,
   deleteClass,
   getAllClasses,
   getClassById,
   getClassesByCustomerId,
   getClassesForCalendar,
-  getExcludedClasses,
   updateClass,
 } from "../services/classesService";
 import { getActiveSubscription } from "../services/subscriptionsService";
-import { prisma } from "../../prisma/prismaClient";
-import { getValidRecurringClasses } from "../services/recurringClassesService";
-import {
-  calculateFirstDate,
-  createDatesBetween,
-  days,
-  getFirstDateInMonths,
-  getMonthNumber,
-} from "../helper/dateUtils";
 
 // GET all classes along with related instructors and customers data
 export const getAllClassesController = async (_: Request, res: Response) => {
@@ -347,124 +336,5 @@ export const nonRebookableCancelController = async (
     res.status(200).json({ message: "Class canceled successfully" });
   } catch (error) {
     res.status(500).json({ error: "An unknown error occurred" });
-  }
-};
-
-export const createClassesForMonthController = async (
-  req: Request,
-  res: Response,
-) => {
-  const { year, month } = req.body;
-  if (!year || !month) {
-    return res.status(400).json({ error: "Invalid year or month." });
-  }
-
-  try {
-    const result = await prisma.$transaction(async (tx) => {
-      // First date of a giving month.
-      const monthNum = getMonthNumber(month);
-      if (monthNum === -1) throw new Error("Invalid month");
-      const firstDateOfMonth = new Date(Date.UTC(year, monthNum, 1));
-
-      // Get valid recurring classes.
-      const recurringClasses = await getValidRecurringClasses(
-        tx,
-        firstDateOfMonth,
-      );
-
-      // Get excluded classes.
-      const recurringClassIds = recurringClasses.map(
-        (recurringClass) => recurringClass.id,
-      );
-      const excludedClasses = await getExcludedClasses(
-        tx,
-        recurringClassIds,
-        firstDateOfMonth,
-      );
-
-      // TODO: Get the instructors' unavailability and exclude it.
-      // TODO: Get the holiday and exclude it.
-
-      // Define until when schedule should be created.
-      const until = getFirstDateInMonths(firstDateOfMonth, 1);
-      until.setUTCDate(until.getUTCDate() - 1);
-
-      // Repeat the number of recurring classes.
-      await Promise.all(
-        recurringClasses.map(async (recurringClass) => {
-          const {
-            id,
-            instructorId,
-            startAt,
-            endAt,
-            subscriptionId,
-            subscription,
-            recurringClassAttendance,
-          } = recurringClass;
-
-          // If startAt is earlier than firstDateOfMonth, skip it.
-          if (firstDateOfMonth < new Date(startAt)) {
-            return;
-          }
-
-          // Extract time from startAt
-          const hours = startAt.getHours().toString().padStart(2, "0");
-          const minutes = startAt.getMinutes().toString().padStart(2, "0");
-          const time = `${hours}:${minutes}`;
-
-          // Get the first date of the class of the month
-          const firstDate = calculateFirstDate(
-            firstDateOfMonth,
-            days[startAt.getDay()],
-            time,
-          );
-
-          // Create the range of dates.
-          const dateTimes = createDatesBetween(
-            firstDate,
-            endAt && endAt < until ? endAt : until,
-          );
-
-          // if you find the same dateTime and instructor id as in the excludedClass, skip it.
-          const isExistingClass = excludedClasses.some((excludedClass) => {
-            const excludedClassDateTimesStr = new Date(
-              excludedClass.dateTime,
-            ).toISOString();
-            const dateTimesStr = dateTimes.map((date) =>
-              new Date(date).toISOString(),
-            );
-            return (
-              dateTimesStr.includes(excludedClassDateTimesStr) &&
-              excludedClass.instructorId === instructorId
-            );
-          });
-          if (isExistingClass) {
-            return;
-          }
-
-          const childrenIds = recurringClassAttendance.map(
-            (attendee) => attendee.childrenId,
-          );
-
-          // Create the classes and its attendance based on the recurring id.
-          await createClassesUsingRecurringClassId(
-            tx,
-            id,
-            instructorId,
-            subscription.customerId,
-            subscriptionId,
-            childrenIds,
-            dateTimes,
-          );
-        }),
-      );
-
-      return recurringClasses;
-    });
-
-    res.status(201).json({ result });
-  } catch (error) {
-    console.error("Controller Error:", error);
-    res.status(500).json({ error: "Failed to add class." });
   }
 };

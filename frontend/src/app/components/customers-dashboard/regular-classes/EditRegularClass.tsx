@@ -30,17 +30,19 @@ function EditRegularClass({
     <div>
       <div>
         <h1>Regular Classes Editing Page </h1>
+        <h3>Regular Classes</h3>
       </div>
       {subscriptionsData &&
         subscriptionsData.subscriptions.map((subscription) => {
+          const { id, plan } = subscription;
           return (
-            <div key={subscription.id}>
+            <div key={id}>
               <div>
-                <h3>Regular Classes</h3>
+                <h4>&nbsp;</h4>
                 <h4>Plan</h4>
-                <p>{subscription.plan.name}</p>
-                <h4>Number of Regular Classes</h4>
-                <p>{subscription.plan.description}</p>
+                <p>
+                  {plan.name} ({plan.description})
+                </p>
               </div>
               <div>
                 <EditRegularClassForm

@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import { prisma } from "../../prisma/prismaClient";
-import { getSubscriptionsById } from "../services/subscriptionsService";
+import {
+  getSubscriptionsById,
+  createNewSubscription,
+} from "../services/subscriptionsService";
+import { getWeeklyClassTimes } from "../services/plansService";
+import { createNewRecurringClass } from "../services/recurringClassesService";
 
 export const registerCustomer = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
@@ -95,5 +100,49 @@ export const getSubscriptionsByIdController = async (
     res.json({ subscriptions });
   } catch (error) {
     res.status(500).json({ error: `${error}` });
+  }
+};
+
+export const registerSubscriptionController = async (
+  req: Request,
+  res: Response,
+) => {
+  const customerId = parseInt(req.params.id);
+  const { planId, startAt } = req.body;
+
+  try {
+    // Get weekly class times based on plan id.
+    const data = await getWeeklyClassTimes(planId);
+    if (!data) {
+      res.status(404).json({ error: "Weekly class times not found" });
+      return;
+    }
+    const { weeklyClassTimes } = data;
+
+    // Create new subscription record.
+    const subscriptionData = {
+      planId,
+      customerId,
+      startAt: new Date(startAt),
+    };
+    const newSubscription = await createNewSubscription(subscriptionData);
+    if (!newSubscription) {
+      res.status(500).json({ error: "Failed to create subscription" });
+      return;
+    }
+    const subscriptionId = newSubscription.id;
+
+    // Create the same number of recurring class records as weekly class times
+    for (let i = 0; i < weeklyClassTimes; i++) {
+      const newRecurringClass = await createNewRecurringClass(subscriptionId);
+      if (!newRecurringClass) {
+        res.status(500).json({ error: "Failed to create recurring class" });
+        return;
+      }
+    }
+
+    res.status(200).json({ newSubscription });
+  } catch (error) {
+    res.status(500).json({ error });
   }
 };

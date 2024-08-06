@@ -116,10 +116,11 @@ model ClassAttendance {
 }
 
 model Plan {
-  id           Int            @id @default(autoincrement())
-  name         String
-  description  String
-  subscription Subscription[]
+  id               Int            @id @default(autoincrement())
+  name             String
+  description      String
+  weeklyClassTimes Int
+  subscription     Subscription[]
 }
 
 model Subscription {
@@ -136,12 +137,12 @@ model Subscription {
 
 model RecurringClass {
   id                       Int                        @id @default(autoincrement())
-  instructorId             Int
-  subscriptionId           Int
-  startAt                  DateTime
+  instructorId             Int?
+  subscriptionId           Int?
+  startAt                  DateTime?
   endAt                    DateTime?
-  instructor               Instructor                 @relation(fields: [instructorId], references: [id])
-  subscription             Subscription               @relation(fields: [subscriptionId], references: [id])
+  instructor               Instructor?                @relation(fields: [instructorId], references: [id])
+  subscription             Subscription?              @relation(fields: [subscriptionId], references: [id])
   recurringClassAttendance RecurringClassAttendance[]
   classes                  Class[]
 }

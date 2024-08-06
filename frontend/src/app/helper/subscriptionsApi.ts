@@ -15,3 +15,29 @@ export const getSubscriptionsByCustomerId = async (customerId: string) => {
     throw error;
   }
 };
+
+// Register a subscription
+export const registerSubscription = async (
+  customerId: string,
+  subscriptionData: RegisterSubscription,
+) => {
+  try {
+    const response = await fetch(
+      `http://localhost:4000/customers/${customerId}/subscription`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(subscriptionData),
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return;
+  } catch (error) {
+    console.error("Failed to register a subscription:", error);
+    throw error;
+  }
+};

@@ -58,8 +58,14 @@ function EditRegularClassForm({
             instructor,
             childrenIds,
           }: RecurringClass) => {
-            const day = getWeekday(new Date(dateTime), "Asia/Tokyo");
-            const time = formatTime(new Date(dateTime), "Asia/Tokyo");
+            let day = null;
+            let time = null;
+
+            if (dateTime) {
+              day = getWeekday(new Date(dateTime), "Asia/Tokyo");
+              time = formatTime(new Date(dateTime), "Asia/Tokyo");
+            }
+
             return {
               id,
               day,
@@ -91,12 +97,6 @@ function EditRegularClassForm({
     event.preventDefault();
 
     try {
-      if (isAdminAuthenticated) {
-        // Redirect the user to regular-classes page of admin dashboard
-        router.push(`/admins/customer-list/${customerId}`);
-        return;
-      }
-
       const data = await editRecurringClass(
         state.id,
         subscriptionId,
@@ -105,6 +105,12 @@ function EditRegularClassForm({
         startDate,
       );
       alert(data.message);
+
+      if (isAdminAuthenticated) {
+        // Redirect the user to regular-classes page of admin dashboard
+        router.push(`/admins/customer-list/${customerId}`);
+        return;
+      }
 
       // Redirect the user to regular-classes page of customer dashboard
       router.push(`/customers/${customerId}/regular-classes`);

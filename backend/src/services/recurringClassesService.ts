@@ -75,6 +75,7 @@ export const getRecurringClassesBySubscriptionId = async (
         instructor: true,
         recurringClassAttendance: { include: { children: true } },
       },
+      orderBy: [{ startAt: "asc" }, { endAt: "asc" }],
     });
 
     return recurringClasses;
@@ -204,5 +205,23 @@ export const getValidRecurringClasses = async (
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch recurring classes.");
+  }
+};
+
+// Create new recurring class record
+export const createNewRecurringClass = async (subscriptionId: number) => {
+  try {
+    const newRecurringClass = await prisma.recurringClass.create({
+      data: {
+        instructorId: null,
+        subscriptionId: subscriptionId,
+        startAt: null,
+        endAt: null,
+      },
+    });
+    return newRecurringClass;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to create new recurring class.");
   }
 };

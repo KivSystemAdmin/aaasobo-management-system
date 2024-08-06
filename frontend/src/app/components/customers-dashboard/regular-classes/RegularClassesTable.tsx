@@ -38,37 +38,44 @@ function RegularClassesTable({ subscriptionId }: { subscriptionId: number }) {
         </thead>
         <tbody>
           {recurringClassesData?.map((recurringClass, index) => {
-            const startTime = formatTime(
-              new Date(recurringClass.dateTime),
-              "Asia/Tokyo",
-            );
-            const endTime = formatTime(
-              getEndTime(new Date(recurringClass.dateTime)),
-              "Asia/Tokyo",
-            );
-            const day = getWeekday(
-              new Date(recurringClass.dateTime),
-              "Asia/Tokyo",
-            );
+            let startTime = null;
+            let endTime = null;
+            let day = null;
+
+            if (recurringClass.dateTime) {
+              startTime = formatTime(
+                new Date(recurringClass.dateTime),
+                "Asia/Tokyo",
+              );
+              endTime = formatTime(
+                getEndTime(new Date(recurringClass.dateTime)),
+                "Asia/Tokyo",
+              );
+              day = getWeekday(new Date(recurringClass.dateTime), "Asia/Tokyo");
+            }
 
             return (
               <tr key={recurringClass.id}>
                 <td>{index + 1}</td>
                 <td>{day}</td>
-                <td>
-                  {startTime}-{endTime}
-                </td>
-                <td>{recurringClass.instructor.nickname}</td>
+                {startTime !== null ? (
+                  <td>
+                    {startTime}-{endTime}
+                  </td>
+                ) : (
+                  <td></td>
+                )}
+                <td>{recurringClass.instructor?.nickname}</td>
                 <td>
                   {recurringClass.recurringClassAttendance
                     .map((attendance) => attendance.children.name)
                     .join(", ")}
                 </td>
-                <td>{recurringClass.instructor.classURL}</td>
+                <td>{recurringClass.instructor?.classURL}</td>
                 <td>
                   {recurringClass.endAt
                     ? recurringClass.endAt.toString().split("T")[0]
-                    : "-"}
+                    : ""}
                 </td>
               </tr>
             );

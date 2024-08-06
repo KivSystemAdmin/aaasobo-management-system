@@ -251,10 +251,12 @@ async function insertPlans() {
       {
         name: "3,180 yen/month",
         description: "twice a week",
+        weeklyClassTimes: 2,
       },
       {
         name: "7,980 yen/month",
         description: "5 times a week",
+        weeklyClassTimes: 5,
       },
     ],
   });
@@ -312,56 +314,6 @@ async function insertRecurringClasses() {
       instructorId: elian.id,
       startAt: "2024-07-03T02:00:00Z",
       endAt: "2024-08-01T00:00:00Z",
-      recurringClassAttendance: {
-        create: [
-          {
-            childrenId: alice.children[0].id,
-          },
-        ],
-      },
-    },
-  });
-  await prisma.recurringClass.create({
-    data: {
-      subscriptionId: alice.subscription[0].id,
-      instructorId: elian.id,
-      startAt: "2024-07-18T03:00:00Z",
-      endAt: "2024-09-01T00:00:00Z",
-      recurringClassAttendance: {
-        create: [
-          {
-            childrenId: alice.children[0].id,
-          },
-          {
-            childrenId: alice.children[1].id,
-          },
-        ],
-      },
-    },
-  });
-  await prisma.recurringClass.create({
-    data: {
-      subscriptionId: alice.subscription[0].id,
-      instructorId: elian.id,
-      startAt: "2024-08-23T01:00:00Z",
-      endAt: "2024-10-01T00:00:00Z",
-      recurringClassAttendance: {
-        create: [
-          {
-            childrenId: alice.children[0].id,
-          },
-          {
-            childrenId: alice.children[1].id,
-          },
-        ],
-      },
-    },
-  });
-  await prisma.recurringClass.create({
-    data: {
-      subscriptionId: alice.subscription[0].id,
-      instructorId: elian.id,
-      startAt: "2024-09-02T04:00:00Z",
       recurringClassAttendance: {
         create: [
           {

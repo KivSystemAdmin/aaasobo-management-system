@@ -26,7 +26,7 @@ function RecurringClassEntry({
   // TODO: Only instructors' availability should be selectable.
   // TODO: Before today shouldn't be selectable.
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const times = ["9:00", "11:00", "16:00", "16:30", "17:00"];
+  const times = ["09:00", "11:00", "16:00", "16:30", "17:00"];
   const [selectedDate, setSelectedDate] = useState("");
 
   const handleChildChange = (
@@ -51,11 +51,12 @@ function RecurringClassEntry({
       <td>
         <select
           name="days"
-          value={day}
+          value={day || ""}
           onChange={(e) => {
             setState({ ...state, day: e.target.value });
           }}
         >
+          <option key="" value="" hidden></option>
           {days.map((day) => (
             <option key={day} value={day}>
               {day}
@@ -66,11 +67,12 @@ function RecurringClassEntry({
       <td>
         <select
           name="times"
-          value={time}
+          value={time || ""}
           onChange={(e) => {
             setState({ ...state, time: e.target.value });
           }}
         >
+          <option key="" value="" hidden></option>
           {times.map((time) => (
             <option key={time} value={time}>
               {time}
@@ -81,11 +83,12 @@ function RecurringClassEntry({
       <td>
         <select
           name="instructors"
-          value={instructorId}
+          value={instructorId || ""}
           onChange={(e) => {
             setState({ ...state, instructorId: parseInt(e.target.value) });
           }}
         >
+          <option key="" value="" hidden></option>
           {instructorsData.data.map((instructor) => {
             return (
               <option key={instructor.id} value={instructor.id}>
@@ -99,10 +102,10 @@ function RecurringClassEntry({
         {childList.map((child) => {
           const childrenIdsSet = new Set(childrenIds);
           return (
-            <label key={child.id} htmlFor={`child-${index}-${child.id}`}>
+            <label key={child.id} htmlFor={`child-${state.id}-${child.id}`}>
               <input
                 type="checkbox"
-                id={`child-${index}-${child.id}`}
+                id={`child-${state.id}-${child.id}`}
                 checked={childrenIdsSet.has(child.id)}
                 onChange={(event) => handleChildChange(event, child.id)}
               />
@@ -111,11 +114,13 @@ function RecurringClassEntry({
           );
         })}
       </td>
-      <input
-        type="date"
-        value={selectedDate}
-        onChange={(e) => setSelectedDate(e.target.value)}
-      />
+      <td>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+        />
+      </td>
       <td>
         <button
           type="button"

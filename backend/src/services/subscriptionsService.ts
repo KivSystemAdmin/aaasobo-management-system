@@ -47,3 +47,20 @@ export const getSubscriptionsById = async (customerId: number) => {
     throw new Error("Failed to fetch the customer's subscriptions.");
   }
 };
+
+// Create new subscriptions
+export const createNewSubscription = async (subscriptionData: {
+  planId: number;
+  customerId: number;
+  startAt: Date;
+}) => {
+  try {
+    const newSubscription = await prisma.subscription.create({
+      data: subscriptionData,
+    });
+    return newSubscription;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to create new subscription.");
+  }
+};

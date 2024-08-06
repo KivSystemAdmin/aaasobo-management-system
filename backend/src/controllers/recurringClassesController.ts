@@ -197,7 +197,10 @@ export const updateRecurringClassesController = async (
       const utcClassStartDate = new Date(
         date.getTime() - JAPAN_TIME_DIFF * 60 * 60 * 1000,
       );
-      if (new Date(utcClassStartDate) < new Date(startAt)) {
+      if (
+        startAt === null ||
+        (startAt !== null && new Date(utcClassStartDate) < new Date(startAt))
+      ) {
         await deleteRecurringClass(tx, req.id);
       }
 

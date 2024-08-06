@@ -2,7 +2,6 @@ import express from "express";
 import {
   cancelClassController,
   createClassController,
-  createClassesForMonthController,
   deleteClassController,
   getAllClassesController,
   getClassByIdController,
@@ -28,7 +27,7 @@ classesRouter.get(
   "/calendar/customer/:customerId",
   getClassesForCustomerCalendar,
 );
-classesRouter.post("/create-classes", createClassesForMonthController);
+
 classesRouter.post("/", createClassController);
 
 classesRouter.delete("/:id", deleteClassController);

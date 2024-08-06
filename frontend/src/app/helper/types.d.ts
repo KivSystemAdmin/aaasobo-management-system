@@ -66,6 +66,8 @@ type Child = {
   name: string;
 };
 
+type Plans = Plan[];
+
 type Plan = {
   id: number;
   name: string;
@@ -83,6 +85,11 @@ type Subscription = {
   startAt: string;
   endAt: string;
   plan: Plan;
+};
+
+type RegisterSubscription = {
+  planId: number;
+  startAt: string;
 };
 
 type RecurringClasses = {

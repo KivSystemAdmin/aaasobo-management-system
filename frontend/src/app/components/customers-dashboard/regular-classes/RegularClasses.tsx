@@ -1,9 +1,11 @@
 "use client";
 
-import EditButton from "@/app/components/customers-dashboard/EditButton";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getSubscriptionsByCustomerId } from "@/app/helper/subscriptionsApi";
-import RegularClassesTable from "../../../components/customers-dashboard/regular-classes/RegularClassesTable";
-import React, { useEffect, useState } from "react";
+import ActionButton from "@/app/components/ActionButton";
+import CurrentSubscription from "@/app/components/customers-dashboard/regular-classes/CurrentSubscription";
+import AddSubscription from "@/app/components/customers-dashboard/regular-classes/AddSubscription";
 
 function RegularClasses({
   customerId,
@@ -14,6 +16,20 @@ function RegularClasses({
 }) {
   const [subscriptionsData, setSubscriptionsData] =
     useState<Subscriptions | null>(null);
+  const [showAddPlan, setShowAddPlan] = useState(false);
+
+  const handleAddRegularClass = () => {
+    setShowAddPlan(true);
+  };
+  const router = useRouter();
+
+  const handleEditRegularClasses = () => {
+    if (isAdminAuthenticated) {
+      router.push(`/admins/customer-list/${customerId}/regular-classes/edit`);
+      return;
+    }
+    router.push(`/customers/${customerId}/regular-classes/edit`);
+  };
 
   useEffect(() => {
     const fetchSubscription = async () => {
@@ -28,36 +44,21 @@ function RegularClasses({
   }, [customerId]);
 
   return (
-    <div>
-      {subscriptionsData &&
-        subscriptionsData.subscriptions.map((subscription) => {
-          return (
-            <div key={subscription.id}>
-              <div>
-                <h3>Regular Classes</h3>
-                <h4>Plan</h4>
-                <p>{subscription.plan.name}</p>
-                <h4>Number of Regular Classes</h4>
-                <p>{subscription.plan.description}</p>
-              </div>
-              <div>
-                <RegularClassesTable subscriptionId={subscription.id} />
-                {isAdminAuthenticated ? (
-                  <EditButton
-                    linkURL={`/admins/customer-list/${customerId}/regular-classes/edit`}
-                    btnText="Edit Regular Classes"
-                  />
-                ) : (
-                  <EditButton
-                    linkURL={`/customers/${customerId}/regular-classes/edit`}
-                    btnText="Edit Regular Classes"
-                  />
-                )}
-              </div>
-            </div>
-          );
-        })}
-    </div>
+    <>
+      <h3>Regular Classes</h3>
+      {isAdminAuthenticated ? (
+        <ActionButton
+          onClick={handleAddRegularClass}
+          btnText="Add Subscription"
+        />
+      ) : null}
+      <ActionButton
+        onClick={handleEditRegularClasses}
+        btnText="Edit Regular Classes"
+      />
+      <CurrentSubscription subscriptionsData={subscriptionsData} />
+      {showAddPlan && <AddSubscription customerId={customerId} />}
+    </>
   );
 }
 
