@@ -1,4 +1,6 @@
 import React, { useRef, forwardRef, useImperativeHandle } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -18,8 +20,12 @@ type InstructorCalendarViewProps = {
     start: string;
     end: string;
     color: string;
+    instructorIcon?: string;
+    instructorNickname?: string;
   }>;
   holidays: string[];
+  customerId?: number;
+  instructorId?: number;
 };
 
 type CalendarViewRefType = {
@@ -30,8 +36,9 @@ type CalendarViewRefType = {
 const CalendarView = forwardRef<
   CalendarViewRefType,
   InstructorCalendarViewProps
->(({ events, holidays }, ref) => {
+>(({ events, holidays, customerId, instructorId }, ref) => {
   const calendarRef = useRef<FullCalendar | null>(null);
+  const router = useRouter();
 
   // Uses useImperativeHandle to define the getApi method and expose it to the parent Page component
   useImperativeHandle(ref, () => ({
@@ -51,13 +58,30 @@ const CalendarView = forwardRef<
     const minutes = String(startDate.getMinutes()).padStart(2, "0");
     const formattedStartTime = `${hours}:${minutes}`;
 
+    const { instructorIcon, instructorNickname } =
+      eventInfo.event.extendedProps;
+
     const isClickable = eventInfo.event.title !== "No booked class";
 
     return (
       <div
         className={styles.eventBlock}
-        style={{ cursor: isClickable ? "pointer" : "default" }}
+        style={{ padding: "3px", cursor: isClickable ? "pointer" : "default" }}
       >
+        {instructorIcon && (
+          <Image
+            src={`/instructors/${instructorIcon}`}
+            alt={instructorNickname || "Instructor"}
+            width={30}
+            height={30}
+            priority
+            style={{
+              borderRadius: "180px",
+              border: "1.5px solid white",
+              marginRight: "5px",
+            }}
+          />
+        )}
         <div className={styles.eventTime}>
           <b>{formattedStartTime}</b> -
         </div>
@@ -82,12 +106,12 @@ const CalendarView = forwardRef<
   };
 
   const handleEventClick = (clickInfo: EventClickArg) => {
-    if (clickInfo.event.title !== "No booked class") {
-      // TODO: navigate the instructor to the detail page of the clicked class
-      const classId = clickInfo.event.extendedProps.classId;
+    const classId = clickInfo.event.extendedProps.classId;
+    if (instructorId && clickInfo.event.title !== "No booked class") {
       console.log("Clicked event classId:", classId);
+    } else if (customerId) {
+      router.push(`/customers/${customerId}/classes/${classId}`);
     }
-    // router.push(`http://localhost:3000/instructors/[id]/[classId]`);
   };
 
   const validRange = () => {

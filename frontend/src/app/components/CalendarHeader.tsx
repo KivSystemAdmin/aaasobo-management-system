@@ -51,15 +51,10 @@ const CalendarHeader = ({ calendarApi }: CalendarHeaderProps) => {
     calendarApi?.today();
   };
 
-  const handleViewChange = (
-    view: "dayGridMonth" | "timeGridWeek" | "timeGridDay",
-  ) => {
-    calendarApi?.changeView(view);
-    setCurrentView(view);
-  };
-
   return (
     <div className={styles.headerToolbar}>
+      <div className={styles.fcToolbarTitle}>{viewTitle}</div>
+
       <div className={styles.toolbarSection}>
         <button className={styles.fcButton} onClick={handlePrev}>
           <ChevronLeftIcon className={styles.icon} />
@@ -69,35 +64,6 @@ const CalendarHeader = ({ calendarApi }: CalendarHeaderProps) => {
         </button>
         <button className={styles.fcButton} onClick={handleNext}>
           <ChevronRightIcon className={styles.icon} />
-        </button>
-      </div>
-
-      <div className={styles.fcToolbarTitle}>{viewTitle}</div>
-
-      <div className={styles.toolbarSection}>
-        <button
-          className={clsx(styles.fcButton, {
-            [styles.active]: currentView === "dayGridMonth",
-          })}
-          onClick={() => handleViewChange("dayGridMonth")}
-        >
-          Month
-        </button>
-        <button
-          className={clsx(styles.fcButton, {
-            [styles.active]: currentView === "timeGridWeek",
-          })}
-          onClick={() => handleViewChange("timeGridWeek")}
-        >
-          Week
-        </button>
-        <button
-          className={clsx(styles.fcButton, {
-            [styles.active]: currentView === "timeGridDay",
-          })}
-          onClick={() => handleViewChange("timeGridDay")}
-        >
-          Day
         </button>
       </div>
     </div>

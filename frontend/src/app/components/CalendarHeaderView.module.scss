@@ -1,7 +1,7 @@
 // --- Header Part -----------------
 .headerToolbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 1rem;
 }
@@ -20,6 +20,7 @@
 }
 
 .fcToolbarTitle {
+  margin-right: 20px;
   font-size: 1.5rem;
   font-weight: bold;
 }

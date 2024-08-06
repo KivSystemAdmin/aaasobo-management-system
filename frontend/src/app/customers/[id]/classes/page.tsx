@@ -1,49 +1,142 @@
 "use client";
 
-import UpcomingClassesTable from "@/app/components/customers-dashboard/classes/UpcomingClassesTable";
+import React, { useEffect, useRef, useState } from "react";
+import CalendarHeader from "@/app/components/CalendarHeader";
+import CalendarView from "@/app/components/CalendarView";
+import styles from "./page.module.scss";
+import FullCalendar from "@fullcalendar/react";
+import { CalendarApi } from "@fullcalendar/core/index.js";
+import { getClassStartAndEndTimes } from "@/app/helper/dateUtils";
+import { fetchClassesForCalendar } from "@/app/helper/classesApi";
 import RedirectButton from "@/app/components/RedirectButton";
-import { getClassesByCustomerId } from "@/app/helper/classesApi";
-import { useEffect, useState } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-function Page({ params }: { params: { id: string } }) {
-  const customerId = params.id;
-  const [classes, setClasses] = useState<ClassType[] | undefined>(undefined);
+const Page = ({ params }: { params: { id: string } }) => {
+  const customerId = parseInt(params.id);
+  const [classesForCalendar, setClassesForCalendar] = useState<EventType[]>([]);
+  const [calendarApi, setCalendarApi] = useState<CalendarApi | null>(null);
+  const calendarRef = useRef<FullCalendar | null>(null);
 
   useEffect(() => {
-    const fetchClasses = async () => {
+    if (!customerId) return;
+
+    const fetchData = async () => {
       try {
-        const fetchedClasses = await getClassesByCustomerId(customerId);
-        setClasses(fetchedClasses);
+        const classes: ClassForCalendar[] = await fetchClassesForCalendar(
+          customerId,
+          "customer",
+        );
+
+        const formattedClasses = classes.map((eachClass) => {
+          const { start, end } = getClassStartAndEndTimes(
+            eachClass.dateTime,
+            "Asia/Tokyo",
+          );
+
+          const color =
+            eachClass.status === "booked"
+              ? "#FF0000"
+              : eachClass.status === "completed"
+                ? "#99FF99"
+                : "#C0C0C0";
+
+          const childrenNames = eachClass.classAttendance.children
+            .map((child) => child.name)
+            .join(", ");
+
+          return {
+            classId: eachClass.id,
+            start,
+            end,
+            title: childrenNames,
+            color,
+            instructorIcon: eachClass.instructor?.icon,
+            instructorNickname: eachClass.instructor?.nickname,
+          };
+        });
+
+        setClassesForCalendar(formattedClasses);
       } catch (error) {
         console.error("Failed to fetch classes:", error);
+        alert("Failed to get classes. Please try again.");
       }
     };
 
-    fetchClasses();
+    fetchData();
   }, [customerId]);
 
+  useEffect(() => {
+    if (calendarRef.current) {
+      setCalendarApi(calendarRef.current.getApi());
+    }
+  }, []);
+
   return (
-    <div>
-      <div>
-        <h1>Class Calendar</h1>
+    // 'Page' is the parent component of 'CalendarHeader' and 'CalendarView' children components.
+    // 'CalendarHeader' and 'CalendarView' are initially independent from each other, but 'Page' can connect them together
+    // by passing 'calendarRef' to 'CalendarView' and retrieving the FullCalendar API instance from it and making the API available for 'CalendarHeader'using state
+    <div className={styles.calendarContainer}>
+      <CalendarHeader calendarApi={calendarApi ?? null} />
+
+      <div className={styles.calendarInstruction}>
+        <p className={styles.headerMessage}>
+          You can see the details of classes by clicking them.{" "}
+          <span
+            style={{
+              fontSize: "0.8rem",
+              borderRadius: "6px",
+              padding: "3px 6px",
+              color: "white",
+              backgroundColor: "#FF0000",
+              width: "150px",
+            }}
+          >
+            booked
+          </span>{" "}
+          <span
+            style={{
+              fontSize: "0.8rem",
+              borderRadius: "6px",
+              padding: "3px 6px",
+              color: "white",
+              backgroundColor: "#99FF99",
+              width: "150px",
+            }}
+          >
+            completed
+          </span>{" "}
+          <span
+            style={{
+              fontSize: "0.8rem",
+              borderRadius: "6px",
+              padding: "3px 6px",
+              color: "white",
+              backgroundColor: "#C0C0C0",
+              width: "150px",
+            }}
+          >
+            canceled
+          </span>
+        </p>
+
+        <RedirectButton
+          linkURL={`/customers/${customerId}/classes/book`}
+          btnText="Book Class"
+          Icon={PlusIcon}
+          className="bookBtn"
+        />
       </div>
 
-      <RedirectButton
-        linkURL={`/customers/${customerId}/classes/book`}
-        btnText="Book Class"
-        Icon={PlusIcon}
-        className="bookBtn"
+      <CalendarView
+        // Create a ref to access the FullCalendar instance in CalendarView;
+        ref={calendarRef}
+        events={classesForCalendar}
+        // TODO: Fetch holidays from the backend
+        holidays={["2024-07-29", "2024-07-30", "2024-07-31"]}
+        customerId={customerId}
       />
-
-      {classes ? (
-        // TODO: Display the customer's classes using the calendar component
-        <UpcomingClassesTable customerId={customerId} classes={classes} />
-      ) : (
-        <div>Loading ...</div>
-      )}
     </div>
   );
-}
+};
 
 export default Page;
