@@ -81,9 +81,15 @@ export const getClassById = async (classId: string) => {
 // PATCH a class date
 export const editClass = async (editedClass: {
   classId: number;
-  dateTime: string;
-  instructorId: number;
+  dateTime?: string;
+  instructorId?: number;
   childrenIds: number[];
+  status?:
+    | "booked"
+    | "completed"
+    | "canceledByCustomer"
+    | "canceledByInstructor";
+  isRebookable?: boolean;
 }) => {
   // Define the data to be sent to the server side.
   const classURL = `http://localhost:4000/classes/${editedClass.classId}`;
@@ -148,6 +154,22 @@ export const cancelClass = async (classId: number) => {
       "Failed to cancel class:",
       error instanceof Error ? error.message : "Unknown error",
     );
+    throw error;
+  }
+};
+
+export const getClassesByInstructorId = async (instructorId: number) => {
+  try {
+    const response = await fetch(
+      `http://localhost:4000/instructors/${instructorId}/classes`,
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const { classes } = await response.json();
+    return classes;
+  } catch (error) {
+    console.error("Failed to fetch classes:", error);
     throw error;
   }
 };

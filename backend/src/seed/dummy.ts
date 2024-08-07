@@ -84,7 +84,6 @@ async function insertInstructorAvailabilities() {
     "2024-07-15T07:30:00Z",
     "2024-07-22T07:30:00Z",
     "2024-07-27T07:30:00Z",
-    "2024-07-28T07:30:00Z",
     "2024-07-29T07:30:00Z",
     "2024-07-30T07:30:00Z",
     "2024-07-31T07:30:00Z",
@@ -94,6 +93,23 @@ async function insertInstructorAvailabilities() {
     "2024-08-04T07:30:00Z",
     "2024-08-05T07:30:00Z",
     "2024-08-06T07:30:00Z",
+    "2024-08-07T07:30:00Z",
+    "2024-08-08T07:30:00Z",
+    "2024-08-09T07:30:00Z",
+    "2024-08-10T07:30:00Z",
+    "2024-08-11T07:30:00Z",
+    "2024-08-12T07:30:00Z",
+    "2024-08-13T07:30:00Z",
+    "2024-08-14T07:30:00Z",
+    "2024-08-15T07:30:00Z",
+    "2024-08-16T07:30:00Z",
+    "2024-08-17T07:30:00Z",
+    "2024-08-18T07:30:00Z",
+    "2024-08-19T07:30:00Z",
+    "2024-08-20T07:30:00Z",
+    "2024-08-21T07:30:00Z",
+    "2024-08-22T07:30:00Z",
+    "2024-08-23T07:30:00Z",
   ]);
   await insertAvailabilities(elian.id, "2024-07-01T08:00:00Z", [
     "2024-07-01T08:00:00Z",
@@ -226,14 +242,23 @@ async function insertChildren() {
       {
         name: "Peppa",
         customerId: alice.id,
+        birthdate: new Date("2018-05-15"),
+        personalInfo:
+          "Age: 6 years, English Level: Beginner. Enjoys playing with friends and loves jumping in muddy puddles.",
       },
       {
         name: "Suzy",
         customerId: alice.id,
+        birthdate: new Date("2018-06-20"),
+        personalInfo:
+          "Age: 6 years, English Level: Beginner. Likes playing with dolls and has a pet sheep named Woolly.",
       },
       {
         name: "Emily",
         customerId: bob.id,
+        birthdate: new Date("2017-11-02"),
+        personalInfo:
+          "Age: 7 years, English Level: Intermediate. Loves drawing and is very creative. Enjoys reading stories.",
       },
     ],
   });

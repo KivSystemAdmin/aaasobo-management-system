@@ -8,6 +8,7 @@ import {
 import ActionButton from "./ActionButton";
 import styles from "./ClassesTable.module.scss";
 import RedirectButton from "./RedirectButton";
+import Link from "next/link";
 
 const ClassesTable = ({
   classes,
@@ -92,11 +93,24 @@ const ClassesTable = ({
                     </td>
                     {pastPrevDayDeadline && !pastClassTimeDeadline ? (
                       <td className={styles.classesTable__td}>
-                        {date}
+                        <Link
+                          href={`/customers/${userId}/classes/${eachClass.id}`}
+                          passHref
+                        >
+                          {date}
+                        </Link>
+
                         <span style={{ color: "red" }}>*</span>
                       </td>
                     ) : (
-                      <td className={styles.classesTable__td}>{date}</td>
+                      <td className={styles.classesTable__td}>
+                        <Link
+                          href={`/customers/${userId}/classes/${eachClass.id}`}
+                          passHref
+                        >
+                          {date}
+                        </Link>
+                      </td>
                     )}
                     <td className={styles.classesTable__td}>
                       <div className={styles.classesTable__time}>

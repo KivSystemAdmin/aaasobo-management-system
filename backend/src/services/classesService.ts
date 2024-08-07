@@ -143,9 +143,15 @@ export const getClassById = async (classId: number) => {
 // Update/Edit a class
 export const updateClass = async (
   classId: number,
-  dateTime: string,
-  instructorId: number,
-  childrenIds: number[],
+  dateTime?: string,
+  instructorId?: number,
+  childrenIds?: number[],
+  status?:
+    | "booked"
+    | "completed"
+    | "canceledByCustomer"
+    | "canceledByInstructor",
+  isRebookable?: boolean,
 ) => {
   try {
     const updatedClass = await prisma.$transaction(async (prisma) => {
@@ -155,6 +161,8 @@ export const updateClass = async (
         data: {
           dateTime,
           instructorId,
+          status,
+          isRebookable,
         },
       });
 
@@ -163,10 +171,15 @@ export const updateClass = async (
         where: { classId },
       });
 
-      // Add new classAttendance records
-      await prisma.classAttendance.createMany({
-        data: childrenIds.map((childId) => ({ classId, childrenId: childId })),
-      });
+      // Add new classAttendance records if childrenIds is provided
+      if (childrenIds) {
+        await prisma.classAttendance.createMany({
+          data: childrenIds.map((childId) => ({
+            classId,
+            childrenId: childId,
+          })),
+        });
+      }
 
       return updatedClass;
     });
@@ -254,6 +267,34 @@ export const cancelClassById = async (
       where: { id: classId },
       data: { status: "canceledByCustomer", isRebookable: false },
     });
+  }
+};
+
+export const fetchInstructorClasses = async (instructorId: number) => {
+  try {
+    const classes = await prisma.class.findMany({
+      where: { instructorId },
+      include: {
+        instructor: true,
+        customer: true,
+        classAttendance: { include: { children: true } },
+        recurringClass: {
+          include: {
+            recurringClassAttendance: {
+              include: {
+                children: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { dateTime: "asc" },
+    });
+
+    return classes;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch classes.");
   }
 };
 

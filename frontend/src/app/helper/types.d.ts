@@ -42,7 +42,11 @@ type ClassType = {
   };
   classAttendance: { children: { id: number; name: string }[] };
 
-  status: "booked" | "completed" | "cancelled";
+  status:
+    | "booked"
+    | "completed"
+    | "canceledByCustomer"
+    | "canceledByInstructor";
   isRebookable: boolean;
 };
 
@@ -59,13 +63,19 @@ type CustomersClass = {
   instructorId: number;
   customerId: number;
   dateTime: string;
-  status: "booked" | "completed" | "cancelled";
+  status:
+    | "booked"
+    | "completed"
+    | "canceledByCustomer"
+    | "canceledByInstructor";
 };
 
 type Child = {
   id: number;
   customerId?: number;
   name: string;
+  birthdate?: string | Date;
+  personalInfo?: string;
 };
 
 type Plans = Plan[];
@@ -128,7 +138,11 @@ type ClassForCalendar = {
   classAttendance: {
     children: Child[];
   };
-  status: string;
+  status:
+    | "booked"
+    | "completed"
+    | "canceledByCustomer"
+    | "canceledByInstructor";
 };
 
 type RecurringClassState = {
@@ -137,6 +151,23 @@ type RecurringClassState = {
   time: string;
   instructorId: number;
   childrenIds: Set<number>;
+};
+
+type InstructorClassDetail = {
+  id: number;
+  dateTime: string;
+  customerName: string;
+  classURL: string;
+  meetingId: string;
+  passcode: string;
+  children: Child[];
+  attendingChildren: Child[];
+  status:
+    | "booked"
+    | "completed"
+    | "canceledByCustomer"
+    | "canceledByInstructor";
+  isRebookable: boolean;
 };
 
 type Tab = {

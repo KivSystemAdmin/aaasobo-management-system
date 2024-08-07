@@ -53,6 +53,7 @@ const Page = ({ params }: { params: { id: string } }) => {
           };
         });
 
+        // TODO: Update fetchInstructorAvailabilities function
         const instructorAvailabilities: string[] =
           await fetchInstructorAvailabilities(instructorId);
 
@@ -129,6 +130,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         events={allEvents}
         // TODO: Fetch holidays from the backend
         holidays={["2024-07-29", "2024-07-30", "2024-07-31"]}
+        instructorId={instructorId}
       />
     </div>
   );

@@ -106,6 +106,8 @@ model Children {
   customer                 Customer                   @relation(fields: [customerId], references: [id])
   classAttendance          ClassAttendance[]
   recurringClassAttendance RecurringClassAttendance[]
+  birthdate                DateTime?
+  personalInfo             String?
 }
 
 model ClassAttendance {

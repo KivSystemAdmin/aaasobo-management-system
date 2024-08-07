@@ -4,6 +4,7 @@ import {
   createClass,
   createClassesUsingRecurringClassId,
   deleteClass,
+  fetchInstructorClasses,
   getAllClasses,
   getClassById,
   getClassesByCustomerId,
@@ -12,6 +13,7 @@ import {
   updateClass,
 } from "../services/classesService";
 import { getActiveSubscription } from "../services/subscriptionsService";
+import { RequestWithId } from "../middlewares/parseId.middleware";
 import { prisma } from "../../prisma/prismaClient";
 import { getValidRecurringClasses } from "../services/recurringClassesService";
 import {
@@ -28,8 +30,15 @@ export const getAllClassesController = async (_: Request, res: Response) => {
     const classes = await getAllClasses();
 
     const classesData = classes.map((eachClass) => {
-      const { id, dateTime, customer, instructor, status, isRebookable } =
-        eachClass;
+      const {
+        id,
+        dateTime,
+        customer,
+        instructor,
+        status,
+        isRebookable,
+        recurringClassId,
+      } = eachClass;
 
       return {
         id,
@@ -45,6 +54,7 @@ export const getAllClassesController = async (_: Request, res: Response) => {
         },
         status,
         isRebookable,
+        recurringClassId,
       };
     });
 
@@ -221,8 +231,9 @@ export const getClassByIdController = async (req: Request, res: Response) => {
 
 // Update[Edit] a class
 export const updateClassController = async (req: Request, res: Response) => {
-  const classId = Number(req.params.id);
-  const { dateTime, instructorId, childrenIds } = req.body;
+  const classId = parseInt(req.params.id);
+  const { dateTime, instructorId, childrenIds, status, isRebookable } =
+    req.body;
 
   try {
     const updatedClass = await updateClass(
@@ -230,6 +241,8 @@ export const updateClassController = async (req: Request, res: Response) => {
       dateTime,
       instructorId,
       childrenIds,
+      status,
+      isRebookable,
     );
 
     res.status(200).json({
@@ -347,6 +360,58 @@ export const nonRebookableCancelController = async (
     res.status(200).json({ message: "Class canceled successfully" });
   } catch (error) {
     res.status(500).json({ error: "An unknown error occurred" });
+  }
+};
+
+export const getInstructorClasses = async (
+  req: RequestWithId,
+  res: Response,
+) => {
+  try {
+    const classes = await fetchInstructorClasses(req.id);
+
+    const classesData = classes.map((eachClass) => {
+      const {
+        id,
+        dateTime,
+        customer,
+        instructor,
+        status,
+        classAttendance,
+        isRebookable,
+        recurringClass,
+      } = eachClass;
+
+      return {
+        id,
+        dateTime,
+        customerName: customer.name,
+        classURL: instructor.classURL,
+        meetingId: instructor.meetingId,
+        passcode: instructor.passcode,
+        children: classAttendance.map((classAttendance) => ({
+          id: classAttendance.children.id,
+          name: classAttendance.children.name,
+          birthdate: classAttendance.children.birthdate,
+          personalInfo: classAttendance.children.personalInfo,
+        })),
+        attendingChildren: recurringClass?.recurringClassAttendance.map(
+          (attendance) => ({
+            id: attendance.children.id,
+            name: attendance.children.name,
+            birthdate: attendance.children.birthdate,
+            personalInfo: attendance.children.personalInfo,
+          }),
+        ),
+        status,
+        isRebookable,
+      };
+    });
+
+    res.json({ classes: classesData });
+  } catch (error) {
+    console.error("Controller Error:", error);
+    res.status(500).json({ error: "Failed to fetch classes." });
   }
 };
 

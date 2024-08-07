@@ -108,7 +108,7 @@ const CalendarView = forwardRef<
   const handleEventClick = (clickInfo: EventClickArg) => {
     const classId = clickInfo.event.extendedProps.classId;
     if (instructorId && clickInfo.event.title !== "No booked class") {
-      console.log("Clicked event classId:", classId);
+      router.push(`/instructors/${instructorId}/class-schedule/${classId}`);
     } else if (customerId) {
       router.push(`/customers/${customerId}/classes/${classId}`);
     }

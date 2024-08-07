@@ -14,6 +14,7 @@ import {
   getInstructorUnavailabilities,
 } from "../controllers/instructorsUnavailabilityController";
 import { authenticateInstructorSession } from "../middlewares/auth.middleware";
+import { getInstructorClasses } from "../controllers/classesController";
 
 export const instructorsRouter = express.Router();
 
@@ -47,3 +48,7 @@ instructorsRouter.get("/:id/availability", parseId, (req, res) => {
 instructorsRouter.get("/", getAllInstructorsController);
 
 instructorsRouter.get("/authentication", authenticateInstructorSession);
+
+instructorsRouter.get("/:id/classes", parseId, (req, res) => {
+  getInstructorClasses(req as RequestWithId, res);
+});
