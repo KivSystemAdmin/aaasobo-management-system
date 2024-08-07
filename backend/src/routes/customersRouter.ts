@@ -8,6 +8,7 @@ import {
   updateCustomerProfile,
   registerSubscriptionController,
 } from "../controllers/customersController";
+import { authenticateCustomerSession } from "../middlewares/auth.middleware";
 
 export const customersRouter = express.Router();
 
@@ -22,3 +23,4 @@ customersRouter.get("/:id/customer", getCustomerById);
 
 customersRouter.patch("/:id", updateCustomerProfile);
 customersRouter.post("/:id/subscription", registerSubscriptionController);
+customersRouter.get("/authentication", authenticateCustomerSession);

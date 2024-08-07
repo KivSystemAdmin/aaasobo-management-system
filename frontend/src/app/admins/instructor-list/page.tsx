@@ -1,7 +1,6 @@
 "use client";
 
-import { FormEvent, ChangeEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent, ChangeEvent, useState } from "react";
 import { useAuth } from "@/app/hooks/useAuth";
 import UsersTable from "@/app/components/admins-dashboard/UsersTable";
 import InstructorScheduleCalendar from "@/app/components/admins-dashboard/InstructorScheduleCalendar";
@@ -33,18 +32,11 @@ function Page() {
   const linkItems = ["ID"]; // Set the item to be a link
   const replaceItems = ["ID"]; // Replace the item with the value(e.g., ID -> 1,2,3...)
   const linkUrls = ["/admins/instructor-list/[ID]"]; // Set the link URL
-  const router = useRouter();
 
   // Check the authentication of the admin.
   const endpoint = "http://localhost:4000/admins/authentication";
-  const result = useAuth(endpoint);
-  const { isAuthenticated, isLoading } = result;
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/admins/login");
-    }
-  }, [isAuthenticated, router]);
+  const redirectPath = "/admins/login";
+  const { isLoading } = useAuth(endpoint, redirectPath);
 
   // Display a loading message while checking authentication
   if (isLoading) {

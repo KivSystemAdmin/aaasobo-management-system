@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent } from "react";
 import { useInput } from "@/app/hooks/useInput";
 import { useAuth } from "@/app/hooks/useAuth";
 import { isValidRegister } from "@/app/helper/validationUtils";
@@ -11,17 +10,11 @@ function Register() {
   const [email, onEmailChange] = useInput();
   const [password, onPasswordChange] = useInput();
   const [passConfirmation, onPassConfirmationChange] = useInput();
-  const router = useRouter();
 
   // Check the authentication of the admin.
   const endpoint = "http://localhost:4000/admins/authentication";
-  const { isAuthenticated, isLoading } = useAuth(endpoint);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/admins/login");
-    }
-  }, [isAuthenticated, router]);
+  const redirectPath = "/admins/login";
+  const { isLoading } = useAuth(endpoint, redirectPath);
 
   // Register the admin.
   const registerHandler = async (e: FormEvent) => {
@@ -70,6 +63,7 @@ function Register() {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
   return (
     <div>
       <h2>Register</h2>

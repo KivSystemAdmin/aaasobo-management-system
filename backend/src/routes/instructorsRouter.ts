@@ -13,6 +13,7 @@ import {
   createInstructorUnavailability,
   getInstructorUnavailabilities,
 } from "../controllers/instructorsUnavailabilityController";
+import { authenticateInstructorSession } from "../middlewares/auth.middleware";
 
 export const instructorsRouter = express.Router();
 
@@ -44,3 +45,5 @@ instructorsRouter.get("/:id/availability", parseId, (req, res) => {
   getInstructorAvailabilities(req as RequestWithId, res);
 });
 instructorsRouter.get("/", getAllInstructorsController);
+
+instructorsRouter.get("/authentication", authenticateInstructorSession);
