@@ -4,8 +4,7 @@ import {
   getAllInstructors,
   createInstructor,
 } from "../services/instructorsService";
-import { getAllChildren } from "../services/childrenService";
-import { getAllSubscriptions } from "../services/subscriptionsService";
+import { getAllCustomers } from "../services/customersService";
 import bcrypt from "bcrypt";
 
 const saltRounds = 12;
@@ -122,38 +121,21 @@ interface SingleChildSubscription extends Omit<Subscription, "customer"> {
   };
 }
 
-// Fetching customers' information
+// Admin dashboard for displaying customers' information
 export const getAllCustomersController = async (_: Request, res: Response) => {
   try {
-    // Fetch the customers data using the email.
-    const subscriptions = await getAllSubscriptions();
-
-    // flatten the subscriptions so that each subscription has a single child
-    const flattenedSubscriptions: SingleChildSubscription[] =
-      subscriptions.flatMap((subscription) =>
-        subscription.customer.children.map((child) => ({
-          ...subscription,
-          customer: {
-            ...subscription.customer,
-            children: child,
-          },
-        })),
-      );
+    // Fetch all customers data using the email.
+    const customers = await getAllCustomers();
 
     // Transform the data structure.
-    const data = flattenedSubscriptions.map((subscription, number) => {
-      const { customerId, customer, plan, startAt, endAt } = subscription;
+    const data = customers.map((customer, number) => {
+      const { id, name, email } = customer;
 
       return {
         No: number + 1,
-        ID: customerId,
-        Name: customer.name,
-        Email: customer.email,
-        "Child ID": customer.children.id,
-        "Child name": customer.children.name,
-        Plan: plan.name,
-        "Start date": startAt.toISOString().slice(0, 10),
-        "End date": endAt ? endAt.toISOString().slice(0, 10) : null,
+        ID: id,
+        Name: name,
+        Email: email,
       };
     });
 

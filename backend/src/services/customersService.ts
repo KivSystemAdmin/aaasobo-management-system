@@ -45,3 +45,13 @@ export const updateCustomer = async (
     throw new Error("Failed to update the customer data.");
   }
 };
+
+// Fetch all customers information
+export const getAllCustomers = async () => {
+  try {
+    return await prisma.customer.findMany();
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch customers.");
+  }
+};
