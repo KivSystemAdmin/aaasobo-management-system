@@ -34,6 +34,7 @@ function AddSubscription({ customerId }: { customerId: string }) {
     try {
       await registerSubscription(customerId, subscriptionData);
       alert("Subscription registered successfully.");
+      localStorage.setItem("activeTab", "2");
       window.location.reload();
     } catch (error) {
       console.error("Error registering subscription:", error);
@@ -42,7 +43,8 @@ function AddSubscription({ customerId }: { customerId: string }) {
   };
 
   // Reload the page to go back to the previous page.
-  const handleCancellation = async () => {
+  const handleCancellation = () => {
+    localStorage.setItem("activeTab", "2");
     window.location.reload();
   };
 

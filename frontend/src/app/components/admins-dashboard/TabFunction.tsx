@@ -2,12 +2,6 @@
 
 import { useState } from "react";
 
-// Define the Tab interface
-interface Tab {
-  label: string;
-  content: React.ReactNode;
-}
-
 // Configure the Tab component
 const Tab: React.FC<{
   label: string;
@@ -30,8 +24,11 @@ const TabContent: React.FC<{ content: React.ReactNode }> = ({ content }) => {
 };
 
 // Configure the TabFunction component
-const TabFunction: React.FC<{ tabs: Tab[] }> = ({ tabs }) => {
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
+const TabFunction: React.FC<{ tabs: Tab[]; initialActiveTab?: number }> = ({
+  tabs,
+  initialActiveTab = 0,
+}) => {
+  const [activeTabIndex, setActiveTabIndex] = useState(initialActiveTab);
 
   return (
     <>

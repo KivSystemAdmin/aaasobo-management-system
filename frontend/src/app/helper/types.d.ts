@@ -138,3 +138,8 @@ type RecurringClassState = {
   instructorId: number;
   childrenIds: Set<number>;
 };
+
+type Tab = {
+  label: string;
+  content: React.ReactNode;
+};

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import TabFunction from "@/app/components/admins-dashboard/TabFunction";
 import InstructorProfile from "@/app/components/instructors-dashboard/instructor-profile/InstructorProfile";
 import { useAuth } from "@/app/hooks/useAuth";
+import { useTabSelect } from "@/app/hooks/useTabSelect";
 
 function Page({ params }: { params: { instructorId: string } }) {
   const instructorId = params.instructorId;
@@ -14,11 +15,8 @@ function Page({ params }: { params: { instructorId: string } }) {
   const endpoint = "http://localhost:4000/admins/authentication";
   const { isAuthenticated } = useAuth(endpoint);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/admins/login");
-    }
-  }, [isAuthenticated, router]);
+  // Get the active tab from the local storage.
+  const { initialActiveTab, isTabInitialized } = useTabSelect("activeTab");
 
   // Tabs with labels and content
   const tabs = [
@@ -41,7 +39,18 @@ function Page({ params }: { params: { instructorId: string } }) {
     },
   ];
 
-  return <TabFunction tabs={tabs} />;
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/admins/login");
+    }
+  }, [isAuthenticated, router]);
+
+  // If the tab is not initialized, return null.
+  if (!isTabInitialized) {
+    return null;
+  }
+
+  return <TabFunction tabs={tabs} initialActiveTab={initialActiveTab} />;
 }
 
 export default Page;
