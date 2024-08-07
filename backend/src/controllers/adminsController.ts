@@ -4,6 +4,7 @@ import {
   getAllInstructors,
   createInstructor,
 } from "../services/instructorsService";
+import { getAllChildren } from "../services/childrenService";
 import { getAllSubscriptions } from "../services/subscriptionsService";
 import bcrypt from "bcrypt";
 
@@ -234,5 +235,30 @@ export const registerInstructorController = async (
         error,
       });
     }
+  }
+};
+
+// Admin dashboard for displaying instructors' information
+export const getAllChildrenController = async (_: Request, res: Response) => {
+  try {
+    // Fetch all children data using the email.
+    const children = await getAllChildren();
+
+    // Transform the data structure.
+    const data = children.map((child, number) => {
+      const { id, name, customer } = child;
+
+      return {
+        No: number + 1,
+        ID: id,
+        Name: name,
+        "Customer ID": customer.id,
+        "Customer name": customer.name,
+      };
+    });
+
+    res.json({ data });
+  } catch (error) {
+    res.status(500).json({ error });
   }
 };

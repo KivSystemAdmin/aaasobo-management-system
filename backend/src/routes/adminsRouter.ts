@@ -6,6 +6,7 @@ import {
   registerInstructorController,
   getAllInstructorsController,
   getAllCustomersController,
+  getAllChildrenController,
 } from "../controllers/adminsController";
 import {
   requireAuthentication,
@@ -27,3 +28,4 @@ adminsRouter.post(
 );
 adminsRouter.get("/instructor-list", getAllInstructorsController);
 adminsRouter.get("/customer-list", getAllCustomersController);
+adminsRouter.get("/child-list", getAllChildrenController);

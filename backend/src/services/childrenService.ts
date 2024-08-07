@@ -87,3 +87,18 @@ export const getChildById = async (id: number) => {
     throw new Error("Failed to fetch child.");
   }
 };
+
+export const getAllChildren = async () => {
+  // Fetch the Children data from the DB
+  try {
+    const children = await prisma.children.findMany({
+      include: { customer: true },
+      orderBy: { id: "asc" },
+    });
+
+    return children;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch all children.");
+  }
+};

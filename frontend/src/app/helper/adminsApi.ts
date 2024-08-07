@@ -29,3 +29,18 @@ export const getAllCustomers = async () => {
     throw error;
   }
 };
+
+// GET all children data
+export const getAllChildren = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/child-list`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const { data } = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch children:", error);
+    throw error;
+  }
+};

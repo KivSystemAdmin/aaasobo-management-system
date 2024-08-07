@@ -10,7 +10,11 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import Link from "next/link";
-import { getAllInstructors, getAllCustomers } from "@/app/helper/adminsApi";
+import {
+  getAllInstructors,
+  getAllCustomers,
+  getAllChildren,
+} from "@/app/helper/adminsApi";
 
 interface UsersTableProps {
   userType: string;
@@ -43,6 +47,9 @@ function UsersTable({
             break;
           case "customer":
             usersData = await getAllCustomers();
+            break;
+          case "child":
+            usersData = await getAllChildren();
             break;
           default:
             usersData = [];
