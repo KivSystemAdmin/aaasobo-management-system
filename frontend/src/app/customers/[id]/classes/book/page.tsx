@@ -34,7 +34,7 @@ function Page({ params }: { params: { id: string } }) {
     };
 
     fetchChildrenByCustomerId(customerId);
-  }, []);
+  }, [customerId]);
 
   return (
     <div>

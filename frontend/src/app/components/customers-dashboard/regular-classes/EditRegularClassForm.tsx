@@ -50,7 +50,12 @@ function EditRegularClassForm({
         // TODO: Get only valid recurring classes.
         const data = await getRecurringClassesBySubscriptionId(subscriptionId);
 
-        const stateList = data.recurringClasses.map(
+        // Select recurringClasses whose endAt is null.
+        const recurringClasses = data.recurringClasses.filter(
+          (recurringClass: RecurringClass) => recurringClass.endAt === null,
+        );
+
+        const stateList = recurringClasses.map(
           ({
             id,
             dateTime,

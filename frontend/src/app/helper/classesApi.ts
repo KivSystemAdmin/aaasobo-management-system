@@ -151,3 +151,30 @@ export const cancelClass = async (classId: number) => {
     throw error;
   }
 };
+
+// POST create monthly classes
+export const createMonthlyClasses = async (data: {
+  year: number;
+  month: string;
+}) => {
+  try {
+    const response = await fetch(
+      "http://localhost:4000/classes/create-classes",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error. status ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Failed to create the monthly classes:", error);
+    throw error;
+  }
+};

@@ -256,3 +256,65 @@ export const cancelClassById = async (
     });
   }
 };
+
+// Create classes based on the recurring class id
+export const createClassesUsingRecurringClassId = async (
+  tx: Prisma.TransactionClient,
+  recurringClassId: number,
+  instructorId: number,
+  customerId: number,
+  subscriptionId: number,
+  childrenIds: number[],
+  dateTimes: Date[],
+) => {
+  try {
+    const createdClasses = await tx.class.createManyAndReturn({
+      data: dateTimes.map((dateTime) => {
+        return {
+          recurringClassId,
+          instructorId,
+          customerId,
+          subscriptionId,
+          status: "booked",
+          dateTime,
+        };
+      }),
+    });
+
+    await tx.classAttendance.createMany({
+      data: createdClasses
+        .map((createdClass) => {
+          return childrenIds.map((childrenId) => ({
+            classId: createdClass.id,
+            childrenId,
+          }));
+        })
+        .flat(),
+    });
+
+    return { createdClasses };
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to add classes.");
+  }
+};
+
+export const getExcludedClasses = async (
+  tx: Prisma.TransactionClient,
+  recurringClassIds: number[],
+  date: Date,
+) => {
+  try {
+    const excludedClassData = await tx.class.findMany({
+      where: {
+        recurringClassId: { in: recurringClassIds },
+        dateTime: { gte: date },
+      },
+    });
+
+    return excludedClassData;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch classes.");
+  }
+};

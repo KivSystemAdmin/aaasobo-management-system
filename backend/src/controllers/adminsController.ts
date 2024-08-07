@@ -5,6 +5,7 @@ import {
   createInstructor,
 } from "../services/instructorsService";
 import { getAllCustomers } from "../services/customersService";
+import { getAllChildren } from "../services/childrenService";
 import bcrypt from "bcrypt";
 
 const saltRounds = 12;

@@ -26,7 +26,7 @@ function RecurringClassEntry({
   // TODO: Only instructors' availability should be selectable.
   // TODO: Before today shouldn't be selectable.
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const times = ["09:00", "11:00", "16:00", "16:30", "17:00"];
+  const times = ["09:00", "11:00", "13:00", "16:00", "16:30", "17:00"];
   const [selectedDate, setSelectedDate] = useState("");
 
   const handleChildChange = (
@@ -89,7 +89,7 @@ function RecurringClassEntry({
           }}
         >
           <option key="" value="" hidden></option>
-          {instructorsData.data.map((instructor) => {
+          {instructorsData.map((instructor) => {
             return (
               <option key={instructor.id} value={instructor.id}>
                 {instructor.name}
