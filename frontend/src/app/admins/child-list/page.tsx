@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import UsersTable from "@/app/components/admins-dashboard/UsersTable";
 
@@ -14,18 +12,11 @@ function Page() {
     "/admins/customer-list/[Customer ID]/children-profiles/[ID]/edit",
     "/admins/customer-list/[Customer ID]",
   ]; // Set the link URL
-  const router = useRouter();
 
   // Check the authentication of the admin.
   const endpoint = "http://localhost:4000/admins/authentication";
-  const result = useAuth(endpoint);
-  const { isAuthenticated, isLoading } = result;
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/admins/login");
-    }
-  }, [isAuthenticated, router]);
+  const redirectPath = "/admins/login";
+  const { isLoading } = useAuth(endpoint, redirectPath);
 
   // Display a loading message while checking authentication
   if (isLoading) {
