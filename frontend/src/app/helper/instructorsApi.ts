@@ -176,3 +176,24 @@ export const fetchInstructorAvailabilities = async (instructorId: number) => {
     throw error;
   }
 };
+
+export const fetchInstructorRecurringAvailabilities = async (
+  instructorId: number,
+) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/${instructorId}/recurringAvailabilityById`,
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.recurringAvailabilities;
+  } catch (error) {
+    console.error(
+      "Failed to fetch instructor recurring availabilities.",
+      error,
+    );
+    throw error;
+  }
+};

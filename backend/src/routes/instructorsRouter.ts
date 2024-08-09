@@ -7,6 +7,7 @@ import {
   RecurringAvailability,
   getInstructorAvailabilities,
   getAllInstructorsController,
+  getRecurringAvailabilityById,
 } from "../controllers/instructorsController";
 import { type RequestWithId, parseId } from "../middlewares/parseId.middleware";
 import {
@@ -45,6 +46,9 @@ instructorsRouter.put("/:id/unavailability", parseId, (req, res) => {
 instructorsRouter.get("/:id/availability", parseId, (req, res) => {
   getInstructorAvailabilities(req as RequestWithId, res);
 });
+instructorsRouter.get("/:id/recurringAvailabilityById", parseId, (req, res) =>
+  getRecurringAvailabilityById(req as RequestWithId, res),
+);
 instructorsRouter.get("/", getAllInstructorsController);
 
 instructorsRouter.get("/authentication", authenticateInstructorSession);

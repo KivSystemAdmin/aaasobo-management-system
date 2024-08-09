@@ -186,3 +186,21 @@ export async function fetchInstructorAvailabilities(instructorId: number) {
     throw new Error("Failed to get instructor availabilities.");
   }
 }
+
+// Fetch recurring availability After endAt or endAt is null
+export const getValidRecurringAvailabilities = async (
+  instructorId: number,
+  date: Date,
+) => {
+  try {
+    const recurringAvailabilities =
+      await prisma.instructorRecurringAvailability.findMany({
+        where: { instructorId, OR: [{ endAt: { gt: date } }, { endAt: null }] },
+      });
+
+    return recurringAvailabilities;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch instructor's recurring availability.");
+  }
+};

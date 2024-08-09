@@ -12,6 +12,7 @@ import {
   getInstructorWithRecurringAvailability,
   fetchInstructorAvailabilities,
   getAllInstructors,
+  getValidRecurringAvailabilities,
 } from "../services/instructorsService";
 import { type RequestWithId } from "../middlewares/parseId.middleware";
 
@@ -350,5 +351,26 @@ export const getAllInstructorsController = async (
     return res.status(200).json({ instructors });
   } catch (error) {
     return setErrorResponse(res, error);
+  }
+};
+
+// GET recurring availability by instructor id.
+export const getRecurringAvailabilityById = async (
+  req: RequestWithId,
+  res: Response,
+) => {
+  // Get the local date and the end of its time.
+  const today = new Date();
+  today.setUTCHours(23, 59, 59, 0);
+  today.setDate(today.getDate());
+  try {
+    const recurringAvailabilities = await getValidRecurringAvailabilities(
+      req.id,
+      today,
+    );
+
+    res.json({ recurringAvailabilities });
+  } catch (error) {
+    res.status(500).json({ error: `${error}` });
   }
 };
