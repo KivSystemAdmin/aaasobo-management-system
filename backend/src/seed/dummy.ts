@@ -27,7 +27,7 @@ async function insertInstructors() {
       classURL: "https://zoom.us/j/67890?pwd=FGHij",
       meetingId: "234 567 8901",
       passcode: "elian",
-      password: "$2b$12$R6tfoOzHAHCC2NgD7HZVtutBQsoWysLtdpWEKGYlkHbeGvMa.WSUe", // password: Elian
+      password: "$2b$12$Oe8qdMedbkuqhY31pgkH7OaMukvbUawE63inMCoDSeY5CHRS3Gc.u", // password: elian
       introductionURL:
         "https://select-type.com/rsv/?id=9krPgyM7znE&c_id=127929",
     },

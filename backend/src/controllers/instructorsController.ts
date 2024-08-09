@@ -13,8 +13,10 @@ import {
   fetchInstructorAvailabilities,
   getAllInstructors,
   getValidRecurringAvailabilities,
+  getInstructorByEmail,
 } from "../services/instructorsService";
 import { type RequestWithId } from "../middlewares/parseId.middleware";
+import bcrypt from "bcrypt";
 
 // Fetch all the instructors and their availabilities
 export const getAllInstructorsAvailabilitiesController = async (
@@ -372,5 +374,49 @@ export const getRecurringAvailabilityById = async (
     res.json({ recurringAvailabilities });
   } catch (error) {
     res.status(500).json({ error: `${error}` });
+  }
+};
+
+// Login Instructor
+export const loginInstructorController = async (
+  req: Request,
+  res: Response,
+) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ message: "Invalid email or password." });
+  }
+
+  try {
+    // Fetch the instructor by the email.
+    const instructor = await getInstructorByEmail(email);
+
+    if (!instructor) {
+      return res.status(401).json({
+        message: "Instructor not found.",
+      });
+    }
+
+    // Check if the password is correct or not.
+    const result = await bcrypt.compare(password, instructor.password);
+
+    if (!result) {
+      return res.status(401).json({
+        message: "Invalid email or password",
+      });
+    }
+
+    // Set the session.
+    req.session = {
+      userId: instructor.id,
+      userType: "instructor",
+    };
+
+    res.status(200).json({
+      instructorId: instructor.id,
+      message: "Instructor logged in successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ error });
   }
 };

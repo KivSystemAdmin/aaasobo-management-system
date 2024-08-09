@@ -8,6 +8,7 @@ import {
   getInstructorAvailabilities,
   getAllInstructorsController,
   getRecurringAvailabilityById,
+  loginInstructorController,
 } from "../controllers/instructorsController";
 import { type RequestWithId, parseId } from "../middlewares/parseId.middleware";
 import {
@@ -56,3 +57,4 @@ instructorsRouter.get("/authentication", authenticateInstructorSession);
 instructorsRouter.get("/:id/classes", parseId, (req, res) => {
   getInstructorClasses(req as RequestWithId, res);
 });
+instructorsRouter.post("/login", loginInstructorController);

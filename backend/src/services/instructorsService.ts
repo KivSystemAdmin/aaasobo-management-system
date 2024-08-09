@@ -204,3 +204,15 @@ export const getValidRecurringAvailabilities = async (
     throw new Error("Failed to fetch instructor's recurring availability.");
   }
 };
+
+// Fetch the instructor by the email
+export const getInstructorByEmail = async (email: string) => {
+  try {
+    return await prisma.instructor.findUnique({
+      where: { email },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch instructor.");
+  }
+};
