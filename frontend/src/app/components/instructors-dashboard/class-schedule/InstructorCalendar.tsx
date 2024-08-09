@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CalendarHeader from "@/app/components/CalendarHeader";
 import CalendarView from "@/app/components/CalendarView";
 import styles from "./page.module.scss";
@@ -12,19 +12,20 @@ import { fetchInstructorAvailabilities } from "@/app/helper/instructorsApi";
 
 function InstructorCalendar({
   id,
+  name,
   isAdminAuthenticated,
 }: {
-  id: string;
+  id: number | null;
+  name?: string | null;
   isAdminAuthenticated?: boolean;
 }) {
   const [allEvents, setAllEvents] = useState<EventType[]>([]);
   const [calendarApi, setCalendarApi] = useState<CalendarApi | null>(null);
   const calendarRef = useRef<FullCalendar | null>(null);
-
-  const instructorId = parseInt(id);
+  const instructorId = id;
 
   useEffect(() => {
-    if (!instructorId) return;
+    if (instructorId === null) return;
 
     const fetchData = async () => {
       try {
@@ -86,7 +87,6 @@ function InstructorCalendar({
         alert("Failed to get classes. Please try again.");
       }
     };
-
     fetchData();
   }, [instructorId]);
 
@@ -102,7 +102,6 @@ function InstructorCalendar({
     // by passing 'calendarRef' to 'CalendarView' and retrieving the FullCalendar API instance from it and making the API available for 'CalendarHeader'using state
     <div className={styles.calendarContainer}>
       <CalendarHeader calendarApi={calendarApi ?? null} />
-
       <p className={styles.headerMessage}>
         You can see the details of classes by clicking them.{" "}
         <span
@@ -129,8 +128,13 @@ function InstructorCalendar({
         >
           completed
         </span>
+        {isAdminAuthenticated ? <br></br> : null}
+        {isAdminAuthenticated && name ? (
+          <span>Instructor: {name}</span>
+        ) : (
+          <span>&nbsp;</span>
+        )}
       </p>
-
       <CalendarView
         // Create a ref to access the FullCalendar instance in CalendarView;
         ref={calendarRef}

@@ -14,7 +14,7 @@ function Page({ params }: { params: { id: string } }) {
     const fetchInstructors = async () => {
       try {
         const instructors = await getInstructors();
-        setInstructors(instructors.data);
+        setInstructors(instructors);
       } catch (error) {
         console.error(error);
       }

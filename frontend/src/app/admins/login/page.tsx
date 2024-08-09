@@ -47,7 +47,7 @@ function Login() {
     }
 
     alert("Logged in successfully"); // Set alert message temporarily.
-    router.push("/admins/dashboard");
+    router.push("/admins/calendar");
   };
 
   return (
