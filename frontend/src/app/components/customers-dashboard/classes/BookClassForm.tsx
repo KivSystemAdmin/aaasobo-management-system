@@ -1,10 +1,16 @@
 import { UserCircleIcon, CalendarIcon } from "@heroicons/react/24/outline";
 import styles from "./BookClassForm.module.scss";
-import { useState } from "react";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { formatDateTime } from "@/app/helper/dateUtils";
-import { bookClass } from "@/app/helper/classesApi";
+import {
+  bookClass,
+  checkChildrenAvailability,
+  checkDoubleBooking,
+} from "@/app/helper/classesApi";
 import { useRouter } from "next/navigation";
+import { fetchInstructorAvailabilitiesForTodayAndAfter } from "@/app/helper/instructorsApi";
+import RedirectButton from "../../RedirectButton";
+import ActionButton from "../../ActionButton";
 
 function BookClassForm({
   customerId,
@@ -24,18 +30,29 @@ function BookClassForm({
   const [selectedChildrenIds, setSelectedChildrenIds] = useState<Set<number>>(
     new Set(),
   );
+  const [instructorAvailabilities, setInstrucotrAvailabilities] = useState<
+    string[]
+  >([]);
+
   const router = useRouter();
 
-  const selectedInstructorAvailabilities =
-    instructors.find((instructor) => instructor.id === selectedInstructorId)
-      ?.availabilities || [];
+  useEffect(() => {
+    const fetchInstructorAvailabilities = async () => {
+      if (selectedInstructorId === null) return;
+      const fetchedInstructorAvailabilities =
+        await fetchInstructorAvailabilitiesForTodayAndAfter(
+          selectedInstructorId,
+        );
+      setInstrucotrAvailabilities(fetchedInstructorAvailabilities);
+    };
+    fetchInstructorAvailabilities();
+  }, [selectedInstructorId]);
 
   const handleInstructorChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const selectedInstructorId = parseInt(event.target.value, 10);
     setSelectedInstructorId(selectedInstructorId);
-
     setSelectedDateTime("");
   };
 
@@ -72,6 +89,39 @@ function BookClassForm({
     const selectedChildrenIdsArray = Array.from(selectedChildrenIds);
 
     try {
+      // Check if the selected children have another class with another instructor
+      const selectedChildrenAvailability = await checkChildrenAvailability(
+        selectedDateTime,
+        selectedChildrenIdsArray,
+      );
+
+      if (selectedChildrenAvailability.error) {
+        const userConfirmed = window.confirm(
+          selectedChildrenAvailability.error +
+            " Do you want to proceed with the booking?",
+        );
+        if (!userConfirmed) {
+          return;
+        }
+      }
+
+      // Check if there is already a booked class for this customer at the same time
+      const classDoubleBookingResult = await checkDoubleBooking(
+        parseInt(customerId),
+        selectedDateTime,
+      );
+
+      if (classDoubleBookingResult.error) {
+        const userConfirmed = window.confirm(
+          classDoubleBookingResult.error +
+            " Do you want to proceed with the booking?",
+        );
+        if (!userConfirmed) {
+          return;
+        }
+      }
+
+      // Proceed with booking the class
       await bookClass({
         classId: classToRebook.id,
         dateTime: selectedDateTime,
@@ -81,10 +131,14 @@ function BookClassForm({
         childrenIds: selectedChildrenIdsArray,
         recurringClassId: classToRebook.recurringClassId,
       });
-
+      alert("The class has been successfully booked.");
       router.push(`/customers/${customerId}/classes`);
     } catch (error) {
-      console.error("Failed to add class:", error);
+      if (error instanceof Error) {
+        alert(`${error.message}`);
+      } else {
+        alert("An unexpected error occurred.");
+      }
     }
   };
 
@@ -132,12 +186,9 @@ function BookClassForm({
                 <option value="" disabled>
                   Select a class date and time
                 </option>
-                {selectedInstructorAvailabilities.map((availability, index) => (
-                  <option key={index} value={availability.dateTime}>
-                    {formatDateTime(
-                      new Date(availability.dateTime),
-                      "Asia/Tokyo",
-                    )}
+                {instructorAvailabilities.map((availability, index) => (
+                  <option key={index} value={availability}>
+                    {formatDateTime(new Date(availability), "Asia/Tokyo")}
                   </option>
                 ))}
               </select>
@@ -166,15 +217,12 @@ function BookClassForm({
       </div>
 
       <div className={styles.actions}>
-        <Link
-          href={`/customers/${customerId}/classes`}
-          className={styles.cancelButton}
-        >
-          Cancel
-        </Link>
-        <button type="submit" className={styles.submitButton}>
-          Book Class
-        </button>
+        <RedirectButton
+          btnText="Cancel"
+          linkURL={`/customers/${customerId}/classes`}
+          className="cancelBtn"
+        />
+        <ActionButton type="submit" btnText="Book Class" className="bookBtn" />
       </div>
     </form>
   );

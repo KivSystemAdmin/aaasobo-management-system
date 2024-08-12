@@ -17,6 +17,10 @@ import {
 } from "../controllers/instructorsUnavailabilityController";
 import { authenticateInstructorSession } from "../middlewares/auth.middleware";
 import { getInstructorClasses } from "../controllers/classesController";
+import {
+  getInstructorAvailabilitiesTodayAndAfter,
+  getInstructorAvailabilitiesTomorrowAndAfter,
+} from "../controllers/instructorsAvailabilityController";
 
 export const instructorsRouter = express.Router();
 
@@ -58,3 +62,18 @@ instructorsRouter.get("/:id/classes", parseId, (req, res) => {
   getInstructorClasses(req as RequestWithId, res);
 });
 instructorsRouter.post("/login", loginInstructorController);
+
+instructorsRouter.get(
+  "/:id/availabilities/after-today",
+  parseId,
+  (req, res) => {
+    getInstructorAvailabilitiesTodayAndAfter(req as RequestWithId, res);
+  },
+);
+instructorsRouter.get(
+  "/:id/availabilities/after-tomorrow",
+  parseId,
+  (req, res) => {
+    getInstructorAvailabilitiesTomorrowAndAfter(req as RequestWithId, res);
+  },
+);

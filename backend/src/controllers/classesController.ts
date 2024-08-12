@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import {
   cancelClassById,
+  checkDoubleBooking,
+  checkForChildrenWithConflictingClasses,
   createClass,
   createClassesUsingRecurringClassId,
   deleteClass,
@@ -10,6 +12,7 @@ import {
   getClassesByCustomerId,
   getClassesForCalendar,
   getExcludedClasses,
+  isInstructorBooked,
   updateClass,
 } from "../services/classesService";
 import { getSubscriptionById } from "../services/subscriptionsService";
@@ -138,19 +141,20 @@ export const createClassController = async (req: Request, res: Response) => {
     recurringClassId,
   } = req.body;
 
-  // Validation for req.body
-  if (
-    !classId ||
-    !dateTime ||
-    !instructorId ||
-    !customerId ||
-    !childrenIds ||
-    !status ||
-    !recurringClassId
-  ) {
-    return res
-      .status(400)
-      .json({ error: "There is a missing required field." });
+  // Check for missing fields
+  const missingFields: string[] = [];
+  if (!classId) missingFields.push("classId");
+  if (!dateTime) missingFields.push("dateTime");
+  if (!instructorId) missingFields.push("instructorId");
+  if (!customerId) missingFields.push("customerId");
+  if (!childrenIds) missingFields.push("childrenIds");
+  if (!status) missingFields.push("status");
+  if (!recurringClassId) missingFields.push("recurringClassId");
+
+  if (missingFields.length > 0) {
+    return res.status(400).json({
+      error: `Missing required field(s): ${missingFields.join(", ")}`,
+    });
   }
 
   try {
@@ -176,6 +180,18 @@ export const createClassController = async (req: Request, res: Response) => {
       return res
         .status(400)
         .json({ error: "No applicable subscription found." });
+    }
+
+    // Check if the selected instructor is already booked at the selected date and time
+    const instructorBooked: boolean = await isInstructorBooked(
+      instructorId,
+      dateTime,
+    );
+    if (instructorBooked) {
+      return res.status(400).json({
+        error:
+          "This instructor is already booked at the selected time. Please refresh your browser and try booking for a different time slot.",
+      });
     }
 
     const isRebookable = false;
@@ -206,7 +222,7 @@ export const createClassController = async (req: Request, res: Response) => {
     res.status(201).json({ newClass, updatedClass });
   } catch (error) {
     console.error("Controller Error:", error);
-    res.status(500).json({ error: "Failed to add class." });
+    res.status(500).json({ error: "Failed to book class." });
   }
 };
 
@@ -596,5 +612,71 @@ export const createClassesForMonthController = async (
   } catch (error) {
     console.error("Controller Error:", error);
     res.status(500).json({ error: "Failed to add class." });
+  }
+};
+
+// Check if there is a class that is already booked at the same dateTime as the newlly booked class
+export const checkDoubleBookingController = async (
+  req: Request,
+  res: Response,
+) => {
+  const { customerId, dateTime } = req.body;
+
+  if (!customerId || !dateTime) {
+    return res
+      .status(400)
+      .json({ error: "customerId and dateTime are required." });
+  }
+
+  try {
+    const isBooked = await checkDoubleBooking(customerId, dateTime);
+
+    if (isBooked) {
+      return res.status(400).json({
+        error: "A class has already been booked at the selected time.",
+      });
+    }
+
+    // No booking found
+    res.status(200).json({ message: "No booked classes found." });
+  } catch (error) {
+    console.error("Controller Error:", error);
+    res.status(500).json({ error: "Failed to check class booking." });
+  }
+};
+
+export const checkChildrenAvailabilityController = async (
+  req: Request,
+  res: Response,
+) => {
+  const { dateTime, selectedChildrenIds } = req.body;
+
+  if (!dateTime || !selectedChildrenIds) {
+    return res
+      .status(400)
+      .json({ error: "dateTime and selectedChildrenIds are required." });
+  }
+
+  try {
+    const childrenWithConflictingClasses =
+      await checkForChildrenWithConflictingClasses(
+        new Date(dateTime),
+        selectedChildrenIds,
+      );
+
+    if (childrenWithConflictingClasses.length > 0) {
+      const childrenNames = childrenWithConflictingClasses.join(", ");
+      const conflictMessage = `Child(ren) ${childrenNames} already has/have another class with another instructor at the selected time.`;
+
+      return res.status(400).json({
+        error: conflictMessage,
+      });
+    }
+
+    // No conflicts found
+    res.status(200).json({ message: "No conflicting classes found." });
+  } catch (error) {
+    console.error("Controller Error:", error);
+    res.status(500).json({ error: "Failed to check children availability." });
   }
 };

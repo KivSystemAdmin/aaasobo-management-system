@@ -97,14 +97,12 @@ async function insertInstructorAvailabilities() {
     "2024-08-08T07:30:00Z",
     "2024-08-09T07:30:00Z",
     "2024-08-10T07:30:00Z",
-    "2024-08-11T07:30:00Z",
     "2024-08-12T07:30:00Z",
     "2024-08-13T07:30:00Z",
     "2024-08-14T07:30:00Z",
     "2024-08-15T07:30:00Z",
     "2024-08-16T07:30:00Z",
     "2024-08-17T07:30:00Z",
-    "2024-08-18T07:30:00Z",
     "2024-08-19T07:30:00Z",
     "2024-08-20T07:30:00Z",
     "2024-08-21T07:30:00Z",
@@ -134,6 +132,18 @@ async function insertInstructorAvailabilities() {
     "2024-07-09T08:30:00Z",
     "2024-07-16T08:30:00Z",
     "2024-07-23T08:30:00Z",
+    "2024-08-10T07:30:00Z",
+    "2024-08-12T07:30:00Z",
+    "2024-08-13T07:30:00Z",
+    "2024-08-14T07:30:00Z",
+    "2024-08-15T07:30:00Z",
+    "2024-08-16T07:30:00Z",
+    "2024-08-17T07:30:00Z",
+    "2024-08-19T07:30:00Z",
+    "2024-08-20T07:30:00Z",
+    "2024-08-21T07:30:00Z",
+    "2024-08-22T07:30:00Z",
+    "2024-08-23T07:30:00Z",
   ]);
 }
 
@@ -419,6 +429,24 @@ async function insertRecurringClasses() {
   });
 }
 
+async function insertInstructorUnavailabilities() {
+  const helen = await getInstructor("Helen");
+  const elian = await getInstructor("Elian");
+
+  await prisma.instructorUnavailability.createMany({
+    data: [
+      {
+        instructorId: helen.id,
+        dateTime: new Date("2024-08-20T07:30:00Z"),
+      },
+      {
+        instructorId: helen.id,
+        dateTime: new Date("2024-08-22T07:30:00Z"),
+      },
+    ],
+  });
+}
+
 async function getCustomer(name: "Alice" | "Bob") {
   const customer = await prisma.customer.findFirst({
     where: { name },
@@ -476,6 +504,7 @@ async function main() {
     await deleteAll("instructor");
     await deleteAll("customer");
     await deleteAll("plan");
+    await deleteAll("instructorUnavailability");
   }
 
   {
@@ -493,6 +522,9 @@ async function main() {
     // Dependant on the above
     await insertRecurringClasses();
     await insertClasses();
+
+    // Dependant on the above
+    await insertInstructorUnavailabilities();
 
     // Dependant on the above
     await insertClassAttendance();

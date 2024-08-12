@@ -8,7 +8,7 @@ import FullCalendar from "@fullcalendar/react";
 import { CalendarApi } from "@fullcalendar/core/index.js";
 import { getClassStartAndEndTimes } from "@/app/helper/dateUtils";
 import { fetchClassesForCalendar } from "@/app/helper/classesApi";
-import { fetchInstructorAvailabilities } from "@/app/helper/instructorsApi";
+import { fetchInstructorAvailabilitiesForTodayAndAfter } from "@/app/helper/instructorsApi";
 
 function InstructorCalendar({
   id,
@@ -22,10 +22,10 @@ function InstructorCalendar({
   const [allEvents, setAllEvents] = useState<EventType[]>([]);
   const [calendarApi, setCalendarApi] = useState<CalendarApi | null>(null);
   const calendarRef = useRef<FullCalendar | null>(null);
-  const instructorId = id;
+  const instructorId = id ?? undefined;
 
   useEffect(() => {
-    if (instructorId === null) return;
+    if (instructorId === undefined) return;
 
     const fetchData = async () => {
       try {
@@ -61,9 +61,8 @@ function InstructorCalendar({
           };
         });
 
-        // TODO: Update fetchInstructorAvailabilities function
         const instructorAvailabilities: string[] =
-          await fetchInstructorAvailabilities(instructorId);
+          await fetchInstructorAvailabilitiesForTodayAndAfter(instructorId);
 
         const formattedAvailabilities = instructorAvailabilities.map(
           (availability) => {
@@ -140,7 +139,7 @@ function InstructorCalendar({
         ref={calendarRef}
         events={allEvents}
         // TODO: Fetch holidays from the backend
-        holidays={["2024-07-29", "2024-07-30", "2024-07-31"]}
+        // holidays={["2024-07-29", "2024-07-30", "2024-07-31"]}
         instructorId={instructorId}
       />
     </div>

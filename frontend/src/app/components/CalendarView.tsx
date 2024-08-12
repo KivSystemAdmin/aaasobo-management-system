@@ -23,7 +23,7 @@ type InstructorCalendarViewProps = {
     instructorIcon?: string;
     instructorNickname?: string;
   }>;
-  holidays: string[];
+  holidays?: string[];
   customerId?: number;
   instructorId?: number;
 };
@@ -90,20 +90,20 @@ const CalendarView = forwardRef<
     );
   };
 
-  // Applies custom styles to calendar cells based on holiday dates
-  const dayCellDidMount = (info: DayCellContentArg) => {
-    const date = new Date(info.date);
-    const formattedDate = date.toISOString().split("T")[0];
+  // // TODO: Applies custom styles to calendar cells based on holiday dates
+  // const dayCellDidMount = (info: DayCellContentArg) => {
+  //   const date = new Date(info.date);
+  //   const formattedDate = date.toISOString().split("T")[0];
 
-    if (!holidays.includes(formattedDate)) {
-      return;
-    }
-    info.el.classList.add(styles.holidayCell);
-    const dayNumber = info.el.querySelector(".fc-daygrid-day-number");
-    if (dayNumber) {
-      dayNumber.classList.add(styles.holidayDateNumber);
-    }
-  };
+  //   if (!holidays.includes(formattedDate)) {
+  //     return;
+  //   }
+  //   info.el.classList.add(styles.holidayCell);
+  //   const dayNumber = info.el.querySelector(".fc-daygrid-day-number");
+  //   if (dayNumber) {
+  //     dayNumber.classList.add(styles.holidayDateNumber);
+  //   }
+  // };
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     const classId = clickInfo.event.extendedProps.classId;
@@ -159,7 +159,8 @@ const CalendarView = forwardRef<
       eventClick={handleEventClick}
       eventContent={renderEventContent}
       validRange={validRange}
-      dayCellDidMount={dayCellDidMount}
+      // TODO: After the 'Holiday' table is created, apply the styling to them
+      // dayCellDidMount={dayCellDidMount}
       locale="en"
       contentHeight="auto"
       dayMaxEvents={true}

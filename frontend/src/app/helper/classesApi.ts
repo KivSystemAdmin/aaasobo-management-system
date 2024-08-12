@@ -52,14 +52,22 @@ export const bookClass = async (classData: {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error. status ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(
+        errorData.error || `HTTP error. status ${response.status}`,
+      );
     }
 
     const result = await response.json();
     return result;
-  } catch (error) {
-    console.error("Failed to add class:", error);
-    throw error;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Failed to book class:", error.message);
+      throw new Error(error.message);
+    } else {
+      console.error("An unexpected error occurred:", error);
+      throw new Error("An unexpected error occurred.");
+    }
   }
 };
 
@@ -200,5 +208,85 @@ export const createMonthlyClasses = async (data: {
   } catch (error) {
     console.error("Failed to create the monthly classes:", error);
     throw error;
+  }
+};
+
+// Check if there is already a booked class for this customer at the same time
+export const checkDoubleBooking = async (
+  customerId: number,
+  dateTime: string,
+): Promise<{
+  error?: string;
+  message?: string;
+}> => {
+  try {
+    const response = await fetch(
+      "http://localhost:4000/classes/check-double-booking",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId,
+          dateTime,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      throw new Error(
+        errorResponse.error || `HTTP error. status ${response.status}`,
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("API Error:", error);
+    if (error instanceof Error) {
+      return { error: error.message || "Failed to check double booking." };
+    } else {
+      return { error: "An unknown error occurred." };
+    }
+  }
+};
+
+// Check if the selected children have another class with another instructor
+export const checkChildrenAvailability = async (
+  dateTime: string,
+  selectedChildrenIds: number[],
+): Promise<{
+  error?: string;
+  message?: string;
+}> => {
+  try {
+    const response = await fetch(
+      "http://localhost:4000/classes/check-children-availability",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dateTime,
+          selectedChildrenIds,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      throw new Error(
+        errorResponse.error || `HTTP error. status ${response.status}`,
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("API Error:", error);
+    if (error instanceof Error) {
+      return {
+        error: error.message || "Failed to check children availability.",
+      };
+    } else {
+      return { error: "An unknown error occurred." };
+    }
   }
 };

@@ -360,3 +360,86 @@ export const getExcludedClasses = async (
     throw new Error("Failed to fetch classes.");
   }
 };
+
+// Check if the instructor is already booked at the specified date and time
+export const isInstructorBooked = async (
+  instructorId: number,
+  dateTime: string,
+): Promise<boolean> => {
+  try {
+    const existingBooking = await prisma.class.findFirst({
+      where: {
+        instructorId,
+        dateTime: new Date(dateTime),
+      },
+    });
+    return existingBooking !== null;
+  } catch (error) {
+    console.error("Error checking instructor booking:", error);
+    throw new Error("Failed to check instructor availability.");
+  }
+};
+
+// Check if the selected children have another class with another instructor at the same dateTime
+// If there are conflicting classes, return the array of the children's names
+export const checkForChildrenWithConflictingClasses = async (
+  dateTime: Date,
+  childrenIds: number[],
+) => {
+  try {
+    const conflictingClasses = await prisma.class.findMany({
+      where: {
+        dateTime,
+        classAttendance: {
+          some: {
+            childrenId: {
+              in: childrenIds,
+            },
+          },
+        },
+      },
+      include: {
+        classAttendance: {
+          include: {
+            children: true,
+          },
+        },
+      },
+    });
+
+    // Filter out names of the selected children that have conflicts
+    const childrenWithConflictingClasses: string[] = conflictingClasses.flatMap(
+      (eachClass) =>
+        eachClass.classAttendance
+          .filter((attendance) => childrenIds.includes(attendance.childrenId))
+          .map((attendance) => attendance.children.name),
+    );
+
+    return childrenWithConflictingClasses;
+  } catch (error) {
+    console.error("Service Error:", error);
+    throw new Error("Failed to check for conflicting classes.");
+  }
+};
+
+// Check if there is a class that is already booked at the same dateTime as the newlly booked class
+export const checkDoubleBooking = async (
+  customerId: number,
+  dateTime: Date,
+): Promise<boolean> => {
+  try {
+    const alreadyBookedClass = await prisma.class.findFirst({
+      where: {
+        customerId,
+        dateTime,
+        status: "booked",
+      },
+    });
+
+    // Return true if a booked class is found, otherwise false
+    return alreadyBookedClass !== null;
+  } catch (error) {
+    console.error("Service Error:", error);
+    throw new Error("Failed to check class booking.");
+  }
+};

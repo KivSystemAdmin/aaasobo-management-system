@@ -160,14 +160,18 @@ export const registerUnavailability = async (
   }).then((res) => res.json());
 };
 
-export const fetchInstructorAvailabilities = async (instructorId: number) => {
+export const fetchInstructorAvailabilitiesForTodayAndAfter = async (
+  instructorId: number,
+) => {
   try {
-    const response = await fetch(`${BASE_URL}/${instructorId}/availability`);
+    const response = await fetch(
+      `${BASE_URL}/${instructorId}/availabilities/after-today`,
+    );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = await response.json();
-    return data.instructorAvailabilities;
+    const instructorAvailabilities = await response.json();
+    return instructorAvailabilities.data;
   } catch (error) {
     console.error(
       "Failed to fetch instructor availability date and times:",
@@ -192,6 +196,27 @@ export const fetchInstructorRecurringAvailabilities = async (
   } catch (error) {
     console.error(
       "Failed to fetch instructor recurring availabilities.",
+      error,
+    );
+    throw error;
+  }
+};
+
+export const fetchInstructorAvailabilitiesForTomorrowAndAfter = async (
+  instructorId: number,
+) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/${instructorId}/availabilities/after-tomorrow`,
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const instructorAvailabilities = await response.json();
+    return instructorAvailabilities.data;
+  } catch (error) {
+    console.error(
+      "Failed to fetch instructor availability date and times:",
       error,
     );
     throw error;
