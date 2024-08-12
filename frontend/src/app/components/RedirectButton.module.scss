@@ -39,7 +39,8 @@
 }
 
 .backBtn,
-.cancelBtn {
+.cancelBtn,
+.deleteBtn {
   background-color: #f3f4f6;
   transition:
     background-color 0.3s ease,
@@ -83,7 +84,8 @@
   }
 }
 
-.bookBtn {
+.bookBtn,
+.addBtn {
   background-color: #007bff;
   transition:
     background-color 0.3s ease,

@@ -5,6 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useInput } from "@/app/hooks/useInput";
 import { addChild } from "@/app/helper/childrenApi";
+import {
+  CakeIcon,
+  IdentificationIcon,
+  PlusIcon,
+  UserCircleIcon,
+} from "@heroicons/react/24/outline";
+import { formatDateToISO } from "@/app/helper/dateUtils";
+import ActionButton from "../../ActionButton";
+import RedirectButton from "../../RedirectButton";
 
 function AddChildForm({
   customerId,
@@ -14,13 +23,24 @@ function AddChildForm({
   isAdminAuthenticated?: boolean;
 }) {
   const [childName, onChildNameChange] = useInput();
+  const [childBirthdate, onChildBirthdateChange] = useInput();
+  const [childPersonalInfo, onChildPersonalInfoChange] = useInput();
+
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const birthdateInISO = formatDateToISO(childBirthdate);
+
     try {
-      const data = await addChild(childName, customerId);
+      const data = await addChild(
+        childName,
+        birthdateInISO,
+        childPersonalInfo,
+        customerId,
+      );
+
       alert(data.message); // Set alert message temporarily.
 
       if (isAdminAuthenticated) {
@@ -42,16 +62,58 @@ function AddChildForm({
         {/* Child Name */}
         <div className={styles.field}>
           <label className={styles.label}>
-            Child Name
+            <p className={styles.label__text}>Name</p>
             <div className={styles.inputWrapper}>
               <input
                 className={styles.inputField}
                 type="text"
-                placeholder="Enter a child name ..."
+                placeholder="Enter a name ..."
                 value={childName}
                 onChange={onChildNameChange}
                 required
               />
+              <UserCircleIcon className={styles.icon} />
+            </div>
+          </label>
+        </div>
+
+        {/* Birthdate */}
+        <div className={styles.field}>
+          <label className={styles.label}>
+            <p className={styles.label__text}>Birthdate</p>
+            <div className={styles.inputWrapper}>
+              <input
+                className={styles.inputField}
+                type="date"
+                value={childBirthdate}
+                onChange={onChildBirthdateChange}
+                required
+              />
+              <CakeIcon className={styles.icon} />
+            </div>
+          </label>
+        </div>
+
+        {/* Personal Info */}
+        <div className={styles.field}>
+          <label className={styles.label}>
+            <p className={styles.label__text}>
+              Personal Information{" "}
+              <span className={styles.label__details}>
+                {" "}
+                (age, English level, their interests, favorite foods, etc.)
+              </span>
+            </p>
+            <div className={styles.inputWrapper}>
+              <input
+                className={styles.inputField}
+                type="text"
+                placeholder="Example: 5 years old, beginner, cars, bread"
+                value={childPersonalInfo}
+                onChange={onChildPersonalInfoChange}
+                required
+              />
+              <IdentificationIcon className={styles.icon} />
             </div>
           </label>
         </div>
@@ -59,23 +121,25 @@ function AddChildForm({
 
       <div className={styles.actions}>
         {isAdminAuthenticated ? (
-          <Link
-            href={`/admins/customer-list/${customerId}`}
-            className={styles.cancelButton}
-          >
-            Cancel
-          </Link>
+          <RedirectButton
+            btnText="Cancel"
+            linkURL={`/admins/customer-list/${customerId}`}
+            className={styles.cancelBtn}
+          />
         ) : (
-          <Link
-            href={`/customers/${customerId}/children-profiles`}
-            className={styles.cancelButton}
-          >
-            Cancel
-          </Link>
+          <RedirectButton
+            btnText="Cancel"
+            linkURL={`/customers/${customerId}/children-profiles`}
+            className="cancelBtn"
+          />
         )}
-        <button type="submit" className={styles.submitButton}>
-          Add Child
-        </button>
+
+        <ActionButton
+          type="submit"
+          className="addBtn"
+          btnText="Add Child"
+          Icon={PlusIcon}
+        />
       </div>
     </form>
   );

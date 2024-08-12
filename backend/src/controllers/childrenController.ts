@@ -29,10 +29,15 @@ export const getChildrenController = async (req: Request, res: Response) => {
 };
 
 export const registerChildController = async (req: Request, res: Response) => {
-  const { name, customerId } = req.body;
+  const { name, birthdate, personalInfo, customerId } = req.body;
 
   try {
-    const child = await registerChild(name, customerId);
+    const child = await registerChild(
+      name,
+      birthdate,
+      personalInfo,
+      customerId,
+    );
 
     res.status(200).json({
       message: "Child is registered successfully",
@@ -44,11 +49,17 @@ export const registerChildController = async (req: Request, res: Response) => {
 };
 
 export const updateChildController = async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
-  const { name, customerId } = req.body;
+  const childId = parseInt(req.params.id);
+  const { name, birthdate, personalInfo, customerId } = req.body;
 
   try {
-    const child = await updateChild(id, name, customerId);
+    const child = await updateChild(
+      childId,
+      name,
+      birthdate,
+      personalInfo,
+      customerId,
+    );
 
     res.status(200).json({
       message: "Child is updated successfully",

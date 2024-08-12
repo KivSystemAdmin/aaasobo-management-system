@@ -17,12 +17,19 @@ export const getChildren = async (customerId: string) => {
   }
 };
 
-export const registerChild = async (name: string, customerId: number) => {
+export const registerChild = async (
+  name: string,
+  birthdate: string,
+  personalInfo: string,
+  customerId: number,
+) => {
   try {
     // Insert the Child data into the DB.
     const child = await prisma.children.create({
       data: {
         name,
+        birthdate,
+        personalInfo,
         customerId,
       },
     });
@@ -35,18 +42,22 @@ export const registerChild = async (name: string, customerId: number) => {
 };
 
 export const updateChild = async (
-  id: number,
+  childId: number,
   name: string,
+  birthdate: string,
+  personalInfo: string,
   customerId: number,
 ) => {
   try {
     // Update the Child data.
     const child = await prisma.children.update({
       where: {
-        id,
+        id: childId,
       },
       data: {
         name,
+        birthdate,
+        personalInfo,
         customerId,
       },
     });

@@ -31,12 +31,19 @@ export const getChildById = async (id: string) => {
 };
 
 // POST a new child data
-export const addChild = async (childName: string, customerId: string) => {
+export const addChild = async (
+  childName: string,
+  childBirthdate: string,
+  childPersonalInfo: string,
+  customerId: string,
+) => {
   // Define the data to be sent to the server side.
   const childrenURL = "http://localhost:4000/children";
   const headers = { "Content-Type": "application/json" };
   const body = JSON.stringify({
     name: childName,
+    birthdate: childBirthdate,
+    personalInfo: childPersonalInfo,
     customerId: Number(customerId),
   });
 
@@ -59,6 +66,8 @@ export const addChild = async (childName: string, customerId: string) => {
 export const editChild = async (
   childId: number,
   childName: string,
+  childBirthedate: string,
+  childInfo: string,
   customerId: string,
 ) => {
   // Define the data to be sent to the server side.
@@ -66,6 +75,8 @@ export const editChild = async (
   const headers = { "Content-Type": "application/json" };
   const body = JSON.stringify({
     name: childName,
+    birthdate: childBirthedate,
+    personalInfo: childInfo,
     customerId: Number(customerId),
   });
 

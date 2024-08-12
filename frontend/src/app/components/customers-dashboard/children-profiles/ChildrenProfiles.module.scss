@@ -1,0 +1,97 @@
+.formContainer {
+  background-color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+.label {
+  margin-bottom: 0.5rem;
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  &__text {
+    font-weight: normal;
+    margin-bottom: 0.2rem;
+  }
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.inputField {
+  display: block;
+  background-color: white;
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem 2.5rem;
+  font-size: 0.875rem;
+  cursor: default;
+  pointer-events: none;
+
+  &:focus {
+    outline: none;
+  }
+
+  &.editable {
+    pointer-events: all;
+    cursor: pointer;
+
+    &:focus {
+      border: 1px solid #0070f3;
+      outline: 1px solid #0070f3;
+    }
+  }
+
+  ::placeholder {
+    color: #6b7280;
+  }
+}
+
+.icon {
+  pointer-events: none;
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  height: 1.125rem;
+  width: 1.125rem;
+  transform: translateY(-50%);
+  color: #6b7280;
+}
+
+.buttonContainer {
+  &__editing {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  &__notEditing {
+    display: flex;
+    justify-content: right;
+    gap: 15px;
+  }
+}
+
+.profileInfo {
+  font-size: 1.2rem;
+  font-family: Poppins;
+  font-weight: normal;
+  display: flex;
+  gap: 10px;
+
+  &__icon {
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+
+  &__identificationIcon {
+    height: 2rem;
+    width: 2rem;
+  }
+}

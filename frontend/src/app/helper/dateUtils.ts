@@ -193,3 +193,20 @@ export const isPastClassEndTime = (
     return false;
   }
 };
+
+// Converts a date string to the format YYYY-MM-DD.
+export const formatBirthdateToISO = (dateString?: string) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "";
+  return date.toISOString().split("T")[0];
+};
+
+// Converts a date in YYYY-MM-DD format to ISO 8601 format (YYYY-MM-DDTHH:MM:SS.sssZ).
+export const formatDateToISO = (dateString: string): string => {
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    throw new Error("Invalid date format");
+  }
+  return date.toISOString();
+};

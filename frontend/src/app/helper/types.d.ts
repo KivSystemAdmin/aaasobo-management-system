@@ -75,7 +75,7 @@ type Child = {
   id: number;
   customerId?: number;
   name: string;
-  birthdate?: string | Date;
+  birthdate?: string;
   personalInfo?: string;
 };
 
