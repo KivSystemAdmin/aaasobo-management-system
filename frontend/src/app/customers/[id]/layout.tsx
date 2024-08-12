@@ -8,7 +8,8 @@ import {
   ClipboardDocumentListIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
-import { FC, SVGProps } from "react";
+import { FC, SVGProps, useEffect, useState } from "react";
+import { getCustomerById } from "@/app/helper/customersApi";
 
 type Link = {
   name: string;
@@ -23,6 +24,8 @@ export default function Layout({
   children: React.ReactNode;
   params: { id: string };
 }) {
+  const [customerName, setCustomerName] = useState<string | null>(null);
+
   const customerId = params.id;
   const links: Link[] = [
     {
@@ -47,10 +50,19 @@ export default function Layout({
     },
   ];
 
+  // TODO: Get the customer name from the session?
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      const customer = await getCustomerById(customerId);
+      setCustomerName(customer.name);
+    };
+    fetchCustomer();
+  }, []);
+
   return (
     <div className={styles.container}>
       <div className={styles.sidebar}>
-        <SideNav links={links} />
+        {customerName && <SideNav links={links} userName={customerName} />}
       </div>
       <div className={styles.content}>{children}</div>
     </div>

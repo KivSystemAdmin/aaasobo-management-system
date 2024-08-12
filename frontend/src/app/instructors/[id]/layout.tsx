@@ -3,7 +3,8 @@
 import SideNav from "@/app/components/SideNav";
 import styles from "./layout.module.scss";
 import { UserIcon, CalendarIcon, ClockIcon } from "@heroicons/react/24/outline";
-import { FC, SVGProps } from "react";
+import { FC, SVGProps, useEffect, useState } from "react";
+import { getInstructor } from "@/app/helper/instructorsApi";
 
 type Link = {
   name: string;
@@ -18,7 +19,9 @@ export default function Layout({
   children: React.ReactNode;
   params: { id: string };
 }) {
-  const instructorId = params.id;
+  const [instructorName, setInstructorName] = useState<string | null>(null);
+
+  const instructorId = parseInt(params.id);
   const links: Link[] = [
     {
       name: "Class Schedule",
@@ -37,10 +40,23 @@ export default function Layout({
     },
   ];
 
+  // TODO: Get the instructor name from the session?
+  useEffect(() => {
+    const fetchInstructor = async () => {
+      const response = await getInstructor(instructorId);
+      if ("instructor" in response) {
+        setInstructorName(response.instructor.nickname);
+      } else {
+        console.error(response.message);
+      }
+    };
+    fetchInstructor();
+  }, []);
+
   return (
     <div className={styles.container}>
       <div className={styles.sidebar}>
-        <SideNav links={links} />
+        {instructorName && <SideNav links={links} userName={instructorName} />}
       </div>
       <div className={styles.content}>{children}</div>
     </div>
