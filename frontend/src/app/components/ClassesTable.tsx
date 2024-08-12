@@ -17,6 +17,7 @@ const ClassesTable = ({
   toggleSelectClass,
   userId,
   handleBulkCancel,
+  isAdminAuthenticated,
 }: {
   classes: ClassType[] | null;
   timeZone: string;
@@ -24,6 +25,7 @@ const ClassesTable = ({
   toggleSelectClass: (classId: number, classDateTime: string) => void;
   userId: string;
   handleBulkCancel: () => void;
+  isAdminAuthenticated?: boolean;
 }) => {
   if (!classes) {
     return <div>No upcoming classes</div>;
@@ -91,27 +93,28 @@ const ClassesTable = ({
                         ""
                       )}
                     </td>
-                    {pastPrevDayDeadline && !pastClassTimeDeadline ? (
-                      <td className={styles.classesTable__td}>
-                        <Link
-                          href={`/customers/${userId}/classes/${eachClass.id}`}
-                          passHref
-                        >
-                          {date}
-                        </Link>
 
-                        <span style={{ color: "red" }}>*</span>
-                      </td>
-                    ) : (
-                      <td className={styles.classesTable__td}>
+                    <td className={styles.classesTable__td}>
+                      {isAdminAuthenticated ? (
+                        <Link
+                          href={`/admins/customer-list/${userId}/classes/${eachClass.id}`}
+                          passHref
+                        >
+                          {date}
+                        </Link>
+                      ) : (
                         <Link
                           href={`/customers/${userId}/classes/${eachClass.id}`}
                           passHref
                         >
                           {date}
                         </Link>
-                      </td>
-                    )}
+                      )}
+                      {pastPrevDayDeadline && !pastClassTimeDeadline ? (
+                        <span style={{ color: "red" }}>*</span>
+                      ) : null}
+                    </td>
+
                     <td className={styles.classesTable__td}>
                       <div className={styles.classesTable__time}>
                         <p>{japanTime}</p>
@@ -130,14 +133,21 @@ const ClassesTable = ({
                       {/* condition 2: the same day of the class or after the class starts => 'Reschedule' btn*/}
 
                       {!pastPrevDayDeadline ? (
-                        <>
+                        isAdminAuthenticated ? (
+                          <RedirectButton
+                            linkURL={`/admins/customer-list/${userId}/classes/${eachClass.id}/reschedule`}
+                            btnText={"Reschedule"}
+                            Icon={PencilIcon}
+                            className="rescheduleBtn"
+                          />
+                        ) : (
                           <RedirectButton
                             linkURL={`/customers/${userId}/classes/${eachClass.id}/reschedule`}
                             btnText={"Reschedule"}
                             Icon={PencilIcon}
                             className="rescheduleBtn"
                           />
-                        </>
+                        )
                       ) : (
                         ""
                       )}

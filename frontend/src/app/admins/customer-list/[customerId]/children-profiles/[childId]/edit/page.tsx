@@ -12,6 +12,9 @@ function Page({ params }: { params: { customerId: string; childId: string } }) {
   const redirectPath = "/admins/login";
   const { isAuthenticated, isLoading } = useAuth(endpoint, redirectPath);
 
+  // Set the active tab to the children profiles tab.
+  localStorage.setItem("activeCustomerTab", "2");
+
   // Display a loading message while checking the authentication.
   if (isLoading) {
     return <div>Loading...</div>;

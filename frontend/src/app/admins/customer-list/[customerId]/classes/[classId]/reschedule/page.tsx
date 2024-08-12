@@ -1,18 +1,19 @@
 "use client";
 
-import AddChildForm from "@/app/components/customers-dashboard/children-profiles/AddChildForm";
 import { useAuth } from "@/app/hooks/useAuth";
+import RescheduleClass from "@/app/components/customers-dashboard/classes/RescheduleClass";
 
-function Page({ params }: { params: { customerId: string; childId: string } }) {
+function Page({ params }: { params: { customerId: string; classId: string } }) {
   const customerId = params.customerId;
+  const classId = params.classId;
 
   // Check the authentication of the admin.
   const endpoint = "http://localhost:4000/admins/authentication";
   const redirectPath = "/admins/login";
   const { isAuthenticated, isLoading } = useAuth(endpoint, redirectPath);
 
-  // Set the active tab to the children profiles tab.
-  localStorage.setItem("activeCustomerTab", "2");
+  // Set the active tab to the class calendar tab.
+  localStorage.setItem("activeCustomerTab", "0");
 
   // Display a loading message while checking the authentication.
   if (isLoading) {
@@ -20,15 +21,11 @@ function Page({ params }: { params: { customerId: string; childId: string } }) {
   }
 
   return (
-    <>
-      <div>
-        <h1>Add Child</h1>
-      </div>
-      <AddChildForm
-        customerId={customerId}
-        isAdminAuthenticated={isAuthenticated}
-      />
-    </>
+    <RescheduleClass
+      customerId={customerId}
+      classId={classId}
+      isAdminAuthenticated={isAuthenticated}
+    />
   );
 }
 

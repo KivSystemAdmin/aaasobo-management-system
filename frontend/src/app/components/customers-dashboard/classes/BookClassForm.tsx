@@ -17,11 +17,13 @@ function BookClassForm({
   instructors,
   children,
   classToRebook,
+  isAdminAuthenticated,
 }: {
   customerId: string;
   instructors: Instructor[];
   children: Child[];
   classToRebook: ClassType | undefined;
+  isAdminAuthenticated?: boolean;
 }) {
   const [selectedInstructorId, setSelectedInstructorId] = useState<
     number | null
@@ -131,6 +133,11 @@ function BookClassForm({
         childrenIds: selectedChildrenIdsArray,
         recurringClassId: classToRebook.recurringClassId,
       });
+
+      if (isAdminAuthenticated) {
+        router.push(`/admins/customer-list/${customerId}`);
+        return;
+      }
       alert("The class has been successfully booked.");
       router.push(`/customers/${customerId}/classes`);
     } catch (error) {
@@ -217,11 +224,19 @@ function BookClassForm({
       </div>
 
       <div className={styles.actions}>
-        <RedirectButton
-          btnText="Cancel"
-          linkURL={`/customers/${customerId}/classes`}
-          className="cancelBtn"
-        />
+        {isAdminAuthenticated ? (
+          <RedirectButton
+            btnText="Cancel"
+            linkURL={`/admins/customer-list/${customerId}`}
+            className="cancelBtn"
+          />
+        ) : (
+          <RedirectButton
+            btnText="Cancel"
+            linkURL={`/customers/${customerId}/classes`}
+            className="cancelBtn"
+          />
+        )}
         <ActionButton type="submit" btnText="Book Class" className="bookBtn" />
       </div>
     </form>

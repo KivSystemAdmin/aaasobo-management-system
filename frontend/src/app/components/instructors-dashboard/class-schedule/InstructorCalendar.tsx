@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import CalendarHeader from "@/app/components/CalendarHeader";
 import CalendarView from "@/app/components/CalendarView";
-import styles from "./page.module.scss";
+import styles from "./InstructorCalendar.module.scss";
 import FullCalendar from "@fullcalendar/react";
 import { CalendarApi } from "@fullcalendar/core/index.js";
 import { getClassStartAndEndTimes } from "@/app/helper/dateUtils";
@@ -141,6 +141,7 @@ function InstructorCalendar({
         // TODO: Fetch holidays from the backend
         // holidays={["2024-07-29", "2024-07-30", "2024-07-31"]}
         instructorId={instructorId}
+        isAdminAuthenticated={isAdminAuthenticated}
       />
     </div>
   );

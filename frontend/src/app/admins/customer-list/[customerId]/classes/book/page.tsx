@@ -1,9 +1,9 @@
 "use client";
 
-import AddChildForm from "@/app/components/customers-dashboard/children-profiles/AddChildForm";
+import BookClass from "@/app/components/customers-dashboard/classes/BookClass";
 import { useAuth } from "@/app/hooks/useAuth";
 
-function Page({ params }: { params: { customerId: string; childId: string } }) {
+function Page({ params }: { params: { customerId: string } }) {
   const customerId = params.customerId;
 
   // Check the authentication of the admin.
@@ -11,8 +11,8 @@ function Page({ params }: { params: { customerId: string; childId: string } }) {
   const redirectPath = "/admins/login";
   const { isAuthenticated, isLoading } = useAuth(endpoint, redirectPath);
 
-  // Set the active tab to the children profiles tab.
-  localStorage.setItem("activeCustomerTab", "2");
+  // Set the active tab to the class calendar tab.
+  localStorage.setItem("activeCustomerTab", "0");
 
   // Display a loading message while checking the authentication.
   if (isLoading) {
@@ -20,15 +20,7 @@ function Page({ params }: { params: { customerId: string; childId: string } }) {
   }
 
   return (
-    <>
-      <div>
-        <h1>Add Child</h1>
-      </div>
-      <AddChildForm
-        customerId={customerId}
-        isAdminAuthenticated={isAuthenticated}
-      />
-    </>
+    <BookClass customerId={customerId} isAdminAuthenticated={isAuthenticated} />
   );
 }
 

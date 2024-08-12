@@ -91,14 +91,14 @@ export const getClassById = async (classId: string) => {
 // PATCH a class date
 export const editClass = async (editedClass: {
   classId: number;
-  dateTime?: string;
-  instructorId?: number;
   childrenIds: number[];
+  dateTime?: string;
   status?:
     | "booked"
     | "completed"
     | "canceledByCustomer"
     | "canceledByInstructor";
+  instructorId?: number;
   isRebookable?: boolean;
 }) => {
   // Define the data to be sent to the server side.

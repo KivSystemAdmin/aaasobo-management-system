@@ -176,6 +176,7 @@ export const createClassController = async (req: Request, res: Response) => {
 
     // Get subscription by subscription id
     const subscription = await getSubscriptionById(subscriptionId);
+
     if (!subscription) {
       return res
         .status(400)
@@ -196,7 +197,7 @@ export const createClassController = async (req: Request, res: Response) => {
 
     const isRebookable = false;
     const [newClass, updatedClass] = await Promise.all([
-      // Create a new 'booked' Class
+      // Create a new Booked Class
       createClass(
         {
           dateTime,
@@ -208,7 +209,7 @@ export const createClassController = async (req: Request, res: Response) => {
         },
         childrenIds,
       ),
-      // Update the 'canceledByCustomer' class that was rebooked => isRebookable: false
+      // Upgrade the CanceledByCustomer class that was rebooked => isRebookable: false
       updateClass(
         classId,
         undefined, // dateTime

@@ -6,6 +6,8 @@ import { registerSubscription } from "@/app/helper/subscriptionsApi";
 import ActionButton from "@/app/components/ActionButton";
 
 function AddSubscription({ customerId }: { customerId: string }) {
+  // Set the active tab to the regular classes tab.
+  localStorage.setItem("activeCustomerTab", "3");
   const [plansData, setPlansData] = useState<Plans>([]);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   useState<string>("");
@@ -34,7 +36,6 @@ function AddSubscription({ customerId }: { customerId: string }) {
     try {
       await registerSubscription(customerId, subscriptionData);
       alert("Subscription registered successfully.");
-      localStorage.setItem("activeTab", "2");
       window.location.reload();
     } catch (error) {
       console.error("Error registering subscription:", error);
@@ -44,7 +45,6 @@ function AddSubscription({ customerId }: { customerId: string }) {
 
   // Reload the page to go back to the previous page.
   const handleCancellation = () => {
-    localStorage.setItem("activeTab", "2");
     window.location.reload();
   };
 

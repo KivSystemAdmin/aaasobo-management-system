@@ -12,11 +12,13 @@ function EditClassForm({
   instructors,
   children,
   editedClass,
+  isAdminAuthenticated,
 }: {
   customerId: string;
   instructors: Instructor[];
   children: Child[];
   editedClass: ClassType;
+  isAdminAuthenticated?: boolean;
 }) {
   const [selectedInstructorId, setSelectedInstructorId] = useState<
     number | null
@@ -76,6 +78,11 @@ function EditClassForm({
         instructorId: selectedInstructorId,
         childrenIds: selectedChildrenIdsArray,
       });
+
+      if (isAdminAuthenticated) {
+        router.push(`/admins/customer-list/${customerId}`);
+        return;
+      }
 
       router.push(`/customers/${customerId}/classes`);
     } catch (error) {
@@ -162,12 +169,21 @@ function EditClassForm({
       </div>
 
       <div className={styles.actions}>
-        <Link
-          href={`/customers/${customerId}/classes/${editedClass.id}`}
-          className={styles.cancelButton}
-        >
-          Back
-        </Link>
+        {isAdminAuthenticated ? (
+          <Link
+            href={`/admins/customer-list/${customerId}/classes/${editedClass.id}`}
+            className={styles.cancelButton}
+          >
+            Back
+          </Link>
+        ) : (
+          <Link
+            href={`/customers/${customerId}/classes/${editedClass.id}`}
+            className={styles.cancelButton}
+          >
+            Back
+          </Link>
+        )}
         <button type="submit" className={styles.submitButton}>
           Reschedule
         </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import TabFunction from "@/app/components/admins-dashboard/TabFunction";
+import InstructorCalendar from "@/app/components/instructors-dashboard/class-schedule/InstructorCalendar";
 import InstructorProfile from "@/app/components/instructors-dashboard/instructor-profile/InstructorProfile";
 import { useAuth } from "@/app/hooks/useAuth";
 import { useTabSelect } from "@/app/hooks/useTabSelect";
@@ -14,13 +15,20 @@ function Page({ params }: { params: { instructorId: string } }) {
   const { isAuthenticated, isLoading } = useAuth(endpoint, redirectPath);
 
   // Get the active tab from the local storage.
-  const { initialActiveTab, isTabInitialized } = useTabSelect("activeTab");
+  const { initialActiveTab, isTabInitialized } = useTabSelect(
+    "activeInstructorTab",
+  );
 
   // Tabs with labels and content
   const tabs = [
     {
       label: "Class Schedule",
-      content: <div>Class Schedule(ToDo)</div>,
+      content: (
+        <InstructorCalendar
+          id={parseInt(instructorId)}
+          isAdminAuthenticated={isAuthenticated}
+        />
+      ),
     },
     {
       label: "Instructor's Profile",

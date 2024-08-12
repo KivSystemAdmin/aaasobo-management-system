@@ -1,6 +1,8 @@
 "use client";
 
 import TabFunction from "@/app/components/admins-dashboard/TabFunction";
+import ClassCalendar from "@/app/components/customers-dashboard/classes/ClassCalendar";
+import CustomerProfile from "@/app/components/customers-dashboard/profile/CustomerProfile";
 import ChildrenProfiles from "@/app/components/customers-dashboard/children-profiles/ChildrenProfiles";
 import RegularClasses from "@/app/components/customers-dashboard/regular-classes/RegularClasses";
 import { useAuth } from "@/app/hooks/useAuth";
@@ -15,13 +17,23 @@ function Page({ params }: { params: { customerId: string } }) {
   const { isAuthenticated, isLoading } = useAuth(endpoint, redirectPath);
 
   // Get the active tab from the local storage.
-  const { initialActiveTab, isTabInitialized } = useTabSelect("activeTab");
+  const { initialActiveTab, isTabInitialized } =
+    useTabSelect("activeCustomerTab");
 
   // Tabs with labels and content
   const tabs = [
     {
+      label: "Class Calendar",
+      content: (
+        <ClassCalendar
+          customerId={customerId}
+          isAdminAuthenticated={isAuthenticated}
+        />
+      ),
+    },
+    {
       label: "Customer's Profile",
-      content: <div>Customer's Profile(Todo)</div>,
+      content: <CustomerProfile customerId={customerId} />,
     },
     {
       label: "Children's Profile",

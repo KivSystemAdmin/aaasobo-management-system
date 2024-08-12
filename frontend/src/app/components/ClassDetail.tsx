@@ -17,11 +17,13 @@ const ClassDetail = ({
   classDetail,
   timeZone,
   handleCancel,
+  isAdminAuthenticated,
 }: {
   customerId: string;
   classDetail: ClassType | null;
   timeZone: string;
   handleCancel: (classId: number, classDateTime: string) => void;
+  isAdminAuthenticated?: boolean;
 }) => {
   if (!classDetail) {
     return <div>No class details available</div>;
@@ -131,14 +133,21 @@ const ClassDetail = ({
               btnText="Cancel"
               className="cancelBtn"
             />
-
-            <RedirectButton
-              linkURL={`/customers/${customerId}/classes/${classDetail.id}/reschedule`}
-              btnText={"Reschedule"}
-              Icon={PencilIcon}
-              className="rescheduleBtn"
-            />
-
+            {isAdminAuthenticated ? (
+              <RedirectButton
+                linkURL={`/admins/customer-list/${customerId}/classes/${classDetail.id}/reschedule`}
+                btnText={"Reschedule"}
+                Icon={PencilIcon}
+                className="rescheduleBtn"
+              />
+            ) : (
+              <RedirectButton
+                linkURL={`/customers/${customerId}/classes/${classDetail.id}/reschedule`}
+                btnText={"Reschedule"}
+                Icon={PencilIcon}
+                className="rescheduleBtn"
+              />
+            )}
             <p>
               ■ This class can be rescheduled until{" "}
               <span style={{ fontWeight: "bold", color: "red" }}>
