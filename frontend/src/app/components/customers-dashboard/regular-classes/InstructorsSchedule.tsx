@@ -13,12 +13,6 @@ import {
 } from "@/app/helper/instructorsApi";
 import { formatTime, getWeekday } from "@/app/helper/dateUtils";
 
-type Availability = {
-  id: number;
-  startAt: Date;
-  endAt: Date | null;
-};
-
 function InstructorsSchedule() {
   const [instructors, selectedInstructorId, onSelectedInstructorIdChange] =
     useInstructorSelect();
@@ -49,7 +43,7 @@ function InstructorsSchedule() {
         const data =
           await fetchInstructorRecurringAvailabilities(selectedInstructorId);
 
-        data.map((availability: Availability) => {
+        data.forEach((availability: RecurringAvailability) => {
           const day = getWeekday(
             new Date(availability.startAt),
             "Asia/Tokyo",

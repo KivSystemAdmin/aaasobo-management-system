@@ -148,7 +148,7 @@ type ClassForCalendar = {
 
 type RecurringClassState = {
   id: number;
-  day: string;
+  day: Day;
   time: string;
   instructorId: number;
   childrenIds: Set<number>;
@@ -174,4 +174,10 @@ type InstructorClassDetail = {
 type Tab = {
   label: string;
   content: React.ReactNode;
+};
+
+type RecurringAvailability = {
+  id: number;
+  startAt: Date;
+  endAt: Date | null;
 };

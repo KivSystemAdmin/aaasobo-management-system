@@ -84,3 +84,22 @@ export const editRecurringClass = async (
     throw error;
   }
 };
+
+// GET recurring classes by instructor id
+export const getRecurringClassesByInstructorId = async (
+  instructorId: number,
+) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/by-instructorId?instructorId=${instructorId}`,
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.recurringClasses;
+  } catch (error) {
+    console.error("Failed to fetch recurring classes:", error);
+    throw error;
+  }
+};

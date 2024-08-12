@@ -4,6 +4,7 @@ import {
   deleteRecurringClass,
   getRecurringClassByRecurringClassId,
   getRecurringClassesBySubscriptionId,
+  getValidRecurringClassesByInstructorId,
   terminateRecurringClass,
 } from "../services/recurringClassesService";
 import { RequestWithId } from "../middlewares/parseId.middleware";
@@ -72,7 +73,15 @@ export const getRecurringClassesBySubscriptionIdController = async (
   }
 
   try {
-    const data = await getRecurringClassesBySubscriptionId(subscriptionId);
+    // Get the local date and the begging of its time.
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    const today = date.toISOString().split("T")[0];
+
+    const data = await getRecurringClassesBySubscriptionId(
+      subscriptionId,
+      new Date(today + "T00:00:00Z"),
+    );
 
     const recurringClasses = data.map((recurringClass) => {
       const {
@@ -238,6 +247,34 @@ export const updateRecurringClassesController = async (
       message: "Regular Class is updated successfully",
       updatedRecurringClasses,
     });
+  } catch (error) {
+    res.status(500).json({ error: `${error}` });
+  }
+};
+
+// GET recurring classes by instructor id.
+export const getRecurringClassesByInstructorIdController = async (
+  req: Request,
+  res: Response,
+) => {
+  const instructorId = parseInt(req.query.instructorId as string);
+  if (isNaN(instructorId)) {
+    res.status(400).json({ error: "Invalid instructor ID" });
+    return;
+  }
+
+  try {
+    // Get the local date and the begging of its time.
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    const today = date.toISOString().split("T")[0];
+
+    const recurringClasses = await getValidRecurringClassesByInstructorId(
+      instructorId,
+      new Date(today + "T00:00:00Z"),
+    );
+
+    res.json({ recurringClasses });
   } catch (error) {
     res.status(500).json({ error: `${error}` });
   }

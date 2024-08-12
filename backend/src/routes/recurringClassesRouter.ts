@@ -2,6 +2,7 @@ import express from "express";
 import { parseId, RequestWithId } from "../middlewares/parseId.middleware";
 import {
   addRecurringClassController,
+  getRecurringClassesByInstructorIdController,
   getRecurringClassesBySubscriptionIdController,
   updateRecurringClassesController,
 } from "../controllers/recurringClassesController";
@@ -14,4 +15,8 @@ recurringClassesRouter.get("/", getRecurringClassesBySubscriptionIdController);
 recurringClassesRouter.post("/", addRecurringClassController);
 recurringClassesRouter.put("/:id", parseId, (req, res) =>
   updateRecurringClassesController(req as RequestWithId, res),
+);
+recurringClassesRouter.get(
+  "/by-instructorId",
+  getRecurringClassesByInstructorIdController,
 );

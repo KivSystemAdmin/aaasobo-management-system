@@ -21,9 +21,10 @@ function EditRegularClassForm({
   subscriptionId: number;
   isAdminAuthenticated?: boolean;
 }) {
-  const [instructorsData, setInstructorsData] = useState<Instructors>();
+  const [instructorsData, setInstructorsData] = useState<Instructor[]>();
   const [children, setChildren] = useState<Child[] | undefined>([]);
   const [states, setStates] = useState<RecurringClassState[]>([]);
+  const [keepStates, setKeepStates] = useState<RecurringClassState[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -47,7 +48,6 @@ function EditRegularClassForm({
 
     const createInitialStates = async () => {
       try {
-        // TODO: Get only valid recurring classes.
         const data = await getRecurringClassesBySubscriptionId(subscriptionId);
 
         // Select recurringClasses whose endAt is null.
@@ -56,13 +56,7 @@ function EditRegularClassForm({
         );
 
         const stateList = recurringClasses.map(
-          ({
-            id,
-            dateTime,
-            instructorId,
-            instructor,
-            childrenIds,
-          }: RecurringClass) => {
+          ({ id, dateTime, instructorId, childrenIds }: RecurringClass) => {
             let day = null;
             let time = null;
 
@@ -81,9 +75,8 @@ function EditRegularClassForm({
           },
         );
 
-        // TODO: Get instructors' availability.
-
         setStates(stateList);
+        setKeepStates(stateList);
       } catch (error) {
         console.error(error);
       }
@@ -100,6 +93,34 @@ function EditRegularClassForm({
     startDate: string,
   ) => {
     event.preventDefault();
+
+    // If the start date doesn't have value, return it.
+    if (!startDate) {
+      alert("Please enter a start date");
+      return;
+    }
+
+    // Find the corresponding state in keepStates
+    const prevState = keepStates.find((s) => s.id === state.id);
+    if (!prevState) {
+      alert("Previous state not found");
+      return;
+    }
+
+    // If all state values are the same as the previous ones, return it.
+    const stateChildren =
+      state.childrenIds.size === prevState.childrenIds.size &&
+      Array.from(state.childrenIds).every((childId) =>
+        Array.from(prevState.childrenIds).includes(childId),
+      );
+    const stateInstructorId = state.instructorId === prevState.instructorId;
+    const stateDay = state.day === prevState.day;
+    const stateTime = state.time === prevState.time;
+
+    if (stateChildren && stateInstructorId && stateDay && stateTime) {
+      alert("Please select a new instructor, day, time and children");
+      return;
+    }
 
     try {
       const data = await editRecurringClass(
@@ -120,7 +141,7 @@ function EditRegularClassForm({
       // Redirect the user to regular-classes page of customer dashboard
       router.push(`/customers/${customerId}/regular-classes`);
     } catch (error) {
-      console.error("Failed to add a new recurring class data:", error);
+      console.error("Failed to edit a new recurring class data:", error);
     }
   };
 
@@ -134,9 +155,9 @@ function EditRegularClassForm({
         <thead>
           <tr>
             <th></th>
+            <th>Instructor</th>
             <th>Day</th>
             <th>Time</th>
-            <th>Instructor</th>
             <th>Children</th>
             <th>Start From</th>
             <th></th>

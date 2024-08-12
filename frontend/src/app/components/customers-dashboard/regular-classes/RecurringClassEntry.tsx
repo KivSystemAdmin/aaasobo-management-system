@@ -1,6 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { formatTime, getWeekday } from "@/app/helper/dateUtils";
+import {
+  Day,
+  fetchInstructorRecurringAvailabilities,
+  SlotsOfDays,
+} from "@/app/helper/instructorsApi";
+import { getRecurringClassesByInstructorId } from "@/app/helper/recurringClassesApi";
+import { useEffect, useState } from "react";
 
 function RecurringClassEntry({
   state,
@@ -12,7 +19,7 @@ function RecurringClassEntry({
 }: {
   state: RecurringClassState;
   setState: (state: RecurringClassState) => void;
-  instructorsData: Instructors;
+  instructorsData: Instructor[];
   childList: Child[];
   index: number;
   onClickHandler: (
@@ -21,13 +28,106 @@ function RecurringClassEntry({
     startDate: string,
   ) => void;
 }) {
+  const emptySlots = {
+    Mon: [],
+    Tue: [],
+    Wed: [],
+    Thu: [],
+    Fri: [],
+    Sat: [],
+    Sun: [],
+  };
   const { day, time, instructorId, childrenIds } = state;
-
-  // TODO: Only instructors' availability should be selectable.
-  // TODO: Before today shouldn't be selectable.
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const times = ["09:00", "11:00", "13:00", "16:00", "16:30", "17:00"];
   const [selectedDate, setSelectedDate] = useState("");
+  const [slots, setSlots] = useState<SlotsOfDays>(emptySlots);
+  const [unavailableSlots, setUnavailableSlots] =
+    useState<SlotsOfDays>(emptySlots);
+  const [times, setTimes] = useState<string[]>([]);
+
+  // Get tomorrow's date
+  // TODO: Tomorrow needs to be fixed.
+  const tomorrow = new Date();
+  tomorrow.setHours(0, 0, 0, 0);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowFormatted = tomorrow.toISOString().split("T")[0];
+
+  useEffect(() => {
+    if (!instructorId) return;
+    const getRecurringAvailabilities = async () => {
+      try {
+        // Set unavailable recurring classes to the slots
+        const recurringClassesData =
+          await getRecurringClassesByInstructorId(instructorId);
+        const newUnavailableSlots: SlotsOfDays = {
+          Mon: [],
+          Tue: [],
+          Wed: [],
+          Thu: [],
+          Fri: [],
+          Sat: [],
+          Sun: [],
+        };
+
+        recurringClassesData.forEach(
+          (recurringClass: RecurringAvailability) => {
+            const day = getWeekday(
+              new Date(recurringClass.startAt),
+              "Asia/Tokyo",
+            ) as Day;
+            const time = formatTime(
+              new Date(recurringClass.startAt),
+              "Asia/Tokyo",
+            );
+
+            newUnavailableSlots[day].push(time);
+          },
+        );
+        setUnavailableSlots(newUnavailableSlots);
+
+        const data = await fetchInstructorRecurringAvailabilities(instructorId);
+        const newSlots: SlotsOfDays = {
+          Mon: [],
+          Tue: [],
+          Wed: [],
+          Thu: [],
+          Fri: [],
+          Sat: [],
+          Sun: [],
+        };
+
+        // Add the current state to the new slots.
+        if (day && time) {
+          newSlots[day as keyof SlotsOfDays].push(time);
+        }
+
+        // Add the instructor recurring availability to the new slots.
+        data.forEach((availability: RecurringAvailability) => {
+          const day = getWeekday(
+            new Date(availability.startAt),
+            "Asia/Tokyo",
+          ) as Day;
+          const time = formatTime(new Date(availability.startAt), "Asia/Tokyo");
+
+          if (!newUnavailableSlots[day].includes(time)) {
+            newSlots[day].push(time);
+          }
+        });
+
+        setSlots(newSlots);
+        setTimes(newSlots[day as keyof SlotsOfDays]);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getRecurringAvailabilities();
+  }, [instructorId]);
+
+  const handleDayChange = (day: Day) => {
+    setState({ ...state, day });
+    setTimes(slots[day] || []);
+  };
 
   const handleChildChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -45,15 +145,38 @@ function RecurringClassEntry({
     setState({ ...state, childrenIds: newSelectedChildrenIds });
   };
 
+  if (!instructorsData || !childList) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <tr>
       <td>{index + 1}</td>
+
+      <td>
+        <select
+          name="instructors"
+          value={instructorId || ""}
+          onChange={(e) => {
+            setState({ ...state, instructorId: parseInt(e.target.value) });
+          }}
+        >
+          <option key="" value="" hidden></option>
+          {instructorsData.map((instructor) => {
+            return (
+              <option key={instructor.id} value={instructor.id}>
+                {instructor.name}
+              </option>
+            );
+          })}
+        </select>
+      </td>
       <td>
         <select
           name="days"
           value={day || ""}
           onChange={(e) => {
-            setState({ ...state, day: e.target.value });
+            handleDayChange(e.target.value as Day);
           }}
         >
           <option key="" value="" hidden></option>
@@ -73,29 +196,15 @@ function RecurringClassEntry({
           }}
         >
           <option key="" value="" hidden></option>
-          {times.map((time) => (
-            <option key={time} value={time}>
-              {time}
-            </option>
-          ))}
-        </select>
-      </td>
-      <td>
-        <select
-          name="instructors"
-          value={instructorId || ""}
-          onChange={(e) => {
-            setState({ ...state, instructorId: parseInt(e.target.value) });
-          }}
-        >
-          <option key="" value="" hidden></option>
-          {instructorsData.map((instructor) => {
-            return (
-              <option key={instructor.id} value={instructor.id}>
-                {instructor.name}
+          {times ? (
+            times.map((time, index) => (
+              <option key={index} value={time}>
+                {time}
               </option>
-            );
-          })}
+            ))
+          ) : (
+            <></>
+          )}
         </select>
       </td>
       <td>
@@ -119,6 +228,7 @@ function RecurringClassEntry({
           type="date"
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}
+          min={tomorrowFormatted}
         />
       </td>
       <td>

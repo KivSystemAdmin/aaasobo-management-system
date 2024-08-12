@@ -61,10 +61,14 @@ export const addRecurringClass = async (
 // Fetch recurring classes by subscription id along with related instructors and customers data
 export const getRecurringClassesBySubscriptionId = async (
   subscriptionId: number,
+  date: Date,
 ) => {
   try {
     const recurringClasses = await prisma.recurringClass.findMany({
-      where: { subscriptionId },
+      where: {
+        subscriptionId,
+        OR: [{ endAt: { gte: date } }, { endAt: null }],
+      },
       include: {
         subscription: {
           include: {
@@ -223,5 +227,22 @@ export const createNewRecurringClass = async (subscriptionId: number) => {
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to create new recurring class.");
+  }
+};
+
+// Fetch recurring classes After endAt or endAt is null by instructor id
+export const getValidRecurringClassesByInstructorId = async (
+  instructorId: number,
+  date: Date,
+) => {
+  try {
+    const recurringClasses = await prisma.recurringClass.findMany({
+      where: { instructorId, OR: [{ endAt: { gte: date } }, { endAt: null }] },
+    });
+
+    return recurringClasses;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch recurring classes.");
   }
 };
