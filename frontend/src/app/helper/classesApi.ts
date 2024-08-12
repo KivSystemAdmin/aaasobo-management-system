@@ -36,11 +36,13 @@ export const deleteClass = async (classId: number) => {
 
 // POST class
 export const bookClass = async (classData: {
+  classId: number;
   dateTime: string;
   instructorId: number;
   customerId: number;
   childrenIds: number[];
   status: string;
+  recurringClassId: number;
 }) => {
   try {
     const response = await fetch("http://localhost:4000/classes", {

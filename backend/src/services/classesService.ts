@@ -44,6 +44,7 @@ export const createClass = async (
     customerId: number;
     status: Status;
     subscriptionId: number;
+    recurringClassId: number;
   },
   childrenIds: number[],
 ) => {

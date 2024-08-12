@@ -114,6 +114,9 @@ const CalendarView = forwardRef<
     }
   };
 
+  // To resoleve the complaint
+  CalendarView.displayName = "CalendarView";
+
   const validRange = () => {
     const now = new Date();
     // TODO: 'start' should be the Instructor's 'createdDate'

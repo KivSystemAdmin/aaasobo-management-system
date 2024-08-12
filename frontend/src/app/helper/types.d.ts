@@ -48,6 +48,7 @@ type ClassType = {
     | "canceledByCustomer"
     | "canceledByInstructor";
   isRebookable: boolean;
+  recurringClassId: number;
 };
 
 type Customer = {

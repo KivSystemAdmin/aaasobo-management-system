@@ -12,10 +12,13 @@ import {
   getExcludedClasses,
   updateClass,
 } from "../services/classesService";
-import { getActiveSubscription } from "../services/subscriptionsService";
+import { getSubscriptionById } from "../services/subscriptionsService";
 import { RequestWithId } from "../middlewares/parseId.middleware";
 import { prisma } from "../../prisma/prismaClient";
-import { getValidRecurringClasses } from "../services/recurringClassesService";
+import {
+  getValidRecurringClasses,
+  getRecurringClassByRecurringClassId,
+} from "../services/recurringClassesService";
 import {
   calculateFirstDate,
   createDatesBetween,
@@ -84,6 +87,7 @@ export const getClassesByCustomerIdController = async (
         status,
         classAttendance,
         isRebookable,
+        recurringClassId,
       } = eachClass;
 
       return {
@@ -111,6 +115,7 @@ export const getClassesByCustomerIdController = async (
         },
         status,
         isRebookable,
+        recurringClassId,
       };
     });
 
@@ -123,32 +128,82 @@ export const getClassesByCustomerIdController = async (
 
 // POST a new class
 export const createClassController = async (req: Request, res: Response) => {
-  const { dateTime, instructorId, customerId, childrenIds, status } = req.body;
+  const {
+    classId,
+    dateTime,
+    instructorId,
+    customerId,
+    childrenIds,
+    status,
+    recurringClassId,
+  } = req.body;
 
   // Validation for req.body
-  if (!dateTime || !instructorId || !customerId || !childrenIds || !status) {
+  if (
+    !classId ||
+    !dateTime ||
+    !instructorId ||
+    !customerId ||
+    !childrenIds ||
+    !status ||
+    !recurringClassId
+  ) {
     return res
       .status(400)
       .json({ error: "There is a missing required field." });
   }
 
   try {
-    const subscription = await getActiveSubscription(customerId);
-    if (!subscription) {
-      return res.status(400).json({ error: "No active subscription found." });
-    }
-    const newClass = await createClass(
-      {
-        dateTime,
-        instructorId,
-        customerId,
-        status,
-        subscriptionId: subscription.id,
-      },
-      childrenIds,
-    );
+    // Get subscription id from recurringClass table
+    const subscriptionId = await prisma.$transaction(async (tx) => {
+      const recurringClass = await getRecurringClassByRecurringClassId(
+        tx,
+        recurringClassId,
+      );
+      if (!recurringClass) {
+        throw new Error("Recurring class not found.");
+      }
+      return recurringClass.subscriptionId;
+    });
 
-    res.status(201).json(newClass);
+    if (!subscriptionId) {
+      return res.status(400).json({ error: "No subscription found." });
+    }
+
+    // Get subscription by subscription id
+    const subscription = await getSubscriptionById(subscriptionId);
+    if (!subscription) {
+      return res
+        .status(400)
+        .json({ error: "No applicable subscription found." });
+    }
+
+    const isRebookable = false;
+    const [newClass, updatedClass] = await Promise.all([
+      // Create a new 'booked' Class
+      createClass(
+        {
+          dateTime,
+          instructorId,
+          customerId,
+          status,
+          subscriptionId: subscription.id,
+          recurringClassId,
+        },
+        childrenIds,
+      ),
+      // Update the 'canceledByCustomer' class that was rebooked => isRebookable: false
+      updateClass(
+        classId,
+        undefined, // dateTime
+        undefined, // instructorId
+        undefined, // childrenIds
+        undefined, // status
+        isRebookable,
+      ),
+    ]);
+
+    res.status(201).json({ newClass, updatedClass });
   } catch (error) {
     console.error("Controller Error:", error);
     res.status(500).json({ error: "Failed to add class." });

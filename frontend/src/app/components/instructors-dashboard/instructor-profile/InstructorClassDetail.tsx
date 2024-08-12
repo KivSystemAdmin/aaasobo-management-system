@@ -17,11 +17,7 @@ const InstructorClassDetail = ({
   }
 
   const renderChildren = () => {
-    // Determine which array to use based on the status
-    const childrenToDisplay =
-      classDetail.status === "completed"
-        ? classDetail.children // Completed status should show attended children
-        : classDetail.attendingChildren || []; // Default to an empty array if undefined
+    const childrenToDisplay = classDetail.children;
 
     // Check if there are no children to display
     if (childrenToDisplay.length === 0) {

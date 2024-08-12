@@ -64,3 +64,18 @@ export const createNewSubscription = async (subscriptionData: {
     throw new Error("Failed to create new subscription.");
   }
 };
+
+// Get subscription by subscription id
+export const getSubscriptionById = async (subscriptionId: number) => {
+  try {
+    const subscription = await prisma.subscription.findUnique({
+      where: { id: subscriptionId },
+      include: { plan: true, customer: true },
+    });
+
+    return subscription;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch subscription.");
+  }
+};

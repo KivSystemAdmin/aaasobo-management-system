@@ -190,6 +190,7 @@ async function insertClasses() {
         status: "completed",
         isRebookable: false,
         subscriptionId: alice.subscription[0].id,
+        recurringClassId: 1,
       },
       {
         instructorId: helen.id,
@@ -198,6 +199,7 @@ async function insertClasses() {
         status: "completed",
         isRebookable: false,
         subscriptionId: alice.subscription[0].id,
+        recurringClassId: 1,
       },
       {
         instructorId: helen.id,
@@ -205,6 +207,7 @@ async function insertClasses() {
         dateTime: "2024-06-03T15:00:00+09:00",
         status: "canceledByCustomer",
         subscriptionId: bob.subscription[0].id,
+        recurringClassId: 1,
       },
       {
         instructorId: helen.id,
@@ -213,6 +216,7 @@ async function insertClasses() {
         status: "completed",
         isRebookable: false,
         subscriptionId: bob.subscription[0].id,
+        recurringClassId: 1,
       },
       {
         instructorId: elian.id,
@@ -221,6 +225,7 @@ async function insertClasses() {
         status: "completed",
         isRebookable: false,
         subscriptionId: bob.subscription[0].id,
+        recurringClassId: 1,
       },
       {
         instructorId: elian.id,
@@ -228,6 +233,7 @@ async function insertClasses() {
         dateTime: "2024-06-29T11:00:00+09:00",
         status: "booked",
         subscriptionId: bob.subscription[0].id,
+        recurringClassId: 1,
       },
     ],
   });

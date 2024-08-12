@@ -73,7 +73,7 @@ model Class {
   id               Int               @id @default(autoincrement())
   instructorId     Int
   customerId       Int
-  recurringClassId Int?
+  recurringClassId Int
   dateTime         DateTime
   status           Status
   instructor       Instructor        @relation(fields: [instructorId], references: [id])

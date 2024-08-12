@@ -10,10 +10,12 @@ function BookClassForm({
   customerId,
   instructors,
   children,
+  classToRebook,
 }: {
   customerId: string;
   instructors: Instructor[];
   children: Child[];
+  classToRebook: ClassType | undefined;
 }) {
   const [selectedInstructorId, setSelectedInstructorId] = useState<
     number | null
@@ -60,7 +62,7 @@ function BookClassForm({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!selectedInstructorId || !selectedDateTime) return;
+    if (!selectedInstructorId || !selectedDateTime || !classToRebook) return;
 
     if (selectedChildrenIds.size === 0) {
       alert("Please choose at least one attending child.");
@@ -71,11 +73,13 @@ function BookClassForm({
 
     try {
       await bookClass({
+        classId: classToRebook.id,
         dateTime: selectedDateTime,
         instructorId: selectedInstructorId,
-        customerId: parseInt(customerId, 10),
+        customerId: parseInt(customerId),
         status: "booked",
         childrenIds: selectedChildrenIdsArray,
+        recurringClassId: classToRebook.recurringClassId,
       });
 
       router.push(`/customers/${customerId}/classes`);

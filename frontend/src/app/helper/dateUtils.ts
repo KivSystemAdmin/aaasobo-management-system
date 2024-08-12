@@ -91,7 +91,7 @@ export const formatPreviousDay = (date: Date, timeZone: string) => {
 
 // Function to format the last day of the month, 5 months after a given date
 export const formatFiveMonthsLaterEndOfMonth = (
-  date: Date,
+  date: Date | string,
   timeZone: string,
 ) => {
   const futureDate = new Date(date);

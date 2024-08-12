@@ -70,9 +70,9 @@ const InstructorClassesTable = ({
 
   const completeClass = async (
     classToCompleteId: number,
-    registeredChildren: Child[],
+    registeredChildren: Child[], // All of the initially registered children(recurringClassAttendance.children)
     classStart: string,
-    childrenWithNoAbsences?: Child[],
+    childrenWithoutEditingAttendance?: Child[],
   ) => {
     if (!isPastClassEndTime(classStart, timeZone)) {
       return alert(
@@ -80,8 +80,8 @@ const InstructorClassesTable = ({
       );
     }
 
-    const attendedChildrenIds = childrenWithNoAbsences
-      ? childrenWithNoAbsences.map((child) => child.id)
+    const attendedChildrenIds = childrenWithoutEditingAttendance
+      ? childrenWithoutEditingAttendance.map((child) => child.id)
       : Array.from(selectedChildrenIds);
 
     try {
@@ -99,7 +99,7 @@ const InstructorClassesTable = ({
             ? {
                 ...eachClass,
                 children:
-                  childrenWithNoAbsences ||
+                  childrenWithoutEditingAttendance ||
                   registeredChildren.filter((child) =>
                     attendedChildrenIds.includes(child.id),
                   ),
@@ -111,7 +111,7 @@ const InstructorClassesTable = ({
 
       handleUpdateClassDetail(
         classToCompleteId,
-        childrenWithNoAbsences ||
+        childrenWithoutEditingAttendance ||
           registeredChildren.filter((child) =>
             attendedChildrenIds.includes(child.id),
           ),
@@ -165,8 +165,8 @@ const InstructorClassesTable = ({
                         <td className={styles.classesTable__td}>
                           {editingClassId === eachClass.id ? (
                             <div className={styles.classesTable__children}>
-                              {/* Initially registered children attendingChildren(recurringClassAttendance.children) are shown when 'Edit' button is clicke 
-                              so that instructors can correct their mistakes in attendance report */}
+                              {/* All of the initially registered children(recurringClassAttendance.children) are shown when 'Edit' button is clicked 
+                              in case instructors make a mistake in attendance report or non-registered children for the class attend the class*/}
                               {eachClass.attendingChildren.map((child) => (
                                 <div
                                   key={child.id}
@@ -208,10 +208,10 @@ const InstructorClassesTable = ({
                               <button
                                 className={styles.classesTable__button}
                                 onClick={() =>
-                                  // Condition 1: Editing attendance is necessary => attending children !== attended children
+                                  // Condition 1: Editing attendance is necessary
                                   completeClass(
                                     eachClass.id,
-                                    eachClass.attendingChildren, // attendingChildren = recurringClassAttendance.children = initially registered children
+                                    eachClass.attendingChildren, // attendingChildren = recurringClassAttendance.children(initially registered children)
                                     eachClass.dateTime,
                                   )
                                 }
@@ -239,7 +239,7 @@ const InstructorClassesTable = ({
                                 onClick={() =>
                                   handleEditClick(
                                     eachClass.id,
-                                    eachClass.attendingChildren,
+                                    eachClass.children,
                                     eachClass.dateTime,
                                   )
                                 }
@@ -249,12 +249,12 @@ const InstructorClassesTable = ({
                               <button
                                 className={styles.classesTable__button}
                                 onClick={() =>
-                                  // Condition 2: Editing attendance is not necessary => attending children === attended children
+                                  // Condition 2: Editing attendance is not necessary
                                   completeClass(
                                     eachClass.id,
-                                    eachClass.attendingChildren, // This argument is not actually needed, but it is passed to satisfy the second parameter.
+                                    eachClass.attendingChildren,
                                     eachClass.dateTime,
-                                    eachClass.attendingChildren, // Here,'attendingChildren' is used to represent that all the chilrend were present.
+                                    eachClass.children,
                                   )
                                 }
                               >
