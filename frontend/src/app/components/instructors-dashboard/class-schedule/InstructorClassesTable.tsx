@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { formatTime, isPastClassEndTime } from "@/app/helper/dateUtils";
 import styles from "./InstructorClassesTable.module.scss";
+import Link from "next/link";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { editClass } from "@/app/helper/classesApi";
@@ -91,7 +92,10 @@ const InstructorClassesTable = ({
     updatedStatus: StatusType,
     childrenWithoutEditingAttendance?: Child[],
   ) => {
-    if (!isPastClassEndTime(classStart, timeZone) && !isAdminAuthenticate) {
+    if (
+      !isPastClassEndTime(classStart, timeZone) &&
+      updatedStatus === "completed"
+    ) {
       return alert(
         "You cannot complete the class as it is before the class end time.",
       );
@@ -104,9 +108,6 @@ const InstructorClassesTable = ({
     const isRebookable = updatedStatus !== "completed";
 
     try {
-      // Whenever instructor clicks the complete button, the status will be set to "completed"
-      const updatedStatus = isAdminAuthenticate ? selectedStatus : "completed";
-
       await editClass({
         classId: classToCompleteId,
         childrenIds: attendedChildrenIds,
@@ -180,7 +181,21 @@ const InstructorClassesTable = ({
                         {/* Time */}
                         <td className={styles.classesTable__td}>
                           <div className={styles.classesTable__time}>
-                            {philippineTime}
+                            {isAdminAuthenticate ? (
+                              <Link
+                                href={`/admins/instructor-list/${instructorId}/class-schedule/${eachClass.id}`}
+                                passHref
+                              >
+                                {philippineTime}
+                              </Link>
+                            ) : (
+                              <Link
+                                href={`/instructors/${instructorId}/class-schedule/${eachClass.id}`}
+                                passHref
+                              >
+                                {philippineTime}
+                              </Link>
+                            )}
                           </div>
                         </td>
 
@@ -233,7 +248,7 @@ const InstructorClassesTable = ({
                                         handleStatusChange("booked")
                                       }
                                     />
-                                    <span>booked</span>
+                                    <span>Booked</span>
                                   </>
                                 ) : (
                                   <>
@@ -244,7 +259,7 @@ const InstructorClassesTable = ({
                                         handleStatusChange("completed")
                                       }
                                     />
-                                    <span>completed</span>
+                                    <span>Completed</span>
                                   </>
                                 )}
                               </label>
@@ -277,35 +292,53 @@ const InstructorClassesTable = ({
                                 onClick={handleCancelClick}
                               >
                                 Cancel
-                              </button>
+                              </button>{" "}
                               <button
                                 className={styles.classesTable__button}
                                 onClick={() =>
+                                  // Condition 1: Editing attendance is necessary
+                                  completeClass(
+                                    eachClass.id,
+                                    eachClass.attendingChildren, // attendingChildren = recurringClassAttendance.children(initially registered children)
+                                    eachClass.dateTime,
+                                    selectedStatus,
+                                  )
+                                }
+                              >
+                                {isAdminAuthenticate ? "Update" : "Complete"}
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                className={styles.classesTable__button}
+                                onClick={() =>
+                                  handleEditClick(
+                                    eachClass.id,
+                                    eachClass.children,
+                                    eachClass.dateTime,
+                                    eachClass.status,
+                                  )
+                                }
+                              >
+                                Edit
+                              </button>{" "}
+                              <button
+                                className={styles.classesTable__button}
+                                onClick={() =>
+                                  // Condition 2: Editing attendance is not necessary
                                   completeClass(
                                     eachClass.id,
                                     eachClass.attendingChildren,
                                     eachClass.dateTime,
-                                    selectedStatus,
+                                    "completed",
+                                    eachClass.children,
                                   )
                                 }
                               >
                                 Complete
                               </button>
                             </>
-                          ) : (
-                            <button
-                              className={styles.classesTable__button}
-                              onClick={() =>
-                                handleEditClick(
-                                  eachClass.id,
-                                  eachClass.children,
-                                  eachClass.dateTime,
-                                  eachClass.status,
-                                )
-                              }
-                            >
-                              Edit
-                            </button>
                           )}
                         </td>
                       </tr>

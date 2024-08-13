@@ -34,10 +34,12 @@ function InstructorCalendar({
           "instructor",
         );
 
-        // Display just 'booked' and 'completed' classes, not 'canceledByCustomer/Instructor' classes
+        // Display just 'booked', 'completed' classes, and 'canceledByInstructor' not 'canceledByCustomer' classes
         const classesToDisplay = classes.filter(
           (eachClass) =>
-            eachClass.status === "booked" || eachClass.status === "completed",
+            eachClass.status === "booked" ||
+            eachClass.status === "completed" ||
+            eachClass.status === "canceledByInstructor",
         );
 
         const formattedClasses = classesToDisplay.map((eachClass) => {
@@ -46,7 +48,13 @@ function InstructorCalendar({
             "Asia/Manila",
           );
 
-          const color = eachClass.status === "booked" ? "#FF0000" : "#C0C0C0";
+          const color =
+            eachClass.status === "booked"
+              ? "#FF0000"
+              : eachClass.status === "completed"
+                ? "#C0C0C0"
+                : "#000000";
+          // const color = eachClass.status === "booked" ? "#FF0000" : "#C0C0C0";
 
           const childrenNames = eachClass.classAttendance.children
             .map((child) => child.name)
@@ -126,6 +134,18 @@ function InstructorCalendar({
           }}
         >
           completed
+        </span>{" "}
+        <span
+          style={{
+            fontSize: "0.8rem",
+            borderRadius: "6px",
+            padding: "3px 6px",
+            color: "white",
+            backgroundColor: "#000000",
+            width: "150px",
+          }}
+        >
+          canceledByCustomer
         </span>
         {isAdminAuthenticated ? <br></br> : null}
         {isAdminAuthenticated && name ? (
