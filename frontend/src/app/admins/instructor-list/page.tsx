@@ -27,11 +27,12 @@ function useNumberInput(
 }
 
 function Page() {
-  const userType = "instructor";
+  const userType = "Instructor List";
   const omitItems = [""]; // Omit the item from the table
   const linkItems = ["ID"]; // Set the item to be a link
   const replaceItems = ["ID"]; // Replace the item with the value(e.g., ID -> 1,2,3...)
   const linkUrls = ["/admins/instructor-list/[ID]"]; // Set the link URL
+  const addUserLink = ["/admins/instructor-list/register", "Add instructor"]; // Set the link URL and name to add a user
 
   // Check the authentication of the admin.
   const endpoint = "http://localhost:4000/admins/authentication";
@@ -51,6 +52,7 @@ function Page() {
         linkItems={linkItems}
         linkUrls={linkUrls}
         replaceItems={replaceItems}
+        addUserLink={addUserLink}
       />
       <CreateCalendarForm />
       <hr />

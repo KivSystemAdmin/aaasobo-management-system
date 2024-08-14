@@ -1,6 +1,6 @@
-"use client";
-
 import { useState, useEffect, useMemo } from "react";
+import styles from "./UsersTable.module.scss"; // Adjust the import according to your file structure
+import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import {
   useReactTable,
   getCoreRowModel,
@@ -15,14 +15,16 @@ import {
   getAllCustomers,
   getAllChildren,
 } from "@/app/helper/adminsApi";
+import RedirectButton from "../RedirectButton";
 
-interface UsersTableProps {
+type UsersTableProps = {
   userType: string;
   omitItems: string[];
   linkItems: string[];
   linkUrls: string[];
   replaceItems: string[];
-}
+  addUserLink?: string[];
+};
 
 function UsersTable({
   userType,
@@ -30,11 +32,13 @@ function UsersTable({
   linkItems,
   linkUrls,
   replaceItems,
+  addUserLink,
 }: UsersTableProps) {
   const [users, setUsers] = useState<any[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [filterColumn, setFilterColumn] = useState<string>("");
+  const [filterColumn, setFilterColumn] = useState<string>("0");
   const [filterValue, setFilterValue] = useState<string>("");
+  const [selectedCellId, setSelectedCellId] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch the users based on the user type
@@ -42,13 +46,13 @@ function UsersTable({
       try {
         let usersData;
         switch (userType) {
-          case "instructor":
+          case "Instructor List":
             usersData = await getAllInstructors();
             break;
-          case "customer":
+          case "Customer List":
             usersData = await getAllCustomers();
             break;
-          case "child":
+          case "Child List":
             usersData = await getAllChildren();
             break;
           default:
@@ -62,6 +66,25 @@ function UsersTable({
 
     fetchUsers();
   }, [userType]);
+
+  useEffect(() => {
+    // Handle the click event on the table cell
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLTableCellElement;
+      if (target && target.tagName === "TD") {
+        const cellId = target.dataset.cellId || "";
+        handleCellClick(cellId);
+      }
+    };
+
+    // Add event listener when clicking on the table cell
+    document.addEventListener("click", handleClick);
+
+    // Cleanup event listener when clicking on the same table cell again
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [users]);
 
   // Define the displays of the table
   const columns = useMemo<ColumnDef<any>[]>(
@@ -82,7 +105,7 @@ function UsersTable({
                 }
                 // Set the link URL
                 let linkUrl = linkUrls[linkItems.indexOf(key)];
-                // Replace the item with the value(e.g.,[ID] -> 1,2,3...)
+                // Replace the item with the value (e.g., [ID] -> 1, 2, 3...)
                 replaceItems.forEach((replaceItem) => {
                   linkUrl = linkUrl.replace(
                     `[${replaceItem}]`,
@@ -95,6 +118,11 @@ function UsersTable({
         : [],
     [users, omitItems, linkItems, linkUrls, replaceItems],
   );
+
+  // Handle cell click to toggle the expanded state
+  const handleCellClick = (cellId: string) => {
+    setSelectedCellId((prevId) => (prevId === cellId ? null : cellId));
+  };
 
   // Configure the filter
   const filteredData = useMemo(
@@ -117,69 +145,120 @@ function UsersTable({
       sorting,
     },
     onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(), //provide a core row model
-    getSortedRowModel: getSortedRowModel(), //provide a sorting row model
+    getCoreRowModel: getCoreRowModel(), // provide a core row model
+    getSortedRowModel: getSortedRowModel(), // provide a sorting row model
   });
+
+  // Change the option color when selected
+  const changeOptionColor = (optionTag: HTMLSelectElement) => {
+    if (parseInt(optionTag.value) !== 0) {
+      optionTag.style.color = "#000000";
+    }
+  };
+
+  // Handle the filter change
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilterColumn(e.target.value);
+    changeOptionColor(e.target);
+  };
+
+  // Delete the selected user
+  const handleDeleteClick = (rowId: string | null) => {
+    // TODO: Delete the selected user
+    if (rowId === null) return alert("Something went wrong. Please try again.");
+    const deleteId = parseInt(rowId);
+    console.log("Delete the selected user:", users[deleteId]);
+  };
 
   return (
     <>
-      <h1>{userType}</h1>
-      <select
-        value={filterColumn}
-        onChange={(e) => setFilterColumn(e.target.value)}
-      >
-        <option disabled value="">
-          --- Select a column ---
-        </option>
-        {users.length > 0 &&
-          Object.keys(users[0])
-            .filter((key) => !omitItems.includes(key))
-            .map((key) => (
-              <option key={key} value={key}>
-                {key}
+      <div className={styles.container}>
+        <div className={styles.topContainer}>
+          <div className={styles.filterContainer}>
+            <select value={filterColumn} onChange={handleChange}>
+              <option disabled value="0">
+                Select a column
               </option>
+              {users.length > 0 &&
+                Object.keys(users[0])
+                  .filter((key) => !omitItems.includes(key))
+                  .map((key) => (
+                    <option key={key} value={key}>
+                      {key}
+                    </option>
+                  ))}
+            </select>
+            <input
+              type="text"
+              placeholder="Enter filter value..."
+              value={filterValue}
+              onChange={(e) => setFilterValue(e.target.value)}
+            />
+          </div>
+          {addUserLink ? (
+            <RedirectButton
+              linkURL={addUserLink[0]}
+              btnText={addUserLink[1]}
+              className="addBtn"
+              Icon={PlusIcon}
+            />
+          ) : null}
+        </div>
+        <table className={styles.tableContainer}>
+          <thead className={styles.tableHeader}>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    onClick={header.column.getToggleSortingHandler()}
+                    className={
+                      header.column.getIsSorted()
+                        ? header.column.getIsSorted() === "asc"
+                          ? "sorted-asc"
+                          : "sorted-desc"
+                        : ""
+                    }
+                  >
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
+                    {{
+                      asc: "▲",
+                      desc: "▼",
+                    }[header.column.getIsSorted() as string] ?? "　"}
+                  </th>
+                ))}
+                <th></th>
+              </tr>
             ))}
-      </select>
-      <input
-        type="text"
-        placeholder="Enter filter value..."
-        value={filterValue}
-        onChange={(e) => setFilterValue(e.target.value)}
-      />
-      <table>
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  onClick={header.column.getToggleSortingHandler()}
-                >
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext(),
-                  )}
-                  {{
-                    asc: "▲",
-                    desc: "▼",
-                  }[header.column.getIsSorted() as string] ?? ""}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </thead>
+          <tbody className={styles.tableBody}>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    data-cell-id={cell.id}
+                    className={
+                      selectedCellId === cell.id ? styles.expanded : ""
+                    }
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+                <td>
+                  <TrashIcon
+                    className={styles.icon}
+                    onClick={() => handleDeleteClick(row.id)}
+                  />
                 </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

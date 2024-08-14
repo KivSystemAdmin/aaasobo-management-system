@@ -130,13 +130,14 @@ export const getAllCustomersController = async (_: Request, res: Response) => {
 
     // Transform the data structure.
     const data = customers.map((customer, number) => {
-      const { id, name, email } = customer;
+      const { id, name, email, prefecture } = customer;
 
       return {
         No: number + 1,
         ID: id,
         Name: name,
         Email: email,
+        Prefecture: prefecture,
       };
     });
 
@@ -157,7 +158,7 @@ export const getAllInstructorsController = async (
 
     // Transform the data structure.
     const data = instructors.map((instructor, number) => {
-      const { id, name, nickname, email, classURL } = instructor;
+      const { id, name, nickname, email } = instructor;
 
       return {
         No: number + 1,
@@ -165,7 +166,6 @@ export const getAllInstructorsController = async (
         Name: name,
         Nickname: nickname,
         Email: email,
-        "Class link": classURL,
       };
     });
 
@@ -229,7 +229,7 @@ export const getAllChildrenController = async (_: Request, res: Response) => {
 
     // Transform the data structure.
     const data = children.map((child, number) => {
-      const { id, name, customer } = child;
+      const { id, name, customer, birthdate, personalInfo } = child;
 
       return {
         No: number + 1,
@@ -237,6 +237,8 @@ export const getAllChildrenController = async (_: Request, res: Response) => {
         Name: name,
         "Customer ID": customer.id,
         "Customer name": customer.name,
+        Birthdate: birthdate?.toISOString().slice(0, 10),
+        "Personal info": personalInfo,
       };
     });
 

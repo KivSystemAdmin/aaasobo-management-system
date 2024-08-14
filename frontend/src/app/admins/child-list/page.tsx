@@ -4,7 +4,7 @@ import { useAuth } from "@/app/hooks/useAuth";
 import UsersTable from "@/app/components/admins-dashboard/UsersTable";
 
 function Page() {
-  const userType = "child";
+  const userType = "Child List";
   const omitItems = [""]; // Omit the item from the table
   const linkItems = ["ID", "Customer ID"]; // Set the item to be a link
   const replaceItems = ["Customer ID", "ID"]; // Replace the item with the value(e.g., ID -> 1,2,3...)
