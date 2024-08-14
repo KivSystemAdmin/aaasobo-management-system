@@ -1,0 +1,187 @@
+@import "../variables.module.scss";
+
+.classCard {
+  padding: 0 25px 25px 25px;
+
+  &.statusBooked {
+    border-top: 17px solid $green-success;
+  }
+  &.statusCompleted {
+    border-top: 17px solid $completed-background-color;
+  }
+  &.statusCanceled {
+    border-top: 17px solid $gray-background;
+  }
+}
+
+.classStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+
+  &__icon {
+    height: 2rem;
+    &.statusBooked {
+      color: $green-success;
+    }
+    &.statusCompleted {
+      color: $completed-background-color;
+    }
+    &.statusCanceled {
+      color: $gray-background;
+    }
+  }
+
+  &__name {
+    font-size: 26px;
+    font-weight: 500;
+  }
+}
+
+.instructor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+
+  &__icon {
+    border-radius: 180px;
+
+    &.statusBooked {
+      border: 3px solid $green-success;
+    }
+    &.statusCompleted {
+      border: 3px solid $completed-background-color;
+    }
+    &.statusCanceled {
+      border: 3px solid $gray-background;
+    }
+  }
+
+  &__name {
+    font-size: 26px;
+    font-weight: 500;
+    margin-top: 5px;
+  }
+}
+
+.dateTime {
+  display: flex;
+  margin-top: 30px;
+
+  &__iconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__icon {
+    height: 2rem;
+    margin-right: 50px;
+  }
+
+  &__details {
+    display: flex;
+    gap: 20px;
+  }
+
+  &__date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__day {
+    font-size: 35px;
+    font-weight: 500;
+  }
+
+  &__month {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  &__time {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px 0 2px 0;
+  }
+
+  &__dayOfWeek {
+    font-size: 20px;
+    font-weight: 400;
+  }
+
+  &__classTime {
+    font-size: 18px;
+  }
+}
+
+.children {
+  display: flex;
+  margin-top: 30px;
+
+  &__iconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__icon {
+    height: 2rem;
+    margin-right: 50px;
+  }
+
+  &__names {
+    font-size: 20px;
+    font-weight: 400;
+  }
+}
+
+.classURL {
+  display: flex;
+  margin-top: 30px;
+
+  &__iconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__icon {
+    height: 2rem;
+    margin-right: 50px;
+  }
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 20px;
+}
+
+.notification {
+  display: flex;
+  font-size: 0.8rem;
+  margin-top: 40px;
+
+  &__iconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__icon {
+    height: 1.5rem;
+    margin-right: 10px;
+    color: $red-alert;
+  }
+
+  &__span {
+    color: $red-alert;
+    font-weight: 500;
+  }
+}

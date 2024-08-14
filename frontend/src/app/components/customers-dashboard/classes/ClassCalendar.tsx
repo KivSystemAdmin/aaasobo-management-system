@@ -7,14 +7,14 @@ import { CalendarApi } from "@fullcalendar/core/index.js";
 import {
   formatFiveMonthsLaterEndOfMonth,
   getClassStartAndEndTimes,
+  isPastPreviousDayDeadline,
 } from "@/app/helper/dateUtils";
-import {
-  fetchClassesForCalendar,
-  getClassesByCustomerId,
-} from "@/app/helper/classesApi";
+import { cancelClass, fetchClassesForCalendar } from "@/app/helper/classesApi";
 import RedirectButton from "@/app/components/RedirectButton";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Modal from "@/app/components/Modal";
+import ActionButton from "../../ActionButton";
+import ClassesTable from "../../ClassesTable";
 
 function ClassCalendar({
   customerId,
@@ -24,61 +24,84 @@ function ClassCalendar({
   isAdminAuthenticated?: boolean;
 }) {
   const [classesForCalendar, setClassesForCalendar] = useState<EventType[]>([]);
+  const [classes, setClasses] = useState<ClassForCalendar[] | null>(null);
   const [calendarApi, setCalendarApi] = useState<CalendarApi | null>(null);
   const [rebookableClasses, setRebookableClasses] = useState<
-    ClassType[] | undefined
+    ClassForCalendar[] | undefined
   >(undefined);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedClasses, setSelectedClasses] = useState<
+    { classId: number; classDateTime: string }[]
+  >([]);
+  const [isBookableClassesModalOpen, setIsBookableClassesModalOpen] =
+    useState(false);
+  const [isCancelingModalOpen, setIsCancelingModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const calendarRef = useRef<FullCalendar | null>(null);
 
-  useEffect(() => {
-    if (!customerId) return;
+  const fetchData = async () => {
+    try {
+      const classesData: ClassForCalendar[] = await fetchClassesForCalendar(
+        parseInt(customerId),
+        "customer",
+      );
 
-    const fetchData = async () => {
-      try {
-        const classes: ClassForCalendar[] = await fetchClassesForCalendar(
-          parseInt(customerId),
-          "customer",
+      setClasses(classesData);
+
+      const rebookableClasses = classesData
+        .filter(
+          (eachClass) =>
+            (eachClass.status === "canceledByCustomer" &&
+              eachClass.isRebookable) ||
+            (eachClass.status === "canceledByInstructor" &&
+              eachClass.isRebookable),
+        )
+        .sort((a, b) => {
+          const dateA = new Date(a.dateTime).getTime();
+          const dateB = new Date(b.dateTime).getTime();
+          return dateA - dateB;
+        });
+      setRebookableClasses(rebookableClasses);
+
+      const formattedClasses = classesData.map((eachClass) => {
+        const { start, end } = getClassStartAndEndTimes(
+          eachClass.dateTime,
+          "Asia/Tokyo",
         );
 
-        const formattedClasses = classes.map((eachClass) => {
-          const { start, end } = getClassStartAndEndTimes(
-            eachClass.dateTime,
-            "Asia/Tokyo",
-          );
+        const color =
+          eachClass.status === "booked"
+            ? "#65b72f"
+            : eachClass.status === "completed"
+              ? "#b5c4ab"
+              : "#d9d9d9";
 
-          const color =
-            eachClass.status === "booked"
-              ? "#FF0000"
-              : eachClass.status === "completed"
-                ? "#99FF99"
-                : "#C0C0C0";
+        const childrenNames = eachClass.classAttendance.children
+          .map((child) => child.name)
+          .join(", ");
 
-          const childrenNames = eachClass.classAttendance.children
-            .map((child) => child.name)
-            .join(", ");
+        return {
+          classId: eachClass.id,
+          start,
+          end,
+          title: childrenNames,
+          color,
+          instructorIcon: eachClass.instructor?.icon,
+          instructorNickname: eachClass.instructor?.nickname,
+        };
+      });
 
-          return {
-            classId: eachClass.id,
-            start,
-            end,
-            title: childrenNames,
-            color,
-            instructorIcon: eachClass.instructor?.icon,
-            instructorNickname: eachClass.instructor?.nickname,
-          };
-        });
+      setClassesForCalendar(formattedClasses);
+    } catch (error) {
+      console.error("Failed to fetch classes:", error);
+      alert("Failed to get classes. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        setClassesForCalendar(formattedClasses);
-      } catch (error) {
-        console.error("Failed to fetch classes:", error);
-        alert("Failed to get classes. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
+  useEffect(() => {
     fetchData();
   }, [customerId]);
 
@@ -89,37 +112,70 @@ function ClassCalendar({
     }
   }, [calendarRef.current]);
 
-  useEffect(() => {
-    const fetchRebookableClassesByCustomerId = async (customerId: string) => {
+  const handleCancelingModalClose = () => {
+    setIsCancelingModalOpen(false);
+    setSelectedClasses([]);
+  };
+
+  const handleBulkCancel = async () => {
+    if (selectedClasses.length === 0) return;
+
+    // Get classes that have passes the previous day cancelation deadline
+    const pastPrevDayClasses = selectedClasses.filter((eachClass) =>
+      isPastPreviousDayDeadline(eachClass.classDateTime, "Asia/Tokyo"),
+    );
+
+    if (pastPrevDayClasses.length > 0) {
+      alert(
+        "Classes cannot be canceled on or after the scheduled day of the class.",
+      );
+      const pastPrevDayClassIds = new Set(
+        pastPrevDayClasses.map((pastClass) => pastClass.classId),
+      );
+      const updatedSelectedClasses = selectedClasses.filter(
+        (eachClass) => !pastPrevDayClassIds.has(eachClass.classId),
+      );
+      return setSelectedClasses(updatedSelectedClasses);
+    }
+
+    // Get classes that are before the previous day's deadline
+    const classesToCancel = selectedClasses.filter(
+      (eachClass) =>
+        !isPastPreviousDayDeadline(eachClass.classDateTime, "Asia/Tokyo"),
+    );
+
+    if (classesToCancel.length > 0) {
+      const confirmed = window.confirm(
+        `Are you sure you want to cancel these ${selectedClasses.length} classes?`,
+      );
+      if (!confirmed) return handleCancelingModalClose();
       try {
-        const classes: ClassType[] = await getClassesByCustomerId(customerId);
-        const rebookableClasses = classes.filter(
-          (eachClass) =>
-            (eachClass.status === "canceledByCustomer" &&
-              eachClass.isRebookable) ||
-            (eachClass.status === "canceledByInstructor" &&
-              eachClass.isRebookable),
+        await Promise.all(
+          classesToCancel.map((eachClass) => cancelClass(eachClass.classId)),
         );
-        setRebookableClasses(rebookableClasses);
+        setSelectedClasses([]);
+
+        // Re-fetch data to update the state
+        fetchData();
+        handleCancelingModalClose();
       } catch (error) {
-        console.error("Failed to fetch rebookable classes:", error);
-      } finally {
-        setIsLoading(false);
+        console.error("Failed to cancel classes:", error);
+        setError("Failed to cancel the classes. Please try again later.");
       }
-    };
-
-    fetchRebookableClassesByCustomerId(customerId);
-  }, []);
-
-  const handleModalOpen = () => {
-    if (rebookableClasses && rebookableClasses.length > 0) {
-      setIsModalOpen(true);
     }
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
+  const toggleSelectClass = (classId: number, classDateTime: string) => {
+    setSelectedClasses((prev) => {
+      const updated = prev.filter((item) => item.classId !== classId);
+      if (updated.length === prev.length) {
+        updated.push({ classId, classDateTime });
+      }
+      return updated;
+    });
   };
+
+  if (error) return <div>{error}</div>;
 
   return (
     // 'Page' is the parent component of 'CalendarHeader' and 'CalendarView' children components.
@@ -132,42 +188,46 @@ function ClassCalendar({
         <>
           <CalendarHeader calendarApi={calendarApi ?? null} />
 
-          <div className={styles.calendarInstruction}>
-            <div className={styles.calendarInstruction__legends}>
-              <span className={`${styles.legend} ${styles.legendBooked}`}>
-                booked
-              </span>
-              <span className={`${styles.legend} ${styles.legendCompleted}`}>
-                completed
-              </span>
-              <span className={`${styles.legend} ${styles.legendCanceled}`}>
-                canceled
-              </span>
-            </div>
-            <div className={styles.calendarInstruction__book}>
-              <p
-                onClick={handleModalOpen}
-                className={`${styles.bookableClasses} ${rebookableClasses && rebookableClasses.length > 0 ? styles.clickable : ""}`}
-              >
-                Bookable Classes: {rebookableClasses?.length ?? 0}
-              </p>
-              {isAdminAuthenticated ? (
-                <RedirectButton
-                  linkURL={`/admins/customer-list/${customerId}/classes/book`}
-                  btnText="Book Class"
-                  Icon={PlusIcon}
-                  className="bookBtn"
-                  disabled={rebookableClasses?.length === 0}
+          <div className={styles.calendarActions}>
+            <div className={styles.calendarActions__container}>
+              <div className={styles.calendarActions__canceling}>
+                <ActionButton
+                  btnText="Cancel Classes"
+                  className="cancelClasses"
+                  onClick={() => {
+                    setIsCancelingModalOpen(true);
+                  }}
                 />
-              ) : (
-                <RedirectButton
-                  linkURL={`/customers/${customerId}/classes/book`}
-                  btnText="Book Class"
-                  Icon={PlusIcon}
-                  className="bookBtn"
-                  disabled={rebookableClasses?.length === 0}
-                />
-              )}
+              </div>
+              <div className={styles.calendarActions__booking}>
+                <p
+                  onClick={() =>
+                    rebookableClasses &&
+                    rebookableClasses.length > 0 &&
+                    setIsBookableClassesModalOpen(true)
+                  }
+                  className={`${styles.bookableClasses} ${rebookableClasses && rebookableClasses.length > 0 ? styles.clickable : ""}`}
+                >
+                  Bookable Classes: {rebookableClasses?.length ?? 0}
+                </p>
+                {isAdminAuthenticated ? (
+                  <RedirectButton
+                    linkURL={`/admins/customer-list/${customerId}/classes/book`}
+                    btnText="Book Class"
+                    Icon={PlusIcon}
+                    className="bookClass"
+                    disabled={rebookableClasses?.length === 0}
+                  />
+                ) : (
+                  <RedirectButton
+                    linkURL={`/customers/${customerId}/classes/book`}
+                    btnText="Book Class"
+                    Icon={PlusIcon}
+                    className="bookClass"
+                    disabled={rebookableClasses?.length === 0}
+                  />
+                )}
+              </div>
             </div>
           </div>
 
@@ -176,13 +236,18 @@ function ClassCalendar({
             ref={calendarRef}
             events={classesForCalendar}
             // TODO: Fetch holidays from the backend
-            holidays={["2024-07-29", "2024-07-30", "2024-07-31"]}
+            // holidays={["2024-07-29", "2024-07-30", "2024-07-31"]}
             customerId={parseInt(customerId)}
             isAdminAuthenticated={isAdminAuthenticated}
+            fetchData={fetchData}
           />
-          <Modal isOpen={isModalOpen} onClose={handleModalClose}>
+
+          <Modal
+            isOpen={isBookableClassesModalOpen}
+            onClose={() => setIsBookableClassesModalOpen(false)}
+          >
             <div className={styles.modal}>
-              <h2>Rebookable Classes</h2>
+              <h2>Bookable Classes</h2>
               {/* Content of the Modal */}
               <ul className={styles.modal__list}>
                 {rebookableClasses?.map((eachClass, index) => (
@@ -195,6 +260,25 @@ function ClassCalendar({
                   </li>
                 ))}
               </ul>
+            </div>
+          </Modal>
+
+          <Modal
+            isOpen={isCancelingModalOpen}
+            onClose={handleCancelingModalClose}
+          >
+            <div className={styles.modal}>
+              <h2>Upcoming Classes</h2>
+              {/* Content of the Modal */}
+              <ClassesTable
+                classes={classes}
+                timeZone="Asia/Tokyo"
+                selectedClasses={selectedClasses}
+                toggleSelectClass={toggleSelectClass}
+                handleBulkCancel={handleBulkCancel}
+                userId={customerId}
+                isAdminAuthenticated
+              />
             </div>
           </Modal>
         </>

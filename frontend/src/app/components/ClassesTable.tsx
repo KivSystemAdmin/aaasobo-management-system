@@ -9,6 +9,7 @@ import ActionButton from "./ActionButton";
 import styles from "./ClassesTable.module.scss";
 import RedirectButton from "./RedirectButton";
 import Link from "next/link";
+import Image from "next/image";
 
 const ClassesTable = ({
   classes,
@@ -19,7 +20,7 @@ const ClassesTable = ({
   handleBulkCancel,
   isAdminAuthenticated,
 }: {
-  classes: ClassType[] | null;
+  classes: ClassForCalendar[] | ClassType[] | null;
   timeZone: string;
   selectedClasses: { classId: number; classDateTime: string }[];
   toggleSelectClass: (classId: number, classDateTime: string) => void;
@@ -31,9 +32,11 @@ const ClassesTable = ({
     return <div>No upcoming classes</div>;
   }
 
-  const bookedClasses = classes.filter(
-    (eachClass) => eachClass.status === "booked",
-  );
+  const bookedClasses = classes
+    .filter((eachClass) => eachClass.status === "booked")
+    .sort(
+      (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime(),
+    );
 
   if (bookedClasses.length === 0) {
     return <div>No upcoming classes</div>;
@@ -57,7 +60,7 @@ const ClassesTable = ({
                 <th className={styles.classesTable__th}>Time</th>
                 <th className={styles.classesTable__th}>Instructor</th>
                 <th className={styles.classesTable__th}>Children</th>
-                <th className={styles.classesTable__th}></th>
+                {/* <th className={styles.classesTable__th}></th> */}
               </tr>
             </thead>
             <tbody className={styles.classesTable__body}>
@@ -120,19 +123,35 @@ const ClassesTable = ({
                         <p>{japanTime}</p>
                       </div>
                     </td>
+
                     <td className={styles.classesTable__td}>
-                      {eachClass.instructor.nickname}
+                      <div>
+                        <Image
+                          src={`/instructors/${eachClass.instructor.icon}`}
+                          alt={eachClass.instructor.nickname}
+                          width={40}
+                          height={40}
+                          priority
+                          style={{
+                            borderRadius: "180px",
+                            border: "1.5px solid white",
+                            marginRight: "5px",
+                          }}
+                        />
+                      </div>
+                      <div>{eachClass.instructor.nickname}</div>
                     </td>
+
                     <td className={styles.classesTable__td}>
                       {eachClass.classAttendance.children
                         .map((child) => child.name)
                         .join(", ")}
                     </td>
-                    <td className={styles.classesTable__td}>
-                      {/* condition 1: before the day of the class => with 'Reschedule' btn*/}
-                      {/* condition 2: the same day of the class or after the class starts => 'Reschedule' btn*/}
+                    {/* <td className={styles.classesTable__td}> */}
+                    {/* condition 1: before the day of the class => with 'Reschedule' btn*/}
+                    {/* condition 2: the same day of the class or after the class starts => 'Reschedule' btn*/}
 
-                      {!pastPrevDayDeadline ? (
+                    {/* {!pastPrevDayDeadline ? (
                         isAdminAuthenticated ? (
                           <RedirectButton
                             linkURL={`/admins/customer-list/${userId}/classes/${eachClass.id}/reschedule`}
@@ -151,7 +170,7 @@ const ClassesTable = ({
                       ) : (
                         ""
                       )}
-                    </td>
+                    </td> */}
                   </tr>
                 );
               })}

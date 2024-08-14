@@ -378,7 +378,14 @@ export const getClassesForCustomerCalendar = async (
     const classes = await getClassesForCalendar(customerId, "customer");
 
     const classesData = classes.map((eachClass) => {
-      const { id, dateTime, instructor, status, classAttendance } = eachClass;
+      const {
+        id,
+        dateTime,
+        instructor,
+        status,
+        classAttendance,
+        isRebookable,
+      } = eachClass;
 
       return {
         id,
@@ -396,6 +403,7 @@ export const getClassesForCustomerCalendar = async (
           })),
         },
         status,
+        isRebookable,
       };
     });
 

@@ -4,6 +4,9 @@
 }
 
 .sidebar {
+  position: fixed;
+  height: 100vh;
+  overflow: auto;
   width: 15rem;
   flex: none;
 }
@@ -11,4 +14,7 @@
 .content {
   flex-grow: 1;
   padding: 1.5rem;
+  margin-left: 15rem;
+  height: 100vh;
+  overflow: auto;
 }

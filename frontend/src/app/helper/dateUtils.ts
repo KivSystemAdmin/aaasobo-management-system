@@ -210,3 +210,32 @@ export const formatDateToISO = (dateString: string): string => {
   }
   return date.toISOString();
 };
+
+// e.g., Monday, Tuesday ...
+export const getDayOfWeek = (dateString: string, timeZone: string): string => {
+  const date = new Date(dateString);
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    timeZone,
+  });
+  return formatter.format(date);
+};
+
+// e.g., JAN, FEB ...
+export const getShortMonth = (dateString: string, timeZone: string): string => {
+  const date = new Date(dateString);
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    timeZone,
+  });
+  return formatter.format(date).toUpperCase();
+};
+
+export const getDay = (dateString: string, timeZone: string): number => {
+  const date = new Date(dateString);
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    timeZone,
+  });
+  return parseInt(formatter.format(date), 10);
+};

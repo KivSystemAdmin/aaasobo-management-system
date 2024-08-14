@@ -135,7 +135,7 @@ type EventType = {
 type ClassForCalendar = {
   id: number;
   dateTime: string;
-  instructor?: Instructor;
+  instructor: Instructor;
   classAttendance: {
     children: Child[];
   };
@@ -144,6 +144,7 @@ type ClassForCalendar = {
     | "completed"
     | "canceledByCustomer"
     | "canceledByInstructor";
+  isRebookable: boolean;
 };
 
 type RecurringClassState = {

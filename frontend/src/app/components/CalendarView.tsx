@@ -1,4 +1,10 @@
-import React, { useRef, forwardRef, useImperativeHandle } from "react";
+import React, {
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  useState,
+  useEffect,
+} from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import FullCalendar from "@fullcalendar/react";
@@ -12,6 +18,10 @@ import {
   EventClickArg,
   EventContentArg,
 } from "@fullcalendar/core";
+import Modal from "./Modal";
+import { cancelClass, getClassesByCustomerId } from "../helper/classesApi";
+import ClassDetail from "./ClassDetail";
+import { isPastPreviousDayDeadline } from "../helper/dateUtils";
 
 type InstructorCalendarViewProps = {
   events: Array<{
@@ -27,6 +37,7 @@ type InstructorCalendarViewProps = {
   customerId?: number;
   instructorId?: number;
   isAdminAuthenticated?: boolean;
+  fetchData: () => void;
 };
 
 type CalendarViewRefType = {
@@ -39,11 +50,39 @@ const CalendarView = forwardRef<
   InstructorCalendarViewProps
 >(
   (
-    { events, holidays, customerId, instructorId, isAdminAuthenticated },
+    {
+      events,
+      holidays,
+      customerId,
+      instructorId,
+      isAdminAuthenticated,
+      fetchData,
+    },
     ref,
   ) => {
+    const [isClassDetailModalOpen, setIsClassDetailModalOpen] = useState(false);
+    const [classes, setClasses] = useState<ClassType[] | null>(null);
+    // const [selectedCLassId, setSelectedClassId] = useState<number | null>(null);
+    const [classDetail, setClassDetail] = useState<ClassType | null>(null);
     const calendarRef = useRef<FullCalendar | null>(null);
     const router = useRouter();
+
+    const fetchClasses = async () => {
+      if (!customerId) return;
+
+      try {
+        const classes: ClassType[] = await getClassesByCustomerId(
+          customerId.toString(),
+        );
+        setClasses(classes);
+      } catch (error) {
+        console.error("Failed to fetch classes:", error);
+      }
+    };
+
+    useEffect(() => {
+      fetchClasses();
+    }, [customerId]);
 
     // Uses useImperativeHandle to define the getApi method and expose it to the parent Page component
     useImperativeHandle(ref, () => ({
@@ -124,15 +163,22 @@ const CalendarView = forwardRef<
         }
         router.push(`/instructors/${instructorId}/class-schedule/${classId}`);
       } else if (customerId) {
-        if (isAdminAuthenticated) {
-          router.push(`/admins/customer-list/${customerId}/classes/${classId}`);
-          return;
-        }
-        router.push(`/customers/${customerId}/classes/${classId}`);
+        if (!classes) return;
+        const selectedClassDetail = classes.find(
+          (eachClass) => eachClass.id === classId,
+        );
+        selectedClassDetail && setClassDetail(selectedClassDetail);
+        setIsClassDetailModalOpen(true);
+        // If the Afmin dashboard uses class details page, instead of the modal, the code below should be used
+        // if (isAdminAuthenticated) {
+        //   router.push(`/admins/customer-list/${customerId}/classes/${classId}`);
+        //   return;
+        // }
+        // router.push(`/customers/${customerId}/classes/${classId}`);
       }
     };
 
-    // To resoleve the complaint
+    // To resoleve the VS code complaint
     CalendarView.displayName = "CalendarView";
 
     const validRange = () => {
@@ -147,46 +193,96 @@ const CalendarView = forwardRef<
       };
     };
 
+    const handleModalClose = () => {
+      setClassDetail(null);
+      setIsClassDetailModalOpen(false);
+    };
+
+    const handleCancel = async (classId: number, classDateTime: string) => {
+      const isPastPreviousDay = isPastPreviousDayDeadline(
+        classDateTime,
+        "Asia/Tokyo",
+      );
+
+      if (isPastPreviousDay)
+        return alert(
+          "Classes cannot be canceled on or after the scheduled day of the class.",
+        );
+
+      const confirmed = window.confirm(
+        "Are you sure you want to cancel this class?",
+      );
+      if (!confirmed) return;
+      try {
+        await cancelClass(classId);
+        fetchData();
+        fetchClasses();
+        handleModalClose();
+      } catch (error) {
+        console.error("Failed to cancel the class:", error);
+        // setError("Failed to cancel the class. Please try again later.");
+      }
+    };
+
     return (
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        headerToolbar={false}
-        views={{
-          timeGridWeek: {
-            slotMinTime: "09:00:00",
-            slotMaxTime: "21:30:00",
-            slotLabelFormat: {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
+      <>
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
+          headerToolbar={false}
+          views={{
+            timeGridWeek: {
+              slotMinTime: "09:00:00",
+              slotMaxTime: "21:30:00",
+              slotLabelFormat: {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              },
             },
-          },
-          timeGridDay: {
-            slotMinTime: "09:00:00",
-            slotMaxTime: "21:30:00",
-            slotLabelFormat: {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
+            timeGridDay: {
+              slotMinTime: "09:00:00",
+              slotMaxTime: "21:30:00",
+              slotLabelFormat: {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              },
             },
-          },
-        }}
-        events={events}
-        eventClick={handleEventClick}
-        eventContent={renderEventContent}
-        validRange={validRange}
-        // TODO: After the 'Holiday' table is created, apply the styling to them
-        // dayCellDidMount={dayCellDidMount}
-        locale="en"
-        contentHeight="auto"
-        dayMaxEvents={true}
-        editable={false}
-        selectable={false}
-        eventDisplay="block"
-        allDaySlot={false}
-      />
+          }}
+          events={events}
+          eventClick={handleEventClick}
+          eventContent={renderEventContent}
+          validRange={validRange}
+          // TODO: After the 'Holiday' table is created, apply the styling to them
+          // dayCellDidMount={dayCellDidMount}
+          locale="en"
+          contentHeight="auto"
+          dayMaxEvents={true}
+          editable={false}
+          selectable={false}
+          eventDisplay="block"
+          allDaySlot={false}
+        />
+
+        <Modal isOpen={isClassDetailModalOpen} onClose={handleModalClose}>
+          <div className={styles.modal}>
+            {customerId ? (
+              <ClassDetail
+                classDetail={classDetail}
+                customerId={customerId.toString()}
+                timeZone="Asia/Tokyo"
+                handleCancel={handleCancel}
+                isAdminAuthenticated
+                handleModalClose={handleModalClose}
+              />
+            ) : (
+              <p>No customer ID available</p>
+            )}
+          </div>
+        </Modal>
+      </>
     );
   },
 );

@@ -1,3 +1,5 @@
+@import "../variables.module.scss";
+
 .btnComponent {
   display: inline-block;
   align-items: center;
@@ -35,7 +37,7 @@
 
 .icon {
   height: 1.25rem;
-  margin-left: 0.75rem;
+  margin-left: 0.5rem;
 }
 
 .backBtn,
@@ -98,6 +100,94 @@
   &:hover {
     background-color: #0056b3;
     transform: scale(1.02);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.5);
+  }
+}
+
+.cancelBooking {
+  background-color: $red-alert;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+  border: 1px solid transparent;
+  color: #ffffff;
+  padding: 0.5rem 0;
+  border-radius: 10px;
+  width: 140px;
+
+  &:hover {
+    background-color: $red-alert-hover;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.5);
+  }
+}
+
+.back {
+  background-color: $back-btn-bc;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+  border: 1px solid transparent;
+  color: #333333;
+  padding: 0.5rem 0;
+  border-radius: 10px;
+  width: 140px;
+
+  &:hover {
+    background-color: $back-btn-bc-hover;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.5);
+  }
+}
+
+.bookClass {
+  background-color: $green-success;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+  border: 1px solid transparent;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  box-shadow:
+    rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px; // width: 140px;
+
+  &:hover {
+    background-color: $green-success-hover;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.5);
+  }
+}
+
+.cancelClasses {
+  background-color: $gray-background;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+  border: 1px solid transparent;
+  color: #333333;
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  box-shadow:
+    rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px; // width: 140px;
+
+  &:hover {
+    background-color: $gray-background-hover;
   }
 
   &:focus-visible {

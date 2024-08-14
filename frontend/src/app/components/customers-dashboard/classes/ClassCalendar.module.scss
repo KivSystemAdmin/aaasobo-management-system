@@ -1,49 +1,57 @@
-.calendarInstruction {
+.calendarActions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  margin-bottom: 10px;
 
-  &__legends {
+  &__container {
     display: flex;
-    gap: 5px;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    gap: 20px;
+  }
+  // &__legends {
+  //   display: flex;
+  //   gap: 5px;
+  //   margin-top: 15px;
+  //   margin-bottom: 15px;
+  // }
+
+  // .legend {
+  //   color: white;
+  //   font-size: 0.8rem;
+  //   border-radius: 6px;
+  //   padding: 3px 6px;
+  // }
+
+  // .legendBooked {
+  //   background-color: #ff0000;
+  // }
+
+  // .legendCanceled {
+  //   background-color: #c0c0c0;
+  //   text-decoration: line-through;
+  // }
+
+  // .legendCompleted {
+  //   background-color: #99ff99;
+  // }
+  &__canceling {
   }
 
-  .legend {
-    color: white;
-    font-size: 0.8rem;
-    border-radius: 6px;
-    padding: 3px 6px;
-  }
-
-  .legendBooked {
-    background-color: #ff0000;
-  }
-
-  .legendCanceled {
-    background-color: #c0c0c0;
-    text-decoration: line-through;
-  }
-
-  .legendCompleted {
-    background-color: #99ff99;
-  }
-
-  &__book {
+  &__booking {
     display: flex;
     align-items: center;
     gap: 15px;
-  }
 
-  .bookableClasses {
-    cursor: default;
-    color: gray;
-    text-decoration: none;
+    .bookableClasses {
+      cursor: default;
+      color: gray;
+      text-decoration: none;
+      font-size: 0.8rem;
 
-    &.clickable {
-      cursor: pointer;
-      color: black;
-      text-decoration: underline;
+      &.clickable {
+        cursor: pointer;
+        color: black;
+        text-decoration: underline;
+      }
     }
   }
 }
