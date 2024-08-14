@@ -17,9 +17,11 @@ type LinkProps = {
 function SideNav({
   links,
   userName,
+  logout,
 }: {
   links: LinkProps[];
   userName: string;
+  logout: () => void;
 }) {
   const pathname = usePathname();
 
@@ -56,7 +58,7 @@ function SideNav({
           );
         })}
 
-        <div className={`${styles.link} ${styles.logOut}`}>
+        <div className={`${styles.link} ${styles.logout}`} onClick={logout}>
           <ArrowLeftStartOnRectangleIcon className={styles.icon} />
           <p className={styles.linkText}>Log Out</p>
         </div>

@@ -222,3 +222,11 @@ export const fetchInstructorAvailabilitiesForTomorrowAndAfter = async (
     throw error;
   }
 };
+
+export const logoutInstructor = async (): Promise<Response<undefined>> => {
+  const response = await fetch("http://localhost:4000/instructors/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+  return response.ok ? undefined : response.json();
+};

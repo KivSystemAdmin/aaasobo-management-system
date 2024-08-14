@@ -4,7 +4,10 @@ import SideNav from "@/app/components/SideNav";
 import styles from "./layout.module.scss";
 import { UserIcon, CalendarIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { FC, SVGProps, useEffect, useState } from "react";
-import { getInstructor } from "@/app/helper/instructorsApi";
+import { getInstructor, logoutInstructor } from "@/app/helper/instructorsApi";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/navigation";
 
 type Link = {
   name: string;
@@ -20,6 +23,7 @@ export default function Layout({
   params: { id: string };
 }) {
   const [instructorName, setInstructorName] = useState<string | null>(null);
+  const router = useRouter();
 
   const instructorId = parseInt(params.id);
   const links: Link[] = [
@@ -53,10 +57,22 @@ export default function Layout({
     fetchInstructor();
   }, []);
 
+  const logout = async () => {
+    const response = await logoutInstructor();
+    if (!response) {
+      router.push("/instructors/login");
+      return;
+    }
+    toast.error(response.message);
+  };
+
   return (
     <div className={styles.container}>
+      <ToastContainer />
       <div className={styles.sidebar}>
-        {instructorName && <SideNav links={links} userName={instructorName} />}
+        {instructorName && (
+          <SideNav links={links} userName={instructorName} logout={logout} />
+        )}
       </div>
       <div className={styles.content}>{children}</div>
     </div>

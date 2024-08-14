@@ -10,6 +10,7 @@ import {
 } from "../services/subscriptionsService";
 import { getWeeklyClassTimes } from "../services/plansService";
 import { createNewRecurringClass } from "../services/recurringClassesService";
+import { logout } from "../helper/logout";
 
 export const registerCustomer = async (req: Request, res: Response) => {
   const { name, email, password, prefecture } = req.body;
@@ -60,6 +61,12 @@ export const loginCustomer = async (req: Request, res: Response) => {
     // Exclude the password from the response.
     const { password: _, ...customerWithoutPassword } = customer;
 
+    // Set the session.
+    req.session = {
+      userId: customer.id,
+      userType: "customer",
+    };
+
     res.status(200).json({
       redirectUrl: `/customers/${customer.id}/classes`,
       message: "Customer logged in successfully",
@@ -68,6 +75,10 @@ export const loginCustomer = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ error });
   }
+};
+
+export const logoutCustomer = async (req: Request, res: Response) => {
+  return logout(req, res, "customer");
 };
 
 export const getCustomersClasses = async (req: Request, res: Response) => {

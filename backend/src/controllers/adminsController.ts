@@ -7,6 +7,7 @@ import {
 import { getAllCustomers } from "../services/customersService";
 import { getAllChildren } from "../services/childrenService";
 import bcrypt from "bcrypt";
+import { logout } from "../helper/logout";
 
 const saltRounds = 12;
 
@@ -49,10 +50,7 @@ export const loginAdminController = async (req: Request, res: Response) => {
 
 // Logout Admin
 export const logoutAdminController = async (req: Request, res: Response) => {
-  req.session = null;
-  res.status(200).json({
-    message: "Admin logged out successfully",
-  });
+  return logout(req, res, "admin");
 };
 
 // Register Admin

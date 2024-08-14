@@ -28,6 +28,7 @@ function Login() {
 
     const response = await fetch(loginURL, {
       method: "POST",
+      credentials: "include",
       headers,
       body,
     });

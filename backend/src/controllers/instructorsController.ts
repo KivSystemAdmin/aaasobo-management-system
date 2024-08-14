@@ -17,6 +17,7 @@ import {
 } from "../services/instructorsService";
 import { type RequestWithId } from "../middlewares/parseId.middleware";
 import bcrypt from "bcrypt";
+import { logout } from "../helper/logout";
 
 // Fetch all the instructors and their availabilities
 export const getAllInstructorsAvailabilitiesController = async (
@@ -419,4 +420,11 @@ export const loginInstructorController = async (
   } catch (error) {
     res.status(500).json({ error });
   }
+};
+
+export const logoutInstructorController = async (
+  req: Request,
+  res: Response,
+) => {
+  return logout(req, res, "instructor");
 };

@@ -44,3 +44,22 @@ export const editCustomer = async (
 
   return data;
 };
+
+type Response<E> =
+  | {
+      ok: true;
+    }
+  | {
+      ok: false;
+      error: E;
+    };
+
+export const logoutCustomer = async (): Promise<Response<string>> => {
+  const response = await fetch("http://localhost:4000/customers/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+  return response.ok
+    ? { ok: true }
+    : { ok: false, error: (await response.json()).message };
+};
