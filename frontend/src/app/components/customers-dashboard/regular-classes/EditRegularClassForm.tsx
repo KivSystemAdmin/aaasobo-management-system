@@ -10,7 +10,10 @@ import {
 import RecurringClassEntry from "./RecurringClassEntry";
 import { useRouter } from "next/navigation";
 import { formatTime, getWeekday } from "@/app/helper/dateUtils";
-import Link from "next/link";
+import styles from "./EditRegularClassForm.module.scss";
+import RedirectButton from "../../RedirectButton";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function EditRegularClassForm({
   customerId,
@@ -18,7 +21,7 @@ function EditRegularClassForm({
   isAdminAuthenticated,
 }: {
   customerId: string;
-  subscriptionId: number;
+  subscriptionId?: number | null;
   isAdminAuthenticated?: boolean;
 }) {
   const [instructorsData, setInstructorsData] = useState<Instructor[]>();
@@ -47,6 +50,9 @@ function EditRegularClassForm({
     };
 
     const createInitialStates = async () => {
+      if (!subscriptionId) {
+        return;
+      }
       try {
         const data = await getRecurringClassesBySubscriptionId(subscriptionId);
 
@@ -85,7 +91,7 @@ function EditRegularClassForm({
     fetchInstructors();
     fetchChildrenByCustomerId(customerId);
     createInitialStates();
-  }, [customerId]);
+  }, [customerId, subscriptionId]);
 
   const onClickHandler = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -96,14 +102,14 @@ function EditRegularClassForm({
 
     // If the start date doesn't have value, return it.
     if (!startDate) {
-      alert("Please enter a start date");
+      toast.warning("Please enter Start From date");
       return;
     }
 
     // Find the corresponding state in keepStates
     const prevState = keepStates.find((s) => s.id === state.id);
     if (!prevState) {
-      alert("Previous state not found");
+      console.error("Previous state not found");
       return;
     }
 
@@ -118,11 +124,14 @@ function EditRegularClassForm({
     const stateTime = state.time === prevState.time;
 
     if (stateChildren && stateInstructorId && stateDay && stateTime) {
-      alert("Please select a new instructor, day, time and children");
+      toast.warning("Please select a new instructor, day, time and children");
       return;
     }
 
     try {
+      if (!subscriptionId) {
+        return;
+      }
       const data = await editRecurringClass(
         state.id,
         subscriptionId,
@@ -130,16 +139,13 @@ function EditRegularClassForm({
         state,
         startDate,
       );
-      alert(data.message);
 
-      if (isAdminAuthenticated) {
-        // Redirect the user to regular-classes page of admin dashboard
-        router.push(`/admins/customer-list/${customerId}`);
-        return;
-      }
+      // Set the URL depending on authenticated admin or not.
+      const targetURL = isAdminAuthenticated
+        ? `/admins/customer-list/${customerId}?message=${encodeURIComponent(data.message)}`
+        : `/customers/${customerId}/regular-classes?message=${encodeURIComponent(data.message)}`;
 
-      // Redirect the user to regular-classes page of customer dashboard
-      router.push(`/customers/${customerId}/regular-classes`);
+      router.push(targetURL);
     } catch (error) {
       console.error("Failed to edit a new recurring class data:", error);
     }
@@ -151,15 +157,16 @@ function EditRegularClassForm({
 
   return (
     <div>
-      <table>
-        <thead>
+      <ToastContainer />
+      <table className={styles.table}>
+        <thead className={styles.header}>
           <tr>
             <th></th>
-            <th>Instructor</th>
-            <th>Day</th>
-            <th>Time</th>
-            <th>Children</th>
-            <th>Start From</th>
+            <th className={styles.headerText}>Instructor</th>
+            <th className={styles.headerText}>Day</th>
+            <th className={styles.headerText}>Time</th>
+            <th className={styles.headerText}>Children</th>
+            <th className={styles.headerText}>Start Date</th>
             <th></th>
           </tr>
         </thead>
@@ -181,11 +188,19 @@ function EditRegularClassForm({
           ))}
         </tbody>
       </table>
-      <div>
+      <div className={styles.buttonWrapper}>
         {isAdminAuthenticated ? (
-          <Link href={`/admins/customer-list/${customerId}`}>Back</Link>
+          <RedirectButton
+            btnText="Back"
+            linkURL={`/admins/customer-list/${customerId}`}
+            className="backBtn"
+          />
         ) : (
-          <Link href={`/customers/${customerId}/regular-classes`}>Back</Link>
+          <RedirectButton
+            btnText="Back"
+            linkURL={`/customers/${customerId}/regular-classes`}
+            className="backBtn"
+          />
         )}
       </div>
     </div>

@@ -41,3 +41,21 @@ export const registerSubscription = async (
     throw error;
   }
 };
+
+// GET subscription by a subscription id
+export const getSubscriptionById = async (subscriptionId: number) => {
+  try {
+    const response = await fetch(
+      `http://localhost:4000/subscriptions/${subscriptionId}`,
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const subscription = await response.json();
+
+    return subscription;
+  } catch (error) {
+    console.error("Failed to fetch subscription:", error);
+    throw error;
+  }
+};

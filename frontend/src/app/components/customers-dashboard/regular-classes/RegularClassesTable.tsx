@@ -3,14 +3,27 @@
 import { formatTime, getEndTime, getWeekday } from "@/app/helper/dateUtils";
 import { getRecurringClassesBySubscriptionId } from "@/app/helper/recurringClassesApi";
 import React, { useEffect, useState } from "react";
+import ActionButton from "../../ActionButton";
+import { useRouter } from "next/navigation";
+import styles from "./RegularClassesTable.module.scss";
+import { CheckCircleIcon, ArrowUpCircleIcon } from "@heroicons/react/24/solid";
 
-function RegularClassesTable({ subscriptionId }: { subscriptionId: number }) {
+function RegularClassesTable({
+  subscriptionId,
+  isAdminAuthenticated,
+  customerId,
+}: {
+  subscriptionId: number;
+  isAdminAuthenticated?: boolean | null;
+  customerId: string;
+}) {
   const [currRecurringClasses, setCurrRecurringClasses] = useState<
     RecurringClass[]
   >([]);
   const [upcomingRecurringClasses, setUpcomingRecurringClasses] = useState<
     RecurringClass[]
   >([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchRecurringClassesBySubscriptionId = async () => {
@@ -44,20 +57,45 @@ function RegularClassesTable({ subscriptionId }: { subscriptionId: number }) {
     fetchRecurringClassesBySubscriptionId();
   }, [subscriptionId]);
 
+  const handleEditRegularClasses = () => {
+    if (isAdminAuthenticated) {
+      router.push(
+        `/admins/customer-list/${customerId}/regular-classes/edit?subscriptionId=${subscriptionId}`,
+      );
+      return;
+    }
+    router.push(
+      `/customers/${customerId}/regular-classes/edit?subscriptionId=${subscriptionId}`,
+    );
+  };
+
   return (
     <div>
       {currRecurringClasses.length > 0 && (
         <div>
-          <h4>Current Regular Class</h4>
+          <div className={styles.subheading}>
+            <CheckCircleIcon className={styles.icon} />
+            <h4>Current Regular Class</h4>
+          </div>
           <Table recurringClasses={currRecurringClasses} />
         </div>
       )}
       {upcomingRecurringClasses.length > 0 && (
         <div>
-          <h4>Upcoming Regular Class</h4>
+          <div className={styles.subheading}>
+            <ArrowUpCircleIcon className={styles.icon} />
+            <h4>Upcoming Regular Class</h4>
+          </div>
           <Table recurringClasses={upcomingRecurringClasses} />
         </div>
       )}
+      <div className={styles.buttonWrapper}>
+        <ActionButton
+          className="editBtn"
+          onClick={handleEditRegularClasses}
+          btnText="Edit Regular Classes"
+        />
+      </div>
     </div>
   );
 }
@@ -66,17 +104,17 @@ export default RegularClassesTable;
 
 function Table({ recurringClasses }: { recurringClasses: RecurringClass[] }) {
   return (
-    <table>
-      <thead>
+    <table className={styles.table}>
+      <thead className={styles.header}>
         <tr>
           <th></th>
-          <th>Instructor</th>
-          <th>Day</th>
-          <th>Time</th>
-          <th>Children</th>
-          <th>Class URL</th>
-          <th>Start From</th>
-          <th>End Date</th>
+          <th className={styles.headerText}>Instructor</th>
+          <th className={styles.headerText}>Day</th>
+          <th className={styles.headerText}>Time</th>
+          <th className={styles.headerText}>Children</th>
+          <th className={styles.headerText}>Class URL</th>
+          <th className={styles.headerText}>Start Date</th>
+          <th className={styles.headerText}>End Date</th>
           <th></th>
         </tr>
       </thead>
@@ -99,29 +137,40 @@ function Table({ recurringClasses }: { recurringClasses: RecurringClass[] }) {
           }
 
           return (
-            <tr key={recurringClass.id}>
-              <td>{index + 1}</td>
-              <td>{recurringClass.instructor?.nickname}</td>
-              <td>{day}</td>
+            <tr key={recurringClass.id} className={styles.body}>
+              <td className={styles.bodyText}>{index + 1}</td>
+              <td className={styles.bodyText}>
+                {recurringClass.instructor?.nickname}
+              </td>
+              <td className={styles.bodyText}>{day}</td>
               {startTime !== null ? (
-                <td>
+                <td className={styles.bodyText}>
                   {startTime}-{endTime}
                 </td>
               ) : (
                 <td></td>
               )}
-              <td>
+              <td className={styles.bodyText}>
                 {recurringClass.recurringClassAttendance
                   .map((attendance) => attendance.children.name)
                   .join(", ")}
               </td>
-              <td>{recurringClass.instructor?.classURL}</td>
-              <td>
+              <td className={`${styles.bodyText} ${styles.url}`}>
+                <a
+                  href={recurringClass.instructor?.classURL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.link}
+                >
+                  {recurringClass.instructor?.classURL}
+                </a>
+              </td>
+              <td className={styles.bodyText}>
                 {recurringClass.dateTime
                   ? recurringClass.dateTime.toString().split("T")[0]
                   : ""}
               </td>
-              <td>
+              <td className={styles.bodyText}>
                 {recurringClass.endAt
                   ? recurringClass.endAt.toString().split("T")[0]
                   : ""}

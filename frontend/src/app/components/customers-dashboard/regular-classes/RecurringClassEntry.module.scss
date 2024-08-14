@@ -1,0 +1,31 @@
+@import "../../../variables.module.scss";
+
+.body {
+  background-color: white;
+  font-size: 0.8rem;
+
+  &:hover {
+    background-color: $yellow-selected;
+  }
+}
+
+.bodyText {
+  padding: 0.5rem;
+  border-bottom: 1.5px solid $gray-background;
+
+  select,
+  input[type="date"] {
+    width: 100%;
+    padding: 0.25rem;
+    border-radius: 0.375rem;
+    border: 1px solid $gray-background;
+  }
+
+  input[type="checkbox"] {
+    margin-right: 0.3rem;
+  }
+
+  label {
+    display: flex;
+  }
+}

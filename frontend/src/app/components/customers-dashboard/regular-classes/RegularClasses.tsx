@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { getSubscriptionsByCustomerId } from "@/app/helper/subscriptionsApi";
 import ActionButton from "@/app/components/ActionButton";
 import CurrentSubscription from "@/app/components/customers-dashboard/regular-classes/CurrentSubscription";
@@ -21,15 +20,6 @@ function RegularClasses({
   const handleAddRegularClass = () => {
     setShowAddPlan(true);
   };
-  const router = useRouter();
-
-  const handleEditRegularClasses = () => {
-    if (isAdminAuthenticated) {
-      router.push(`/admins/customer-list/${customerId}/regular-classes/edit`);
-      return;
-    }
-    router.push(`/customers/${customerId}/regular-classes/edit`);
-  };
 
   useEffect(() => {
     const fetchSubscription = async () => {
@@ -43,6 +33,10 @@ function RegularClasses({
     fetchSubscription();
   }, [customerId]);
 
+  if (!subscriptionsData) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <h3>Regular Classes</h3>
@@ -52,11 +46,11 @@ function RegularClasses({
           btnText="Add Subscription"
         />
       ) : null}
-      <ActionButton
-        onClick={handleEditRegularClasses}
-        btnText="Edit Regular Classes"
+      <CurrentSubscription
+        subscriptionsData={subscriptionsData}
+        customerId={customerId}
+        isAdminAuthenticated={isAdminAuthenticated}
       />
-      <CurrentSubscription subscriptionsData={subscriptionsData} />
       {showAddPlan && <AddSubscription customerId={customerId} />}
     </>
   );

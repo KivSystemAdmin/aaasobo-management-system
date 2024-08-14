@@ -8,6 +8,8 @@ import {
 } from "@/app/helper/instructorsApi";
 import { getRecurringClassesByInstructorId } from "@/app/helper/recurringClassesApi";
 import { useEffect, useState } from "react";
+import styles from "./RecurringClassEntry.module.scss";
+import ActionButton from "../../ActionButton";
 
 function RecurringClassEntry({
   state,
@@ -41,8 +43,6 @@ function RecurringClassEntry({
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const [selectedDate, setSelectedDate] = useState("");
   const [slots, setSlots] = useState<SlotsOfDays>(emptySlots);
-  const [unavailableSlots, setUnavailableSlots] =
-    useState<SlotsOfDays>(emptySlots);
   const [times, setTimes] = useState<string[]>([]);
 
   // Get tomorrow's date
@@ -83,7 +83,6 @@ function RecurringClassEntry({
             newUnavailableSlots[day].push(time);
           },
         );
-        setUnavailableSlots(newUnavailableSlots);
 
         const data = await fetchInstructorRecurringAvailabilities(instructorId);
         const newSlots: SlotsOfDays = {
@@ -125,8 +124,13 @@ function RecurringClassEntry({
   }, [instructorId]);
 
   const handleDayChange = (day: Day) => {
-    setState({ ...state, day });
-    setTimes(slots[day] || []);
+    const availableTimes = slots[day] || [];
+    setState({
+      ...state,
+      day,
+      time: availableTimes.length > 0 ? state.time : "",
+    });
+    setTimes(availableTimes);
   };
 
   const handleChildChange = (
@@ -150,10 +154,10 @@ function RecurringClassEntry({
   }
 
   return (
-    <tr>
-      <td>{index + 1}</td>
+    <tr className={styles.body}>
+      <td className={styles.bodyText}>{index + 1}</td>
 
-      <td>
+      <td className={styles.bodyText}>
         <select
           name="instructors"
           value={instructorId || ""}
@@ -171,7 +175,7 @@ function RecurringClassEntry({
           })}
         </select>
       </td>
-      <td>
+      <td className={styles.bodyText}>
         <select
           name="days"
           value={day || ""}
@@ -187,7 +191,7 @@ function RecurringClassEntry({
           ))}
         </select>
       </td>
-      <td>
+      <td className={styles.bodyText}>
         <select
           name="times"
           value={time || ""}
@@ -207,7 +211,7 @@ function RecurringClassEntry({
           )}
         </select>
       </td>
-      <td>
+      <td className={styles.bodyText}>
         {childList.map((child) => {
           const childrenIdsSet = new Set(childrenIds);
           return (
@@ -223,7 +227,7 @@ function RecurringClassEntry({
           );
         })}
       </td>
-      <td>
+      <td className={styles.bodyText}>
         <input
           type="date"
           value={selectedDate}
@@ -231,13 +235,12 @@ function RecurringClassEntry({
           min={tomorrowFormatted}
         />
       </td>
-      <td>
-        <button
-          type="button"
+      <td className={styles.bodyText}>
+        <ActionButton
+          className="editBtn"
           onClick={(event) => onClickHandler(event, state, selectedDate)}
-        >
-          Edit
-        </button>
+          btnText="Edit"
+        />
       </td>
     </tr>
   );

@@ -12,6 +12,7 @@ import {
   SlotsOfDays,
 } from "@/app/helper/instructorsApi";
 import { formatTime, getWeekday } from "@/app/helper/dateUtils";
+import styles from "./InstructorsSchedule.module.scss";
 
 function InstructorsSchedule() {
   const [instructors, selectedInstructorId, onSelectedInstructorIdChange] =
@@ -65,13 +66,15 @@ function InstructorsSchedule() {
 
   return (
     <div>
-      <div>Check Instructor's Schedule</div>
-      <InstructorSelect
-        instructors={instructors}
-        id={selectedInstructorId}
-        onChange={onSelectedInstructorIdChange}
-      />
-      <ScheduleCalendar slotsOfDays={slots} setSlotsOfDays={setSlots} />
+      <h3 className={styles.subheading}>Check Instructor's Schedule</h3>
+      <div className={styles.container}>
+        <InstructorSelect
+          instructors={instructors}
+          id={selectedInstructorId}
+          onChange={onSelectedInstructorIdChange}
+        />
+        <ScheduleCalendar slotsOfDays={slots} setSlotsOfDays={setSlots} />
+      </div>
     </div>
   );
 }
