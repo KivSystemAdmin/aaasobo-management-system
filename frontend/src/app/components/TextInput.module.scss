@@ -1,7 +1,7 @@
 @import "../variables.module.scss";
 
 .inputWrapper {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-size: 0.9rem;
 }
 
@@ -30,4 +30,9 @@
 .icon {
   display: flex;
   padding-right: 0.5rem;
+}
+
+.required {
+  color: $red-alert;
+  font-size: 0.8rem;
 }

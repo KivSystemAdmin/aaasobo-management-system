@@ -8,6 +8,7 @@ type TextInputProps = {
   placeholder: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   icon?: React.ReactNode;
+  inputRequired?: boolean;
 };
 
 function TextInput({
@@ -17,11 +18,13 @@ function TextInput({
   placeholder,
   onChange,
   icon,
+  inputRequired,
 }: TextInputProps) {
   return (
     <div className={styles.inputWrapper}>
       <label className={styles.label}>
         {label}
+        {inputRequired ? <span className={styles.required}>*</span> : ""}
         <div className={styles.inputContainer}>
           {icon ? <div className={styles.icon}>{icon}</div> : ""}
           <input
