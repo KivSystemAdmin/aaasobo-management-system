@@ -8,6 +8,7 @@ import { useTabSelect } from "@/app/hooks/useTabSelect";
 
 function Page({ params }: { params: { instructorId: string } }) {
   const instructorId = params.instructorId;
+  const breadcrumb = ["Instructor List", `ID: ${instructorId}`];
 
   // Check the authentication of the admin.
   const endpoint = "http://localhost:4000/admins/authentication";
@@ -50,7 +51,13 @@ function Page({ params }: { params: { instructorId: string } }) {
     return <div>Loading...</div>;
   }
 
-  return <TabFunction tabs={tabs} initialActiveTab={initialActiveTab} />;
+  return (
+    <TabFunction
+      tabs={tabs}
+      breadcrumb={breadcrumb}
+      initialActiveTab={initialActiveTab}
+    />
+  );
 }
 
 export default Page;

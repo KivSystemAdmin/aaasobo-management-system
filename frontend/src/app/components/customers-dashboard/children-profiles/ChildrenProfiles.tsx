@@ -17,7 +17,13 @@ import { useEffect, useState } from "react";
 import ActionButton from "../../ActionButton";
 import { formatBirthdateToISO, formatDateToISO } from "@/app/helper/dateUtils";
 
-function ChildrenProfiles({ customerId }: { customerId: string }) {
+function ChildrenProfiles({
+  customerId,
+  isAdminAuthenticated,
+}: {
+  customerId: string;
+  isAdminAuthenticated?: boolean;
+}) {
   const [children, setChildren] = useState<Child[] | undefined>([]);
   const [latestChildDataToEdit, setLatestChildDataToEdit] = useState<
     Child | undefined

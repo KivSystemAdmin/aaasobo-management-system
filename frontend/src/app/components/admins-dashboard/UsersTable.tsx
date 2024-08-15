@@ -172,6 +172,7 @@ function UsersTable({
 
   return (
     <>
+      <h1 className={styles.title}>{userType}</h1>
       <div className={styles.container}>
         <div className={styles.topContainer}>
           <div className={styles.filterContainer}>
