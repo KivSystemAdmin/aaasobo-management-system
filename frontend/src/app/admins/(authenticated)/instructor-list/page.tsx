@@ -3,18 +3,8 @@
 import { FormEvent, ChangeEvent, useState } from "react";
 import { useAuth } from "@/app/hooks/useAuth";
 import UsersTable from "@/app/components/admins-dashboard/UsersTable";
-import InstructorScheduleCalendar from "@/app/components/admins-dashboard/InstructorScheduleCalendar";
-import Calendar from "@/app/components/Calendar";
-import {
-  Instructor,
-  InstructorSelect,
-  useInstructorSelect,
-} from "@/app/components/admins-dashboard/InstructorSelect";
 
-import {
-  addAvailability,
-  registerUnavailability,
-} from "@/app/helper/instructorsApi";
+import { addAvailability } from "@/app/helper/instructorsApi";
 
 function useNumberInput(
   initialValue: number,
@@ -55,79 +45,8 @@ function Page() {
         addUserLink={addUserLink}
       />
       <CreateCalendarForm />
-      <hr />
-      <h2>Instructor Schedule Calendar</h2>
-      <InstructorScheduleCalendar />
-      <hr />
-      <h2>Availability Calendar</h2>
-      <AvailabilityCalendar />
     </div>
   );
-}
-
-function AvailabilityCalendar() {
-  const [
-    instructors,
-    selectedInstructorId,
-    onSelectedInstructorIdChange,
-    refresh,
-  ] = useInstructorSelect();
-  const [selectedEvent, setSelectedEvent] = useState("");
-
-  const events = buildEvents(
-    instructors.find((i) => i.id === selectedInstructorId),
-  );
-
-  const submit = async () => {
-    const res = await registerUnavailability(
-      selectedInstructorId,
-      selectedEvent,
-    );
-    if ("message" in res) {
-      alert(res.message);
-      return;
-    }
-    await refresh();
-  };
-
-  return (
-    <>
-      <InstructorSelect
-        instructors={instructors}
-        id={selectedInstructorId}
-        onChange={onSelectedInstructorIdChange}
-      />
-      <Calendar
-        events={events}
-        selectable={true}
-        select={(info) => setSelectedEvent(info.startStr)}
-      />
-      <>
-        {/* Show dummy date to stabilize the position of those elements. */}
-        <p>{selectedEvent ? selectedEvent : "0000-00-00T00:00:00+09:00"}</p>
-        <button onClick={submit}>Register Unavailability</button>
-      </>
-    </>
-  );
-}
-
-function buildEvents(instructor: Instructor | undefined) {
-  const toEvents = (availabilities: { dateTime: string }[], color?: string) =>
-    availabilities.map((dateTime) => {
-      const start = dateTime.dateTime;
-      const end = new Date(
-        new Date(start).getTime() + 25 * 60000,
-      ).toISOString();
-      return {
-        id: start,
-        start,
-        end,
-        color,
-      };
-    });
-  const availabilities = toEvents(instructor?.availabilities ?? []);
-  const unavailabilities = toEvents(instructor?.unavailabilities ?? [], "gray");
-  return [...availabilities, ...unavailabilities];
 }
 
 function CreateCalendarForm() {

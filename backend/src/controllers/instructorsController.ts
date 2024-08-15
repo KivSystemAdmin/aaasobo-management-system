@@ -1,7 +1,13 @@
 import { Request, Response } from "express";
 import { prisma } from "../../prisma/prismaClient";
 import { pickProperties } from "../helper/commonUtils";
-import { Day, calculateFirstDate } from "../helper/dateUtils";
+import {
+  Day,
+  days,
+  JAPAN_TIME_DIFF,
+  createDatesBetween,
+  calculateFirstDate,
+} from "../helper/dateUtils";
 import {
   getAllInstructorsAvailabilities,
   getInstructorById,
@@ -14,6 +20,9 @@ import {
   getAllInstructors,
   getValidRecurringAvailabilities,
   getInstructorByEmail,
+  terminateRecurringAvailability,
+  getInstructorWithRecurringAvailabilityDay,
+  updateRecurringAvailabilityInterval,
 } from "../services/instructorsService";
 import { type RequestWithId } from "../middlewares/parseId.middleware";
 import bcrypt from "bcrypt";
@@ -119,6 +128,7 @@ export const getInstructor = async (req: Request, res: Response) => {
         id: instructor.id,
         name: instructor.name,
         availabilities: instructor.instructorAvailability,
+        unavailabilities: instructor.instructorUnavailability,
         nickname: instructor.nickname,
         email: instructor.email,
         icon: instructor.icon,
@@ -158,7 +168,7 @@ export module RecurringAvailability {
     const availabilitiesOfDay = instructor.instructorRecurringAvailability
       .filter(({ startAt, endAt }) => {
         const notStarted = date < startAt;
-        const alreadyEnded = endAt && endAt < date;
+        const alreadyEnded = endAt && endAt <= date;
         return !notStarted && !alreadyEnded;
       })
       .map(({ startAt }) => {
@@ -176,39 +186,96 @@ export module RecurringAvailability {
     });
   };
 
-  export const put = async (req: RequestWithId, res: Response) => {
-    const { day, time, startDate } = req.body;
-    if (!day || !time || !startDate) {
-      return res.status(400).json({ message: "Invalid parameters provided." });
-    }
-
-    const date = new Date(startDate);
-
-    // The following calculation for setDate works only for after 09:00 in Japanese time.
-    // Japanese time is UTC+9. Thus, after 09:00, date.getUTCDay() returns the same day as in Japan.
-    date.setDate(date.getDate() + ((day - date.getUTCDay() + 7) % 7));
-
-    const [hour, minute] = time.split(":");
-    date.setUTCHours(hour - JAPAN_TIME_DIFF);
-    date.setUTCMinutes(minute);
-
-    try {
-      const recurringInstructorAvailability =
-        await addInstructorRecurringAvailability(req.id, date);
-      return res.status(200).json({ recurringInstructorAvailability });
-    } catch (error) {
-      return res.status(500).json({ message: `${error}` });
-    }
+  type RecurringAvailabilityWithDay = {
+    id: number;
+    instructorId: number;
+    startAt: Date;
+    endAt?: Date;
+    day: Day;
+    time: string;
   };
 
-  type Day = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
+  export const put = async (req: RequestWithId, res: Response) => {
+    const {
+      slotsOfDays,
+      startDate: startDateStr,
+    }: { slotsOfDays: SlotsOfDays; startDate: string } = req.body;
 
-  // Request and response are in Japanese time.
-  const JAPAN_TIME_DIFF = 9;
+    const startDate = new Date(startDateStr);
+    const newEndAt = startDate;
+
+    // Use Promise.all to avoid the error "Transaction already closed: Could not perform operation.".
+    const tasks: Promise<any>[] = [];
+    await prisma.$transaction(async (tx) => {
+      const recurrings = (await getInstructorWithRecurringAvailabilityDay(
+        req.id,
+        tx,
+      )) as RecurringAvailabilityWithDay[];
+
+      for (const { id, startAt, endAt, day, time } of recurrings) {
+        const isIncludedInNewSchedule = slotsOfDays[day].some(
+          (slot) => slot === time,
+        );
+        if (!isIncludedInNewSchedule) {
+          const end = maxDate(startAt, newEndAt);
+          tasks.push(terminateRecurringAvailability(req.id, id, end, tx));
+          continue;
+        }
+
+        const newStartAt = calculateFirstDate(startDate, day, time);
+        if (endAt && endAt < newStartAt) {
+          // startAt  endAt  newStartAt
+          // |---------|      |----------
+          tasks.push(
+            addInstructorRecurringAvailability(req.id, newStartAt, tx),
+          );
+        }
+
+        // newStartAt  startAt  (endAt)
+        //   |---------------------
+        // startAt  newStartAt  (endAt)
+        //   |---------------------
+        const start = minDate(startAt, newStartAt);
+        tasks.push(updateRecurringAvailabilityInterval(id, start, null, tx));
+      }
+
+      // Create new recurring availabilities.
+      days.forEach((day) => {
+        slotsOfDays[day]
+          .filter((time) => {
+            // Exclude data already processed above.
+            const existsInDb = recurrings.some(
+              (a) => a.day === day && a.time === time,
+            );
+            return !existsInDb;
+          })
+          .forEach(async (time) => {
+            const startAt = calculateFirstDate(startDate, day, time);
+            tasks.push(addInstructorRecurringAvailability(req.id, startAt, tx));
+          });
+      });
+
+      await Promise.all(tasks);
+    });
+
+    res.status(200).end();
+  };
+
+  type SlotsOfDays = {
+    // time must be in 24 format: "HH:MM"
+    [day in Day]: string[];
+  };
 
   const getDayName = (date: Date): Day => {
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
     return days[date.getUTCDay()];
+  };
+
+  const minDate = (a: Date, b: Date) => {
+    return a < b ? a : b;
+  };
+
+  const maxDate = (a: Date, b: Date) => {
+    return a > b ? a : b;
   };
 
   // Format the time to "HH:MM".
@@ -250,7 +317,8 @@ export const addAvailability = async (req: RequestWithId, res: Response) => {
   if (!fromStr || !untilStr) {
     return res.status(400).json({ message: "Invalid parameters provided." });
   }
-  const until = new Date(untilStr + "T23:59:59Z"); // include until date
+  const until = new Date(untilStr);
+  until.setUTCDate(until.getUTCDate() + 1); // include until date
   const from = new Date(fromStr);
   if (until < from) {
     return res.status(400).json({ message: "Invalid range provided." });
@@ -260,19 +328,19 @@ export const addAvailability = async (req: RequestWithId, res: Response) => {
       tx,
       req.id,
     );
-    // Get overlapping dates of [startAt, endAt] and [from, until].
+    // Get overlapping dates of [startAt, endAt) and [from, until).
     const dateTimes = recurringAvailabilities.map(
       ({ id, startAt: startAtStr, endAt: endAtStr }) => {
         const startAt = new Date(startAtStr);
         const endAt = endAtStr ? new Date(endAtStr) : null;
         // from  until  startAt  endAt
         // || (empty)
-        if (until < startAt) {
+        if (until <= startAt) {
           return { instructorRecurringAvailabilityId: id, dateTimes: [] };
         }
         // startAt  endAt  from  until
         // || (empty)
-        if (endAt && endAt < from) {
+        if (endAt && endAt <= from) {
           return { instructorRecurringAvailabilityId: id, dateTimes: [] };
         }
         const start = startAt;
@@ -300,16 +368,6 @@ export const addAvailability = async (req: RequestWithId, res: Response) => {
   });
   return res.status(200);
 };
-
-// Generate the data between `from` and `until` dates including `until`.
-function createDatesBetween(start: Date, end: Date): Date[] {
-  const dates = [];
-  while (start <= end) {
-    dates.push(new Date(start));
-    start.setUTCDate(start.getUTCDate() + 7);
-  }
-  return dates;
-}
 
 export const deleteAvailability = async (req: RequestWithId, res: Response) => {
   const { dateTime } = req.body;

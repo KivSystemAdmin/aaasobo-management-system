@@ -144,7 +144,7 @@ export const addRecurringAvailabilities = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ slotsOfDays, startDate }),
-  }).then((res) => res.json());
+  });
 };
 
 export const registerUnavailability = async (

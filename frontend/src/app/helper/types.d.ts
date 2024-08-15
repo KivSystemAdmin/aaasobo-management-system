@@ -12,6 +12,7 @@ type Instructor = {
   id: number;
   name: string;
   availabilities: Availability[];
+  unavailabilities: Availability[];
   email: string;
   nickname: string;
   classURL: string;

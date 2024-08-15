@@ -109,7 +109,7 @@ export const terminateRecurringClass = async (
       where: {
         recurringClassId,
         dateTime: {
-          gt: endAt,
+          gte: endAt,
         },
       },
       select: { id: true },
