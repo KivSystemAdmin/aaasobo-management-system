@@ -268,7 +268,6 @@ function ClassCalendar({
             onClose={handleCancelingModalClose}
           >
             <div className={styles.modal}>
-              <h2>Upcoming Classes</h2>
               {/* Content of the Modal */}
               <ClassesTable
                 classes={classes}
@@ -278,6 +277,7 @@ function ClassCalendar({
                 handleBulkCancel={handleBulkCancel}
                 userId={customerId}
                 isAdminAuthenticated
+                handleCancelingModalClose={handleCancelingModalClose}
               />
             </div>
           </Modal>

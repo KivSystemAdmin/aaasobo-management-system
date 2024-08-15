@@ -2,6 +2,7 @@
 
 .classCard {
   padding: 0 25px 25px 25px;
+  width: 470px;
 
   &.statusBooked {
     border-top: 17px solid $green-success;
@@ -177,7 +178,7 @@
   &__icon {
     height: 1.5rem;
     margin-right: 10px;
-    color: $red-alert;
+    color: $blue-primary;
   }
 
   &__span {

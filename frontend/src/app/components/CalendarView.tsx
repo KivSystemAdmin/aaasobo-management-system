@@ -82,7 +82,7 @@ const CalendarView = forwardRef<
 
     useEffect(() => {
       fetchClasses();
-    }, [customerId]);
+    }, [customerId, classes]);
 
     // Uses useImperativeHandle to define the getApi method and expose it to the parent Page component
     useImperativeHandle(ref, () => ({
