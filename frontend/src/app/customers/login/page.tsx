@@ -1,9 +1,14 @@
 "use client";
 
+import TextInput from "@/app/components/TextInput";
 import { useInput } from "@/app/hooks/useInput";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { FormEvent } from "react";
+import styles from "./page.module.scss";
+import ActionButton from "@/app/components/ActionButton";
+import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 
 function Login() {
   const [email, onEmailChange] = useInput();
@@ -45,22 +50,46 @@ function Login() {
     router.push(redirectUrl);
   };
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={loginHandler}>
-        <label>
-          Email
-          <input type="email" value={email} onChange={onEmailChange} />
-        </label>
-        <label>
-          Password
-          <input type="password" value={password} onChange={onPasswordChange} />
-        </label>
+    <div className={styles.outsideContainer}>
+      <div className={styles.container}>
+        <Image
+          src={"/images/logo2.svg"}
+          alt="logo"
+          width={100}
+          height={100}
+          className={styles.logo}
+        />
+        <h2>Login</h2>
         <p>
-          New to AaasoBo? <Link href="/customers/register">Register now</Link>
+          Not a member yet? <Link href="/customers/register">Join us!</Link>
         </p>
-        <button type="submit">LOGIN</button>
-      </form>
+        <form className={styles.form}>
+          <TextInput
+            label="Email"
+            type="email"
+            value={email}
+            placeholder="example@aaasobo.com"
+            onChange={onEmailChange}
+            icon={<EnvelopeIcon className={styles.icon} />}
+          />
+          <TextInput
+            label="Password"
+            type="password"
+            value={password}
+            placeholder="password"
+            onChange={onPasswordChange}
+            icon={<LockClosedIcon className={styles.icon} />}
+          />
+          {/* <Link href="/customers/register">Forgot Password?</Link> */}
+          <div className={styles.buttonWrapper}>
+            <ActionButton
+              btnText="Login"
+              onClick={loginHandler}
+              className="bookBtn"
+            />
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

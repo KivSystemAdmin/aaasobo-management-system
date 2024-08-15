@@ -1,0 +1,33 @@
+@import "../variables.module.scss";
+
+.inputWrapper {
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 0.3rem;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+
+  &:focus-within {
+    border-color: $blue_primary;
+  }
+}
+
+.inputField {
+  width: 100%;
+  border: none;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.icon {
+  display: flex;
+  padding-right: 0.5rem;
+}

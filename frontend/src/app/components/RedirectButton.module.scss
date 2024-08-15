@@ -88,7 +88,7 @@
 
 .bookBtn,
 .addBtn {
-  background-color: #007bff;
+  background-color: $blue_primary;
   transition:
     background-color 0.3s ease,
     transform 0.3s ease;
@@ -98,8 +98,7 @@
   border-radius: 0.375rem;
 
   &:hover {
-    background-color: #0056b3;
-    transform: scale(1.02);
+    background-color: $blue_primary_hover;
   }
 
   &:focus-visible {
