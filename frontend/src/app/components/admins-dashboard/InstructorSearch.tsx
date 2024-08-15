@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import styles from "./InstructorSearch.module.scss";
 import { getInstructors } from "@/app/helper/instructorsApi";
 import ActionButton from "@/app/components/ActionButton";
 
@@ -62,28 +63,31 @@ function InstructorSearch({
 
   return (
     <>
-      <input
-        type="text"
-        placeholder="Search instructors"
-        onChange={handleSearch}
-        value={searchTerm}
-      />
-      {suggestions.length > 0 && (
-        <ul>
-          {suggestions.map((instructor, index) => (
-            <li
-              key={index}
-              onClick={() => handleAutocompleteClick(instructor.name)}
-            >
-              {instructor.name}
-            </li>
-          ))}
-        </ul>
-      )}
-      <ActionButton
-        onClick={() => handleUpdateCalendar()}
-        btnText="Update Calendar"
-      />
+      <div className={styles.filterContainer}>
+        <input
+          type="text"
+          placeholder="Search instructors..."
+          onChange={handleSearch}
+          value={searchTerm}
+        />
+        {suggestions.length > 0 && (
+          <ul>
+            {suggestions.map((instructor, index) => (
+              <li
+                key={index}
+                onClick={() => handleAutocompleteClick(instructor.name)}
+              >
+                {instructor.name}
+              </li>
+            ))}
+          </ul>
+        )}
+        <ActionButton
+          onClick={() => handleUpdateCalendar()}
+          btnText="Display Calendar"
+          className="bookBtn"
+        />
+      </div>
     </>
   );
 }

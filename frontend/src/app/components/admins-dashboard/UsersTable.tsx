@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import styles from "./UsersTable.module.scss"; // Adjust the import according to your file structure
+import styles from "./UsersTable.module.scss";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import {
   useReactTable,

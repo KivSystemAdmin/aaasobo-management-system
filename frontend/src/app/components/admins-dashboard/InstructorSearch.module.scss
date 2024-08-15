@@ -1,0 +1,51 @@
+@import "../../variables.module.scss";
+
+$border_radius: 0.375rem;
+
+.filterContainer {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+
+  input {
+    width: 180px;
+    max-height: 200px;
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: $border_radius;
+    font-size: 0.875rem;
+  }
+
+  ul {
+    position: absolute;
+    top: 100%;
+    width: 180px;
+    left: 0;
+    overflow-y: auto;
+    z-index: 10;
+    list-style-type: none;
+    gap: 0.5rem;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    padding: 0.5rem;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    cursor: pointer;
+
+    &:hover {
+      color: #ef4444;
+    }
+
+    &:first-child {
+      border-radius: $border_radius $border_radius 0 0;
+    }
+
+    &:last-child {
+      border-radius: 0 0 $border_radius $border_radius;
+    }
+  }
+}
