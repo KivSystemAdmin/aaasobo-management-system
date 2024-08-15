@@ -22,6 +22,11 @@ import Modal from "./Modal";
 import { cancelClass, getClassesByCustomerId } from "../helper/classesApi";
 import ClassDetail from "./ClassDetail";
 import { isPastPreviousDayDeadline } from "../helper/dateUtils";
+import {
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/solid";
 
 type InstructorCalendarViewProps = {
   events: Array<{
@@ -32,6 +37,11 @@ type InstructorCalendarViewProps = {
     color: string;
     instructorIcon?: string;
     instructorNickname?: string;
+    classStatus?:
+      | "booked"
+      | "completed"
+      | "canceledByCustomer"
+      | "canceledByInsturctor";
   }>;
   holidays?: string[];
   customerId?: number;
@@ -102,8 +112,9 @@ const CalendarView = forwardRef<
       const minutes = String(startDate.getMinutes()).padStart(2, "0");
       const formattedStartTime = `${hours}:${minutes}`;
 
-      const { instructorIcon, instructorNickname } =
+      const { instructorIcon, instructorNickname, classStatus } =
         eventInfo.event.extendedProps;
+      const { title } = eventInfo.event;
 
       const isClickable = eventInfo.event.title !== "No booked class";
 
@@ -111,28 +122,33 @@ const CalendarView = forwardRef<
         <div
           className={styles.eventBlock}
           style={{
-            padding: "3px",
             cursor: isClickable ? "pointer" : "default",
           }}
         >
-          {instructorIcon && (
+          {classStatus === "booked" && instructorIcon ? (
             <Image
               src={`/instructors/${instructorIcon}`}
               alt={instructorNickname || "Instructor"}
               width={30}
               height={30}
               priority
-              style={{
-                borderRadius: "180px",
-                border: "1.5px solid white",
-                marginRight: "5px",
-              }}
+              className={styles.instructorIcon}
             />
-          )}
-          <div className={styles.eventTime}>
-            <b>{formattedStartTime}</b> -
-          </div>
-          <div className={styles.eventTitle}>{eventInfo.event.title}</div>
+          ) : classStatus === "completed" ? (
+            <div className={styles.classStatusIconContainer}>
+              <CheckCircleIcon style={{ width: "25px" }} />
+            </div>
+          ) : classStatus === "canceledByCustomer" ? (
+            <div className={styles.classStatusIconContainer}>
+              <XCircleIcon style={{ width: "25px" }} />
+            </div>
+          ) : classStatus === "canceledByInstructor" ? (
+            <div className={styles.classStatusIconContainer}>
+              <ExclamationTriangleIcon style={{ width: "25px" }} />
+            </div>
+          ) : null}
+          <div className={styles.eventTime}>{formattedStartTime} -</div>
+          <div className={styles.eventTitle}>{title}</div>
         </div>
       );
     };

@@ -198,7 +198,7 @@ function CustomerProfile({ customerId }: { customerId: string }) {
           </div>
         </form>
       ) : (
-        <p>Loading ...</p>
+        <p className={styles.loadingContainer}>Loading ...</p>
       )}
     </>
   );

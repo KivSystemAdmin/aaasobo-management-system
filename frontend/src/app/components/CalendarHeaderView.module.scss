@@ -1,28 +1,46 @@
+@import "../variables.module.scss";
+
 // --- Header Part -----------------
 .headerToolbar {
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 1rem;
+  align-items: flex-end;
+  padding: 0 0 0.7rem 0.5rem;
+  gap: 15px;
 }
 
 .toolbarSection {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
 }
 
-.fcButton {
-  padding: 0.5rem 1rem;
-  border: none;
+.calendarHeader {
+  width: 28px;
+  height: 28px;
+  border: 5px solid $blue-primary;
+  border-radius: 180px;
+  color: white;
+  background-color: $blue-primary;
+}
+
+.calendarHeader:hover {
   cursor: pointer;
-  background-color: #f0f0f0;
-  color: #000;
 }
 
 .fcToolbarTitle {
-  margin-right: 20px;
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: 500;
+}
+
+.todayBtn {
+  padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
+  background-color: $blue-primary;
+  color: white;
+  border-radius: 6px;
+  font-weight: 400;
 }
 
 .active {
@@ -30,31 +48,37 @@
   color: #fff;
 }
 
-.icon {
-  width: 15px;
-  height: 15px;
-  color: #000;
-}
-
 // --- View Part ------------------------------
 // -- Event blocks -----------
 .eventBlock {
   color: white;
   white-space: nowrap;
+  padding: 3px;
+  display: flex;
+  align-items: center;
 }
 
-.eventBlock .eventTime {
-  display: inline-block;
+.eventTime {
   font-size: 12px;
-  font-weight: normal;
-  font-family: serif;
+  margin-right: 5px;
+  font-weight: 400;
+}
+
+.eventTitle {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.instructorIcon {
+  border-radius: 50%;
+  border: 1.5px solid white;
   margin-right: 5px;
 }
 
-.eventBlock .eventTitle {
-  display: inline-block;
-  font-size: 14px;
-  font-weight: normal;
+.classStatusIconContainer {
+  height: 25px;
+  width: 25px;
+  margin-right: 5px;
 }
 
 // -- Holiday cells ---------------------------

@@ -75,7 +75,9 @@ function ClassCalendar({
             ? "#65b72f"
             : eachClass.status === "completed"
               ? "#b5c4ab"
-              : "#d9d9d9";
+              : eachClass.status === "canceledByCustomer"
+                ? "#d9d9d9"
+                : "#9e9e9e";
 
         const childrenNames = eachClass.classAttendance.children
           .map((child) => child.name)
@@ -89,6 +91,7 @@ function ClassCalendar({
           color,
           instructorIcon: eachClass.instructor?.icon,
           instructorNickname: eachClass.instructor?.nickname,
+          classStatus: eachClass.status,
         };
       });
 
@@ -186,47 +189,49 @@ function ClassCalendar({
         <div className={styles.loadingContainer}>Loading ...</div>
       ) : (
         <>
-          <CalendarHeader calendarApi={calendarApi ?? null} />
+          <div className={styles.calendarHeaderContainer}>
+            <CalendarHeader calendarApi={calendarApi ?? null} />
 
-          <div className={styles.calendarActions}>
-            <div className={styles.calendarActions__container}>
-              <div className={styles.calendarActions__canceling}>
-                <ActionButton
-                  btnText="Cancel Classes"
-                  className="cancelClasses"
-                  onClick={() => {
-                    setIsCancelingModalOpen(true);
-                  }}
-                />
-              </div>
-              <div className={styles.calendarActions__booking}>
-                <p
-                  onClick={() =>
-                    rebookableClasses &&
-                    rebookableClasses.length > 0 &&
-                    setIsBookableClassesModalOpen(true)
-                  }
-                  className={`${styles.bookableClasses} ${rebookableClasses && rebookableClasses.length > 0 ? styles.clickable : ""}`}
-                >
-                  Bookable Classes: {rebookableClasses?.length ?? 0}
-                </p>
-                {isAdminAuthenticated ? (
-                  <RedirectButton
-                    linkURL={`/admins/customer-list/${customerId}/classes/book`}
-                    btnText="Book Class"
-                    Icon={PlusIcon}
-                    className="bookClass"
-                    disabled={rebookableClasses?.length === 0}
+            <div className={styles.calendarActions}>
+              <div className={styles.calendarActions__container}>
+                <div className={styles.calendarActions__canceling}>
+                  <ActionButton
+                    btnText="Cancel Classes"
+                    className="cancelClasses"
+                    onClick={() => {
+                      setIsCancelingModalOpen(true);
+                    }}
                   />
-                ) : (
-                  <RedirectButton
-                    linkURL={`/customers/${customerId}/classes/book`}
-                    btnText="Book Class"
-                    Icon={PlusIcon}
-                    className="bookClass"
-                    disabled={rebookableClasses?.length === 0}
-                  />
-                )}
+                </div>
+                <div className={styles.calendarActions__booking}>
+                  <p
+                    onClick={() =>
+                      rebookableClasses &&
+                      rebookableClasses.length > 0 &&
+                      setIsBookableClassesModalOpen(true)
+                    }
+                    className={`${styles.bookableClasses} ${rebookableClasses && rebookableClasses.length > 0 ? styles.clickable : ""}`}
+                  >
+                    Bookable Classes: {rebookableClasses?.length ?? 0}
+                  </p>
+                  {isAdminAuthenticated ? (
+                    <RedirectButton
+                      linkURL={`/admins/customer-list/${customerId}/classes/book`}
+                      btnText="Book Class"
+                      Icon={PlusIcon}
+                      className="bookClass"
+                      disabled={rebookableClasses?.length === 0}
+                    />
+                  ) : (
+                    <RedirectButton
+                      linkURL={`/customers/${customerId}/classes/book`}
+                      btnText="Book Class"
+                      Icon={PlusIcon}
+                      className="bookClass"
+                      disabled={rebookableClasses?.length === 0}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -248,7 +253,6 @@ function ClassCalendar({
           >
             <div className={styles.modal}>
               <h2>Bookable Classes</h2>
-              {/* Content of the Modal */}
               <ul className={styles.modal__list}>
                 {rebookableClasses?.map((eachClass, index) => (
                   <li key={eachClass.id}>

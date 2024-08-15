@@ -3,6 +3,7 @@
 import { getInstructor } from "@/app/helper/instructorsApi";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import styles from "./InstructorProfile.module.scss";
 
 function InstructorProfile({
   instructorId,
@@ -74,7 +75,7 @@ function InstructorProfile({
           </p>
         </>
       ) : (
-        <div>Loading ...</div>
+        <div className={styles.loadingContainer}>Loading ...</div>
       )}
     </>
   );

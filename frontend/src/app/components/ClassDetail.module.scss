@@ -10,6 +10,9 @@
   &.statusCompleted {
     border-top: 17px solid $completed-background-color;
   }
+  &.statusCanceledByInstructor {
+    border-top: 17px solid $gray-canceled-by-instructor;
+  }
   &.statusCanceled {
     border-top: 17px solid $gray-background;
   }
@@ -28,6 +31,9 @@
     }
     &.statusCompleted {
       color: $completed-background-color;
+    }
+    &.statusCanceledByInstructor {
+      color: $gray-canceled-by-instructor;
     }
     &.statusCanceled {
       color: $gray-background;
@@ -54,6 +60,9 @@
     }
     &.statusCompleted {
       border: 3px solid $completed-background-color;
+    }
+    &.statusCanceledByInstructor {
+      border: 3px solid $gray-canceled-by-instructor;
     }
     &.statusCanceled {
       border: 3px solid $gray-background;

@@ -16,6 +16,7 @@ import styles from "./ClassDetail.module.scss";
 import {
   CalendarDaysIcon,
   CheckCircleIcon,
+  ExclamationTriangleIcon,
   InformationCircleIcon,
   UsersIcon,
   VideoCameraIcon,
@@ -49,7 +50,9 @@ const ClassDetail = ({
       ? styles.statusBooked
       : classDetail.status === "completed"
         ? styles.statusCompleted
-        : styles.statusCanceled;
+        : classDetail.status === "canceledByInstructor"
+          ? styles.statusCanceledByInstructor
+          : styles.statusCanceled;
 
   return (
     <div className={`${styles.classCard} ${statusClass}`}>
@@ -58,6 +61,10 @@ const ClassDetail = ({
         {classDetail.status === "booked" ||
         classDetail.status === "completed" ? (
           <CheckCircleIcon
+            className={`${styles.classStatus__icon} ${statusClass}`}
+          />
+        ) : classDetail.status === "canceledByInstructor" ? (
+          <ExclamationTriangleIcon
             className={`${styles.classStatus__icon} ${statusClass}`}
           />
         ) : (
@@ -247,6 +254,30 @@ const ClassDetail = ({
                   no make-up classes will be available
                 </span>{" "}
                 in this case.
+              </p>
+            </div>
+          </div>
+        ) : classDetail.status === "canceledByCustomer" ? (
+          <div className={styles.notification}>
+            <div className={styles.notification__iconContainer}>
+              <InformationCircleIcon className={styles.notification__icon} />
+            </div>
+            <div>
+              <p>
+                Classes canceled by the day before are counted towards the
+                number of bookable classes and are valid for 6 months.
+              </p>
+            </div>
+          </div>
+        ) : classDetail.status === "canceledByInstructor" ? (
+          <div className={styles.notification}>
+            <div className={styles.notification__iconContainer}>
+              <InformationCircleIcon className={styles.notification__icon} />
+            </div>
+            <div>
+              <p>
+                Classes canceled by the instructor are counted towards the
+                number of bookable classes and are valid for 6 months.
               </p>
             </div>
           </div>
