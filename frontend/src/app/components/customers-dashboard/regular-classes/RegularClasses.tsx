@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import style from "./RegularClasses.module.scss";
+import { PlusIcon } from "@heroicons/react/24/outline";
 import { getSubscriptionsByCustomerId } from "@/app/helper/subscriptionsApi";
 import ActionButton from "@/app/components/ActionButton";
 import CurrentSubscription from "@/app/components/customers-dashboard/regular-classes/CurrentSubscription";
@@ -16,9 +18,18 @@ function RegularClasses({
   const [subscriptionsData, setSubscriptionsData] =
     useState<Subscriptions | null>(null);
   const [showAddPlan, setShowAddPlan] = useState(false);
+  const [updateCount, setUpdateCount] = useState(0);
 
   const handleAddRegularClass = () => {
     setShowAddPlan(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowAddPlan(false);
+  };
+
+  const handleUpdateSubscription = () => {
+    setUpdateCount(updateCount + 1);
   };
 
   useEffect(() => {
@@ -31,7 +42,7 @@ function RegularClasses({
       }
     };
     fetchSubscription();
-  }, [customerId]);
+  }, [customerId, updateCount]);
 
   if (!subscriptionsData) {
     return <div>Loading...</div>;
@@ -39,19 +50,29 @@ function RegularClasses({
 
   return (
     <>
-      <h3>Regular Classes</h3>
       {isAdminAuthenticated ? (
-        <ActionButton
-          onClick={handleAddRegularClass}
-          btnText="Add Subscription"
-        />
+        <div className={style.addBtn}>
+          <ActionButton
+            onClick={handleAddRegularClass}
+            btnText="Add New Subscription"
+            className="addBtn"
+            Icon={PlusIcon}
+          />
+        </div>
       ) : null}
+      {showAddPlan && (
+        <AddSubscription
+          customerId={customerId}
+          isOpen={true}
+          onClose={handleCloseForm}
+          updateSubscription={handleUpdateSubscription}
+        />
+      )}
       <CurrentSubscription
         subscriptionsData={subscriptionsData}
         customerId={customerId}
         isAdminAuthenticated={isAdminAuthenticated}
       />
-      {showAddPlan && <AddSubscription customerId={customerId} />}
     </>
   );
 }

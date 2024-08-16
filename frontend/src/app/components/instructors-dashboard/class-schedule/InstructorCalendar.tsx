@@ -27,6 +27,7 @@ function InstructorCalendar({
   const calendarRef = useRef<FullCalendar | null>(null);
   const instructorId = id ?? undefined;
   if (instructorId === undefined) return;
+  if (instructorId === undefined) return;
 
   const fetchData = async () => {
     try {
@@ -127,6 +128,13 @@ function InstructorCalendar({
         <>
           <CalendarHeader calendarApi={calendarApi ?? null} />
           <p className={styles.headerMessage}></p>
+          {isAdminAuthenticated && name ? (
+            <span className={styles.instructorName}>
+              Instructor: &nbsp;{name}
+            </span>
+          ) : (
+            <span>&nbsp;</span>
+          )}
           <CalendarView
             // Create a ref to access the FullCalendar instance in CalendarView;
             ref={calendarRef}

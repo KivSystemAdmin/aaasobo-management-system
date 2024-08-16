@@ -157,9 +157,9 @@ function UsersTable({
   };
 
   // Handle the filter change
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilterColumn(e.target.value);
-    changeOptionColor(e.target);
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilterColumn(event.target.value);
+    changeOptionColor(event.target);
   };
 
   // Delete the selected user

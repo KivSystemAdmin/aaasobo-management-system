@@ -1,0 +1,44 @@
+@import "../../../variables.module.scss";
+
+$border_radius: 0.5rem;
+$font_size: 0.9rem;
+
+.container {
+  box-sizing: border-box;
+  background-color: $gray-background;
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: $border_radius;
+}
+
+.filterContainer {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+
+  select,
+  input {
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: $border_radius;
+    font-size: $font_size;
+    color: #888888;
+  }
+
+  select {
+    width: 260px;
+  }
+
+  input {
+    width: 160px;
+  }
+
+  input:not(:placeholder-shown) {
+    color: #000000;
+  }
+}
+
+.horizontalLine {
+  margin: 1.5rem 1rem 1.5rem 1rem;
+  border-top: 1px solid $gray-background;
+}
