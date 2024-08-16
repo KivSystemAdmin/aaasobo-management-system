@@ -47,16 +47,14 @@ export const isValidRegister = ({
 export const isValidLogin = ({ email, password }: LoginProps) => {
   // If the values are null, return false.
   if (!email || !password) {
-    alert("Please fill in both fields"); // Set alert message temporarily.
-    return false;
+    return { isValid: false, message: "Please enter your email and password." };
   }
 
   // If the email is not in the correct format, return false.
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailPattern.test(email)) {
-    alert("Please enter a valid email address"); // Set alert message temporarily.
-    return false;
+    return { isValid: false, message: "Please enter a valid email address." };
   }
 
-  return true;
+  return { isValid: true };
 };
