@@ -12,7 +12,7 @@ import {
   EnvelopeIcon,
   HomeIcon,
   LockClosedIcon,
-  UserIcon,
+  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import ActionButton from "@/app/components/ActionButton";
 import { toast, ToastContainer } from "react-toastify";
@@ -101,7 +101,7 @@ function Register() {
               value={name}
               placeholder="e.g., John Doe"
               onChange={onNameChange}
-              icon={<UserIcon className={styles.icon} />}
+              icon={<UserCircleIcon className={styles.icon} />}
               inputRequired={true}
             />
             <TextInput

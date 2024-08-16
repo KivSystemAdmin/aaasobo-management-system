@@ -44,7 +44,6 @@ function Page() {
         replaceItems={replaceItems}
         addUserLink={addUserLink}
       />
-      <CreateCalendarForm />
     </div>
   );
 }

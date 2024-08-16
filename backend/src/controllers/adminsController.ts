@@ -178,7 +178,17 @@ export const registerInstructorController = async (
   req: Request,
   res: Response,
 ) => {
-  const { name, email, password } = req.body;
+  const {
+    name,
+    email,
+    password,
+    nickname,
+    icon,
+    classURL,
+    meetingId,
+    passcode,
+    introductionURL,
+  } = req.body;
 
   try {
     // Hash the password.
@@ -189,12 +199,12 @@ export const registerInstructorController = async (
       name,
       email,
       password: hashedPassword,
-      nickname: "",
-      icon: "",
-      classURL: "",
-      meetingId: "",
-      passcode: "",
-      introductionURL: "",
+      nickname,
+      icon,
+      classURL,
+      meetingId,
+      passcode,
+      introductionURL,
     });
 
     // Exclude the password from the response.
