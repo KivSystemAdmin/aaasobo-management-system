@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import RedirectButton from "@/app/components/RedirectButton";
 import { getClassesByInstructorId } from "@/app/helper/classesApi";
 import { formatDate } from "@/app/helper/dateUtils";
 import InstructorClassDetail from "@/app/components/instructors-dashboard/class-schedule/InstructorClassDetail";
 import InstructorClassesTable from "@/app/components/instructors-dashboard/class-schedule/InstructorClassesTable";
+import styles from "./ClassDetails.module.scss";
+import Link from "next/link";
 
 type StatusType =
   | "booked"
@@ -81,39 +82,48 @@ function ClassDetails({
     });
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className={styles.loadingContainer}>Loading...</div>;
   if (error) return <div>{error}</div>;
 
   return (
-    <>
-      <h1>Class Details</h1>
-      <br />
-      <InstructorClassDetail classDetail={classDetail} timeZone="Asia/Manila" />
+    <div className={styles.classDetails}>
+      <nav className={styles.breadcrumb}>
+        <ul className={styles.breadcrumb__list}>
+          <li className={styles.breadcrumb__item}>
+            <Link href={`/instructors/${instructorId}/class-schedule`} passHref>
+              Class Schedule
+            </Link>
+          </li>
+          <li className={styles.breadcrumb__separator}>{" >> "}</li>
+          <li className={styles.breadcrumb__item}>Class Details</li>
+        </ul>
+      </nav>
 
-      <h2>{`Classes (${classDate})`}</h2>
-      <InstructorClassesTable
-        instructorId={instructorId}
-        selectedDateClasses={selectedDateClasses}
-        timeZone="Asia/Manila"
-        handleUpdateClassDetail={handleUpdateClassDetail}
-        isAdminAuthenticate={isAdminAuthenticated}
-      />
+      <div className={styles.classDetails__container}>
+        <div className={styles.classDetails__classesList}>
+          {instructorId !== null && classId !== null ? (
+            <InstructorClassesTable
+              instructorId={instructorId}
+              selectedDateClasses={selectedDateClasses}
+              timeZone="Asia/Manila"
+              handleUpdateClassDetail={handleUpdateClassDetail}
+              isAdminAuthenticate={isAdminAuthenticated}
+              classDate={classDate}
+              classId={classId}
+            />
+          ) : (
+            <p>No classes available.</p>
+          )}
+        </div>
 
-      <br />
-      {isAdminAuthenticated ? (
-        <RedirectButton
-          linkURL={`/admins/instructor-list/${instructorId}`}
-          btnText="Back"
-          className="backBtn"
-        />
-      ) : (
-        <RedirectButton
-          linkURL={`/instructors/${instructorId}/class-schedule`}
-          btnText="Back"
-          className="backBtn"
-        />
-      )}
-    </>
+        <div className={styles.classDetails__classDetail}>
+          <InstructorClassDetail
+            classDetail={classDetail}
+            timeZone="Asia/Manila"
+          />
+        </div>
+      </div>
+    </div>
   );
 }
 

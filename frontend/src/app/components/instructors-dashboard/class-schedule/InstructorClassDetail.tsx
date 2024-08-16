@@ -1,9 +1,24 @@
 import {
+  formatBirthdateToISO,
   formatDate,
-  formatDayDate,
   formatTime,
   formatTimeWithAddedMinutes,
+  getDay,
+  getDayOfWeek,
+  getShortMonth,
+  isPastClassEndTime,
 } from "@/app/helper/dateUtils";
+import styles from "./InstructorClassDetail.module.scss";
+import CheckCircleIcon from "@heroicons/react/24/solid/CheckCircleIcon";
+import {
+  CalendarDaysIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+  UserIcon,
+  VideoCameraIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/solid";
+import { UserIcon as UserIconOutline } from "@heroicons/react/24/outline";
 
 const InstructorClassDetail = ({
   classDetail,
@@ -75,87 +90,191 @@ const InstructorClassDetail = ({
     );
   };
 
-  const renderClassURL = () => {
-    if (classDetail.status === "booked") {
-      return (
-        <>
-          <h3>
-            Class URL:{" "}
-            <span style={{ fontSize: "0.8em", fontWeight: "normal" }}>
-              <a
-                href={classDetail.classURL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {classDetail.classURL}{" "}
-              </a>
-            </span>
-          </h3>
-          <h3>
-            Meeting ID:{" "}
-            <span style={{ fontSize: "0.8em", fontWeight: "normal" }}>
-              {classDetail.meetingId}
-            </span>
-          </h3>
-          <h3>
-            Passcode:{" "}
-            <span style={{ fontSize: "0.8em", fontWeight: "normal" }}>
-              {classDetail.passcode}
-            </span>
-          </h3>
-        </>
-      );
-    }
-    return null;
-  };
-
-  const renderNotification = () => {
-    if (classDetail.status === "booked") {
-      return (
-        <h3 style={{ fontWeight: "bold", color: "red" }}>
-          ■ If you need to cancel a class, please contact our staff promptly via
-          LINE.
-        </h3>
-      );
-    }
-    return null;
-  };
+  const statusClass =
+    classDetail.status === "booked"
+      ? styles.statusBooked
+      : classDetail.status === "completed"
+        ? styles.statusCompleted
+        : classDetail.status === "canceledByInstructor"
+          ? styles.statusCanceledByInstructor
+          : styles.statusCanceled;
 
   return (
-    <div style={{ backgroundColor: "#f9fafb", padding: "15px" }}>
-      <h3>【{classDetail.status}】</h3>
-
-      <h3>
-        Date:{" "}
-        <span style={{ fontSize: "0.8em", fontWeight: "normal" }}>
-          {formatDayDate(new Date(classDetail.dateTime), timeZone)}
-        </span>
-      </h3>
-
-      <h3>
-        Time:{" "}
-        <span style={{ fontSize: "0.8em", fontWeight: "normal" }}>
-          {formatTime(new Date(classDetail.dateTime), timeZone)} -{" "}
-          {formatTimeWithAddedMinutes(
-            new Date(classDetail.dateTime),
-            timeZone,
-            25,
+    <div className={styles.classCardContainer}>
+      <div className={styles.classCardContainer__title}>Class Details</div>
+      <div className={`${styles.classCard} ${statusClass}`}>
+        {/* Class Status */}
+        <div className={styles.classStatus}>
+          {classDetail.status === "booked" ||
+          classDetail.status === "completed" ? (
+            <CheckCircleIcon
+              className={`${styles.classStatus__icon} ${statusClass}`}
+            />
+          ) : classDetail.status === "canceledByInstructor" ? (
+            <ExclamationTriangleIcon
+              className={`${styles.classStatus__icon} ${statusClass}`}
+            />
+          ) : (
+            <XCircleIcon
+              className={`${styles.classStatus__icon} ${statusClass}`}
+            />
           )}
-        </span>
-      </h3>
 
-      <h3>
-        Guardian:{" "}
-        <span style={{ fontSize: "0.8em", fontWeight: "normal" }}>
-          {classDetail.customerName}
-        </span>
-      </h3>
+          <div className={styles.classStatus__name}>
+            {classDetail.status === "booked"
+              ? "Booked"
+              : classDetail.status === "completed"
+                ? "Completed"
+                : classDetail.status === "canceledByCustomer"
+                  ? "Canceled by Customer"
+                  : classDetail.status === "canceledByInstructor"
+                    ? "Canceled by Instructor"
+                    : "Unknown Status"}
+          </div>
+        </div>
 
-      {renderChildren()}
+        {/* Date & TIme */}
+        <div className={styles.dateTime}>
+          <div className={styles.dateTime__iconContainer}>
+            <CalendarDaysIcon className={styles.dateTime__icon} />
+          </div>
 
-      {renderClassURL()}
+          <div className={styles.dateTime__details}>
+            <div className={styles.dateTime__date}>
+              <div className={styles.dateTime__day}>
+                {getDay(classDetail.dateTime, timeZone)}
+              </div>
+              <div className={styles.dateTime__month}>
+                {getShortMonth(classDetail.dateTime, timeZone)}
+              </div>
+            </div>
 
-      {renderNotification()}
+            <div className={styles.dateTime__time}>
+              <div className={styles.dateTime__dayOfWeek}>
+                {getDayOfWeek(classDetail.dateTime, timeZone)}
+              </div>
+              <div className={styles.dateTime__classTime}>
+                {formatTime(new Date(classDetail.dateTime), timeZone)} -{" "}
+                {formatTimeWithAddedMinutes(
+                  new Date(classDetail.dateTime),
+                  timeZone,
+                  25,
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Class URL */}
+        {classDetail.status === "booked" &&
+        !isPastClassEndTime(classDetail.dateTime, "Asia/Tokyo") ? (
+          <div className={styles.classURL}>
+            <div className={styles.classURL__iconContainer}>
+              <VideoCameraIcon className={styles.classURL__icon} />
+            </div>
+            <div className={styles.classURL__details}>
+              <div className={styles.classURL__url}>
+                <a
+                  href={classDetail.classURL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {classDetail.classURL}
+                </a>
+              </div>
+              <div className={styles.classURL__password}>
+                Meeting ID: {classDetail.meetingId}
+              </div>
+              <div className={styles.classURL__password}>
+                Passcode: {classDetail.passcode}
+              </div>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
+
+        {/* Children */}
+        <div className={styles.children}>
+          <div className={styles.children__title}>
+            {classDetail.status === "booked"
+              ? "Attending Children"
+              : "Attended Children"}
+          </div>
+
+          {classDetail.children.length === 0 ? (
+            <div className={styles.children__header}>
+              <div className={styles.children__iconContainer}>
+                <UserIconOutline className={styles.children__icon} />
+              </div>
+              <div className={styles.children__nameContainer}>
+                <div className={styles.children__nameTitle}>
+                  The registered children were absent.
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.children__contentContainer}>
+              {classDetail.children.map((child) => (
+                <div key={child.id} className={styles.children__content}>
+                  <div className={styles.children__header}>
+                    <div className={styles.children__iconContainer}>
+                      <UserIconOutline className={styles.children__icon} />
+                    </div>
+                    <div className={styles.children__nameContainer}>
+                      <div className={styles.children__nameTitle}>Name</div>
+                      <div className={styles.children__name}>{child.name}</div>
+                    </div>
+                  </div>
+                  <div className={styles.children__birthdateContainer}>
+                    <div className={styles.children__birthdateTitle}>
+                      Birthdate
+                    </div>
+                    <div className={styles.children__birthdate}>
+                      {child.birthdate
+                        ? formatBirthdateToISO(child.birthdate)
+                        : "N/A"}
+                    </div>
+                  </div>
+                  <div className={styles.children__personalInfoContainer}>
+                    <div className={styles.children__personalInfoTitle}>
+                      Notes
+                    </div>
+                    <div className={styles.children__personalInfo}>
+                      {child.personalInfo}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Guardian */}
+        <div className={styles.guardian}>
+          <div className={styles.guardian__iconContainer}>
+            <UserIcon className={styles.guardian__icon} />
+          </div>
+          <div className={styles.guardian__name}>
+            Guardian: {classDetail.customerName}
+          </div>
+        </div>
+
+        {/* Notification */}
+        {classDetail.status === "booked" ? (
+          <div className={styles.notification}>
+            <div className={styles.notification__iconContainer}>
+              <InformationCircleIcon className={styles.notification__icon} />
+            </div>
+            <p>
+              If you need to cancel a class, please contact our staff promptly
+              via Facebook.
+            </p>
+          </div>
+        ) : (
+          ""
+        )}
+      </div>
     </div>
   );
 };

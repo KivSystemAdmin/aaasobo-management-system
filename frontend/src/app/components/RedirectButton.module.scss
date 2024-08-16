@@ -215,3 +215,54 @@
     box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.5);
   }
 }
+
+.completeBtn {
+  background-color: $blue_primary;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+  border: 1px solid transparent;
+  color: #ffffff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.375rem;
+  font-size: 0.8rem;
+  width: 76px;
+
+  &:hover {
+    background-color: $blue_primary_hover;
+  }
+}
+
+.editAttendance {
+  background-color: #7fbf5a;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+  border: 1px solid transparent;
+  color: #ffffff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.375rem;
+  font-size: 0.8rem;
+  width: 76px;
+
+  &:hover {
+    background-color: $green-success-hover;
+  }
+}
+
+.cancelEditing {
+  background-color: $gray-background;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+  border: 1px solid transparent;
+  color: #333333;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.375rem;
+  font-size: 0.8rem;
+  width: 76px;
+
+  &:hover {
+    background-color: $gray-background-hover;
+  }
+}

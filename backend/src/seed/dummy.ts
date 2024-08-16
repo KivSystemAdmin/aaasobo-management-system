@@ -248,6 +248,105 @@ async function insertClasses() {
       {
         instructorId: helen.id,
         customerId: alice.id,
+        dateTime: "2024-08-08T10:00:00+09:00",
+        status: "booked",
+        subscriptionId: alice.subscription[0].id,
+        recurringClassId: 1,
+        isRebookable: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: bob.id,
+        dateTime: "2024-08-08T10:30:00+09:00",
+        status: "booked",
+        subscriptionId: bob.subscription[0].id,
+        recurringClassId: 1,
+        isRebookable: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2024-08-08T11:00:00+09:00",
+        status: "booked",
+        subscriptionId: alice.subscription[0].id,
+        recurringClassId: 1,
+        isRebookable: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: bob.id,
+        dateTime: "2024-08-08T11:30:00+09:00",
+        status: "booked",
+        subscriptionId: bob.subscription[0].id,
+        recurringClassId: 1,
+        isRebookable: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2024-08-08T12:00:00+09:00",
+        status: "booked",
+        subscriptionId: alice.subscription[0].id,
+        recurringClassId: 1,
+        isRebookable: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: bob.id,
+        dateTime: "2024-08-08T12:30:00+09:00",
+        status: "booked",
+        subscriptionId: bob.subscription[0].id,
+        recurringClassId: 1,
+        isRebookable: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2024-08-08T13:00:00+09:00",
+        status: "booked",
+        subscriptionId: alice.subscription[0].id,
+        recurringClassId: 1,
+        isRebookable: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: bob.id,
+        dateTime: "2024-08-08T13:30:00+09:00",
+        status: "booked",
+        subscriptionId: bob.subscription[0].id,
+        recurringClassId: 1,
+        isRebookable: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2024-08-08T14:00:00+09:00",
+        status: "booked",
+        subscriptionId: alice.subscription[0].id,
+        recurringClassId: 1,
+        isRebookable: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: bob.id,
+        dateTime: "2024-08-08T14:30:00+09:00",
+        status: "booked",
+        subscriptionId: bob.subscription[0].id,
+        recurringClassId: 1,
+        isRebookable: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2024-08-08T15:00:00+09:00",
+        status: "booked",
+        subscriptionId: alice.subscription[0].id,
+        recurringClassId: 1,
+        isRebookable: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
         dateTime: "2024-08-13T11:00:00+09:00",
         status: "booked",
         subscriptionId: alice.subscription[0].id,
@@ -385,6 +484,7 @@ async function insertChildren() {
 }
 
 async function insertClassAttendance() {
+  const customers = await prisma.customer.findMany();
   const classes = await prisma.class.findMany();
   const children = await prisma.children.findMany();
 
@@ -400,6 +500,31 @@ async function insertClassAttendance() {
       { classId: classes[2].id, childrenId: children[2].id },
       { classId: classes[3].id, childrenId: children[2].id },
     ],
+  });
+
+  if (classes.length < 17 || children.length < 2) {
+    throw new Error("Not enough classes or children found");
+  }
+
+  const august8ClassIds = classes.slice(6, 17).map((c) => c.id);
+
+  if (august8ClassIds.length !== 11) {
+    throw new Error("August 8th class IDs count mismatch");
+  }
+
+  const aliceChildren = children.filter(
+    (child) => child.customerId === customers[0].id,
+  );
+
+  const attendanceData = august8ClassIds.flatMap((classId) =>
+    aliceChildren.map((child) => ({
+      classId,
+      childrenId: child.id,
+    })),
+  );
+
+  await prisma.classAttendance.createMany({
+    data: attendanceData,
   });
 }
 

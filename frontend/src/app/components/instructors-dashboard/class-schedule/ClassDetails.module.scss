@@ -1,0 +1,56 @@
+@import "@/app/variables.module.scss";
+
+.classDetails {
+  &__container {
+    display: flex;
+    gap: 20px;
+  }
+
+  &__classesList {
+    flex: 4;
+  }
+
+  &__classDetail {
+    flex: 6;
+  }
+}
+
+.breadcrumb {
+  margin-bottom: 1rem;
+  font-size: 18px;
+  font-weight: 500;
+
+  &__list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__item {
+    margin-right: 0.5rem;
+
+    a {
+      text-decoration: none;
+      color: $blue-primary;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__separator {
+    margin-right: 0.5rem;
+    color: #555;
+  }
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.5rem;
+  color: #333;
+}

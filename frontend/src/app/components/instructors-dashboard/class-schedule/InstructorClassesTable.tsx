@@ -5,6 +5,8 @@ import Link from "next/link";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { editClass } from "@/app/helper/classesApi";
+import ActionButton from "../../ActionButton";
+import { CheckCircleIcon, UsersIcon } from "@heroicons/react/24/solid";
 
 type StatusType =
   | "booked"
@@ -18,6 +20,8 @@ const InstructorClassesTable = ({
   timeZone,
   handleUpdateClassDetail,
   isAdminAuthenticate,
+  classDate,
+  classId,
 }: {
   instructorId: number;
   selectedDateClasses: InstructorClassDetail[] | null;
@@ -28,6 +32,8 @@ const InstructorClassesTable = ({
     updatedStatus: StatusType,
   ) => void;
   isAdminAuthenticate?: boolean;
+  classDate: string;
+  classId: number;
 }) => {
   const [classes, setClasses] = useState<InstructorClassDetail[] | null>(null);
   const [editingClassId, setEditingClassId] = useState<number | null>(null);
@@ -97,7 +103,7 @@ const InstructorClassesTable = ({
       updatedStatus === "completed"
     ) {
       return alert(
-        "You cannot complete the class as it is before the class end time.",
+        "You cannot edit the class as it is before the class end time.",
       );
     }
 
@@ -153,203 +159,249 @@ const InstructorClassesTable = ({
   };
 
   return (
-    <>
+    <div className={styles.instructorClasses}>
+      <div className={styles.instructorClasses__classDate}>{classDate}</div>
       <ToastContainer />
-      <div className={styles.classesTable}>
-        <div className={styles.classesTable__wrapper}>
-          <div className={styles.classesTable__container}>
-            <table className={styles.classesTable__desktop}>
-              <thead className={styles.classesTable__head}>
-                <tr>
-                  <th className={styles.classesTable__th}>Time</th>
-                  <th className={styles.classesTable__th}>Children</th>
-                  <th className={styles.classesTable__th}>Class Status</th>
-                  <th className={styles.classesTable__th}></th>
-                </tr>
-              </thead>
-              <tbody className={styles.classesTable__body}>
-                {classes &&
-                  classes.map((eachClass) => {
-                    const dateTime = new Date(eachClass.dateTime);
-                    const philippineTime = formatTime(dateTime, timeZone);
 
-                    return (
-                      <tr
-                        key={eachClass.id}
-                        className={styles.classesTable__row}
+      {classes &&
+        classes
+          .filter((eachClass) => eachClass.status !== "canceledByCustomer")
+          .map((eachClass) => {
+            const dateTime = new Date(eachClass.dateTime);
+            const philippineTime = formatTime(dateTime, timeZone);
+
+            const statusClass =
+              eachClass.status === "booked"
+                ? styles.statusBooked
+                : eachClass.status === "completed"
+                  ? styles.statusCompleted
+                  : eachClass.status === "canceledByInstructor"
+                    ? styles.statusCanceledByInstructor
+                    : styles.statusCanceled;
+
+            return (
+              <div
+                key={eachClass.id}
+                className={`${styles.instructorClasses__classItem} ${statusClass} ${eachClass.id === classId ? styles.currentClassBackground : ""}`}
+              >
+                <div className={styles.instructorClasses__classItemHead}>
+                  <div className={styles.instructorClasses__classInfo}>
+                    {isAdminAuthenticate && editingClassId === eachClass.id ? (
+                      <div>
+                        <label>
+                          {!isPastClassEndTime(eachClass.dateTime, timeZone) ? (
+                            <>
+                              <input
+                                type="checkbox"
+                                checked={selectedStatus === "booked"}
+                                onChange={() => handleStatusChange("booked")}
+                              />
+                              <span>Booked</span>
+                            </>
+                          ) : (
+                            <>
+                              <input
+                                type="checkbox"
+                                checked={selectedStatus === "completed"}
+                                onChange={() => handleStatusChange("completed")}
+                              />
+                              <span>Completed</span>
+                            </>
+                          )}
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={selectedStatus === "canceledByInstructor"}
+                            onChange={() =>
+                              handleStatusChange("canceledByInstructor")
+                            }
+                          />
+                          <span>Canceled by Instructor</span>
+                        </label>
+                      </div>
+                    ) : eachClass.status === "canceledByInstructor" ? (
+                      <div
+                        className={
+                          styles.instructorClasses__classStatusContainer
+                        }
                       >
-                        {/* Time */}
-                        <td className={styles.classesTable__td}>
-                          <div className={styles.classesTable__time}>
-                            {isAdminAuthenticate ? (
-                              <Link
-                                href={`/admins/instructor-list/${instructorId}/class-schedule/${eachClass.id}`}
-                                passHref
-                              >
-                                {philippineTime}
-                              </Link>
-                            ) : (
-                              <Link
-                                href={`/instructors/${instructorId}/class-schedule/${eachClass.id}`}
-                                passHref
-                              >
-                                {philippineTime}
-                              </Link>
-                            )}
-                          </div>
-                        </td>
+                        <CheckCircleIcon
+                          className={`${styles.instructorClasses__classStatusIcon} ${statusClass}`}
+                        />
+                        <div className={styles.instructorClasses__classStatus}>
+                          canceled by instructor
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        className={
+                          styles.instructorClasses__classStatusContainer
+                        }
+                      >
+                        <CheckCircleIcon
+                          className={`${styles.instructorClasses__classStatusIcon} ${statusClass}`}
+                        />
+                        <div className={styles.instructorClasses__classStatus}>
+                          {eachClass.status}
+                        </div>
+                      </div>
+                    )}
 
-                        {/* Children */}
-                        <td className={styles.classesTable__td}>
-                          {editingClassId === eachClass.id ? (
-                            <div className={styles.classesTable__children}>
-                              {/* All of the initially registered children(recurringClassAttendance.children) are shown when 'Edit' button is clicked 
-                              in case instructors make a mistake in attendance report or non-registered children for the class attend the class*/}
-                              {eachClass.attendingChildren.map((child) => (
-                                <div
-                                  key={child.id}
-                                  className={styles.classesTable__child}
-                                >
-                                  <input
-                                    type="checkbox"
-                                    checked={selectedChildrenIds.has(child.id)}
-                                    onChange={(event) =>
-                                      handleChildChange(event, child.id)
-                                    }
-                                  />
-                                  <span>{child.name}</span>
-                                </div>
-                              ))}
-                            </div>
-                          ) : eachClass.children.length === 0 ? (
-                            "Absent"
-                          ) : (
-                            eachClass.children
-                              .map((child) => child.name)
-                              .join(", ")
-                          )}
-                        </td>
+                    <div className={styles.instructorClasses__children}>
+                      <UsersIcon
+                        className={styles.instructorClasses__childrenIcon}
+                      />
 
-                        {/* Class Status(Only for admin) */}
-                        <td className={styles.classesTable__td}>
-                          {isAdminAuthenticate &&
-                          editingClassId === eachClass.id ? (
-                            <div>
-                              <label>
-                                {!isPastClassEndTime(
-                                  eachClass.dateTime,
-                                  timeZone,
-                                ) ? (
-                                  <>
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedStatus === "booked"}
-                                      onChange={() =>
-                                        handleStatusChange("booked")
-                                      }
-                                    />
-                                    <span>Booked</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedStatus === "completed"}
-                                      onChange={() =>
-                                        handleStatusChange("completed")
-                                      }
-                                    />
-                                    <span>Completed</span>
-                                  </>
-                                )}
-                              </label>
-                              <label>
-                                <input
-                                  type="checkbox"
-                                  checked={
-                                    selectedStatus === "canceledByInstructor"
-                                  }
-                                  onChange={() =>
-                                    handleStatusChange("canceledByInstructor")
-                                  }
-                                />
-                                <span>Canceled by Instructor</span>
-                              </label>
+                      {editingClassId === eachClass.id ? (
+                        <div
+                          className={styles.instructorClasses__childrenToEdit}
+                        >
+                          {eachClass.attendingChildren.map((child) => (
+                            <div
+                              key={child.id}
+                              className={styles.instructorClasses__childToEdit}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedChildrenIds.has(child.id)}
+                                onChange={(event) =>
+                                  handleChildChange(event, child.id)
+                                }
+                                style={{ marginRight: "0.2rem" }}
+                              />
+                              <span>{child.name}</span>
                             </div>
-                          ) : (
-                            <div className={styles.classesTable__time}>
-                              <p>{eachClass.status}</p>
-                            </div>
-                          )}
-                        </td>
+                          ))}
+                        </div>
+                      ) : eachClass.children.length === 0 ? (
+                        <div
+                          className={styles.instructorClasses__childrenToEdit}
+                        >
+                          Absent
+                        </div>
+                      ) : (
+                        <div
+                          className={styles.instructorClasses__childrenToEdit}
+                        >
+                          {eachClass.children
+                            .map((child) => child.name)
+                            .join(", ")}
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-                        {/* Button */}
-                        <td className={styles.classesTable__td}>
-                          {editingClassId === eachClass.id ? (
-                            <>
-                              <button
-                                className={styles.classesTable__button}
-                                onClick={handleCancelClick}
-                              >
-                                Cancel
-                              </button>{" "}
-                              <button
-                                className={styles.classesTable__button}
-                                onClick={() =>
-                                  // Condition 1: Editing attendance is necessary
-                                  completeClass(
-                                    eachClass.id,
-                                    eachClass.attendingChildren, // attendingChildren = recurringClassAttendance.children(initially registered children)
-                                    eachClass.dateTime,
-                                    selectedStatus,
-                                  )
-                                }
-                              >
-                                {isAdminAuthenticate ? "Update" : "Complete"}
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                className={styles.classesTable__button}
-                                onClick={() =>
-                                  handleEditClick(
-                                    eachClass.id,
-                                    eachClass.children,
-                                    eachClass.dateTime,
-                                    eachClass.status,
-                                  )
-                                }
-                              >
-                                Edit
-                              </button>{" "}
-                              <button
-                                className={styles.classesTable__button}
-                                onClick={() =>
-                                  // Condition 2: Editing attendance is not necessary
-                                  completeClass(
-                                    eachClass.id,
-                                    eachClass.attendingChildren,
-                                    eachClass.dateTime,
-                                    "completed",
-                                    eachClass.children,
-                                  )
-                                }
-                              >
-                                Complete
-                              </button>
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </>
+                  <div className={styles.instructorClasses__time}>
+                    {isAdminAuthenticate ? (
+                      <Link
+                        href={`/admins/instructor-list/${instructorId}/class-schedule/${eachClass.id}`}
+                        passHref
+                      >
+                        {philippineTime}
+                      </Link>
+                    ) : (
+                      <Link
+                        href={`/instructors/${instructorId}/class-schedule/${eachClass.id}`}
+                        passHref
+                      >
+                        {philippineTime}
+                      </Link>
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.instructorClasses__buttons}>
+                  {editingClassId === eachClass.id &&
+                  eachClass.status === "booked" ? (
+                    <>
+                      <ActionButton
+                        btnText="Cancel"
+                        onClick={handleCancelClick}
+                        className="cancelEditing"
+                      />
+                      <ActionButton
+                        btnText="Complete"
+                        onClick={() =>
+                          completeClass(
+                            eachClass.id,
+                            eachClass.attendingChildren,
+                            eachClass.dateTime,
+                            selectedStatus,
+                          )
+                        }
+                        className="completeBtn"
+                      />
+                    </>
+                  ) : editingClassId === eachClass.id &&
+                    eachClass.status === "completed" ? (
+                    <>
+                      <ActionButton
+                        btnText="Cancel"
+                        onClick={handleCancelClick}
+                        className="cancelEditing"
+                      />
+                      <ActionButton
+                        btnText="Update"
+                        onClick={() =>
+                          completeClass(
+                            eachClass.id,
+                            eachClass.attendingChildren,
+                            eachClass.dateTime,
+                            selectedStatus,
+                          )
+                        }
+                        className="completeBtn"
+                      />
+                    </>
+                  ) : !isAdminAuthenticate &&
+                    eachClass.status === "completed" ? (
+                    <ActionButton
+                      btnText="Edit"
+                      onClick={() =>
+                        handleEditClick(
+                          eachClass.id,
+                          eachClass.children,
+                          eachClass.dateTime,
+                          eachClass.status,
+                        )
+                      }
+                      className="editAttendance"
+                    />
+                  ) : (
+                    <>
+                      <ActionButton
+                        btnText="Edit"
+                        onClick={() =>
+                          handleEditClick(
+                            eachClass.id,
+                            eachClass.children,
+                            eachClass.dateTime,
+                            eachClass.status,
+                          )
+                        }
+                        className="editAttendance"
+                      />
+                      <ActionButton
+                        btnText="Complete"
+                        onClick={() =>
+                          completeClass(
+                            eachClass.id,
+                            eachClass.attendingChildren,
+                            eachClass.dateTime,
+                            "completed",
+                            eachClass.children,
+                          )
+                        }
+                        className="completeBtn"
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+    </div>
   );
 };
 

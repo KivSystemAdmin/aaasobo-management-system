@@ -1,66 +1,99 @@
-.classesTable {
-  &__wrapper {
-    width: 100%;
-    overflow: hidden;
+@import "@/app/variables.module.scss";
+
+.instructorClasses__classItem {
+  &.statusBooked {
+    border-left: 8px solid $green-success;
+  }
+  &.statusCompleted {
+    border-left: 8px solid $completed-background-color;
+  }
+  &.statusCanceledByInstructor {
+    border-left: 8px solid $gray-canceled-by-instructor;
+  }
+  &.statusCanceled {
+    border-left: 8px solid $gray-background;
+  }
+}
+
+.instructorClasses {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #f9fafb;
+  padding: 1rem;
+  border-radius: 8px;
+
+  &__classDate {
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
   }
 
-  &__container {
-    background-color: #f9fafb;
-    padding: 2rem;
-    border-radius: 0.5rem;
-    overflow: hidden;
+  &__classStatusContainer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
   }
+  &__classStatusIcon {
+    height: 1.2rem;
 
-  &__desktop {
-    border-collapse: collapse;
-    width: 100%;
-    border: none;
+    &.statusBooked {
+      color: $green-success;
+    }
+    &.statusCompleted {
+      color: $completed-background-color;
+    }
+    &.statusCanceledByInstructor {
+      color: $gray-canceled-by-instructor;
+    }
+    &.statusCanceled {
+      color: $gray-background;
+    }
   }
-
-  &__head {
-    text-align: left;
-    font-weight: normal;
-  }
-
-  &__th {
-    padding: 0.5rem;
-    font-weight: medium;
-  }
-
-  &__body {
-    background-color: #ffffff;
+  &__classStatus {
     font-size: 0.9rem;
   }
 
-  &__td {
-    padding: 0.75rem;
+  &__classItem {
+    background-color: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    box-shadow:
+      rgba(0, 0, 0, 0.1) 0px 10px 15px -3px,
+      rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
   }
 
-  &__row:first-of-type &__td:first-of-type {
-    border-top-left-radius: 0.5rem;
+  &__classItemHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
   }
 
-  &__row:first-of-type &__td:last-of-type {
-    border-top-right-radius: 0.5rem;
+  &__children {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  &__childrenToEdit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+  }
+  &__childrenIcon {
+    height: 1.2rem;
   }
 
-  &__row:last-of-type &__td:first-of-type {
-    border-bottom-left-radius: 0.5rem;
-  }
-
-  &__row:last-of-type &__td:last-of-type {
-    border-bottom-right-radius: 0.5rem;
+  &__buttons {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
   }
 }
 
-.classesTable__children {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.classesTable__child {
-  display: flex;
-  align-items: center;
-  gap: 2px;
+.currentClassBackground {
+  background-color: #fff9f2;
 }

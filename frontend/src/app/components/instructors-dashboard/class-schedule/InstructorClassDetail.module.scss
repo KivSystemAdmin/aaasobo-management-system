@@ -1,0 +1,252 @@
+@import "@/app/variables.module.scss";
+
+.classCardContainer {
+  background-color: #f9fafb;
+  padding: 1rem;
+  border-radius: 8px;
+  min-height: 100%;
+
+  &__title {
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+}
+
+.classCard {
+  position: sticky;
+  top: 0;
+  background-color: white; // #fff9f2
+  padding: 0 25px 25px 25px;
+  border-radius: 12px;
+  box-shadow:
+    rgba(0, 0, 0, 0.1) 0px 10px 15px -3px,
+    rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+
+  &.statusBooked {
+    border-top: 17px solid $green-success;
+  }
+  &.statusCompleted {
+    border-top: 17px solid $completed-background-color;
+  }
+  &.statusCanceledByInstructor {
+    border-top: 17px solid $gray-canceled-by-instructor;
+  }
+  &.statusCanceled {
+    border-top: 17px solid $gray-background;
+  }
+}
+
+.classStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+
+  &__icon {
+    height: 2rem;
+    &.statusBooked {
+      color: $green-success;
+    }
+    &.statusCompleted {
+      color: $completed-background-color;
+    }
+    &.statusCanceledByInstructor {
+      color: $gray-canceled-by-instructor;
+    }
+    &.statusCanceled {
+      color: $gray-background;
+    }
+  }
+
+  &__name {
+    font-size: 26px;
+    font-weight: 500;
+  }
+}
+
+.dateTime {
+  display: flex;
+  margin-top: 30px;
+
+  &__iconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__icon {
+    height: 2rem;
+    margin-right: 50px;
+  }
+
+  &__details {
+    display: flex;
+    gap: 20px;
+  }
+
+  &__date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__day {
+    font-size: 35px;
+    font-weight: 500;
+  }
+
+  &__month {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  &__time {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px 0 2px 0;
+  }
+
+  &__dayOfWeek {
+    font-size: 20px;
+    font-weight: 400;
+  }
+
+  &__classTime {
+    font-size: 18px;
+  }
+}
+
+.classURL {
+  display: flex;
+  margin-top: 30px;
+
+  &__iconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__icon {
+    height: 2rem;
+    margin-right: 50px;
+  }
+}
+
+.children {
+  margin-top: 30px;
+
+  &__title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  &__iconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 180px;
+    background-color: #c2c1c3;
+    border: 5px solid #c2c1c3;
+  }
+
+  &__contentContainer {
+    display: flex;
+    gap: 30px;
+  }
+
+  &__content {
+    background-color: white;
+
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow:
+      rgba(0, 0, 0, 0.1) 0px 10px 15px -3px,
+      rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+  }
+
+  &__icon {
+    height: 1.7rem;
+    color: white;
+  }
+
+  &__nameTitle {
+    font-size: 14px;
+  }
+  &__name {
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  &__birthdateContainer {
+    margin-top: 10px;
+    background-color: #f2f2f2;
+    border-radius: 10px;
+    padding: 1rem;
+  }
+  &__birthdateTitle {
+    font-size: 14px;
+  }
+  &__birthdate {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  &__personalInfoContainer {
+    margin-top: 10px;
+    background-color: #f2f2f2;
+    border-radius: 10px;
+    padding: 1rem;
+  }
+  &__personalInfoTitle {
+    font-size: 14px;
+  }
+  &__personalInfo {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.guardian {
+  display: flex;
+  margin-top: 30px;
+
+  &__iconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__icon {
+    height: 2rem;
+    margin-right: 50px;
+  }
+}
+
+.notification {
+  display: flex;
+  font-size: 0.8rem;
+  margin-top: 40px;
+
+  &__iconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__icon {
+    height: 1.5rem;
+    margin-right: 10px;
+    color: $blue-primary;
+  }
+}
