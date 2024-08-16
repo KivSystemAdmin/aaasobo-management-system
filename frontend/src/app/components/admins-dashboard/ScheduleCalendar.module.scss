@@ -1,31 +1,79 @@
+@import "../../variables.module.scss";
+
 .root {
-  --time-width: 100px;
-  --time-height: 24px;
+  --column-width: 80px;
+  --cell-height: 40px;
+  --border: 1px solid black;
+  --border-thin: 1px solid lightgray;
 
+  width: calc(var(--column-width) * 8);
   display: flex;
+  border: var(--border-thin);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: $white-background;
+}
 
-  @mixin cell {
-    width: var(--time-width);
-    height: var(--time-height);
-    border: 1px solid black;
-  }
+.header {
+  height: var(--cell-height);
+  padding: 10px;
+  text-align: center;
+  border-bottom: var(--border);
+}
 
-  .time {
-    @include cell;
-    background-color: lightgray;
-  }
+.time,
+.disabledCell,
+.emptyCell,
+.selectedCell {
+  height: var(--cell-height);
+  padding: 10px;
+  text-align: center;
+  border-bottom: var(--border-thin);
+}
 
-  .emptyCell {
-    @include cell;
-  }
+.timeColumn {
+  width: var(--column-width);
+  border-right: var(--border);
+}
 
+.column {
+  width: var(--column-width);
+  border-right: var(--border-thin);
+
+  .disabledCell,
+  .emptyCell,
   .selectedCell {
-    @include cell;
-    background-color: lightgreen;
+    cursor: pointer;
   }
 
   .disabledCell {
-    @include cell;
-    background-color: gray;
+    background-color: lighten($gray-background, 5%);
+    cursor: not-allowed;
+  }
+
+  .emptyCell {
+    background-color: white;
+
+    &:hover {
+      background-color: $purple-accent;
+    }
+  }
+
+  .selectedCell {
+    --circle-diameter: 20px;
+
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:after {
+      content: "";
+      width: var(--circle-diameter);
+      height: var(--circle-diameter);
+      background-color: $purple-accent;
+      border-radius: 50%;
+      display: block;
+    }
   }
 }

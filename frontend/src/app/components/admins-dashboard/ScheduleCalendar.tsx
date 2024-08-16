@@ -39,7 +39,7 @@ export default function ScheduleCalendar({
 function TimeColumn() {
   return (
     <div className={styles.timeColumn}>
-      <p>Time</p>
+      <p className={styles.header} />
       {BusinessTime.times.map((time) => (
         <div key={time} className={styles.time}>
           {time}
@@ -63,8 +63,8 @@ function DayColumn({
 
   return (
     <div>
-      <p>{day}</p>
       <div className={styles.column}>
+        <p className={styles.header}>{day}</p>
         {BusinessTime.times.map((time) => {
           if (disabledTimes.includes(time)) {
             return <Cell.Disabled key={time} />;
