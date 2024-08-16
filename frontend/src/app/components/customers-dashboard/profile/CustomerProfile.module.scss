@@ -1,77 +1,139 @@
-.formContainer {
-  background-color: #f9fafb;
-  padding: 1rem;
-  border-radius: 0.375rem;
-}
+@import "@/app/variables.module.scss";
 
-.field {
+.customer {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 550px;
+  max-width: 550px;
+  min-height: 450px;
+  padding: 1.5rem;
+  border-radius: 10px;
   margin-bottom: 1rem;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  overflow: hidden;
 }
 
-.label {
-  margin-bottom: 0.5rem;
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
+// name
+.customerName {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 1rem;
+
+  &__nameSection {
+    width: 100%;
+    margin-right: 5px;
+  }
   &__text {
-    margin-bottom: 0.2rem;
+    font-size: 16px;
+    font-weight: 300;
+    width: 100%;
+  }
+  &__inputField {
+    font-size: 24px;
+    font-weight: 500;
+    padding: 3px 6px;
+    border-radius: 6px;
+    width: 100%;
+  }
+
+  &__name {
+    font-size: 24px;
+    font-weight: 500;
   }
 }
 
-.inputWrapper {
-  position: relative;
+.profileInfoIcon {
+  height: 70px;
+  width: 70px;
+  color: $blue-primary;
 }
 
-.inputField {
-  display: block;
-  background-color: white;
-  width: 100%;
-  border-radius: 0.375rem;
-  border: 1px solid #e5e7eb;
-  padding: 0.5rem 2.5rem;
-  font-size: 0.875rem;
-  cursor: default;
-  pointer-events: none;
+// email
+.email {
+  margin-top: 10px;
+  background-color: #f2f2f2;
+  border-radius: 6px;
+  padding: 20px 10px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
 
-  &:focus {
-    outline: none;
+  &__icon {
+    height: 25px;
+    width: 25px;
   }
 
-  &.editable {
-    pointer-events: all;
-    cursor: pointer;
-
-    &:focus {
-      border: 1px solid #0070f3;
-      outline: 1px solid #0070f3;
-    }
+  &__inputField {
+    padding: 3px 6px;
+    font-size: 20px;
+    font-weight: 400;
+    border-radius: 6px;
+    width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
   }
 
-  ::placeholder {
-    color: #6b7280;
+  &__name {
+    font-size: 20px;
+    font-weight: 400;
+    padding: 3px;
+    border-radius: 6px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
   }
 }
 
-.icon {
-  pointer-events: none;
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  height: 1.125rem;
-  width: 1.125rem;
-  transform: translateY(-50%);
-  color: #6b7280;
+// home
+.customerHome {
+  margin-top: 20px;
+  background-color: #f2f2f2;
+  border-radius: 6px;
+  padding: 20px 10px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+
+  &__iconContainer {
+    height: 25px;
+    width: 25px;
+    flex-shrink: 0;
+  }
+  &__icon {
+    height: 25px;
+    width: 25px;
+  }
+
+  &__inputField {
+    font-size: 20px;
+    font-weight: 400;
+    padding: 3px;
+    border-radius: 6px;
+    width: 50%;
+  }
+
+  &__name {
+    font-size: 20px;
+    font-weight: 400;
+    padding: 3px;
+    border-radius: 6px;
+  }
 }
 
-.buttonContainer {
-  &__editing {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-  }
+// buttons
+.buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+  margin-bottom: 10px;
+  gap: 30px;
+
+  &__editing,
   &__notEditing {
     display: flex;
-    justify-content: right;
+    gap: 40px;
   }
 }
 
@@ -82,4 +144,9 @@
   height: 100vh;
   font-size: 1.5rem;
   color: #333;
+}
+
+.addBtn {
+  margin-top: 10px;
+  margin-bottom: 20px;
 }

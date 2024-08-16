@@ -7,15 +7,15 @@ import {
   getChildrenByCustomerId,
 } from "@/app/helper/childrenApi";
 import {
-  CakeIcon,
-  IdentificationIcon,
-  PencilIcon,
-  UserCircleIcon as UserCircleOutline,
-} from "@heroicons/react/24/outline";
-import { UserCircleIcon as UserCircleSolid } from "@heroicons/react/24/solid";
+  PlusIcon,
+  UserCircleIcon as UserCircleSolid,
+} from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 import ActionButton from "../../ActionButton";
 import { formatBirthdateToISO, formatDateToISO } from "@/app/helper/dateUtils";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import RedirectButton from "../../RedirectButton";
 
 function ChildrenProfiles({
   customerId,
@@ -66,17 +66,16 @@ function ChildrenProfiles({
       childToEdit.birthdate === latestChildDataToEdit?.birthdate &&
       childToEdit.personalInfo === latestChildDataToEdit?.personalInfo
     ) {
-      return alert("No changes were made.");
+      return toast.info("No changes were made.");
     }
 
-    // Convert birthdate to ISO format or handle if undefined
     let birthdateInISO = "";
     if (childToEdit.birthdate) {
       try {
         birthdateInISO = formatDateToISO(childToEdit.birthdate);
       } catch (error) {
         console.error("Invalid date format:", error);
-        return alert("Invalid birthdate format.");
+        return toast.error("Invalid birthdate format.");
       }
     }
 
@@ -90,12 +89,17 @@ function ChildrenProfiles({
         personalInfo,
         customerId,
       );
-      alert(data.message);
+      toast.success("Child profile updated successfully!");
+
+      setChildren((prevChildren) =>
+        prevChildren?.map((child) =>
+          child.id === editingChildId ? data.child : child,
+        ),
+      );
 
       setEditingChildId(null);
-
-      setChildToEdit(data.child);
-      setLatestChildDataToEdit(data.child);
+      setChildToEdit(undefined);
+      setLatestChildDataToEdit(undefined);
     } catch (error) {
       console.error("Failed to edit child data:", error);
     }
@@ -132,20 +136,30 @@ function ChildrenProfiles({
   };
 
   return (
-    <>
+    <div className={styles.container}>
+      <div className={styles.addBtn}>
+        <RedirectButton
+          linkURL={`children-profiles/add-child`}
+          btnText="Add Child"
+          className="addBtn"
+          Icon={PlusIcon}
+        />
+      </div>
       {children ? (
-        <div>
+        <div className={styles.children}>
           {children.map((child) => (
-            <div className={styles.formContainer} key={child.id}>
+            <div className={styles.childCard} key={child.id}>
               {/* Child Name */}
-              <div className={styles.field}>
-                <label className={styles.label}>
-                  <p className={styles.label__text}>Name</p>
+              <div className={styles.childName}>
+                <UserCircleSolid className={styles.profileInfoIcon} />
+
+                <label className={styles.childName__label}>
+                  <p className={styles.childName__text}>Name</p>
 
                   {editingChildId === child.id ? (
-                    <div className={styles.inputWrapper}>
+                    <div className={styles.childName__inputWrapper}>
                       <input
-                        className={`${styles.inputField} ${editingChildId === child.id ? styles.editable : ""}`}
+                        className={`${styles.childName__inputField} ${editingChildId === child.id ? styles.editable : ""}`}
                         type="text"
                         value={
                           childToEdit?.id === child.id
@@ -163,13 +177,10 @@ function ChildrenProfiles({
                         }}
                         required
                       />
-
-                      <UserCircleOutline className={styles.icon} />
                     </div>
                   ) : (
-                    <div className={styles.profileInfo}>
-                      <UserCircleSolid className={styles.profileInfo__icon} />
-                      <div className={styles.profileInfo__data}>
+                    <div className={styles.childName}>
+                      <div className={styles.childName__name}>
                         {childToEdit && childToEdit.id === child.id
                           ? childToEdit.name
                           : child.name}
@@ -180,21 +191,20 @@ function ChildrenProfiles({
               </div>
 
               {/* Birthdate */}
-              <div className={styles.field}>
-                <label className={styles.label}>
-                  <p className={styles.label__text}>Birthdate</p>
+              <div className={styles.birthdate}>
+                <label className={styles.birthdate__label}>
+                  <p className={styles.birthdate__text}>Birthdate</p>
 
                   {editingChildId === child.id ? (
-                    <div className={styles.inputWrapper}>
+                    <div className={styles.birthdate__inputWrapper}>
                       <input
-                        className={`${styles.inputField} ${editingChildId === child.id ? styles.editable : ""}`}
+                        className={`${styles.birthdate__inputField} ${editingChildId === child.id ? styles.editable : ""}`}
                         type="date"
                         value={
                           childToEdit?.id === child.id
                             ? formatBirthdateToISO(childToEdit.birthdate)
                             : formatBirthdateToISO(child.birthdate)
                         }
-                        readOnly={editingChildId !== child.id}
                         onChange={(e) => {
                           if (editingChildId === child.id) {
                             const newBirthdate = e.target.value;
@@ -207,11 +217,9 @@ function ChildrenProfiles({
                         }}
                         required
                       />
-                      <CakeIcon className={styles.icon} />
                     </div>
                   ) : (
                     <div className={styles.profileInfo}>
-                      <CakeIcon className={styles.profileInfo__icon} />
                       <div className={styles.profileInfo__data}>
                         {childToEdit && childToEdit.id === child.id
                           ? formatBirthdateToISO(childToEdit.birthdate)
@@ -222,14 +230,14 @@ function ChildrenProfiles({
                 </label>
               </div>
 
-              <div className={styles.field}>
-                <label className={styles.label}>
-                  <p className={styles.label__text}>Personal Information</p>
+              <div className={styles.personalInfo}>
+                <label className={styles.personalInfo__label}>
+                  <p className={styles.personalInfo__text}>Notes</p>
 
                   {editingChildId === child.id ? (
-                    <div className={styles.inputWrapper}>
+                    <div className={styles.personalInfo__inputWrapper}>
                       <textarea
-                        className={`${styles.inputField} ${styles.textarea} ${editingChildId === child.id ? styles.editable : ""}`}
+                        className={`${styles.personalInfo__inputField} ${styles.textarea} ${editingChildId === child.id ? styles.editable : ""}`}
                         value={
                           childToEdit?.id === child.id
                             ? childToEdit.personalInfo
@@ -246,13 +254,9 @@ function ChildrenProfiles({
                         }}
                         required
                       />
-                      <IdentificationIcon className={styles.icon} />
                     </div>
                   ) : (
                     <div className={styles.profileInfo}>
-                      <IdentificationIcon
-                        className={styles.profileInfo__identificationIcon}
-                      />
                       <div className={styles.profileInfo__data}>
                         {childToEdit && childToEdit.id === child.id
                           ? childToEdit.personalInfo
@@ -263,11 +267,11 @@ function ChildrenProfiles({
                 </label>
               </div>
 
-              <div className={styles.buttonContainer}>
+              <div className={styles.buttons}>
                 {editingChildId === child.id ? (
-                  <div className={styles.buttonContainer__editing}>
+                  <div className={styles.buttons__editing}>
                     <ActionButton
-                      className="cancelBtn"
+                      className="cancelEditingChild"
                       btnText="Cancel"
                       type="button"
                       onClick={(e) => {
@@ -277,7 +281,7 @@ function ChildrenProfiles({
                     />
 
                     <ActionButton
-                      className="saveBtn"
+                      className="saveChild"
                       btnText="Save"
                       type="button"
                       onClick={() => {
@@ -286,18 +290,17 @@ function ChildrenProfiles({
                     />
                   </div>
                 ) : (
-                  <div className={styles.buttonContainer__notEditing}>
+                  <div className={styles.buttons__notEditing}>
                     <ActionButton
-                      className="deleteBtn"
+                      className="deleteChild"
                       btnText="Delete"
                       onClick={() => handleDeleteClick(child.id)}
                       disabled={editingChildId !== null}
                     />
                     <ActionButton
-                      className="editBtn"
+                      className="editChild"
                       btnText="Edit"
                       onClick={() => handleEditClick(child.id)}
-                      Icon={PencilIcon}
                       disabled={editingChildId !== null}
                     />
                   </div>
@@ -307,9 +310,9 @@ function ChildrenProfiles({
           ))}
         </div>
       ) : (
-        <p>Loading ...</p>
+        <p className={styles.loadingContainer}>Loading ...</p>
       )}
-    </>
+    </div>
   );
 }
 

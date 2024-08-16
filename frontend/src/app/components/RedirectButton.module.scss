@@ -266,3 +266,49 @@
     background-color: $gray-background-hover;
   }
 }
+
+.deleteChild,
+.cancelEditingChild {
+  background-color: #d9d9d9;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+  border: 1px solid transparent;
+  color: #333333;
+  padding: 0.5rem 0;
+  border-radius: 10px;
+  width: 130px;
+  height: 35px;
+
+  &:hover {
+    background-color: $back-btn-bc-hover;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.5);
+  }
+}
+
+.editChild,
+.saveChild {
+  background-color: $green-success;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+  border: 1px solid transparent;
+  color: #ffffff;
+  padding: 0.5rem;
+  border-radius: 10px;
+  width: 130px;
+  height: 35px;
+
+  &:hover {
+    background-color: $green-success-hover;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.5);
+  }
+}

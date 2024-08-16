@@ -1,7 +1,6 @@
 "use client";
 
 import styles from "./AddChildForm.module.scss";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useInput } from "@/app/hooks/useInput";
 import { addChild } from "@/app/helper/childrenApi";
@@ -14,6 +13,8 @@ import {
 import { formatDateToISO } from "@/app/helper/dateUtils";
 import ActionButton from "../../ActionButton";
 import RedirectButton from "../../RedirectButton";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function AddChildForm({
   customerId,
@@ -41,18 +42,18 @@ function AddChildForm({
         customerId,
       );
 
-      alert(data.message); // Set alert message temporarily.
+      toast.success("Child registered successfully!");
 
-      if (isAdminAuthenticated) {
-        // Redirect the admin to children-profiles page
-        router.push(`/admins/customer-list/${customerId}`);
-        return;
-      }
-
-      // Redirect the user to children-profiles page
-      router.push(`/customers/${customerId}/children-profiles`);
+      setTimeout(() => {
+        if (isAdminAuthenticated) {
+          router.push(`/admins/customer-list/${customerId}`);
+        } else {
+          router.push(`/customers/${customerId}/children-profiles`);
+        }
+      }, 3000); // Adjust this delay if needed
     } catch (error) {
       console.error("Failed to add a new child data:", error);
+      toast.error("Failed to register the child.");
     }
   };
 
@@ -128,7 +129,7 @@ function AddChildForm({
           />
         ) : (
           <RedirectButton
-            btnText="Cancel"
+            btnText="Back"
             linkURL={`/customers/${customerId}/children-profiles`}
             className="cancelBtn"
           />

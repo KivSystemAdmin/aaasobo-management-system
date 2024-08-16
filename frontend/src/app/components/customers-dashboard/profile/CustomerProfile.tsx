@@ -7,11 +7,12 @@ import {
   UserCircleIcon,
   EnvelopeIcon,
   HomeIcon,
-  PencilIcon,
-  ArrowPathIcon,
-} from "@heroicons/react/24/outline";
+} from "@heroicons/react/24/solid";
 import { prefectures } from "@/app/helper/data";
 import ActionButton from "../../ActionButton";
+import { CheckIcon } from "@heroicons/react/24/outline";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function CustomerProfile({ customerId }: { customerId: string }) {
   const [customer, setCustomer] = useState<Customer | undefined>();
@@ -64,7 +65,7 @@ function CustomerProfile({ customerId }: { customerId: string }) {
         customer.email,
         customer.prefecture,
       );
-      alert(data.message);
+      toast.success("Profile edited successfully!");
 
       setIsEditing(false);
       setCustomer(data.customer);
@@ -84,17 +85,18 @@ function CustomerProfile({ customerId }: { customerId: string }) {
   return (
     <>
       {customer ? (
-        <form className={styles.formContainer} onSubmit={handleFormSubmit}>
+        <form className={styles.customer} onSubmit={handleFormSubmit}>
           {/* Customer Name */}
-          <div className={styles.field}>
-            <label className={styles.label}>
-              <p className={styles.label__text}>Name</p>
-              <div className={styles.inputWrapper}>
+          <label className={styles.customerName}>
+            <UserCircleIcon className={styles.profileInfoIcon} />
+
+            <div className={styles.customerName__nameSection}>
+              <p className={styles.customerName__text}>Name</p>
+              {isEditing ? (
                 <input
-                  className={`${styles.inputField} ${isEditing ? styles.editable : ""}`}
+                  className={`${styles.customerName__inputField} ${isEditing ? styles.editable : ""}`}
                   type="text"
                   value={customer.name}
-                  readOnly={!isEditing}
                   onChange={(e) => {
                     if (isEditing) {
                       setCustomer({ ...customer, name: e.target.value });
@@ -102,74 +104,68 @@ function CustomerProfile({ customerId }: { customerId: string }) {
                   }}
                   required
                 />
-                <UserCircleIcon className={styles.icon} />
-              </div>
-            </label>
-          </div>
+              ) : (
+                <div className={styles.customerName__name}>{customer.name}</div>
+              )}
+            </div>
+          </label>
 
           {/* Customer email */}
-          <div className={styles.field}>
-            <label className={styles.label}>
-              <p className={styles.label__text}>E-mail</p>
-              <div className={styles.inputWrapper}>
-                <input
-                  className={`${styles.inputField} ${isEditing ? styles.editable : ""}`}
-                  type="email"
-                  value={customer.email}
-                  readOnly={!isEditing}
-                  onChange={(e) => {
-                    if (isEditing) {
-                      setCustomer({ ...customer, email: e.target.value });
-                    }
-                  }}
-                  required
-                />
-                <EnvelopeIcon className={styles.icon} />
-              </div>
-            </label>
-          </div>
+          <label className={styles.email}>
+            <div className={styles.email__iconContainer}>
+              <EnvelopeIcon className={styles.email__icon} />
+            </div>
+            {isEditing ? (
+              <input
+                className={`${styles.email__inputField} ${isEditing ? styles.editable : ""}`}
+                type="email"
+                value={customer.email}
+                onChange={(e) => {
+                  if (isEditing) {
+                    setCustomer({ ...customer, email: e.target.value });
+                  }
+                }}
+                required
+              />
+            ) : (
+              <div className={styles.email__name}>{customer.email}</div>
+            )}
+          </label>
 
           {/* Customer prefecture */}
-          <div className={styles.field}>
-            <label className={styles.label}>
-              <p className={styles.label__text}>Prefecture</p>
-              <div className={styles.inputWrapper}>
-                {isEditing ? (
-                  <select
-                    className={`${styles.inputField} ${isEditing ? styles.editable : ""}`}
-                    value={customer.prefecture}
-                    onChange={(e) => {
-                      setCustomer({
-                        ...customer,
-                        prefecture: e.target.value,
-                      });
-                    }}
-                    required
-                  >
-                    {prefectures.map((prefecture) => (
-                      <option key={prefecture} value={prefecture}>
-                        {prefecture}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    className={styles.inputField}
-                    type="text"
-                    value={customer.prefecture}
-                    readOnly
-                  />
-                )}
-                <HomeIcon className={styles.icon} />
-              </div>
-            </label>
-          </div>
+          <label className={styles.customerHome}>
+            <HomeIcon className={styles.customerHome__icon} />
 
-          <div className={styles.buttonContainer}>
             {isEditing ? (
-              <div className={styles.buttonContainer__editing}>
+              <select
+                className={`${styles.customerHome__inputField} ${isEditing ? styles.editable : ""}`}
+                value={customer.prefecture}
+                onChange={(e) => {
+                  setCustomer({
+                    ...customer,
+                    prefecture: e.target.value,
+                  });
+                }}
+                required
+              >
+                {prefectures.map((prefecture) => (
+                  <option key={prefecture} value={prefecture}>
+                    {prefecture}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div className={styles.customerHome__name}>
+                {customer.prefecture}
+              </div>
+            )}
+          </label>
+
+          <div className={styles.buttons}>
+            {isEditing ? (
+              <div className={styles.buttons__editing}>
                 <ActionButton
-                  className="cancelBtn"
+                  className="cancelEditingChild"
                   btnText="Cancel"
                   type="button"
                   onClick={(e) => {
@@ -179,19 +175,18 @@ function CustomerProfile({ customerId }: { customerId: string }) {
                 />
 
                 <ActionButton
-                  className="saveBtn"
+                  className="saveChild"
                   btnText="Save"
                   type="submit"
-                  Icon={ArrowPathIcon}
+                  Icon={CheckIcon}
                 />
               </div>
             ) : (
-              <div className={styles.buttonContainer__notEditing}>
+              <div className={styles.buttons__notEditing}>
                 <ActionButton
-                  className="editBtn"
+                  className="editChild"
                   btnText="Edit"
                   onClick={handleEditClick}
-                  Icon={PencilIcon}
                 />
               </div>
             )}
