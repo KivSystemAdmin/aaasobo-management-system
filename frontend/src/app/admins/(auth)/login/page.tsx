@@ -4,6 +4,13 @@ import React, { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useInput } from "@/app/hooks/useInput";
 import { isValidLogin } from "@/app/helper/validationUtils";
+import styles from "./page.module.scss";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
+import TextInput from "@/app/components/TextInput";
+import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
+import ActionButton from "@/app/components/ActionButton";
 
 function Login() {
   const [email, onEmailChange] = useInput();
@@ -19,7 +26,8 @@ function Login() {
       password,
     });
 
-    if (!checkResult) {
+    if (!checkResult.isValid) {
+      toast.warning(checkResult.message);
       return;
     }
 
@@ -39,31 +47,56 @@ function Login() {
     });
 
     const data = await response.json();
-    const message = data.message;
 
     if (!response.ok) {
-      alert(message); // Set alert message temporarily.
+      toast.error("Login Failed. Please check email/password.");
       return;
     }
 
-    alert("Logged in successfully"); // Set alert message temporarily.
     router.push("/admins/calendar");
   };
 
   return (
     <div>
-      <h2>Login</h2>
-      <form onSubmit={loginHandler}>
-        <label>
-          Email
-          <input type="email" value={email} onChange={onEmailChange} />
-        </label>
-        <label>
-          Password
-          <input type="password" value={password} onChange={onPasswordChange} />
-        </label>
-        <button type="submit">Login</button>
-      </form>
+      <ToastContainer />
+      <div className={styles.outsideContainer}>
+        <div className={styles.container}>
+          <Image
+            src={"/images/logo2.svg"}
+            alt="logo"
+            width={100}
+            height={100}
+            className={styles.logo}
+          />
+          <h2>Login for admin</h2>
+          <form className={styles.form}>
+            <TextInput
+              label="Email"
+              type="email"
+              value={email}
+              placeholder="example@aaasobo.com"
+              onChange={onEmailChange}
+              icon={<EnvelopeIcon className={styles.icon} />}
+            />
+            <TextInput
+              label="Password"
+              type="password"
+              value={password}
+              placeholder="password"
+              onChange={onPasswordChange}
+              icon={<LockClosedIcon className={styles.icon} />}
+            />
+            {/* <Link href="/customers/register">Forgot Password?</Link> */}
+            <div className={styles.buttonWrapper}>
+              <ActionButton
+                btnText="Login"
+                onClick={loginHandler}
+                className="bookBtn"
+              />
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
