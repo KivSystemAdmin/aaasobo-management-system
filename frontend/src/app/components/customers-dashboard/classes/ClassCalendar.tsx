@@ -15,6 +15,8 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import Modal from "@/app/components/Modal";
 import ActionButton from "../../ActionButton";
 import ClassesTable from "../../ClassesTable";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function ClassCalendar({
   customerId,
@@ -50,13 +52,23 @@ function ClassCalendar({
       setClasses(classesData);
 
       const rebookableClasses = classesData
-        .filter(
-          (eachClass) =>
-            (eachClass.status === "canceledByCustomer" &&
+        .filter((eachClass) => {
+          const fiveMonthsLaterEndOfMonth = new Date(
+            formatFiveMonthsLaterEndOfMonth(eachClass.dateTime, "Asia/Tokyo"),
+          );
+
+          const now = new Date(
+            new Date().toLocaleString("en-US", { timeZone: "Asia/Tokyo" }),
+          );
+
+          return (
+            ((eachClass.status === "canceledByCustomer" &&
               eachClass.isRebookable) ||
-            (eachClass.status === "canceledByInstructor" &&
-              eachClass.isRebookable),
-        )
+              (eachClass.status === "canceledByInstructor" &&
+                eachClass.isRebookable)) &&
+            now <= fiveMonthsLaterEndOfMonth
+          );
+        })
         .sort((a, b) => {
           const dateA = new Date(a.dateTime).getTime();
           const dateB = new Date(b.dateTime).getTime();
@@ -159,6 +171,7 @@ function ClassCalendar({
         // Re-fetch data to update the state
         fetchData();
         handleCancelingModalClose();
+        toast.success("The classes have been successfully canceled!");
       } catch (error) {
         console.error("Failed to cancel classes:", error);
         setError("Failed to cancel the classes. Please try again later.");

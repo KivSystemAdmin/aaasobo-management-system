@@ -76,7 +76,7 @@ function ClassDetails({
 
       return {
         ...prev,
-        children: attendedChildren,
+        attendingChildren: attendedChildren,
         status: updatedStatus,
       };
     });

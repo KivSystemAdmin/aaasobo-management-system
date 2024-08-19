@@ -1,6 +1,5 @@
 import {
   formatBirthdateToISO,
-  formatDate,
   formatTime,
   formatTimeWithAddedMinutes,
   getDay,
@@ -30,65 +29,6 @@ const InstructorClassDetail = ({
   if (!classDetail) {
     return <div>No class details available</div>;
   }
-
-  const renderChildren = () => {
-    const childrenToDisplay = classDetail.children;
-
-    // Check if there are no children to display
-    if (childrenToDisplay.length === 0) {
-      return (
-        <h3>
-          {classDetail.status === "completed"
-            ? "Attended Children"
-            : "Attending Children"}
-          :{" "}
-          <span style={{ fontSize: "0.8em", fontWeight: "normal" }}>
-            The registered children were absent.
-          </span>
-        </h3>
-      );
-    }
-
-    return (
-      <div>
-        <h3>
-          {classDetail.status === "booked"
-            ? "Attending Children"
-            : "Attended Children"}
-        </h3>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Name</th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                Date of Birth
-              </th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                Personal Info
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {childrenToDisplay.map((child) => (
-              <tr key={child.id}>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  {child.name}
-                </td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  {child.birthdate
-                    ? formatDate(new Date(child.birthdate), timeZone)
-                    : "N/A"}
-                </td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  {child.personalInfo || "N/A"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
 
   const statusClass =
     classDetail.status === "booked"
@@ -199,12 +139,12 @@ const InstructorClassDetail = ({
         {/* Children */}
         <div className={styles.children}>
           <div className={styles.children__title}>
-            {classDetail.status === "booked"
+            {classDetail.status === "booked" || "canceledByCustomer"
               ? "Attending Children"
               : "Attended Children"}
           </div>
 
-          {classDetail.children.length === 0 ? (
+          {classDetail.attendingChildren.length === 0 ? (
             <div className={styles.children__header}>
               <div className={styles.children__iconContainer}>
                 <UserIconOutline className={styles.children__icon} />
@@ -217,7 +157,7 @@ const InstructorClassDetail = ({
             </div>
           ) : (
             <div className={styles.children__contentContainer}>
-              {classDetail.children.map((child) => (
+              {classDetail.attendingChildren.map((child) => (
                 <div key={child.id} className={styles.children__content}>
                   <div className={styles.children__header}>
                     <div className={styles.children__iconContainer}>

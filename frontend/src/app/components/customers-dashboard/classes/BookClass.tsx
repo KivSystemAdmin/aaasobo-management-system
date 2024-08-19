@@ -3,6 +3,7 @@ import { getInstructors } from "@/app/helper/instructorsApi";
 import { getChildrenByCustomerId } from "@/app/helper/childrenApi";
 import BookClassForm from "@/app/components/customers-dashboard/classes/BookClassForm";
 import { getClassesByCustomerId } from "@/app/helper/classesApi";
+import { formatFiveMonthsLaterEndOfMonth } from "@/app/helper/dateUtils";
 import Breadcrumb from "../../Breadcrumb";
 import SimpleLoading from "../../SimpleLoading";
 
@@ -51,13 +52,24 @@ function BookClass({
     const fetchRebookableClassesByCustomerId = async (customerId: string) => {
       try {
         const classes: ClassType[] = await getClassesByCustomerId(customerId);
-        const rebookableClasses = classes.filter(
-          (eachClass) =>
+        const rebookableClasses = classes.filter((eachClass) => {
+          const fiveMonthsLaterEndOfMonth = new Date(
+            formatFiveMonthsLaterEndOfMonth(eachClass.dateTime, "Asia/Tokyo"),
+          );
+
+          const now = new Date(
+            new Date().toLocaleString("en-US", { timeZone: "Asia/Tokyo" }),
+          );
+
+          return (
             (eachClass.status === "canceledByCustomer" &&
               eachClass.isRebookable) ||
             (eachClass.status === "canceledByInstructor" &&
-              eachClass.isRebookable),
-        );
+              eachClass.isRebookable &&
+              now <= fiveMonthsLaterEndOfMonth)
+          );
+        });
+
         const oldestRebookableClass = rebookableClasses.reduce(
           (oldest, current) => {
             return new Date(current.dateTime) < new Date(oldest.dateTime)

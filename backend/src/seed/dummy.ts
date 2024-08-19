@@ -196,6 +196,15 @@ async function insertClasses() {
       {
         instructorId: helen.id,
         customerId: alice.id,
+        dateTime: "2024-01-01T11:00:00+09:00",
+        status: "canceledByCustomer",
+        isRebookable: true,
+        subscriptionId: alice.subscription[0].id,
+        recurringClassId: 1,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
         dateTime: "2024-06-01T11:00:00+09:00",
         status: "completed",
         isRebookable: false,

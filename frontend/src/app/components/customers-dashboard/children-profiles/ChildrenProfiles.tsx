@@ -124,7 +124,7 @@ function ChildrenProfiles({
         prevChildren?.filter((child) => child.id !== childId),
       );
 
-      alert(deletedChildData.message);
+      toast.success(deletedChildData.message);
     } catch (error) {
       console.error("Failed to delete the child profile:", error);
       if (error instanceof Error) {

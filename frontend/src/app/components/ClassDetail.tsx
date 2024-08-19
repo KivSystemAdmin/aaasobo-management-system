@@ -265,7 +265,7 @@ const ClassDetail = ({
             <div>
               <p>
                 Classes canceled by the day before are counted towards the
-                number of bookable classes and are valid for 6 months.
+                number of bookable classes and are valid for 5 months.
               </p>
             </div>
           </div>
@@ -277,7 +277,7 @@ const ClassDetail = ({
             <div>
               <p>
                 Classes canceled by the instructor are counted towards the
-                number of bookable classes and are valid for 6 months.
+                number of bookable classes and are valid for 5 months.
               </p>
             </div>
           </div>

@@ -256,19 +256,26 @@ export const cancelClassById = async (
     throw new Error("Class cannot be canceled");
   }
 
-  // If classes are canceled before the class dates (!isPastPrevDayDeadline), they can be rescheduled (isRebookable: true).
-  // Otherwise (isPastPrevDayDeadline), not (isRebookable: false)
-  if (!isPastPrevDayDeadline) {
-    await prisma.class.update({
-      where: { id: classId },
-      data: { status: "canceledByCustomer" },
+  // Use a transaction to ensure both operations succeed or fail together
+  await prisma.$transaction(async (prisma) => {
+    // Delete class attendance records
+    await prisma.classAttendance.deleteMany({
+      where: { classId },
     });
-  } else {
-    await prisma.class.update({
-      where: { id: classId },
-      data: { status: "canceledByCustomer", isRebookable: false },
-    });
-  }
+    // If classes are canceled before the class dates (!isPastPrevDayDeadline), they can be rescheduled (isRebookable: true).
+    // Otherwise (isPastPrevDayDeadline), not (isRebookable: false)
+    if (!isPastPrevDayDeadline) {
+      await prisma.class.update({
+        where: { id: classId },
+        data: { status: "canceledByCustomer" },
+      });
+    } else {
+      await prisma.class.update({
+        where: { id: classId },
+        data: { status: "canceledByCustomer", isRebookable: false },
+      });
+    }
+  });
 };
 
 export const fetchInstructorClasses = async (instructorId: number) => {
@@ -277,17 +284,12 @@ export const fetchInstructorClasses = async (instructorId: number) => {
       where: { instructorId },
       include: {
         instructor: true,
-        customer: true,
-        classAttendance: { include: { children: true } },
-        recurringClass: {
+        customer: {
           include: {
-            recurringClassAttendance: {
-              include: {
-                children: true,
-              },
-            },
+            children: true,
           },
         },
+        classAttendance: { include: { children: true } },
       },
       orderBy: { dateTime: "asc" },
     });
@@ -371,6 +373,9 @@ export const isInstructorBooked = async (
       where: {
         instructorId,
         dateTime: new Date(dateTime),
+        NOT: {
+          status: "canceledByCustomer", // if the class status is 'canceledByCustomer, which means the time slot is available (not booked)
+        },
       },
     });
     return existingBooking !== null;

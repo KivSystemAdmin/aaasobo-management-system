@@ -44,13 +44,11 @@ function AddChildForm({
 
       toast.success("Child registered successfully!");
 
-      setTimeout(() => {
-        if (isAdminAuthenticated) {
-          router.push(`/admins/customer-list/${customerId}`);
-        } else {
-          router.push(`/customers/${customerId}/children-profiles`);
-        }
-      }, 3000); // Adjust this delay if needed
+      if (isAdminAuthenticated) {
+        router.push(`/admins/customer-list/${customerId}`);
+      } else {
+        router.push(`/customers/${customerId}/children-profiles`);
+      }
     } catch (error) {
       console.error("Failed to add a new child data:", error);
       toast.error("Failed to register the child.");

@@ -163,8 +163,8 @@ type InstructorClassDetail = {
   classURL: string;
   meetingId: string;
   passcode: string;
-  children: Child[];
   attendingChildren: Child[];
+  customerChildren: Child[];
   status:
     | "booked"
     | "completed"

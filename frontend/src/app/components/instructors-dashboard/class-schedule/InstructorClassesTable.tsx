@@ -58,7 +58,7 @@ const InstructorClassesTable = ({
   ) => {
     if (!isPastClassEndTime(classStart, timeZone) && !isAdminAuthenticate) {
       return alert(
-        "You cannot complete the class as it is before the class end time.",
+        "You cannot edit the class as it is before the class end time.",
       );
     }
     setEditingClassId(classId);
@@ -93,7 +93,7 @@ const InstructorClassesTable = ({
 
   const completeClass = async (
     classToCompleteId: number,
-    registeredChildren: Child[], // All of the initially registered children(recurringClassAttendance.children)
+    registeredChildren: Child[], // All of the initially registered children(all the children of the customer)
     classStart: string,
     updatedStatus: StatusType,
     childrenWithoutEditingAttendance?: Child[],
@@ -103,7 +103,7 @@ const InstructorClassesTable = ({
       updatedStatus === "completed"
     ) {
       return alert(
-        "You cannot edit the class as it is before the class end time.",
+        "You cannot complete the class as it is before the class end time.",
       );
     }
 
@@ -128,8 +128,7 @@ const InstructorClassesTable = ({
           eachClass.id === classToCompleteId
             ? {
                 ...eachClass,
-                children:
-                  childrenWithoutEditingAttendance ||
+                attendingChildren:
                   childrenWithoutEditingAttendance ||
                   registeredChildren.filter((child) =>
                     attendedChildrenIds.includes(child.id),
@@ -268,7 +267,7 @@ const InstructorClassesTable = ({
                         <div
                           className={styles.instructorClasses__childrenToEdit}
                         >
-                          {eachClass.attendingChildren.map((child) => (
+                          {eachClass.customerChildren.map((child) => (
                             <div
                               key={child.id}
                               className={styles.instructorClasses__childToEdit}
@@ -285,7 +284,7 @@ const InstructorClassesTable = ({
                             </div>
                           ))}
                         </div>
-                      ) : eachClass.children.length === 0 ? (
+                      ) : eachClass.attendingChildren.length === 0 ? (
                         <div
                           className={styles.instructorClasses__childrenToEdit}
                         >
@@ -295,7 +294,7 @@ const InstructorClassesTable = ({
                         <div
                           className={styles.instructorClasses__childrenToEdit}
                         >
-                          {eachClass.children
+                          {eachClass.attendingChildren
                             .map((child) => child.name)
                             .join(", ")}
                         </div>
@@ -336,7 +335,7 @@ const InstructorClassesTable = ({
                         onClick={() =>
                           completeClass(
                             eachClass.id,
-                            eachClass.attendingChildren,
+                            eachClass.customerChildren,
                             eachClass.dateTime,
                             selectedStatus,
                           )
@@ -357,7 +356,7 @@ const InstructorClassesTable = ({
                         onClick={() =>
                           completeClass(
                             eachClass.id,
-                            eachClass.attendingChildren,
+                            eachClass.customerChildren,
                             eachClass.dateTime,
                             selectedStatus,
                           )
@@ -366,13 +365,16 @@ const InstructorClassesTable = ({
                       />
                     </>
                   ) : !isAdminAuthenticate &&
+                    eachClass.status === "canceledByInstructor" ? (
+                    ""
+                  ) : !isAdminAuthenticate &&
                     eachClass.status === "completed" ? (
                     <ActionButton
                       btnText="Edit"
                       onClick={() =>
                         handleEditClick(
                           eachClass.id,
-                          eachClass.children,
+                          eachClass.attendingChildren,
                           eachClass.dateTime,
                           eachClass.status,
                         )
@@ -386,7 +388,7 @@ const InstructorClassesTable = ({
                         onClick={() =>
                           handleEditClick(
                             eachClass.id,
-                            eachClass.children,
+                            eachClass.attendingChildren,
                             eachClass.dateTime,
                             eachClass.status,
                           )
@@ -398,10 +400,10 @@ const InstructorClassesTable = ({
                         onClick={() =>
                           completeClass(
                             eachClass.id,
-                            eachClass.attendingChildren,
+                            eachClass.customerChildren,
                             eachClass.dateTime,
                             "completed",
-                            eachClass.children,
+                            eachClass.attendingChildren,
                           )
                         }
                         className="completeBtn"

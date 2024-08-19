@@ -459,7 +459,6 @@ export const getInstructorClasses = async (
         status,
         classAttendance,
         isRebookable,
-        recurringClass,
       } = eachClass;
 
       return {
@@ -469,20 +468,18 @@ export const getInstructorClasses = async (
         classURL: instructor.classURL,
         meetingId: instructor.meetingId,
         passcode: instructor.passcode,
-        children: classAttendance.map((classAttendance) => ({
+        attendingChildren: classAttendance.map((classAttendance) => ({
           id: classAttendance.children.id,
           name: classAttendance.children.name,
           birthdate: classAttendance.children.birthdate,
           personalInfo: classAttendance.children.personalInfo,
         })),
-        attendingChildren: recurringClass?.recurringClassAttendance.map(
-          (attendance) => ({
-            id: attendance.children.id,
-            name: attendance.children.name,
-            birthdate: attendance.children.birthdate,
-            personalInfo: attendance.children.personalInfo,
-          }),
-        ),
+        customerChildren: customer.children.map((child) => ({
+          id: child.id,
+          name: child.name,
+          birthdate: child.birthdate,
+          personalInfo: child.personalInfo,
+        })),
         status,
         isRebookable,
       };

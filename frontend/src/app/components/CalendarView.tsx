@@ -26,7 +26,9 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   XCircleIcon,
-} from "@heroicons/react/24/outline";
+} from "@heroicons/react/24/solid";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type InstructorCalendarViewProps = {
   events: Array<{
@@ -240,9 +242,9 @@ const CalendarView = forwardRef<
         fetchData?.();
         fetchClasses();
         handleModalClose();
+        toast.success("The class has been successfully canceled!");
       } catch (error) {
         console.error("Failed to cancel the class:", error);
-        // setError("Failed to cancel the class. Please try again later.");
       }
     };
 
