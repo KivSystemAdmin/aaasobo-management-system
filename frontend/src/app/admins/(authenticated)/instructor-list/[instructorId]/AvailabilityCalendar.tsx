@@ -68,7 +68,11 @@ function AvailabilityCalendarInternal({
 }
 
 function buildEvents(instructor: Instructor | undefined) {
-  const toEvents = (availabilities: { dateTime: string }[], color?: string) =>
+  const toEvents = (
+    availabilities: { dateTime: string }[],
+    color: string,
+    textColor: string,
+  ) =>
     availabilities.map((dateTime) => {
       const start = dateTime.dateTime;
       const end = new Date(
@@ -79,12 +83,18 @@ function buildEvents(instructor: Instructor | undefined) {
         start,
         end,
         color,
+        textColor,
       };
     });
-  const availabilities = toEvents(instructor?.availabilities ?? [], "#66FF66");
+  const availabilities = toEvents(
+    instructor?.availabilities ?? [],
+    "#A2B098",
+    "#FFF",
+  );
   const unavailabilities = toEvents(
     instructor?.unavailabilities ?? [],
-    "#b5c4ab",
+    "#FFEBE0",
+    "#D7590F",
   );
   return [...availabilities, ...unavailabilities];
 }
