@@ -2,11 +2,11 @@
 
 // --- Header Part -----------------
 .headerToolbar {
+  flex-grow: 1;
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   padding: 0 0 0.7rem 0.5rem;
-  gap: 15px;
+  gap: 30px;
 }
 
 .toolbarSection {
@@ -16,8 +16,8 @@
 }
 
 .calendarHeader {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border: 5px solid $blue-primary;
   border-radius: 180px;
   color: white;
@@ -28,12 +28,19 @@
   cursor: pointer;
 }
 
+.calendarTitleContainer {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+
 .fcToolbarTitle {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 500;
 }
 
 .todayBtn {
+  height: 39px;
   padding: 0.5rem 1rem;
   border: none;
   cursor: pointer;
@@ -51,34 +58,70 @@
 // --- View Part ------------------------------
 // -- Event blocks -----------
 .eventBlock {
-  color: white;
   white-space: nowrap;
-  padding: 3px;
+  overflow: hidden;
+  text-overflow: clip;
+  box-sizing: border-box;
+  padding: 0.5px 2px;
   display: flex;
   align-items: center;
+  box-shadow:
+    rgba(14, 63, 126, 0.06) 0px 0px 0px 1px,
+    rgba(42, 51, 70, 0.03) 0px 1px 1px -0.5px,
+    rgba(42, 51, 70, 0.04) 0px 2px 2px -1px,
+    rgba(42, 51, 70, 0.04) 0px 3px 3px -1.5px,
+    rgba(42, 51, 70, 0.03) 0px 5px 5px -2.5px,
+    rgba(42, 51, 70, 0.03) 0px 10px 10px -5px,
+    rgba(42, 51, 70, 0.03) 0px 24px 24px -8px;
 }
 
 .eventTime {
-  font-size: 12px;
+  font-size: 11.5px;
   margin-right: 5px;
   font-weight: 400;
 }
 
 .eventTitle {
-  font-size: 14px;
+  font-size: 11.5px;
   font-weight: 400;
 }
 
 .instructorIcon {
   border-radius: 50%;
-  border: 1.5px solid white;
+  border: 1.5px solid #7f8c6b;
   margin-right: 5px;
 }
 
-.classStatusIconContainer {
-  height: 25px;
-  width: 25px;
+.classStatusIcon {
+  height: 17px;
+  width: 17px;
   margin-right: 5px;
+
+  &__completed {
+    color: #7f8c6b;
+    width: 17px;
+  }
+
+  &__canceled {
+    color: #d7590f;
+    width: 18px;
+  }
+}
+
+.eventDetails {
+  color: white;
+  display: flex;
+  align-items: center;
+  &.booked {
+    color: #2c6e01;
+  }
+  &.completed {
+    color: #7f8c6b;
+  }
+  &.canceled {
+    color: #d7590f;
+    text-decoration: line-through;
+  }
 }
 
 // -- Holiday cells ---------------------------
@@ -88,13 +131,4 @@
 
 .holidayDateNumber {
   color: #997676;
-}
-
-.eventBlock {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: clip;
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
 }

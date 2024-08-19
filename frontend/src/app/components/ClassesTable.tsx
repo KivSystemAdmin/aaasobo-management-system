@@ -113,6 +113,7 @@ const ClassesTable = ({
                           onChange={() =>
                             toggleSelectClass(eachClass.id, eachClass.dateTime)
                           }
+                          onClick={(e) => e.stopPropagation()}
                         />
                       ) : (
                         ""

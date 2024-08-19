@@ -15,7 +15,7 @@ body {
   overflow-x: hidden;
 }
 
-// Styling for the calendar
+// Styling for the calendar ------------------------------
 .fc-day-sun {
   background-color: #f9f4f1 !important;
   color: red !important;
@@ -29,10 +29,6 @@ body {
   font-weight: 400;
 }
 
-.fc-day-today {
-  background-color: white !important;
-}
-
 .fc-day-today .fc-daygrid-day-number {
   background-color: $blue-primary !important;
   border-radius: 180px;
@@ -42,4 +38,69 @@ body {
   text-align: center;
   font-size: 0.9rem;
   margin: 2px;
+}
+
+.fc-toolbar-title {
+  font-weight: 500;
+}
+
+.fc-prev-button {
+  &.fc-button {
+    &.fc-button-primary {
+      color: white;
+      background-color: $blue-primary;
+      margin-right: 5px;
+    }
+  }
+}
+
+.fc-next-button {
+  &.fc-button {
+    &.fc-button-primary {
+      color: white;
+      background-color: $blue-primary;
+    }
+  }
+}
+
+.fc-today-button {
+  &.fc-button {
+    &.fc-button-primary {
+      color: white;
+      background-color: $blue-primary;
+    }
+  }
+}
+
+.fc-dayGridMonth-button {
+  &.fc-button {
+    &.fc-button-primary {
+      background-color: $blue_primary_hover;
+      &.fc-button-active {
+        background-color: $blue-primary;
+      }
+    }
+  }
+}
+
+.fc-timeGridWeek-button {
+  &.fc-button {
+    &.fc-button-primary {
+      background-color: $blue_primary_hover;
+      &.fc-button-active {
+        background-color: $blue-primary;
+      }
+    }
+  }
+}
+
+.fc-timeGridDay-button {
+  &.fc-button {
+    &.fc-button-primary {
+      background-color: $blue_primary_hover;
+      &.fc-button-active {
+        background-color: $blue-primary;
+      }
+    }
+  }
 }

@@ -26,7 +26,7 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   XCircleIcon,
-} from "@heroicons/react/24/solid";
+} from "@heroicons/react/24/outline";
 
 type InstructorCalendarViewProps = {
   events: Array<{
@@ -47,7 +47,7 @@ type InstructorCalendarViewProps = {
   customerId?: number;
   instructorId?: number;
   isAdminAuthenticated?: boolean;
-  fetchData: () => void;
+  fetchData?: () => void;
 };
 
 type CalendarViewRefType = {
@@ -135,20 +135,26 @@ const CalendarView = forwardRef<
               className={styles.instructorIcon}
             />
           ) : classStatus === "completed" ? (
-            <div className={styles.classStatusIconContainer}>
-              <CheckCircleIcon style={{ width: "25px" }} />
+            <div className={styles.classStatusIcon}>
+              <CheckCircleIcon className={styles.classStatusIcon__completed} />
             </div>
           ) : classStatus === "canceledByCustomer" ? (
-            <div className={styles.classStatusIconContainer}>
-              <XCircleIcon style={{ width: "25px" }} />
+            <div className={styles.classStatusIcon}>
+              <XCircleIcon className={styles.classStatusIcon__canceled} />
             </div>
           ) : classStatus === "canceledByInstructor" ? (
-            <div className={styles.classStatusIconContainer}>
-              <ExclamationTriangleIcon style={{ width: "25px" }} />
+            <div className={styles.classStatusIcon}>
+              <ExclamationTriangleIcon
+                className={styles.classStatusIcon__canceled}
+              />
             </div>
           ) : null}
-          <div className={styles.eventTime}>{formattedStartTime} -</div>
-          <div className={styles.eventTitle}>{title}</div>
+          <div
+            className={`${styles.eventDetails} ${classStatus === "booked" ? styles.booked : classStatus === "completed" ? styles.completed : classStatus === "canceledByCustomer" || classStatus === "canceledByInstructor" ? styles.canceled : ""}`}
+          >
+            <div className={styles.eventTime}>{formattedStartTime} -</div>
+            <div className={styles.eventTitle}>{title}</div>
+          </div>
         </div>
       );
     };
@@ -231,7 +237,7 @@ const CalendarView = forwardRef<
       if (!confirmed) return;
       try {
         await cancelClass(classId);
-        fetchData();
+        fetchData?.();
         fetchClasses();
         handleModalClose();
       } catch (error) {
@@ -245,8 +251,16 @@ const CalendarView = forwardRef<
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
-          headerToolbar={false}
+          initialView={instructorId ? "timeGridWeek" : "dayGridMonth"}
+          headerToolbar={
+            instructorId
+              ? {
+                  left: "prev,next today",
+                  center: "title",
+                  right: "dayGridMonth,timeGridWeek,timeGridDay",
+                }
+              : false
+          }
           views={{
             timeGridWeek: {
               slotMinTime: "09:00:00",

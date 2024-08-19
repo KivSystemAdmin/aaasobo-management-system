@@ -72,12 +72,10 @@ function ClassCalendar({
 
         const color =
           eachClass.status === "booked"
-            ? "#65b72f"
+            ? "#E7FBD9"
             : eachClass.status === "completed"
-              ? "#b5c4ab"
-              : eachClass.status === "canceledByCustomer"
-                ? "#d9d9d9"
-                : "#9e9e9e";
+              ? "#B5C4AB"
+              : "#FFEBE0";
 
         const childrenNames = eachClass.classAttendance.children
           .map((child) => child.name)

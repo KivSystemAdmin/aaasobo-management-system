@@ -52,12 +52,10 @@ function InstructorCalendar({
 
         const color =
           eachClass.status === "booked"
-            ? "#65b72f"
+            ? "#E7FBD9"
             : eachClass.status === "completed"
-              ? "#b5c4ab"
-              : eachClass.status === "canceledByCustomer"
-                ? "#d9d9d9"
-                : "#9e9e9e";
+              ? "#B5C4AB"
+              : "#FFEBE0";
 
         // const color = eachClass.status === "booked" ? "#FF0000" : "#C0C0C0";
 
@@ -89,7 +87,7 @@ function InstructorCalendar({
             start,
             end,
             title: "No booked class",
-            color: "#d2b48c",
+            color: "#A2B098",
           };
         },
       );
@@ -126,15 +124,14 @@ function InstructorCalendar({
       {isLoading && <div className={styles.loadingContainer}>Loading ...</div>}
       {!isLoading && !error && (
         <>
-          <CalendarHeader calendarApi={calendarApi ?? null} />
+          {/* Do not dispaly the custom calendar header */}
+          {/* <CalendarHeader calendarApi={calendarApi ?? null} /> */}
           <p className={styles.headerMessage}></p>
           {isAdminAuthenticated && name ? (
             <span className={styles.instructorName}>
               Instructor: &nbsp;{name}
             </span>
-          ) : (
-            <span>&nbsp;</span>
-          )}
+          ) : null}
           <CalendarView
             // Create a ref to access the FullCalendar instance in CalendarView;
             ref={calendarRef}

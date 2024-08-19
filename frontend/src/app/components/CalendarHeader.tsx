@@ -3,13 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { CalendarApi } from "@fullcalendar/core";
 import styles from "./CalendarHeaderView.module.scss";
-import clsx from "clsx";
-import {
-  ChevronDoubleLeftIcon,
-  ChevronDoubleRightIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 type CalendarHeaderProps = {
   calendarApi: CalendarApi | null;
@@ -58,8 +52,6 @@ const CalendarHeader = ({ calendarApi }: CalendarHeaderProps) => {
 
   return (
     <div className={styles.headerToolbar}>
-      <div className={styles.fcToolbarTitle}>{viewTitle}</div>
-
       <div className={styles.toolbarSection}>
         <ChevronLeftIcon
           className={styles.calendarHeader}
@@ -67,13 +59,17 @@ const CalendarHeader = ({ calendarApi }: CalendarHeaderProps) => {
         />
 
         <button className={styles.todayBtn} onClick={handleToday}>
-          Today
+          This Month
         </button>
 
         <ChevronRightIcon
           className={styles.calendarHeader}
           onClick={handleNext}
         />
+      </div>
+
+      <div className={styles.calendarTitleContainer}>
+        <div className={styles.fcToolbarTitle}>{viewTitle}</div>
       </div>
     </div>
   );
