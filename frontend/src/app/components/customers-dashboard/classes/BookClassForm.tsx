@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { fetchInstructorAvailabilitiesForTodayAndAfter } from "@/app/helper/instructorsApi";
 import RedirectButton from "../../RedirectButton";
 import ActionButton from "../../ActionButton";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function BookClassForm({
   customerId,
@@ -138,7 +140,8 @@ function BookClassForm({
         router.push(`/admins/customer-list/${customerId}`);
         return;
       }
-      alert("The class has been successfully booked.");
+      toast.success("The class has been successfully booked!");
+
       router.push(`/customers/${customerId}/classes`);
     } catch (error) {
       if (error instanceof Error) {
@@ -214,6 +217,7 @@ function BookClassForm({
                   <input
                     type="checkbox"
                     onChange={(event) => handleChildChange(event, child.id)}
+                    className={styles.checkbox}
                   />
                   {child.name}
                 </label>
@@ -226,18 +230,22 @@ function BookClassForm({
       <div className={styles.actions}>
         {isAdminAuthenticated ? (
           <RedirectButton
-            btnText="Cancel"
+            btnText="Back"
             linkURL={`/admins/customer-list/${customerId}`}
-            className="cancelBtn"
+            className="back"
           />
         ) : (
           <RedirectButton
-            btnText="Cancel"
+            btnText="Back"
             linkURL={`/customers/${customerId}/classes`}
-            className="cancelBtn"
+            className="deleteChild"
           />
         )}
-        <ActionButton type="submit" btnText="Book Class" className="bookBtn" />
+        <ActionButton
+          type="submit"
+          btnText="Book Class"
+          className="editChild"
+        />
       </div>
     </form>
   );

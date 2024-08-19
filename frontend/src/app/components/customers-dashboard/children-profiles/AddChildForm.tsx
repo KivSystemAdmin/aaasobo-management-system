@@ -131,16 +131,11 @@ function AddChildForm({
           <RedirectButton
             btnText="Back"
             linkURL={`/customers/${customerId}/children-profiles`}
-            className="cancelBtn"
+            className="deleteChild"
           />
         )}
 
-        <ActionButton
-          type="submit"
-          className="addBtn"
-          btnText="Add Child"
-          Icon={PlusIcon}
-        />
+        <ActionButton type="submit" className="editChild" btnText="Add Child" />
       </div>
     </form>
   );

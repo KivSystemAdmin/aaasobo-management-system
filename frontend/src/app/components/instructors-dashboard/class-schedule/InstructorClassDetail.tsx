@@ -105,20 +105,22 @@ const InstructorClassDetail = ({
       <div className={`${styles.classCard} ${statusClass}`}>
         {/* Class Status */}
         <div className={styles.classStatus}>
-          {classDetail.status === "booked" ||
-          classDetail.status === "completed" ? (
-            <CheckCircleIcon
-              className={`${styles.classStatus__icon} ${statusClass}`}
-            />
-          ) : classDetail.status === "canceledByInstructor" ? (
-            <ExclamationTriangleIcon
-              className={`${styles.classStatus__icon} ${statusClass}`}
-            />
-          ) : (
-            <XCircleIcon
-              className={`${styles.classStatus__icon} ${statusClass}`}
-            />
-          )}
+          <div className={styles.classStatus__iconContainer}>
+            {classDetail.status === "booked" ||
+            classDetail.status === "completed" ? (
+              <CheckCircleIcon
+                className={`${styles.classStatus__icon} ${statusClass}`}
+              />
+            ) : classDetail.status === "canceledByInstructor" ? (
+              <ExclamationTriangleIcon
+                className={`${styles.classStatus__icon} ${statusClass}`}
+              />
+            ) : (
+              <XCircleIcon
+                className={`${styles.classStatus__icon} ${statusClass}`}
+              />
+            )}
+          </div>
 
           <div className={styles.classStatus__name}>
             {classDetail.status === "booked"

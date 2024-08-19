@@ -149,163 +149,166 @@ function ChildrenProfiles({
         <div className={styles.children}>
           {children.map((child) => (
             <div className={styles.childCard} key={child.id}>
-              {/* Child Name */}
-              <div className={styles.childName}>
-                <UserCircleSolid className={styles.profileInfoIcon} />
+              <div className={styles.childCard__profile}>
+                {/* Child Name */}
+                <div className={styles.childName}>
+                  <div className={styles.childName__profileIconContainer}>
+                    <UserCircleSolid
+                      className={styles.childName__profileIcon}
+                    />
+                  </div>
 
-                <label className={styles.childName__label}>
-                  <p className={styles.childName__text}>Name</p>
+                  <label className={styles.childName__label}>
+                    <p className={styles.childName__text}>Name</p>
 
-                  {editingChildId === child.id ? (
-                    <div className={styles.childName__inputWrapper}>
-                      <input
-                        className={`${styles.childName__inputField} ${editingChildId === child.id ? styles.editable : ""}`}
-                        type="text"
-                        value={
-                          childToEdit?.id === child.id
-                            ? childToEdit.name
-                            : child.name
-                        }
-                        onChange={(e) => {
-                          if (editingChildId === child.id) {
-                            setChildToEdit((prev) =>
-                              prev
-                                ? { ...prev, name: e.target.value }
-                                : undefined,
-                            );
+                    {editingChildId === child.id ? (
+                      <div className={styles.childName__inputWrapper}>
+                        <input
+                          className={`${styles.childName__inputField} ${editingChildId === child.id ? styles.editable : ""}`}
+                          type="text"
+                          value={
+                            childToEdit?.id === child.id
+                              ? childToEdit.name
+                              : child.name
                           }
-                        }}
-                        required
-                      />
-                    </div>
-                  ) : (
-                    <div className={styles.childName}>
+                          onChange={(e) => {
+                            if (editingChildId === child.id) {
+                              setChildToEdit((prev) =>
+                                prev
+                                  ? { ...prev, name: e.target.value }
+                                  : undefined,
+                              );
+                            }
+                          }}
+                          required
+                        />
+                      </div>
+                    ) : (
                       <div className={styles.childName__name}>
                         {childToEdit && childToEdit.id === child.id
                           ? childToEdit.name
                           : child.name}
                       </div>
-                    </div>
-                  )}
-                </label>
-              </div>
+                    )}
+                  </label>
+                </div>
 
-              {/* Birthdate */}
-              <div className={styles.birthdate}>
-                <label className={styles.birthdate__label}>
-                  <p className={styles.birthdate__text}>Birthdate</p>
+                {/* Birthdate */}
+                <div className={styles.birthdate}>
+                  <label className={styles.birthdate__label}>
+                    <p className={styles.birthdate__text}>Birthdate</p>
 
-                  {editingChildId === child.id ? (
-                    <div className={styles.birthdate__inputWrapper}>
-                      <input
-                        className={`${styles.birthdate__inputField} ${editingChildId === child.id ? styles.editable : ""}`}
-                        type="date"
-                        value={
-                          childToEdit?.id === child.id
+                    {editingChildId === child.id ? (
+                      <div className={styles.birthdate__inputWrapper}>
+                        <input
+                          className={`${styles.birthdate__inputField} ${editingChildId === child.id ? styles.editable : ""}`}
+                          type="date"
+                          value={
+                            childToEdit?.id === child.id
+                              ? formatBirthdateToISO(childToEdit.birthdate)
+                              : formatBirthdateToISO(child.birthdate)
+                          }
+                          onChange={(e) => {
+                            if (editingChildId === child.id) {
+                              const newBirthdate = e.target.value;
+                              setChildToEdit((prev) =>
+                                prev
+                                  ? { ...prev, birthdate: newBirthdate }
+                                  : undefined,
+                              );
+                            }
+                          }}
+                          required
+                        />
+                      </div>
+                    ) : (
+                      <div className={styles.profileInfo}>
+                        <div className={styles.profileInfo__data}>
+                          {childToEdit && childToEdit.id === child.id
                             ? formatBirthdateToISO(childToEdit.birthdate)
-                            : formatBirthdateToISO(child.birthdate)
-                        }
-                        onChange={(e) => {
-                          if (editingChildId === child.id) {
-                            const newBirthdate = e.target.value;
-                            setChildToEdit((prev) =>
-                              prev
-                                ? { ...prev, birthdate: newBirthdate }
-                                : undefined,
-                            );
-                          }
-                        }}
-                        required
-                      />
-                    </div>
-                  ) : (
-                    <div className={styles.profileInfo}>
-                      <div className={styles.profileInfo__data}>
-                        {childToEdit && childToEdit.id === child.id
-                          ? formatBirthdateToISO(childToEdit.birthdate)
-                          : formatBirthdateToISO(child.birthdate)}
+                            : formatBirthdateToISO(child.birthdate)}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </label>
-              </div>
+                    )}
+                  </label>
+                </div>
 
-              <div className={styles.personalInfo}>
-                <label className={styles.personalInfo__label}>
-                  <p className={styles.personalInfo__text}>Notes</p>
+                {/* Personal Info */}
+                <div className={styles.personalInfo}>
+                  <label className={styles.personalInfo__label}>
+                    <p className={styles.personalInfo__text}>Notes</p>
 
-                  {editingChildId === child.id ? (
-                    <div className={styles.personalInfo__inputWrapper}>
-                      <textarea
-                        className={`${styles.personalInfo__inputField} ${styles.textarea} ${editingChildId === child.id ? styles.editable : ""}`}
-                        value={
-                          childToEdit?.id === child.id
+                    {editingChildId === child.id ? (
+                      <div className={styles.personalInfo__inputWrapper}>
+                        <textarea
+                          className={`${styles.personalInfo__inputField} ${styles.textarea} ${editingChildId === child.id ? styles.editable : ""}`}
+                          value={
+                            childToEdit?.id === child.id
+                              ? childToEdit.personalInfo
+                              : child.personalInfo
+                          }
+                          onChange={(e) => {
+                            if (editingChildId === child.id) {
+                              setChildToEdit((prev) =>
+                                prev
+                                  ? { ...prev, personalInfo: e.target.value }
+                                  : undefined,
+                              );
+                            }
+                          }}
+                          required
+                        />
+                      </div>
+                    ) : (
+                      <div className={styles.profileInfo}>
+                        <div className={styles.profileInfo__data}>
+                          {childToEdit && childToEdit.id === child.id
                             ? childToEdit.personalInfo
-                            : child.personalInfo
-                        }
-                        onChange={(e) => {
-                          if (editingChildId === child.id) {
-                            setChildToEdit((prev) =>
-                              prev
-                                ? { ...prev, personalInfo: e.target.value }
-                                : undefined,
-                            );
-                          }
-                        }}
-                        required
-                      />
-                    </div>
-                  ) : (
-                    <div className={styles.profileInfo}>
-                      <div className={styles.profileInfo__data}>
-                        {childToEdit && childToEdit.id === child.id
-                          ? childToEdit.personalInfo
-                          : child.personalInfo}
+                            : child.personalInfo}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </label>
+                    )}
+                  </label>
+                </div>
               </div>
 
-              <div className={styles.buttons}>
-                {editingChildId === child.id ? (
-                  <div className={styles.buttons__editing}>
-                    <ActionButton
-                      className="cancelEditingChild"
-                      btnText="Cancel"
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleCancelClick();
-                      }}
-                    />
+              {editingChildId === child.id ? (
+                <div className={styles.childCard__buttons}>
+                  <ActionButton
+                    className="cancelEditingChild"
+                    btnText="Cancel"
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleCancelClick();
+                    }}
+                  />
 
-                    <ActionButton
-                      className="saveChild"
-                      btnText="Save"
-                      type="button"
-                      onClick={() => {
-                        handleSaveClick();
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className={styles.buttons__notEditing}>
-                    <ActionButton
-                      className="deleteChild"
-                      btnText="Delete"
-                      onClick={() => handleDeleteClick(child.id)}
-                      disabled={editingChildId !== null}
-                    />
-                    <ActionButton
-                      className="editChild"
-                      btnText="Edit"
-                      onClick={() => handleEditClick(child.id)}
-                      disabled={editingChildId !== null}
-                    />
-                  </div>
-                )}
-              </div>
+                  <ActionButton
+                    className="saveChild"
+                    btnText="Save"
+                    type="button"
+                    onClick={() => {
+                      handleSaveClick();
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className={styles.childCard__buttons}>
+                  <ActionButton
+                    className="deleteChild"
+                    btnText="Delete"
+                    onClick={() => handleDeleteClick(child.id)}
+                    disabled={editingChildId !== null}
+                  />
+                  <ActionButton
+                    className="editChild"
+                    btnText="Edit"
+                    onClick={() => handleEditClick(child.id)}
+                    disabled={editingChildId !== null}
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>

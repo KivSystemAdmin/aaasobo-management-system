@@ -3,6 +3,8 @@ import { getInstructors } from "@/app/helper/instructorsApi";
 import { getChildrenByCustomerId } from "@/app/helper/childrenApi";
 import BookClassForm from "@/app/components/customers-dashboard/classes/BookClassForm";
 import { getClassesByCustomerId } from "@/app/helper/classesApi";
+import Breadcrumb from "../../Breadcrumb";
+import SimpleLoading from "../../SimpleLoading";
 
 function BookClass({
   customerId,
@@ -72,25 +74,30 @@ function BookClass({
     fetchRebookableClassesByCustomerId(customerId);
   }, []);
 
+  const breadcrumbLinks = [
+    { href: `/customers/${customerId}/classes`, label: "Class Calendar" },
+    { label: "Book Class" },
+  ];
+
   const isLoading = instructors === undefined || children === undefined;
 
   return (
-    <div>
-      <div>
-        <h1>Book Class</h1>
-      </div>
+    <>
       {isLoading ? (
-        <div>Loading...</div>
+        <SimpleLoading />
       ) : (
-        <BookClassForm
-          customerId={customerId}
-          instructors={instructors}
-          children={children}
-          classToRebook={classToRebook}
-          isAdminAuthenticated={isAdminAuthenticated}
-        />
+        <>
+          <Breadcrumb links={breadcrumbLinks} />
+          <BookClassForm
+            customerId={customerId}
+            instructors={instructors}
+            children={children}
+            classToRebook={classToRebook}
+            isAdminAuthenticated={isAdminAuthenticated}
+          />
+        </>
       )}
-    </div>
+    </>
   );
 }
 

@@ -226,9 +226,14 @@ const InstructorClassesTable = ({
                           styles.instructorClasses__classStatusContainer
                         }
                       >
-                        <CheckCircleIcon
-                          className={`${styles.instructorClasses__classStatusIcon} ${statusClass}`}
-                        />
+                        <div
+                          className={styles.instructorClasses__iconContainer}
+                        >
+                          <CheckCircleIcon
+                            className={`${styles.instructorClasses__classStatusIcon} ${statusClass}`}
+                          />
+                        </div>
+
                         <div className={styles.instructorClasses__classStatus}>
                           canceled by instructor
                         </div>
@@ -249,9 +254,15 @@ const InstructorClassesTable = ({
                     )}
 
                     <div className={styles.instructorClasses__children}>
-                      <UsersIcon
-                        className={styles.instructorClasses__childrenIcon}
-                      />
+                      <div
+                        className={
+                          styles.instructorClasses__childrenIconContainer
+                        }
+                      >
+                        <UsersIcon
+                          className={styles.instructorClasses__childrenIcon}
+                        />
+                      </div>
 
                       {editingClassId === eachClass.id ? (
                         <div

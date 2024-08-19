@@ -4,20 +4,33 @@
   display: flex;
   flex-wrap: wrap;
   gap: 40px;
-  // justify-content: space-around;
 }
 
 .childCard {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   flex: 1 1 350px;
   max-width: 350px;
-  height: 400px;
   background-color: white;
-  padding: 1rem;
+  padding: 28px 32px 0 32px;
   border-radius: 10px;
   margin-bottom: 1rem;
-  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  box-shadow:
+    rgba(0, 0, 0, 0.16) 0px 3px 6px,
+    rgba(0, 0, 0, 0.23) 0px 3px 6px;
   overflow: hidden;
+
+  &__profile {
+    margin-bottom: 24px;
+  }
+
+  // buttons
+  &__buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
 }
 
 // name
@@ -25,30 +38,38 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-bottom: 1rem;
+  margin-bottom: 24px;
 
+  &__profileIconContainer {
+    height: 66px;
+    width: 66px;
+  }
+  &__profileIcon {
+    width: 66px;
+    color: $blue-primary;
+  }
+
+  &__label {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
   &__text {
     font-size: 16px;
     font-weight: 300;
   }
-
   &__inputField {
-    font-size: 24px;
-    font-weight: 500;
+    font-size: 20px;
+    font-weight: 400;
+    font-family: var(--font-poppins), sans-serif;
     padding: 3px;
     border-radius: 6px;
+    width: 100%;
   }
-
   &__name {
     font-size: 24px;
     font-weight: 500;
   }
-}
-
-.profileInfoIcon {
-  height: 50px;
-  width: 50px;
-  color: $blue-primary;
 }
 
 // birthdate
@@ -63,10 +84,11 @@
   }
 
   &__inputField {
-    font-size: 20px;
+    font-size: 14px;
     font-weight: 400;
-    padding: 3px;
+    padding: 0 5px;
     border-radius: 6px;
+    font-family: var(--font-poppins), sans-serif;
   }
 }
 
@@ -75,10 +97,9 @@
   background-color: #f2f2f2;
   border-radius: 6px;
   padding: 10px;
-  margin-top: 20px;
+  margin-top: 24px;
   flex: 1;
   overflow-y: auto;
-  margin-bottom: 50px;
 
   &__text {
     font-size: 14px;
@@ -86,30 +107,13 @@
   }
 
   &__inputField {
-    font-size: 20px;
+    font-size: 14px;
     font-weight: 400;
-    padding: 3px;
+    padding: 0 3px;
     border-radius: 6px;
     width: 100%;
-    height: 80px;
-  }
-}
-
-// buttons
-.buttons {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  gap: 30px;
-
-  &__editing,
-  &__notEditing {
-    display: flex;
-    gap: 40px;
+    height: 100px;
+    font-family: var(--font-poppins), sans-serif;
   }
 }
 

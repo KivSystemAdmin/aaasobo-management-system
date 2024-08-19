@@ -85,10 +85,12 @@ function CustomerProfile({ customerId }: { customerId: string }) {
   return (
     <>
       {customer ? (
-        <form className={styles.customer} onSubmit={handleFormSubmit}>
+        <form className={styles.profileCard} onSubmit={handleFormSubmit}>
           {/* Customer Name */}
           <label className={styles.customerName}>
-            <UserCircleIcon className={styles.profileInfoIcon} />
+            <div className={styles.customerName__profileIconContainer}>
+              <UserCircleIcon className={styles.customerName__profileIcon} />
+            </div>
 
             <div className={styles.customerName__nameSection}>
               <p className={styles.customerName__text}>Name</p>
@@ -112,9 +114,7 @@ function CustomerProfile({ customerId }: { customerId: string }) {
 
           {/* Customer email */}
           <label className={styles.email}>
-            <div className={styles.email__iconContainer}>
-              <EnvelopeIcon className={styles.email__icon} />
-            </div>
+            <div className={styles.email__title}>e-mail</div>
             {isEditing ? (
               <input
                 className={`${styles.email__inputField} ${isEditing ? styles.editable : ""}`}
@@ -134,7 +134,9 @@ function CustomerProfile({ customerId }: { customerId: string }) {
 
           {/* Customer prefecture */}
           <label className={styles.customerHome}>
-            <HomeIcon className={styles.customerHome__icon} />
+            <div className={styles.customerHome__title}>
+              Prefecture of residence
+            </div>
 
             {isEditing ? (
               <select
@@ -161,36 +163,34 @@ function CustomerProfile({ customerId }: { customerId: string }) {
             )}
           </label>
 
-          <div className={styles.buttons}>
-            {isEditing ? (
-              <div className={styles.buttons__editing}>
-                <ActionButton
-                  className="cancelEditingChild"
-                  btnText="Cancel"
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleCancelClick();
-                  }}
-                />
+          {isEditing ? (
+            <div className={styles.buttons}>
+              <ActionButton
+                className="cancelEditingChild"
+                btnText="Cancel"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleCancelClick();
+                }}
+              />
 
-                <ActionButton
-                  className="saveChild"
-                  btnText="Save"
-                  type="submit"
-                  Icon={CheckIcon}
-                />
-              </div>
-            ) : (
-              <div className={styles.buttons__notEditing}>
-                <ActionButton
-                  className="editChild"
-                  btnText="Edit"
-                  onClick={handleEditClick}
-                />
-              </div>
-            )}
-          </div>
+              <ActionButton
+                className="saveChild"
+                btnText="Save"
+                type="submit"
+                Icon={CheckIcon}
+              />
+            </div>
+          ) : (
+            <div className={styles.buttons}>
+              <ActionButton
+                className="editChild"
+                btnText="Edit"
+                onClick={handleEditClick}
+              />
+            </div>
+          )}
         </form>
       ) : (
         <p className={styles.loadingContainer}>Loading ...</p>
