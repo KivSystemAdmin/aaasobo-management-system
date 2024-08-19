@@ -148,7 +148,7 @@ function Table({ recurringClasses }: { recurringClasses: RecurringClass[] }) {
                   {startTime}-{endTime}
                 </td>
               ) : (
-                <td></td>
+                <td className={styles.bodyText}></td>
               )}
               <td className={styles.bodyText}>
                 {recurringClass.recurringClassAttendance

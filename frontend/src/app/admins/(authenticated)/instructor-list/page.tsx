@@ -1,22 +1,9 @@
 "use client";
 
-import { FormEvent, ChangeEvent, useState } from "react";
 import { useAuth } from "@/app/hooks/useAuth";
 import UsersTable from "@/app/components/admins-dashboard/UsersTable";
 
-import { addAvailability } from "@/app/helper/instructorsApi";
-
-function useNumberInput(
-  initialValue: number,
-): [number, (e: ChangeEvent<HTMLInputElement>) => void] {
-  const [value, setValue] = useState(initialValue.toString());
-  const onChange = (e: ChangeEvent<HTMLInputElement>) =>
-    setValue(e.target.value);
-  const num = parseInt(value);
-  return [isNaN(num) ? 0 : num, onChange];
-}
-
-function Page() {
+export default function Page() {
   const userType = "Instructor List";
   const omitItems = [""]; // Omit the item from the table
   const linkItems = ["ID"]; // Set the item to be a link

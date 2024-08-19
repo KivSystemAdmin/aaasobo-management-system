@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import CalendarHeader from "@/app/components/CalendarHeader";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CalendarView from "@/app/components/CalendarView";
 import styles from "./InstructorCalendar.module.scss";
 import FullCalendar from "@fullcalendar/react";
@@ -20,16 +19,15 @@ function InstructorCalendar({
   isAdminAuthenticated?: boolean;
 }) {
   const [allEvents, setAllEvents] = useState<EventType[]>([]);
-  const [calendarApi, setCalendarApi] = useState<CalendarApi | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const calendarRef = useRef<FullCalendar | null>(null);
   const instructorId = id ?? undefined;
-  if (instructorId === undefined) return;
-  if (instructorId === undefined) return;
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    if (instructorId === undefined) return;
+
     try {
       const classes: ClassForCalendar[] = await fetchClassesForCalendar(
         instructorId,
@@ -56,8 +54,6 @@ function InstructorCalendar({
             : eachClass.status === "completed"
               ? "#B5C4AB"
               : "#FFEBE0";
-
-        // const color = eachClass.status === "booked" ? "#FF0000" : "#C0C0C0";
 
         const childrenNames = eachClass.classAttendance.children
           .map((child) => child.name)
@@ -99,18 +95,13 @@ function InstructorCalendar({
     } finally {
       setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchData();
   }, [instructorId]);
 
   useEffect(() => {
-    // Only set calendarApi if calendarRef is not null
-    if (calendarRef.current) {
-      setCalendarApi(calendarRef.current.getApi());
-    }
-  }, [calendarRef.current]);
+    fetchData();
+  }, [fetchData]);
+
+  if (instructorId === undefined) return <></>;
 
   if (error) {
     return <div>{error}</div>;
@@ -124,9 +115,6 @@ function InstructorCalendar({
       {isLoading && <div className={styles.loadingContainer}>Loading ...</div>}
       {!isLoading && !error && (
         <>
-          {/* Do not dispaly the custom calendar header */}
-          {/* <CalendarHeader calendarApi={calendarApi ?? null} /> */}
-          <p className={styles.headerMessage}></p>
           {isAdminAuthenticated && name ? (
             <span className={styles.instructorName}>
               Instructor: &nbsp;{name}

@@ -18,36 +18,37 @@ async function insertInstructors() {
         "https://select-type.com/rsv/?id=9krPgyM7znE&c_id=129259",
     },
   });
-  await prisma.instructor.create({
-    data: {
-      email: "elian@example.com",
-      name: "Elian P.Quilisadio",
-      nickname: "Elian",
-      icon: "elian-1.jpg",
-      classURL: "https://zoom.us/j/67890?pwd=FGHij",
-      meetingId: "234 567 8901",
-      passcode: "elian",
-      password: "$2b$12$Oe8qdMedbkuqhY31pgkH7OaMukvbUawE63inMCoDSeY5CHRS3Gc.u", // password: elian
-      introductionURL:
-        "https://select-type.com/rsv/?id=9krPgyM7znE&c_id=127929",
-    },
-  });
+  // await prisma.instructor.create({
+  //   data: {
+  //     email: "elian@example.com",
+  //     name: "Elian P.Quilisadio",
+  //     nickname: "Elian",
+  //     icon: "elian-1.jpg",
+  //     classURL: "https://zoom.us/j/67890?pwd=FGHij",
+  //     meetingId: "234 567 8901",
+  //     passcode: "elian",
+  //     password: "$2b$12$Oe8qdMedbkuqhY31pgkH7OaMukvbUawE63inMCoDSeY5CHRS3Gc.u", // password: elian
+  //     introductionURL:
+  //       "https://select-type.com/rsv/?id=9krPgyM7znE&c_id=127929",
+  //   },
+  // });
 }
 
 async function insertInstructorAvailabilities() {
   const helen = await getInstructor("Helen");
-  const elian = await getInstructor("Elian");
+  // const elian = await getInstructor("Elian");
   await prisma.instructorRecurringAvailability.createMany({
     data: [
-      { startAt: "2024-07-01T07:00:00Z", instructorId: helen.id }, // 16:00 in Japan
-      { startAt: "2024-07-01T07:30:00Z", instructorId: helen.id }, // 16:30 in Japan
-      { startAt: "2024-07-01T08:00:00Z", instructorId: elian.id }, // 17:00 in Japan
-      { startAt: "2024-07-02T08:00:00Z", instructorId: elian.id }, // 17:00 in Japan
-      {
-        startAt: "2024-07-02T08:30:00Z",
-        instructorId: elian.id,
-        endAt: "2024-07-24T00:00:00Z",
-      }, // 17:30 in Japan
+      { startAt: "2024-08-05T07:00:00Z", instructorId: helen.id }, // 16:00 in Japan
+      { startAt: "2024-08-06T07:00:00Z", instructorId: helen.id }, // 16:00 in Japan
+      // { startAt: "2024-07-01T07:30:00Z", instructorId: helen.id }, // 16:30 in Japan
+      // { startAt: "2024-07-01T08:00:00Z", instructorId: elian.id }, // 17:00 in Japan
+      // { startAt: "2024-07-02T08:00:00Z", instructorId: elian.id }, // 17:00 in Japan
+      // {
+      //   startAt: "2024-07-02T08:30:00Z",
+      //   instructorId: elian.id,
+      //   endAt: "2024-07-24T00:00:00Z",
+      // }, // 17:30 in Japan
     ],
   });
 
@@ -71,80 +72,87 @@ async function insertInstructorAvailabilities() {
     });
   };
 
-  await insertAvailabilities(helen.id, "2024-07-01T07:00:00Z", [
-    "2024-07-01T07:00:00Z",
-    "2024-07-08T07:00:00Z",
-    "2024-07-15T07:00:00Z",
-    "2024-07-22T07:00:00Z",
-    "2024-07-29T07:00:00Z",
+  await insertAvailabilities(helen.id, "2024-08-05T07:00:00Z", [
+    "2024-08-05T07:00:00Z",
+    "2024-08-12T07:00:00Z",
+    "2024-08-19T07:00:00Z",
+    "2024-08-26T07:00:00Z",
+    // "2024-07-29T07:00:00Z",
   ]);
-  await insertAvailabilities(helen.id, "2024-07-01T07:30:00Z", [
-    "2024-07-01T07:30:00Z",
-    "2024-07-08T07:30:00Z",
-    "2024-07-15T07:30:00Z",
-    "2024-07-22T07:30:00Z",
-    "2024-07-27T07:30:00Z",
-    "2024-07-29T07:30:00Z",
-    "2024-07-30T07:30:00Z",
-    "2024-07-31T07:30:00Z",
-    "2024-08-01T07:30:00Z",
-    "2024-08-02T07:30:00Z",
-    "2024-08-03T07:30:00Z",
-    "2024-08-04T07:30:00Z",
-    "2024-08-05T07:30:00Z",
-    "2024-08-06T07:30:00Z",
-    "2024-08-07T07:30:00Z",
-    "2024-08-08T07:30:00Z",
-    "2024-08-09T07:30:00Z",
-    "2024-08-10T07:30:00Z",
-    "2024-08-12T07:30:00Z",
-    "2024-08-13T07:30:00Z",
-    "2024-08-14T07:30:00Z",
-    "2024-08-15T07:30:00Z",
-    "2024-08-16T07:30:00Z",
-    "2024-08-17T07:30:00Z",
-    "2024-08-19T07:30:00Z",
-    "2024-08-20T07:30:00Z",
-    "2024-08-21T07:30:00Z",
-    "2024-08-22T07:30:00Z",
-    "2024-08-23T07:30:00Z",
+
+  await insertAvailabilities(helen.id, "2024-08-06T07:00:00Z", [
+    "2024-08-06T07:00:00Z",
+    "2024-08-13T07:00:00Z",
+    "2024-08-20T07:00:00Z",
+    "2024-08-27T07:00:00Z",
   ]);
-  await insertAvailabilities(elian.id, "2024-07-01T08:00:00Z", [
-    "2024-07-01T08:00:00Z",
-    "2024-07-08T08:00:00Z",
-    "2024-07-15T08:00:00Z",
-    "2024-07-22T08:00:00Z",
-    "2024-07-29T08:00:00Z",
-    "2024-08-03T07:30:00Z",
-    "2024-08-04T07:30:00Z",
-    "2024-08-05T07:30:00Z",
-    "2024-08-06T07:30:00Z",
-  ]);
-  await insertAvailabilities(elian.id, "2024-07-02T08:00:00Z", [
-    "2024-07-02T08:00:00Z",
-    "2024-07-09T08:00:00Z",
-    "2024-07-16T08:00:00Z",
-    "2024-07-23T08:00:00Z",
-    "2024-07-30T08:00:00Z",
-  ]);
-  await insertAvailabilities(elian.id, "2024-07-02T08:30:00Z", [
-    "2024-07-02T08:30:00Z",
-    "2024-07-09T08:30:00Z",
-    "2024-07-16T08:30:00Z",
-    "2024-07-23T08:30:00Z",
-    "2024-08-10T07:30:00Z",
-    "2024-08-12T07:30:00Z",
-    "2024-08-13T07:30:00Z",
-    "2024-08-14T07:30:00Z",
-    "2024-08-15T07:30:00Z",
-    "2024-08-16T07:30:00Z",
-    "2024-08-17T07:30:00Z",
-    "2024-08-19T07:30:00Z",
-    "2024-08-20T07:30:00Z",
-    "2024-08-21T07:30:00Z",
-    "2024-08-22T07:30:00Z",
-    "2024-08-23T07:30:00Z",
-  ]);
+  // await insertAvailabilities(helen.id, "2024-07-01T07:30:00Z", [
+  //   "2024-07-01T07:30:00Z",
+  //   "2024-07-08T07:30:00Z",
+  //   "2024-07-15T07:30:00Z",
+  //   "2024-07-22T07:30:00Z",
+  //   "2024-07-27T07:30:00Z",
+  //   "2024-07-29T07:30:00Z",
+  //   "2024-07-30T07:30:00Z",
+  //   "2024-07-31T07:30:00Z",
+  //   "2024-08-01T07:30:00Z",
+  //   "2024-08-02T07:30:00Z",
+  //   "2024-08-03T07:30:00Z",
+  //   "2024-08-04T07:30:00Z",
+  //   "2024-08-05T07:30:00Z",
+  //   "2024-08-06T07:30:00Z",
+  //   "2024-08-07T07:30:00Z",
+  //   "2024-08-08T07:30:00Z",
+  //   "2024-08-09T07:30:00Z",
+  //   "2024-08-10T07:30:00Z",
+  //   "2024-08-12T07:30:00Z",
+  //   "2024-08-13T07:30:00Z",
+  //   "2024-08-14T07:30:00Z",
+  //   "2024-08-15T07:30:00Z",
+  //   "2024-08-16T07:30:00Z",
+  //   "2024-08-17T07:30:00Z",
+  //   "2024-08-19T07:30:00Z",
+  //   "2024-08-20T07:30:00Z",
+  //   "2024-08-21T07:30:00Z",
+  //   "2024-08-22T07:30:00Z",
+  //   "2024-08-23T07:30:00Z",
+  // ]);
+  // await insertAvailabilities(elian.id, "2024-07-01T08:00:00Z", [
+  //   "2024-07-01T08:00:00Z",
+  //   "2024-07-08T08:00:00Z",
+  //   "2024-07-15T08:00:00Z",
+  //   "2024-07-22T08:00:00Z",
+  //   "2024-07-29T08:00:00Z",
+  //   "2024-08-03T07:30:00Z",
+  //   "2024-08-04T07:30:00Z",
+  //   "2024-08-05T07:30:00Z",
+  //   "2024-08-06T07:30:00Z",
+  // ]);
+  // await insertAvailabilities(elian.id, "2024-07-02T08:00:00Z", [
+  //   "2024-07-02T08:00:00Z",
+  //   "2024-07-09T08:00:00Z",
+  //   "2024-07-16T08:00:00Z",
+  //   "2024-07-23T08:00:00Z",
+  //   "2024-07-30T08:00:00Z",
+  // ]);
+  // await insertAvailabilities(elian.id, "2024-07-02T08:30:00Z", [
+  //   "2024-07-02T08:30:00Z",
+  //   "2024-07-09T08:30:00Z",
+  //   "2024-07-16T08:30:00Z",
+  //   "2024-07-23T08:30:00Z",
+  //   "2024-08-10T07:30:00Z",
+  //   "2024-08-12T07:30:00Z",
+  //   "2024-08-13T07:30:00Z",
+  //   "2024-08-14T07:30:00Z",
+  //   "2024-08-15T07:30:00Z",
+  //   "2024-08-16T07:30:00Z",
+  //   "2024-08-17T07:30:00Z",
+  //   "2024-08-19T07:30:00Z",
+  //   "2024-08-20T07:30:00Z",
+  //   "2024-08-21T07:30:00Z",
+  //   "2024-08-22T07:30:00Z",
+  //   "2024-08-23T07:30:00Z",
+  // ]);
 }
 
 async function insertCustomers() {
@@ -156,12 +164,12 @@ async function insertCustomers() {
         password: "alice",
         prefecture: "Aomori",
       },
-      {
-        name: "Bob",
-        email: "bob@example.com",
-        password: "bob",
-        prefecture: "Hokkaido",
-      },
+      // {
+      //   name: "Bob",
+      //   email: "bob@example.com",
+      //   password: "bob",
+      //   prefecture: "Hokkaido",
+      // },
     ],
   });
 }
@@ -187,17 +195,17 @@ async function insertAdmins() {
 
 async function insertClasses() {
   const alice = await getCustomer("Alice");
-  const bob = await getCustomer("Bob");
+  // const bob = await getCustomer("Bob");
   const helen = await getInstructor("Helen");
-  const elian = await getInstructor("Elian");
+  // const elian = await getInstructor("Elian");
 
   await prisma.class.createMany({
     data: [
       {
         instructorId: helen.id,
         customerId: alice.id,
-        dateTime: "2024-01-01T11:00:00+09:00",
-        status: "canceledByCustomer",
+        dateTime: "2024-08-05T07:00:00Z",
+        status: "completed",
         isRebookable: true,
         subscriptionId: alice.subscription[0].id,
         recurringClassId: 1,
@@ -205,8 +213,8 @@ async function insertClasses() {
       {
         instructorId: helen.id,
         customerId: alice.id,
-        dateTime: "2024-06-01T11:00:00+09:00",
-        status: "completed",
+        dateTime: "2024-08-12T07:00:00Z",
+        status: "booked",
         isRebookable: false,
         subscriptionId: alice.subscription[0].id,
         recurringClassId: 1,
@@ -214,256 +222,291 @@ async function insertClasses() {
       {
         instructorId: helen.id,
         customerId: alice.id,
-        dateTime: "2024-06-01T11:30:00+09:00",
-        status: "completed",
+        dateTime: "2024-08-19T07:00:00Z",
+        status: "booked",
         isRebookable: false,
         subscriptionId: alice.subscription[0].id,
         recurringClassId: 1,
       },
       {
         instructorId: helen.id,
-        customerId: bob.id,
-        dateTime: "2024-06-03T15:00:00+09:00",
-        status: "canceledByCustomer",
-        subscriptionId: bob.subscription[0].id,
+        customerId: alice.id,
+        dateTime: "2024-08-26T07:00:00Z",
+        status: "booked",
+        subscriptionId: alice.subscription[0].id,
         recurringClassId: 1,
       },
       {
         instructorId: helen.id,
-        customerId: bob.id,
-        dateTime: "2024-06-03T15:30:00+09:00",
+        customerId: alice.id,
+        dateTime: "2024-08-06T07:00:00Z",
         status: "completed",
+        isRebookable: true,
+        subscriptionId: alice.subscription[0].id,
+        recurringClassId: 1,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2024-08-13T07:00:00Z",
+        status: "booked",
         isRebookable: false,
-        subscriptionId: bob.subscription[0].id,
+        subscriptionId: alice.subscription[0].id,
         recurringClassId: 1,
       },
       {
-        instructorId: elian.id,
-        customerId: bob.id,
-        dateTime: "2024-06-03T16:00:00+09:00",
-        status: "completed",
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2024-08-20T07:00:00Z",
+        status: "booked",
         isRebookable: false,
-        subscriptionId: bob.subscription[0].id,
-        recurringClassId: 1,
-      },
-      {
-        instructorId: elian.id,
-        customerId: bob.id,
-        dateTime: "2024-06-29T11:00:00+09:00",
-        status: "booked",
-        subscriptionId: bob.subscription[0].id,
-        recurringClassId: 1,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-08T10:00:00+09:00",
-        status: "booked",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-        isRebookable: true,
-      },
-      {
-        instructorId: helen.id,
-        customerId: bob.id,
-        dateTime: "2024-08-08T10:30:00+09:00",
-        status: "booked",
-        subscriptionId: bob.subscription[0].id,
-        recurringClassId: 1,
-        isRebookable: true,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-08T11:00:00+09:00",
-        status: "booked",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-        isRebookable: true,
-      },
-      {
-        instructorId: helen.id,
-        customerId: bob.id,
-        dateTime: "2024-08-08T11:30:00+09:00",
-        status: "booked",
-        subscriptionId: bob.subscription[0].id,
-        recurringClassId: 1,
-        isRebookable: true,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-08T12:00:00+09:00",
-        status: "booked",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-        isRebookable: true,
-      },
-      {
-        instructorId: helen.id,
-        customerId: bob.id,
-        dateTime: "2024-08-08T12:30:00+09:00",
-        status: "booked",
-        subscriptionId: bob.subscription[0].id,
-        recurringClassId: 1,
-        isRebookable: true,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-08T13:00:00+09:00",
-        status: "booked",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-        isRebookable: true,
-      },
-      {
-        instructorId: helen.id,
-        customerId: bob.id,
-        dateTime: "2024-08-08T13:30:00+09:00",
-        status: "booked",
-        subscriptionId: bob.subscription[0].id,
-        recurringClassId: 1,
-        isRebookable: true,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-08T14:00:00+09:00",
-        status: "booked",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-        isRebookable: true,
-      },
-      {
-        instructorId: helen.id,
-        customerId: bob.id,
-        dateTime: "2024-08-08T14:30:00+09:00",
-        status: "booked",
-        subscriptionId: bob.subscription[0].id,
-        recurringClassId: 1,
-        isRebookable: true,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-08T15:00:00+09:00",
-        status: "booked",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-        isRebookable: true,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-13T11:00:00+09:00",
-        status: "booked",
         subscriptionId: alice.subscription[0].id,
         recurringClassId: 1,
       },
       {
         instructorId: helen.id,
         customerId: alice.id,
-        dateTime: "2024-08-14T11:00:00+09:00",
+        dateTime: "2024-08-27T07:00:00Z",
         status: "booked",
         subscriptionId: alice.subscription[0].id,
         recurringClassId: 1,
       },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-14T12:00:00+09:00",
-        status: "completed",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-14T13:00:00+09:00",
-        status: "canceledByInstructor",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-14T14:00:00+09:00",
-        status: "canceledByCustomer",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-15T11:00:00+09:00",
-        status: "booked",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-16T11:00:00+09:00",
-        status: "booked",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-17T11:00:00+09:00",
-        status: "booked",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-19T11:00:00+09:00",
-        status: "booked",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-20T11:00:00+09:00",
-        status: "canceledByCustomer",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-21T11:00:00+09:00",
-        status: "canceledByInstructor",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-22T11:00:00+09:00",
-        status: "booked",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-      },
-      {
-        instructorId: helen.id,
-        customerId: alice.id,
-        dateTime: "2024-08-23T11:00:00+09:00",
-        status: "booked",
-        subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
-      },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: bob.id,
+      //   dateTime: "2024-06-03T15:30:00+09:00",
+      //   status: "completed",
+      //   isRebookable: false,
+      //   subscriptionId: bob.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: elian.id,
+      //   customerId: bob.id,
+      //   dateTime: "2024-06-03T16:00:00+09:00",
+      //   status: "completed",
+      //   isRebookable: false,
+      //   subscriptionId: bob.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: elian.id,
+      //   customerId: bob.id,
+      //   dateTime: "2024-06-29T11:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: bob.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-08T10:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      //   isRebookable: true,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: bob.id,
+      //   dateTime: "2024-08-08T10:30:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: bob.subscription[0].id,
+      //   recurringClassId: 1,
+      //   isRebookable: true,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-08T11:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      //   isRebookable: true,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: bob.id,
+      //   dateTime: "2024-08-08T11:30:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: bob.subscription[0].id,
+      //   recurringClassId: 1,
+      //   isRebookable: true,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-08T12:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      //   isRebookable: true,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: bob.id,
+      //   dateTime: "2024-08-08T12:30:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: bob.subscription[0].id,
+      //   recurringClassId: 1,
+      //   isRebookable: true,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-08T13:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      //   isRebookable: true,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: bob.id,
+      //   dateTime: "2024-08-08T13:30:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: bob.subscription[0].id,
+      //   recurringClassId: 1,
+      //   isRebookable: true,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-08T14:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      //   isRebookable: true,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: bob.id,
+      //   dateTime: "2024-08-08T14:30:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: bob.subscription[0].id,
+      //   recurringClassId: 1,
+      //   isRebookable: true,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-08T15:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      //   isRebookable: true,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-13T11:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-14T11:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-14T12:00:00+09:00",
+      //   status: "completed",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-14T13:00:00+09:00",
+      //   status: "canceledByInstructor",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-14T14:00:00+09:00",
+      //   status: "canceledByCustomer",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-15T11:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-16T11:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-17T11:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-19T11:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-20T11:00:00+09:00",
+      //   status: "canceledByCustomer",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-21T11:00:00+09:00",
+      //   status: "canceledByInstructor",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-22T11:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
+      // {
+      //   instructorId: helen.id,
+      //   customerId: alice.id,
+      //   dateTime: "2024-08-23T11:00:00+09:00",
+      //   status: "booked",
+      //   subscriptionId: alice.subscription[0].id,
+      //   recurringClassId: 1,
+      // },
     ],
   });
 }
 
 async function insertChildren() {
   const alice = await getCustomer("Alice");
-  const bob = await getCustomer("Bob");
+  // const bob = await getCustomer("Bob");
 
   await prisma.children.createMany({
     data: [
@@ -481,13 +524,13 @@ async function insertChildren() {
         personalInfo:
           "Age: 6 years, English Level: Beginner. Likes playing with dolls and has a pet sheep named Woolly.",
       },
-      {
-        name: "Emily",
-        customerId: bob.id,
-        birthdate: new Date("2017-11-02"),
-        personalInfo:
-          "Age: 7 years, English Level: Intermediate. Loves drawing and is very creative. Enjoys reading stories.",
-      },
+      // {
+      //   name: "Emily",
+      //   customerId: bob.id,
+      //   birthdate: new Date("2017-11-02"),
+      //   personalInfo:
+      //     "Age: 7 years, English Level: Intermediate. Loves drawing and is very creative. Enjoys reading stories.",
+      // },
     ],
   });
 }
@@ -497,44 +540,48 @@ async function insertClassAttendance() {
   const classes = await prisma.class.findMany();
   const children = await prisma.children.findMany();
 
-  if (classes.length < 6 || children.length < 3) {
+  if (classes.length < 4 || children.length < 1) {
     throw new Error("Not enough classes or children found");
   }
 
   await prisma.classAttendance.createMany({
     data: [
       { classId: classes[0].id, childrenId: children[0].id },
-      { classId: classes[0].id, childrenId: children[1].id },
+      // { classId: classes[0].id, childrenId: children[1].id },
       { classId: classes[1].id, childrenId: children[0].id },
-      { classId: classes[2].id, childrenId: children[2].id },
-      { classId: classes[3].id, childrenId: children[2].id },
+      { classId: classes[2].id, childrenId: children[0].id },
+      { classId: classes[3].id, childrenId: children[0].id },
+      { classId: classes[4].id, childrenId: children[0].id },
+      { classId: classes[5].id, childrenId: children[0].id },
+      { classId: classes[6].id, childrenId: children[0].id },
+      { classId: classes[7].id, childrenId: children[0].id },
     ],
   });
 
-  if (classes.length < 17 || children.length < 2) {
-    throw new Error("Not enough classes or children found");
-  }
+  // if (classes.length < 17 || children.length < 2) {
+  //   throw new Error("Not enough classes or children found");
+  // }
 
-  const august8ClassIds = classes.slice(6, 17).map((c) => c.id);
+  // const august8ClassIds = classes.slice(6, 17).map((c) => c.id);
 
-  if (august8ClassIds.length !== 11) {
-    throw new Error("August 8th class IDs count mismatch");
-  }
+  // if (august8ClassIds.length !== 11) {
+  //   throw new Error("August 8th class IDs count mismatch");
+  // }
 
-  const aliceChildren = children.filter(
-    (child) => child.customerId === customers[0].id,
-  );
+  // const aliceChildren = children.filter(
+  //   (child) => child.customerId === customers[0].id,
+  // );
 
-  const attendanceData = august8ClassIds.flatMap((classId) =>
-    aliceChildren.map((child) => ({
-      classId,
-      childrenId: child.id,
-    })),
-  );
+  // const attendanceData = august8ClassIds.flatMap((classId) =>
+  //   aliceChildren.map((child) => ({
+  //     classId,
+  //     childrenId: child.id,
+  //   })),
+  // );
 
-  await prisma.classAttendance.createMany({
-    data: attendanceData,
-  });
+  // await prisma.classAttendance.createMany({
+  //   data: attendanceData,
+  // });
 }
 
 async function insertPlans() {
@@ -542,12 +589,12 @@ async function insertPlans() {
     data: [
       {
         name: "3,180 yen/month",
-        description: "twice a week",
+        description: "2 classes per week",
         weeklyClassTimes: 2,
       },
       {
         name: "7,980 yen/month",
-        description: "5 times a week",
+        description: "5 classes per week",
         weeklyClassTimes: 5,
       },
     ],
@@ -556,7 +603,7 @@ async function insertPlans() {
 
 async function insertSubscriptions() {
   const alice = await getCustomer("Alice");
-  const bob = await getCustomer("Bob");
+  // const bob = await getCustomer("Bob");
   const plan1 = await getPlan("3,180 yen/month");
   const plan2 = await getPlan("7,980 yen/month");
 
@@ -565,15 +612,15 @@ async function insertSubscriptions() {
       {
         customerId: alice.id,
         planId: plan1.id,
-        startAt: new Date("2024-06-01"),
+        startAt: new Date("2024-08-01"),
         endAt: null,
       },
-      {
-        customerId: bob.id,
-        planId: plan2.id,
-        startAt: new Date("2024-06-01"),
-        endAt: null,
-      },
+      // {
+      //   customerId: bob.id,
+      //   planId: plan2.id,
+      //   startAt: new Date("2024-06-01"),
+      //   endAt: null,
+      // },
     ],
   });
 }
@@ -581,31 +628,31 @@ async function insertSubscriptions() {
 async function insertRecurringClasses() {
   const alice = await getCustomer("Alice");
   const helen = await getInstructor("Helen");
-  const elian = await getInstructor("Elian");
+  // const elian = await getInstructor("Elian");
 
   await prisma.recurringClass.create({
     data: {
       subscriptionId: alice.subscription[0].id,
       instructorId: helen.id,
-      startAt: "2024-07-01T00:00:00Z",
+      startAt: "2024-08-05T00:00:00Z",
       recurringClassAttendance: {
         create: [
           {
             childrenId: alice.children[0].id,
           },
-          {
-            childrenId: alice.children[1].id,
-          },
+          // {
+          //   childrenId: alice.children[1].id,
+          // },
         ],
       },
     },
   });
+
   await prisma.recurringClass.create({
     data: {
       subscriptionId: alice.subscription[0].id,
-      instructorId: elian.id,
-      startAt: "2024-07-03T02:00:00Z",
-      endAt: "2024-08-01T00:00:00Z",
+      instructorId: helen.id,
+      startAt: "2024-08-06T00:00:00Z",
       recurringClassAttendance: {
         create: [
           {
@@ -615,56 +662,71 @@ async function insertRecurringClasses() {
       },
     },
   });
-  await prisma.recurringClass.create({
-    data: {
-      subscriptionId: alice.subscription[0].id,
-      instructorId: elian.id,
-      startAt: "2024-07-18T03:00:00Z",
-      endAt: "2024-09-01T00:00:00Z",
-      recurringClassAttendance: {
-        create: [
-          {
-            childrenId: alice.children[0].id,
-          },
-          {
-            childrenId: alice.children[1].id,
-          },
-        ],
-      },
-    },
-  });
-  await prisma.recurringClass.create({
-    data: {
-      subscriptionId: alice.subscription[0].id,
-      instructorId: elian.id,
-      startAt: "2024-08-23T01:00:00Z",
-      endAt: "2024-10-01T00:00:00Z",
-      recurringClassAttendance: {
-        create: [
-          {
-            childrenId: alice.children[0].id,
-          },
-          {
-            childrenId: alice.children[1].id,
-          },
-        ],
-      },
-    },
-  });
-  await prisma.recurringClass.create({
-    data: {
-      subscriptionId: alice.subscription[0].id,
-      instructorId: elian.id,
-      startAt: "2024-09-02T04:00:00Z",
-      recurringClassAttendance: {
-        create: [
-          {
-            childrenId: alice.children[0].id,
-          },
-        ],
-      },
-    },
-  });
+  // await prisma.recurringClass.create({
+  //   data: {
+  //     subscriptionId: alice.subscription[0].id,
+  //     instructorId: elian.id,
+  //     startAt: "2024-07-03T02:00:00Z",
+  //     endAt: "2024-08-01T00:00:00Z",
+  //     recurringClassAttendance: {
+  //       create: [
+  //         {
+  //           childrenId: alice.children[0].id,
+  //         },
+  //       ],
+  //     },
+  //   },
+  // });
+  // await prisma.recurringClass.create({
+  //   data: {
+  //     subscriptionId: alice.subscription[0].id,
+  //     instructorId: elian.id,
+  //     startAt: "2024-07-18T03:00:00Z",
+  //     endAt: "2024-09-01T00:00:00Z",
+  //     recurringClassAttendance: {
+  //       create: [
+  //         {
+  //           childrenId: alice.children[0].id,
+  //         },
+  //         {
+  //           childrenId: alice.children[1].id,
+  //         },
+  //       ],
+  //     },
+  //   },
+  // });
+  // await prisma.recurringClass.create({
+  //   data: {
+  //     subscriptionId: alice.subscription[0].id,
+  //     instructorId: elian.id,
+  //     startAt: "2024-08-23T01:00:00Z",
+  //     endAt: "2024-10-01T00:00:00Z",
+  //     recurringClassAttendance: {
+  //       create: [
+  //         {
+  //           childrenId: alice.children[0].id,
+  //         },
+  //         {
+  //           childrenId: alice.children[1].id,
+  //         },
+  //       ],
+  //     },
+  //   },
+  // });
+  // await prisma.recurringClass.create({
+  //   data: {
+  //     subscriptionId: alice.subscription[0].id,
+  //     instructorId: elian.id,
+  //     startAt: "2024-09-02T04:00:00Z",
+  //     recurringClassAttendance: {
+  //       create: [
+  //         {
+  //           childrenId: alice.children[0].id,
+  //         },
+  //       ],
+  //     },
+  //   },
+  // });
 }
 
 async function insertInstructorUnavailabilities() {
@@ -762,7 +824,7 @@ async function main() {
     await insertClasses();
 
     // Dependant on the above
-    await insertInstructorUnavailabilities();
+    // await insertInstructorUnavailabilities();
 
     // Dependant on the above
     await insertClassAttendance();
