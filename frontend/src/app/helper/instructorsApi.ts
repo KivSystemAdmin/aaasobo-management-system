@@ -67,7 +67,7 @@ export const addAvailability = async (
   id: number,
   from: string,
   until: string,
-): Promise<Response<{ availability: Availability }>> => {
+): Promise<Response<{}>> => {
   return await fetch(`${BASE_URL}/${id}/availability`, {
     method: "PUT",
     headers: {

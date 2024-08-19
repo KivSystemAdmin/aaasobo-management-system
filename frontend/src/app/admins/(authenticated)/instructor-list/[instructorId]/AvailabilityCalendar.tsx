@@ -13,27 +13,36 @@ export default function AvailabilityCalendar({
 }) {
   const [instructor, setInstructor] = useState<Instructor | undefined>();
 
+  const refresh = async () => {
+    const instructor = await getInstructor(instructorId);
+    if ("message" in instructor) {
+      alert(instructor.message);
+      return;
+    }
+    setInstructor(instructor.instructor);
+  };
+
   useEffect(() => {
-    (async () => {
-      const instructor = await getInstructor(instructorId);
-      if ("message" in instructor) {
-        alert(instructor.message);
-        return;
-      }
-      setInstructor(instructor.instructor);
-    })();
+    refresh();
   }, [instructorId]);
 
   if (!instructor) {
     return <>Loading...</>;
   }
-  return <AvailabilityCalendarInternal instructor={instructor} />;
+  return (
+    <AvailabilityCalendarInternal
+      instructor={instructor}
+      postSubmit={refresh}
+    />
+  );
 }
 
 function AvailabilityCalendarInternal({
   instructor,
+  postSubmit,
 }: {
   instructor: Instructor;
+  postSubmit: () => Promise<void>;
 }) {
   const [selectedEvent, setSelectedEvent] = useState("");
 
@@ -45,6 +54,7 @@ function AvailabilityCalendarInternal({
       alert(res.message);
       return;
     }
+    await postSubmit();
   };
 
   return (

@@ -14,8 +14,9 @@ export default function InstructorSchedule({
 }: {
   instructorId: number;
 }) {
-  const [selectedDate, setSelectedDate] = useState("2024-07-01");
-  const [startFrom, setStartFrom] = useState("2024-08-01");
+  const today = new Date().toISOString().split("T")[0];
+  const [selectedDate, setSelectedDate] = useState(today);
+  const [startFrom, setStartFrom] = useState(today);
   const [slots, setSlots] = useState<SlotsOfDays>({
     Mon: [],
     Tue: [],

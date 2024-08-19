@@ -304,3 +304,14 @@ export async function updateRecurringAvailabilityInterval(
     );
   }
 }
+
+export async function getUnavailabilities(instructorId: number) {
+  try {
+    return await prisma.instructorUnavailability.findMany({
+      where: { instructorId },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch instructor unavailabilities.");
+  }
+}

@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../prisma/prismaClient";
 import { pickProperties } from "../helper/commonUtils";
 import {
@@ -23,6 +24,7 @@ import {
   terminateRecurringAvailability,
   getInstructorWithRecurringAvailabilityDay,
   updateRecurringAvailabilityInterval,
+  getUnavailabilities,
 } from "../services/instructorsService";
 import { type RequestWithId } from "../middlewares/parseId.middleware";
 import bcrypt from "bcrypt";
@@ -256,6 +258,12 @@ export module RecurringAvailability {
       });
 
       await Promise.all(tasks);
+
+      const until = new Date();
+      until.setUTCMonth(until.getMonth() + 3);
+      until.setUTCDate(1);
+      until.setUTCHours(0, 0, 0, 0);
+      await addAvailabilityInternal(tx, req.id, startDate, until);
     });
 
     res.status(200).end();
@@ -324,50 +332,68 @@ export const addAvailability = async (req: RequestWithId, res: Response) => {
     return res.status(400).json({ message: "Invalid range provided." });
   }
   await prisma.$transaction(async (tx) => {
-    const recurringAvailabilities = await getInstructorRecurringAvailabilities(
-      tx,
-      req.id,
-    );
-    // Get overlapping dates of [startAt, endAt) and [from, until).
-    const dateTimes = recurringAvailabilities.map(
-      ({ id, startAt: startAtStr, endAt: endAtStr }) => {
-        const startAt = new Date(startAtStr);
-        const endAt = endAtStr ? new Date(endAtStr) : null;
-        // from  until  startAt  endAt
-        // || (empty)
-        if (until <= startAt) {
-          return { instructorRecurringAvailabilityId: id, dateTimes: [] };
-        }
-        // startAt  endAt  from  until
-        // || (empty)
-        if (endAt && endAt <= from) {
-          return { instructorRecurringAvailabilityId: id, dateTimes: [] };
-        }
-        const start = startAt;
-        while (startAt < from) {
-          startAt.setUTCDate(startAt.getUTCDate() + 7);
-        }
-        if (!endAt) {
-          // start  until
-          //   |------|
-          return {
-            instructorRecurringAvailabilityId: id,
-            dateTimes: createDatesBetween(start, until),
-          };
-        }
-        const end = until < endAt ? until : endAt;
-        // start  end
-        //   |-----|
+    await addAvailabilityInternal(tx, req.id, from, until);
+  });
+  return res.status(200).json({});
+};
+
+async function addAvailabilityInternal(
+  tx: Prisma.TransactionClient,
+  instructorId: number,
+  from: Date,
+  until: Date,
+) {
+  const recurringAvailabilities = await getInstructorRecurringAvailabilities(
+    tx,
+    instructorId,
+  );
+  // const unavailabilities = await getInstructorUnavailabilities(tx, instructorId);
+  // Get overlapping dates of [startAt, endAt) and [from, until).
+  const dateTimes = recurringAvailabilities.map(
+    ({ id, startAt: startAtStr, endAt: endAtStr }) => {
+      const startAt = new Date(startAtStr);
+      const endAt = endAtStr ? new Date(endAtStr) : null;
+      // from  until  startAt  endAt
+      // || (empty)
+      if (until <= startAt) {
+        return { instructorRecurringAvailabilityId: id, dateTimes: [] };
+      }
+      // startAt  endAt  from  until
+      // || (empty)
+      if (endAt && endAt <= from) {
+        return { instructorRecurringAvailabilityId: id, dateTimes: [] };
+      }
+      const start = startAt;
+      while (startAt < from) {
+        startAt.setUTCDate(startAt.getUTCDate() + 7);
+      }
+      if (!endAt) {
+        // start  until
+        //   |------|
         return {
           instructorRecurringAvailabilityId: id,
-          dateTimes: createDatesBetween(start, end),
+          dateTimes: createDatesBetween(start, until),
         };
-      },
+      }
+      const end = until < endAt ? until : endAt;
+      // start  end
+      //   |-----|
+      return {
+        instructorRecurringAvailabilityId: id,
+        dateTimes: createDatesBetween(start, end),
+      };
+    },
+  );
+  const unavailabilities = (await getUnavailabilities(instructorId)).map(
+    ({ dateTime }) => dateTime,
+  );
+  dateTimes.forEach((dateTimes) => {
+    dateTimes.dateTimes = dateTimes.dateTimes.filter(
+      (dateTime) => !unavailabilities.includes(dateTime),
     );
-    await addInstructorAvailabilities(tx, req.id, dateTimes);
   });
-  return res.status(200);
-};
+  await addInstructorAvailabilities(tx, instructorId, dateTimes);
+}
 
 export const deleteAvailability = async (req: RequestWithId, res: Response) => {
   const { dateTime } = req.body;
