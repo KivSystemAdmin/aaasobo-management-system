@@ -251,7 +251,7 @@ export async function terminateRecurringAvailability(
     const availabilitiesToDelete = await tx.instructorAvailability.findMany({
       where: {
         instructorRecurringAvailabilityId,
-        dateTime: { gt: endAt },
+        dateTime: { gte: endAt },
       },
     });
 
@@ -272,7 +272,7 @@ export async function terminateRecurringAvailability(
     await tx.instructorAvailability.deleteMany({
       where: {
         instructorRecurringAvailabilityId,
-        dateTime: { gt: endAt },
+        dateTime: { gte: endAt },
       },
     });
 
