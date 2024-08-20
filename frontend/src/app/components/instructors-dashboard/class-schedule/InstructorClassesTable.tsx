@@ -6,7 +6,11 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { editClass } from "@/app/helper/classesApi";
 import ActionButton from "../../ActionButton";
-import { CheckCircleIcon, UsersIcon } from "@heroicons/react/24/solid";
+import {
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  UsersIcon,
+} from "@heroicons/react/24/solid";
 
 type StatusType =
   | "booked"
@@ -228,7 +232,7 @@ const InstructorClassesTable = ({
                         <div
                           className={styles.instructorClasses__iconContainer}
                         >
-                          <CheckCircleIcon
+                          <ExclamationTriangleIcon
                             className={`${styles.instructorClasses__classStatusIcon} ${statusClass}`}
                           />
                         </div>

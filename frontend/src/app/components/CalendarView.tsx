@@ -26,7 +26,7 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   XCircleIcon,
-} from "@heroicons/react/24/solid";
+} from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

@@ -8,7 +8,7 @@ import {
   checkDoubleBooking,
 } from "@/app/helper/classesApi";
 import { useRouter } from "next/navigation";
-import { fetchInstructorAvailabilitiesForTodayAndAfter } from "@/app/helper/instructorsApi";
+import { fetchInstructorAvailabilitiesForTomorrowAndAfter } from "@/app/helper/instructorsApi";
 import RedirectButton from "../../RedirectButton";
 import ActionButton from "../../ActionButton";
 import { toast } from "react-toastify";
@@ -44,9 +44,10 @@ function BookClassForm({
     const fetchInstructorAvailabilities = async () => {
       if (selectedInstructorId === null) return;
       const fetchedInstructorAvailabilities =
-        await fetchInstructorAvailabilitiesForTodayAndAfter(
+        await fetchInstructorAvailabilitiesForTomorrowAndAfter(
           selectedInstructorId,
         );
+
       setInstrucotrAvailabilities(fetchedInstructorAvailabilities);
     };
     fetchInstructorAvailabilities();
