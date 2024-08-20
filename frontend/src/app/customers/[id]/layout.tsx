@@ -13,6 +13,7 @@ import {
 import { FC, SVGProps, useEffect, useState } from "react";
 import { getCustomerById, logoutCustomer } from "@/app/helper/customersApi";
 import { useRouter } from "next/navigation";
+import { CustomerAuthentication } from "@/app/helper/authenticationUtils";
 
 type Link = {
   name: string;
@@ -29,8 +30,11 @@ export default function Layout({
 }) {
   const [customerName, setCustomerName] = useState<string | null>(null);
   const router = useRouter();
-
   const customerId = params.id;
+
+  // Check the authentication of the customer.
+  const { isLoading } = CustomerAuthentication(customerId);
+
   const links: Link[] = [
     {
       name: "Class Calendar",
@@ -71,6 +75,11 @@ export default function Layout({
     }
     toast.error(result.error);
   };
+
+  // Display a loading message while checking authentication.
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={styles.container}>

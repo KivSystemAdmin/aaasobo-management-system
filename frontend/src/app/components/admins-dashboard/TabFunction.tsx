@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styles from "./TabFunction.module.scss";
+import Link from "next/link";
 
 // Configure the Tab component
 const Tab: React.FC<{
@@ -28,20 +29,36 @@ const TabContent: React.FC<{ content: React.ReactNode }> = ({ content }) => {
 const TabFunction: React.FC<{
   tabs: Tab[];
   breadcrumb: string[];
+  activeTabName: string;
   initialActiveTab?: number;
-}> = ({ tabs, breadcrumb, initialActiveTab = 0 }) => {
+}> = ({ tabs, breadcrumb, activeTabName, initialActiveTab = 0 }) => {
   const [activeTabIndex, setActiveTabIndex] = useState(initialActiveTab);
+
+  const handleTabClick = (index: number, activeTabName: string) => {
+    setActiveTabIndex(index);
+    localStorage.setItem(activeTabName, index.toString());
+  };
 
   return (
     <>
-      <p className={styles.breadcrumb}>{breadcrumb.join(" > ")}</p>
+      <nav className={styles.breadcrumb}>
+        <ul className={styles.breadcrumb__list}>
+          <li className={styles.breadcrumb__item}>
+            <Link href={breadcrumb[1]} passHref>
+              {breadcrumb[0]}{" "}
+            </Link>
+          </li>
+          <li className={styles.breadcrumb__separator}>{" >> "}</li>
+          <li className={styles.breadcrumb__item}>{breadcrumb[2]}</li>
+        </ul>
+      </nav>
       <div className={styles.tabWrapper}>
         <div className={styles.tabContainer}>
           {tabs.map((tab, index) => (
             <Tab
               key={index}
               label={tab.label}
-              onClick={() => setActiveTabIndex(index)}
+              onClick={() => handleTabClick(index, activeTabName)}
               isActive={index === activeTabIndex}
             />
           ))}

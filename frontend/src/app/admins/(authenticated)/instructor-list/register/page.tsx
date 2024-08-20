@@ -2,7 +2,6 @@
 
 import { FormEvent } from "react";
 import { useInput } from "@/app/hooks/useInput";
-import { useAuth } from "@/app/hooks/useAuth";
 import { isValidRegister } from "@/app/helper/validationUtils";
 import styles from "./page.module.scss";
 import {
@@ -33,10 +32,6 @@ function Register() {
   const [passcode, onPasscodeChange] = useInput();
   const [introductionURL, onIntroductionURLChange] = useInput();
 
-  // Check the authentication of the admin.
-  const endpoint = "http://localhost:4000/admins/authentication";
-  const redirectPath = "/admins/login";
-  const { isLoading } = useAuth(endpoint, redirectPath);
   const router = useRouter();
 
   // Register the admin.
@@ -101,11 +96,6 @@ function Register() {
     // Redirect to the instructor list page
     router.push(`/admins/instructor-list`);
   };
-
-  // Display a loading message while checking authentication
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div>

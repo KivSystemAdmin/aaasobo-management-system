@@ -48,12 +48,18 @@ function UsersTable({
         switch (userType) {
           case "Instructor List":
             usersData = await getAllInstructors();
+            // Set the active tab to the instructor calendar tab.
+            localStorage.setItem("activeInstructorTab", "0");
             break;
           case "Customer List":
             usersData = await getAllCustomers();
+            // Set the active tab to the customer calendar tab.
+            localStorage.setItem("activeCustomerTab", "0");
             break;
           case "Child List":
             usersData = await getAllChildren();
+            // Set the active tab to the children profiles tab.
+            localStorage.setItem("activeCustomerTab", "2");
             break;
           default:
             usersData = [];
@@ -231,7 +237,7 @@ function UsersTable({
                     }[header.column.getIsSorted() as string] ?? "　"}
                   </th>
                 ))}
-                <th></th>
+                {/* <th></th> */}
               </tr>
             ))}
           </thead>
@@ -249,12 +255,12 @@ function UsersTable({
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
-                <td>
+                {/* <td>
                   <TrashIcon
                     className={styles.icon}
                     onClick={() => handleDeleteClick(row.id)}
                   />
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

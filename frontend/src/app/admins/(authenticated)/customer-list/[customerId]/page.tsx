@@ -1,21 +1,25 @@
 "use client";
 
+import { useContext } from "react";
+import { AuthContext } from "@/app/admins/(authenticated)/layout";
 import TabFunction from "@/app/components/admins-dashboard/TabFunction";
 import ClassCalendar from "@/app/components/customers-dashboard/classes/ClassCalendar";
 import CustomerProfile from "@/app/components/customers-dashboard/profile/CustomerProfile";
 import ChildrenProfiles from "@/app/components/customers-dashboard/children-profiles/ChildrenProfiles";
 import RegularClasses from "@/app/components/customers-dashboard/regular-classes/RegularClasses";
-import { useAuth } from "@/app/hooks/useAuth";
 import { useTabSelect } from "@/app/hooks/useTabSelect";
 
 function Page({ params }: { params: { customerId: string } }) {
   const customerId = params.customerId;
-  const breadcrumb = ["Customer List", `ID: ${customerId}`];
+  const breadcrumb = [
+    "Customer List",
+    `/admins/customer-list`,
+    `ID: ${customerId}`,
+  ];
+  const activeTabName = "activeCustomerTab";
 
   // Check the authentication of the admin.
-  const endpoint = "http://localhost:4000/admins/authentication";
-  const redirectPath = "/admins/login";
-  const { isAuthenticated, isLoading } = useAuth(endpoint, redirectPath);
+  const { isAuthenticated } = useContext(AuthContext);
 
   // Get the active tab from the local storage.
   const { initialActiveTab, isTabInitialized } =
@@ -56,8 +60,8 @@ function Page({ params }: { params: { customerId: string } }) {
     },
   ];
 
-  // Display a loading message while checking the authentication and initializing the tab.
-  if (isLoading || !isTabInitialized) {
+  // Display a loading message while initializing the tab.
+  if (!isTabInitialized) {
     return <div>Loading...</div>;
   }
 
@@ -65,6 +69,7 @@ function Page({ params }: { params: { customerId: string } }) {
     <TabFunction
       tabs={tabs}
       breadcrumb={breadcrumb}
+      activeTabName={activeTabName}
       initialActiveTab={initialActiveTab}
     />
   );

@@ -90,9 +90,18 @@ function ClassDetails({
       <nav className={styles.breadcrumb}>
         <ul className={styles.breadcrumb__list}>
           <li className={styles.breadcrumb__item}>
-            <Link href={`/instructors/${instructorId}/class-schedule`} passHref>
-              Class Schedule
-            </Link>
+            {isAdminAuthenticated ? (
+              <Link href={`/admins/instructor-list/${instructorId}`} passHref>
+                Class Schedule
+              </Link>
+            ) : (
+              <Link
+                href={`/instructors/${instructorId}/class-schedule`}
+                passHref
+              >
+                Class Schedule
+              </Link>
+            )}
           </li>
           <li className={styles.breadcrumb__separator}>{" >> "}</li>
           <li className={styles.breadcrumb__item}>Class Details</li>

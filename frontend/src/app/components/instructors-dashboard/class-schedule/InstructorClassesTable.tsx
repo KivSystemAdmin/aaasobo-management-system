@@ -199,7 +199,7 @@ const InstructorClassesTable = ({
                                 checked={selectedStatus === "booked"}
                                 onChange={() => handleStatusChange("booked")}
                               />
-                              <span>Booked</span>
+                              <span>Booked</span>{" "}
                             </>
                           ) : (
                             <>
@@ -208,7 +208,7 @@ const InstructorClassesTable = ({
                                 checked={selectedStatus === "completed"}
                                 onChange={() => handleStatusChange("completed")}
                               />
-                              <span>Completed</span>
+                              <span>Completed</span>{" "}
                             </>
                           )}
                         </label>

@@ -57,7 +57,7 @@ instructorsRouter.get("/:id/recurringAvailabilityById", parseId, (req, res) =>
 );
 instructorsRouter.get("/", getAllInstructorsController);
 
-instructorsRouter.get("/authentication", authenticateInstructorSession);
+instructorsRouter.get("/:id/authentication", authenticateInstructorSession);
 
 instructorsRouter.get("/:id/classes", parseId, (req, res) => {
   getInstructorClasses(req as RequestWithId, res);

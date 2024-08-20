@@ -8,6 +8,7 @@ import { getInstructor, logoutInstructor } from "@/app/helper/instructorsApi";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
+import { InstructorAuthentication } from "@/app/helper/authenticationUtils";
 
 type Link = {
   name: string;
@@ -24,8 +25,11 @@ export default function Layout({
 }) {
   const [instructorName, setInstructorName] = useState<string | null>(null);
   const router = useRouter();
+  const instructorId = params.id;
 
-  const instructorId = parseInt(params.id);
+  // Check the authentication of the instructor.
+  const { isLoading } = InstructorAuthentication(instructorId);
+
   const links: Link[] = [
     {
       name: "Class Schedule",
@@ -65,6 +69,11 @@ export default function Layout({
     }
     toast.error(response.message);
   };
+
+  // Display a loading message while checking authentication.
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={styles.container}>

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import styles from "./AddSubscription.module.scss";
 import { getAllPlans } from "@/app/helper/plansApi";
 import { registerSubscription } from "@/app/helper/subscriptionsApi";
@@ -17,9 +19,6 @@ function AddSubscription({
   onClose: () => void;
   updateSubscription: () => void;
 }) {
-  // Set the active tab to the regular classes tab.
-  localStorage.setItem("activeCustomerTab", "3");
-
   const [isOpenForm, setIsOpenForm] = useState(isOpen);
   const [plansData, setPlansData] = useState<Plans>([]);
   const [filterColumn, setFilterColumn] = useState<string>("0");
@@ -55,7 +54,9 @@ function AddSubscription({
   // Register a subscription.
   const handleRegisterSubscription = async () => {
     if (selectedPlan === null || selectedDate === "") {
-      alert("Please select a plan and a date to register the subscription.");
+      toast.error(
+        "Please select a plan and a date to register the subscription.",
+      );
       return;
     }
 
@@ -66,12 +67,11 @@ function AddSubscription({
 
     try {
       await registerSubscription(customerId, subscriptionData);
-      alert("Subscription registered successfully.");
       updateSubscription();
       onClose();
     } catch (error) {
       console.error("Error registering subscription:", error);
-      alert("There was an error registering the subscription.");
+      toast.error("There was an error registering the subscription.");
     }
   };
 
@@ -98,6 +98,7 @@ function AddSubscription({
     <>
       {isOpenForm && (
         <>
+          <ToastContainer />
           <div className={styles.container}>
             <div className={styles.filterContainer}>
               <div>

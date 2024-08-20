@@ -28,11 +28,6 @@ function ClassDetails({
   const fetchClassDetails = async () => {
     if (!customerId || isNaN(classId)) return;
 
-    if (isAdminAuthenticated) {
-      // Set the active tab to the class calendar tab.
-      localStorage.setItem("activeCustomerTab", "0");
-    }
-
     try {
       const classes: ClassType[] = await getClassesByCustomerId(customerId);
       setClasses(classes);

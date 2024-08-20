@@ -2,7 +2,6 @@
 
 import { FormEvent } from "react";
 import { useInput } from "@/app/hooks/useInput";
-import { useAuth } from "@/app/hooks/useAuth";
 import { isValidRegister } from "@/app/helper/validationUtils";
 
 function Register() {
@@ -10,11 +9,6 @@ function Register() {
   const [email, onEmailChange] = useInput();
   const [password, onPasswordChange] = useInput();
   const [passConfirmation, onPassConfirmationChange] = useInput();
-
-  // Check the authentication of the admin.
-  const endpoint = "http://localhost:4000/admins/authentication";
-  const redirectPath = "/admins/login";
-  const { isLoading } = useAuth(endpoint, redirectPath);
 
   // Register the admin.
   const registerHandler = async (e: FormEvent) => {
@@ -58,11 +52,6 @@ function Register() {
 
     alert("Registered successfully"); // Set alert message temporarily.
   };
-
-  // Display a loading message while checking authentication
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div>

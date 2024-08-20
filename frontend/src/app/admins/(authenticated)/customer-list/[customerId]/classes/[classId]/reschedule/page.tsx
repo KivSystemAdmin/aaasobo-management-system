@@ -1,6 +1,7 @@
 "use client";
 
-import { useAuth } from "@/app/hooks/useAuth";
+import { useContext } from "react";
+import { AuthContext } from "@/app/admins/(authenticated)/layout";
 import RescheduleClass from "@/app/components/customers-dashboard/classes/RescheduleClass";
 
 function Page({ params }: { params: { customerId: string; classId: string } }) {
@@ -8,17 +9,7 @@ function Page({ params }: { params: { customerId: string; classId: string } }) {
   const classId = params.classId;
 
   // Check the authentication of the admin.
-  const endpoint = "http://localhost:4000/admins/authentication";
-  const redirectPath = "/admins/login";
-  const { isAuthenticated, isLoading } = useAuth(endpoint, redirectPath);
-
-  // Set the active tab to the class calendar tab.
-  localStorage.setItem("activeCustomerTab", "0");
-
-  // Display a loading message while checking the authentication.
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const { isAuthenticated } = useContext(AuthContext);
 
   return (
     <RescheduleClass

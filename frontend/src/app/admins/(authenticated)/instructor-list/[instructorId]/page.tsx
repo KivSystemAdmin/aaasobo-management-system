@@ -3,19 +3,23 @@
 import TabFunction from "@/app/components/admins-dashboard/TabFunction";
 import InstructorCalendar from "@/app/components/instructors-dashboard/class-schedule/InstructorCalendar";
 import InstructorProfile from "@/app/components/instructors-dashboard/instructor-profile/InstructorProfile";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useContext } from "react";
+import { AuthContext } from "@/app/admins/(authenticated)/layout";
 import { useTabSelect } from "@/app/hooks/useTabSelect";
 import AvailabilityCalendar from "./AvailabilityCalendar";
 import InstructorSchedule from "./InstructorSchedule";
 
 function Page({ params }: { params: { instructorId: string } }) {
   const instructorId = params.instructorId;
-  const breadcrumb = ["Instructor List", `ID: ${instructorId}`];
+  const breadcrumb = [
+    "Instructor List",
+    `/admins/instructor-list`,
+    `ID: ${instructorId}`,
+  ];
+  const activeTabName = "activeInstructorTab";
 
   // Check the authentication of the admin.
-  const endpoint = "http://localhost:4000/admins/authentication";
-  const redirectPath = "/admins/login";
-  const { isAuthenticated, isLoading } = useAuth(endpoint, redirectPath);
+  const { isAuthenticated } = useContext(AuthContext);
 
   // Get the active tab from the local storage.
   const { initialActiveTab, isTabInitialized } = useTabSelect(
@@ -52,8 +56,8 @@ function Page({ params }: { params: { instructorId: string } }) {
     },
   ];
 
-  // Display a loading message while checking the authentication and initializing the tab.
-  if (isLoading || !isTabInitialized) {
+  // Display a loading message while initializing the tab.
+  if (!isTabInitialized) {
     return <div>Loading...</div>;
   }
 
@@ -61,6 +65,7 @@ function Page({ params }: { params: { instructorId: string } }) {
     <TabFunction
       tabs={tabs}
       breadcrumb={breadcrumb}
+      activeTabName={activeTabName}
       initialActiveTab={initialActiveTab}
     />
   );

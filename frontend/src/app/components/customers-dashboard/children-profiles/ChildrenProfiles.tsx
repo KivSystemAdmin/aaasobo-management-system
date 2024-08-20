@@ -138,12 +138,21 @@ function ChildrenProfiles({
   return (
     <div className={styles.container}>
       <div className={styles.addBtn}>
-        <RedirectButton
-          linkURL={`children-profiles/add-child`}
-          btnText="Add Child"
-          className="addBtn"
-          Icon={PlusIcon}
-        />
+        {isAdminAuthenticated ? (
+          <RedirectButton
+            linkURL={`/admins/customer-list/${customerId}/children-profiles/add-child`}
+            btnText="Add Child"
+            className="addBtn"
+            Icon={PlusIcon}
+          />
+        ) : (
+          <RedirectButton
+            linkURL={`children-profiles/add-child`}
+            btnText="Add Child"
+            className="addBtn"
+            Icon={PlusIcon}
+          />
+        )}
       </div>
       {children ? (
         <div className={styles.children}>

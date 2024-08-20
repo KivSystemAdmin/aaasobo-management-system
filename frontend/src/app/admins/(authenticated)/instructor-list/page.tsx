@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from "@/app/hooks/useAuth";
 import UsersTable from "@/app/components/admins-dashboard/UsersTable";
 
 export default function Page() {
@@ -10,16 +9,6 @@ export default function Page() {
   const replaceItems = ["ID"]; // Replace the item with the value(e.g., ID -> 1,2,3...)
   const linkUrls = ["/admins/instructor-list/[ID]"]; // Set the link URL
   const addUserLink = ["/admins/instructor-list/register", "Add instructor"]; // Set the link URL and name to add a user
-
-  // Check the authentication of the admin.
-  const endpoint = "http://localhost:4000/admins/authentication";
-  const redirectPath = "/admins/login";
-  const { isLoading } = useAuth(endpoint, redirectPath);
-
-  // Display a loading message while checking authentication
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div>

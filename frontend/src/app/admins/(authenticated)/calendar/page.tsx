@@ -1,18 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AuthContext } from "@/app/admins/(authenticated)/layout";
 import InstructorCalendar from "@/app/components/instructors-dashboard/class-schedule/InstructorCalendar";
 import InstructorSearch from "@/app/components/admins-dashboard/InstructorSearch";
-import { useAuth } from "@/app/hooks/useAuth";
 
 const Page = () => {
   const [instructorId, setInstructorId] = useState<number | null>(null);
   const [instructorName, setInstructorName] = useState<string | null>(null);
 
   // Check the authentication of the admin.
-  const endpoint = "http://localhost:4000/admins/authentication";
-  const redirectPath = "/admins/login";
-  const { isAuthenticated, isLoading } = useAuth(endpoint, redirectPath);
+  const { isAuthenticated } = useContext(AuthContext);
 
   const handleSendInstructor = async (id: number, name: string) => {
     localStorage.setItem("activeInstructor", [String(id), name].join(","));
@@ -30,11 +28,6 @@ const Page = () => {
     setInstructorId(parseInt(id));
     setInstructorName(name);
   }, []);
-
-  // Display a loading message while checking authentication.
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <>

@@ -25,4 +25,4 @@ customersRouter.get("/:id/customer", getCustomerById);
 
 customersRouter.patch("/:id", updateCustomerProfile);
 customersRouter.post("/:id/subscription", registerSubscriptionController);
-customersRouter.get("/authentication", authenticateCustomerSession);
+customersRouter.get("/:id/authentication", authenticateCustomerSession);
