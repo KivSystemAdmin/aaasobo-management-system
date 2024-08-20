@@ -1,6 +1,7 @@
 import styles from "./InstructorSchedule.module.scss";
 
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 import {
   getInstructorRecurringAvailability,
   addRecurringAvailabilities,
@@ -46,10 +47,12 @@ export default function InstructorSchedule({
   const save = async () => {
     await addRecurringAvailabilities(instructorId, slots, startFrom);
     await fetchData();
+    toast.success("Instructor schedule saved successfully.");
   };
 
   return (
     <>
+      <ToastContainer />
       <div className={styles.dateInput}>
         <label className={styles.label}>
           Display Schedule on
