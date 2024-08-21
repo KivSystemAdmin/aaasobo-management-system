@@ -25,6 +25,16 @@ function SideNav({
 }) {
   const pathname = usePathname();
 
+  const [background, userType] = (() => {
+    if (pathname.startsWith("/customers")) {
+      return ["#009f80", "(Customer)"];
+    }
+    if (pathname.startsWith("/instructors")) {
+      return ["#909000", "(Instructor)"];
+    }
+    return ["#414298", ""];
+  })();
+
   return (
     <div className={styles.sideNavContainer}>
       <div className={styles.innerContainer}>
@@ -36,9 +46,11 @@ function SideNav({
           />
         </div>
 
-        <div className={styles.sideNavUser}>
+        <div className={styles.sideNavUser} style={{ background }}>
           <UserIconSolid className={styles.sideNavUser__icon} />
-          <div className={styles.sideNavUser__name}>{userName}</div>
+          <div className={styles.sideNavUser__name}>
+            {userName} {userType}
+          </div>
         </div>
 
         {links.map((link) => {
