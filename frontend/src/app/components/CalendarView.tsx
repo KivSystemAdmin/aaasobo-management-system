@@ -11,6 +11,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import momentTimezonePlugin from "@fullcalendar/moment-timezone";
 import styles from "./CalendarHeaderView.module.scss";
 import {
   CalendarApi,
@@ -109,8 +110,12 @@ const CalendarView = forwardRef<
 
     // Formats and displays the content of an event on the calendar view page
     const renderEventContent = (eventInfo: EventContentArg) => {
-      const startDate = new Date(eventInfo.event.startStr);
-      const hours = String(startDate.getHours()).padStart(2, "0");
+      const startDate = new Date(
+        new Date(eventInfo.event.startStr).toLocaleString("en-US", {
+          timeZone: instructorId ? "Asia/Manila" : "Asia/Tokyo",
+        }),
+      );
+      const hours = startDate.getHours();
       const minutes = String(startDate.getMinutes()).padStart(2, "0");
       const formattedStartTime = `${hours}:${minutes}`;
 
@@ -252,8 +257,14 @@ const CalendarView = forwardRef<
       <>
         <FullCalendar
           ref={calendarRef}
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView={instructorId ? "timeGridWeek" : "dayGridMonth"}
+          plugins={[
+            dayGridPlugin,
+            timeGridPlugin,
+            interactionPlugin,
+            momentTimezonePlugin,
+          ]}
+          // initialView={instructorId ? "timeGridWeek" : "dayGridMonth"}
+          initialView={"dayGridMonth"}
           headerToolbar={
             instructorId
               ? {
@@ -265,8 +276,8 @@ const CalendarView = forwardRef<
           }
           views={{
             timeGridWeek: {
-              slotMinTime: "09:00:00",
-              slotMaxTime: "21:30:00",
+              slotMinTime: "08:00:00",
+              slotMaxTime: "20:30:00",
               slotLabelFormat: {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -274,8 +285,8 @@ const CalendarView = forwardRef<
               },
             },
             timeGridDay: {
-              slotMinTime: "09:00:00",
-              slotMaxTime: "21:30:00",
+              slotMinTime: "08:00:00",
+              slotMaxTime: "20:30:00",
               slotLabelFormat: {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -296,6 +307,7 @@ const CalendarView = forwardRef<
           selectable={false}
           eventDisplay="block"
           allDaySlot={false}
+          timeZone={instructorId ? "Asia/Manila" : "Asia/Tokyo"}
         />
 
         <Modal isOpen={isClassDetailModalOpen} onClose={handleModalClose}>

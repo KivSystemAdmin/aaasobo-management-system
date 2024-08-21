@@ -6,7 +6,6 @@ import FullCalendar from "@fullcalendar/react";
 import { CalendarApi } from "@fullcalendar/core/index.js";
 import {
   formatFiveMonthsLaterEndOfMonth,
-  getClassStartAndEndTimes,
   isPastPreviousDayDeadline,
 } from "@/app/helper/dateUtils";
 import { cancelClass, fetchClassesForCalendar } from "@/app/helper/classesApi";
@@ -77,10 +76,10 @@ function ClassCalendar({
       setRebookableClasses(rebookableClasses);
 
       const formattedClasses = classesData.map((eachClass) => {
-        const { start, end } = getClassStartAndEndTimes(
-          eachClass.dateTime,
-          "Asia/Tokyo",
-        );
+        const start = eachClass.dateTime;
+        const end = new Date(
+          new Date(start).getTime() + 25 * 60000,
+        ).toISOString();
 
         const color =
           eachClass.status === "booked"

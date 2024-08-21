@@ -4,8 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import CalendarView from "@/app/components/CalendarView";
 import styles from "./InstructorCalendar.module.scss";
 import FullCalendar from "@fullcalendar/react";
-import { CalendarApi } from "@fullcalendar/core/index.js";
-import { getClassStartAndEndTimes } from "@/app/helper/dateUtils";
 import { fetchClassesForCalendar } from "@/app/helper/classesApi";
 import { fetchInstructorAvailabilitiesForTodayAndAfter } from "@/app/helper/instructorsApi";
 
@@ -43,10 +41,10 @@ function InstructorCalendar({
       );
 
       const formattedClasses = classesToDisplay.map((eachClass) => {
-        const { start, end } = getClassStartAndEndTimes(
-          eachClass.dateTime,
-          "Asia/Manila",
-        );
+        const start = eachClass.dateTime;
+        const end = new Date(
+          new Date(start).getTime() + 25 * 60000,
+        ).toISOString();
 
         const color =
           eachClass.status === "booked"
@@ -74,10 +72,10 @@ function InstructorCalendar({
 
       const formattedAvailabilities = instructorAvailabilities.map(
         (availability) => {
-          const { start, end } = getClassStartAndEndTimes(
-            availability,
-            "Asia/Manila",
-          );
+          const start = availability;
+          const end = new Date(
+            new Date(start).getTime() + 25 * 60000,
+          ).toISOString();
 
           return {
             start,
