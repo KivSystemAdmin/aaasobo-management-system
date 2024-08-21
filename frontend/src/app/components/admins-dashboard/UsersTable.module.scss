@@ -85,6 +85,11 @@ $font_size: 0.9rem;
         overflow: visible;
         text-overflow: unset;
       }
+
+      a {
+        display: block;
+        width: 100%;
+      }
     }
   }
 }
