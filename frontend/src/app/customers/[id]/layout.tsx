@@ -33,7 +33,7 @@ export default function Layout({
   const customerId = params.id;
 
   // Check the authentication of the customer.
-  const { isLoading } = CustomerAuthentication(customerId);
+  // const { isLoading } = CustomerAuthentication(customerId);
 
   const links: Link[] = [
     {
@@ -77,9 +77,9 @@ export default function Layout({
   };
 
   // Display a loading message while checking authentication.
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <div className={styles.container}>

@@ -5,6 +5,7 @@ import InstructorClassDetail from "@/app/components/instructors-dashboard/class-
 import InstructorClassesTable from "@/app/components/instructors-dashboard/class-schedule/InstructorClassesTable";
 import styles from "./ClassDetails.module.scss";
 import Link from "next/link";
+import { set } from "date-fns";
 
 type StatusType =
   | "booked"
@@ -81,6 +82,9 @@ function ClassDetails({
       };
     });
   };
+
+  // Set the active tab to the instructor calendar tab.
+  if (isAdminAuthenticated) localStorage.setItem("activeInstructorTab", "0");
 
   if (loading) return <div className={styles.loadingContainer}>Loading...</div>;
   if (error) return <div>{error}</div>;

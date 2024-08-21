@@ -28,7 +28,7 @@ export default function Layout({
   const instructorId = params.id;
 
   // Check the authentication of the instructor.
-  const { isLoading } = InstructorAuthentication(instructorId);
+  // const { isLoading } = InstructorAuthentication(instructorId);
 
   const links: Link[] = [
     {
@@ -51,7 +51,7 @@ export default function Layout({
   // TODO: Get the instructor name from the session?
   useEffect(() => {
     const fetchInstructor = async () => {
-      const response = await getInstructor(instructorId);
+      const response = await getInstructor(parseInt(instructorId));
       if ("instructor" in response) {
         setInstructorName(response.instructor.nickname);
       } else {
@@ -71,9 +71,9 @@ export default function Layout({
   };
 
   // Display a loading message while checking authentication.
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <div className={styles.container}>
