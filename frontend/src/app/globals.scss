@@ -104,3 +104,11 @@ body {
     }
   }
 }
+
+.fc-header-toolbar {
+  &.fc-toolbar {
+    &.fc-toolbar-ltr div:nth-child(3) {
+      width: 190px;
+    }
+  }
+}
