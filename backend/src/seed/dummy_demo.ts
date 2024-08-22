@@ -35,6 +35,44 @@ async function insertInstructors() {
 }
 
 async function insertInstructorAvailabilities() {
+  const helen = await getInstructor("Helen");
+  await prisma.instructorRecurringAvailability.create({
+    data: {
+      startAt: "2024-08-05T08:00:00Z", // Mon 17:00 JST
+      instructorId: helen.id,
+      instructorAvailability: {
+        create: createDates("2024-08-05T08:00:00Z").map((dateTime) => ({
+          dateTime,
+          instructorId: helen.id,
+        })),
+      },
+    },
+  });
+  await prisma.instructorRecurringAvailability.create({
+    data: {
+      startAt: "2024-08-05T08:30:00Z", // Mon 17:30 JST
+      instructorId: helen.id,
+      instructorAvailability: {
+        create: createDates("2024-08-05T08:30:00Z").map((dateTime) => ({
+          dateTime,
+          instructorId: helen.id,
+        })),
+      },
+    },
+  });
+  await prisma.instructorRecurringAvailability.create({
+    data: {
+      startAt: "2024-08-06T08:30:00Z", // Tue 17:30 JST
+      instructorId: helen.id,
+      instructorAvailability: {
+        create: createDates("2024-08-06T08:30:00Z").map((dateTime) => ({
+          dateTime,
+          instructorId: helen.id,
+        })),
+      },
+    },
+  });
+
   const elian = await getInstructor("Elian");
   await prisma.instructorRecurringAvailability.create({
     data: {
@@ -78,6 +116,12 @@ async function insertCustomers() {
   await prisma.customer.createMany({
     data: [
       {
+        name: "Shingo",
+        email: "shingo@example.com",
+        password: "shingo",
+        prefecture: "Tokyo",
+      },
+      {
         name: "Alice",
         email: "alice@example.com",
         password: "alice",
@@ -107,10 +151,18 @@ async function insertAdmins() {
 }
 
 async function insertChildren() {
+  const shingo = await getCustomer("Shingo");
   const alice = await getCustomer("Alice");
 
   await prisma.children.createMany({
     data: [
+      {
+        name: "Ken",
+        customerId: shingo.id,
+        birthdate: new Date("2020-01-01"),
+        personalInfo:
+          "English Level: Beginner. Enjoys playing the piano and loves the Beatles.",
+      },
       {
         name: "Peppa",
         customerId: alice.id,
@@ -147,11 +199,18 @@ async function insertPlans() {
 }
 
 async function insertSubscriptions() {
+  const shingo = await getCustomer("Shingo");
   const alice = await getCustomer("Alice");
   const plan1 = await getPlan("3,180 yen/month");
 
   await prisma.subscription.createMany({
     data: [
+      {
+        customerId: shingo.id,
+        planId: plan1.id,
+        startAt: new Date("2024-08-01"),
+        endAt: null,
+      },
       {
         customerId: alice.id,
         planId: plan1.id,
@@ -163,6 +222,18 @@ async function insertSubscriptions() {
 }
 
 async function insertRecurringClasses() {
+  const shingo = await getCustomer("Shingo");
+  await prisma.recurringClass.createMany({
+    data: [
+      {
+        subscriptionId: shingo.subscription[0].id,
+      },
+      {
+        subscriptionId: shingo.subscription[0].id,
+      },
+    ],
+  });
+
   const alice = await getCustomer("Alice");
   const elian = await getInstructor("Elian");
 
@@ -234,7 +305,7 @@ async function insertRecurringClasses() {
   });
 }
 
-async function getCustomer(name: "Alice" | "Bob") {
+async function getCustomer(name: "Alice" | "Shingo") {
   const customer = await prisma.customer.findFirst({
     where: { name },
     include: { children: true, subscription: true },
