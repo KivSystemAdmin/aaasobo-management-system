@@ -9,6 +9,7 @@ import {
 import { SlotsOfDays } from "@/app/helper/instructorsApi";
 import ScheduleCalendar from "@/app/components/admins-dashboard/ScheduleCalendar";
 import ActionButton from "@/app/components/ActionButton";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function InstructorSchedule({
   instructorId,

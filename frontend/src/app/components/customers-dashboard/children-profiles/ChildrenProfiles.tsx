@@ -13,7 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import ActionButton from "../../ActionButton";
 import { formatBirthdateToISO, formatDateToISO } from "@/app/helper/dateUtils";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import RedirectButton from "../../RedirectButton";
 
@@ -137,6 +137,7 @@ function ChildrenProfiles({
 
   return (
     <div className={styles.container}>
+      <ToastContainer />
       <div className={styles.addBtn}>
         {isAdminAuthenticated ? (
           <RedirectButton

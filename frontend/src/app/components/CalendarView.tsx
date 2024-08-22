@@ -21,7 +21,7 @@ import {
   ExclamationTriangleIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 type InstructorCalendarViewProps = {
@@ -223,6 +223,7 @@ const CalendarView: React.FC<InstructorCalendarViewProps> = ({
 
   return (
     <>
+      <ToastContainer />
       <FullCalendar
         plugins={[
           dayGridPlugin,

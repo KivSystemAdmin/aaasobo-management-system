@@ -11,7 +11,7 @@ import {
 import { prefectures } from "@/app/helper/data";
 import ActionButton from "../../ActionButton";
 import { CheckIcon } from "@heroicons/react/24/outline";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function CustomerProfile({ customerId }: { customerId: string }) {
@@ -84,6 +84,7 @@ function CustomerProfile({ customerId }: { customerId: string }) {
 
   return (
     <>
+      <ToastContainer />
       {customer ? (
         <form className={styles.profileCard} onSubmit={handleFormSubmit}>
           {/* Customer Name */}
