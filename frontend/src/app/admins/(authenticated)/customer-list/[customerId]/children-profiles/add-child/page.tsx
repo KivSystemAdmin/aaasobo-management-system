@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-import { AuthContext } from "@/app/admins/(authenticated)/layout";
+import { AuthContext } from "@/app/admins/(authenticated)/authContext";
 import AddChildForm from "@/app/components/customers-dashboard/children-profiles/AddChildForm";
 
 function Page({ params }: { params: { customerId: string; childId: string } }) {

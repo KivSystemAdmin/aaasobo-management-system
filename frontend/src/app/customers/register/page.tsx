@@ -155,7 +155,7 @@ function Register() {
               <p className={styles.privacyPolicy}>
                 We will take a screenshot as a record that the class was
                 conducted. Additionally, we may record the session for the
-                purpose of improving the instructor's skills.
+                purpose of improving the instructor&apos;s skills.
               </p>
             </label>
             <div className={styles.checkboxWrapper}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import CalendarView from "@/app/components/CalendarView";
 import styles from "./ClassCalendar.module.scss";
 import FullCalendar from "@fullcalendar/react";
@@ -36,7 +36,7 @@ function ClassCalendar({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const classesData: ClassForCalendar[] = await fetchClassesForCalendar(
         parseInt(customerId),
@@ -106,11 +106,11 @@ function ClassCalendar({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [customerId]);
 
   useEffect(() => {
     fetchData();
-  }, [customerId]);
+  }, [fetchData]);
 
   const handleCancelingModalClose = () => {
     setIsCancelingModalOpen(false);

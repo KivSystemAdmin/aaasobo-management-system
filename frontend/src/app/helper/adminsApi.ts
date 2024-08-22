@@ -44,3 +44,17 @@ export const getAllChildren = async () => {
     throw error;
   }
 };
+
+export const logoutAdmin = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/logout`, {
+      credentials: "include",
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Failed to logout:", error);
+    throw error;
+  }
+};

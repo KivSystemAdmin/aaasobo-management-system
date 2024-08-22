@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useContext } from "react";
-import { AuthContext } from "@/app/admins/(authenticated)/layout";
+import { AuthContext } from "@/app/admins/(authenticated)/authContext";
 import InstructorCalendar from "@/app/components/instructors-dashboard/class-schedule/InstructorCalendar";
 import InstructorSearch from "@/app/components/admins-dashboard/InstructorSearch";
 

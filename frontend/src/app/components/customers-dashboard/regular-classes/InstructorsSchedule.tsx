@@ -66,7 +66,7 @@ function InstructorsSchedule() {
 
   return (
     <div>
-      <h3 className={styles.subheading}>Check Instructor's Schedule</h3>
+      <h3 className={styles.subheading}>Check Instructor&apos;s Schedule</h3>
       <div className={styles.container}>
         <InstructorSelect
           instructors={instructors}

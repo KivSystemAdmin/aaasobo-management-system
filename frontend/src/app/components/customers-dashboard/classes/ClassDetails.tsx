@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { cancelClass, getClassesByCustomerId } from "@/app/helper/classesApi";
 import ClassDetail from "@/app/components/ClassDetail";
 import ClassesTable from "@/app/components/ClassesTable";
@@ -25,7 +25,7 @@ function ClassDetails({
     { classId: number; classDateTime: string }[]
   >([]);
 
-  const fetchClassDetails = async () => {
+  const fetchClassDetails = useCallback(async () => {
     if (!customerId || isNaN(classId)) return;
 
     try {
@@ -40,11 +40,11 @@ function ClassDetails({
     } finally {
       setLoading(false);
     }
-  };
+  }, [classId, customerId]);
 
   useEffect(() => {
     fetchClassDetails();
-  }, [customerId, classId]);
+  }, [fetchClassDetails]);
 
   const handleCancel = async (classId: number, classDateTime: string) => {
     const isPastPreviousDay = isPastPreviousDayDeadline(
@@ -128,6 +128,16 @@ function ClassDetails({
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
+  const handleModalClose = async () => {
+    // TODO: Implement
+    throw new Error("Not implemented");
+  };
+
+  const handleCancelingModalClose = async () => {
+    // TODO: Implement
+    throw new Error("Not implemented");
+  };
+
   return (
     <>
       <h1>Class Details</h1>
@@ -138,6 +148,7 @@ function ClassDetails({
         timeZone="Asia/Tokyo"
         handleCancel={handleCancel}
         isAdminAuthenticated={isAdminAuthenticated}
+        handleModalClose={handleModalClose}
       />
 
       <h2>Upcoming Classes</h2>
@@ -149,6 +160,7 @@ function ClassDetails({
         userId={customerId}
         handleBulkCancel={handleBulkCancel}
         isAdminAuthenticated={isAdminAuthenticated}
+        handleCancelingModalClose={handleCancelingModalClose}
       />
 
       <br />

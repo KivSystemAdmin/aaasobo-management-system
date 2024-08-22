@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-import { AuthContext } from "@/app/admins/(authenticated)/layout";
+import { AuthContext } from "@/app/admins/(authenticated)/authContext";
 import ClassDetails from "@/app/components/customers-dashboard/classes/ClassDetails";
 
 const ClassDetailPage = ({

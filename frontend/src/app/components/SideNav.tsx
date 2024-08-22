@@ -2,6 +2,7 @@
 
 import styles from "./SideNav.module.scss";
 import Link from "next/link";
+import Image from "next/image";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
 import { FC, SVGProps } from "react";
@@ -39,10 +40,12 @@ function SideNav({
     <div className={styles.sideNavContainer}>
       <div className={styles.innerContainer}>
         <div className={styles.sideNavLogo}>
-          <img
+          <Image
             className={styles.sideNavLogo__img}
             src="/images/logo2.svg"
             alt="My SVG Image"
+            width={183}
+            height={51}
           />
         </div>
 

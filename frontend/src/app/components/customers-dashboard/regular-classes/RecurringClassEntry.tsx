@@ -121,7 +121,7 @@ function RecurringClassEntry({
     };
 
     getRecurringAvailabilities();
-  }, [instructorId]);
+  }, [instructorId, day, time]);
 
   const handleDayChange = (day: Day) => {
     const availableTimes = slots[day] || [];

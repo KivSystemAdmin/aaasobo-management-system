@@ -20,7 +20,6 @@ function InstructorCalendar({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const calendarRef = useRef<FullCalendar | null>(null);
   const instructorId = id ?? undefined;
 
   const fetchData = useCallback(async () => {
@@ -119,8 +118,6 @@ function InstructorCalendar({
             </span>
           ) : null}
           <CalendarView
-            // Create a ref to access the FullCalendar instance in CalendarView;
-            ref={calendarRef}
             events={allEvents}
             // TODO: Fetch holidays from the backend
             // holidays={["2024-07-29", "2024-07-30", "2024-07-31"]}

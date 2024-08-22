@@ -41,7 +41,7 @@ function RescheduleClass({
     };
 
     fetchChildrenByCustomerId(customerId);
-  }, []);
+  }, [customerId]);
 
   useEffect(() => {
     const fetchClassById = async (id: string) => {
@@ -64,10 +64,11 @@ function RescheduleClass({
         <EditClassForm
           customerId={customerId}
           instructors={instructors}
-          children={children}
           editedClass={editedClass}
           isAdminAuthenticated={isAdminAuthenticated}
-        />
+        >
+          {children}
+        </EditClassForm>
       ) : (
         <div>Loading ...</div>
       )}

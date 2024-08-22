@@ -4,7 +4,7 @@ import TabFunction from "@/app/components/admins-dashboard/TabFunction";
 import InstructorCalendar from "@/app/components/instructors-dashboard/class-schedule/InstructorCalendar";
 import InstructorProfile from "@/app/components/instructors-dashboard/instructor-profile/InstructorProfile";
 import { useContext } from "react";
-import { AuthContext } from "@/app/admins/(authenticated)/layout";
+import { AuthContext } from "@/app/admins/(authenticated)/authContext";
 import { useTabSelect } from "@/app/hooks/useTabSelect";
 import AvailabilityCalendar from "./AvailabilityCalendar";
 import InstructorSchedule from "./InstructorSchedule";

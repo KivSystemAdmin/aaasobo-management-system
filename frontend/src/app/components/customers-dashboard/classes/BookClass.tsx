@@ -46,7 +46,7 @@ function BookClass({
     };
 
     fetchChildrenByCustomerId(customerId);
-  }, []);
+  }, [customerId]);
 
   useEffect(() => {
     const fetchRebookableClassesByCustomerId = async (customerId: string) => {
@@ -84,7 +84,7 @@ function BookClass({
     };
 
     fetchRebookableClassesByCustomerId(customerId);
-  }, []);
+  }, [customerId]);
 
   const breadcrumbLinks = [
     { href: `/customers/${customerId}/classes`, label: "Class Calendar" },
@@ -103,10 +103,11 @@ function BookClass({
           <BookClassForm
             customerId={customerId}
             instructors={instructors}
-            children={children}
             classToRebook={classToRebook}
             isAdminAuthenticated={isAdminAuthenticated}
-          />
+          >
+            {children}
+          </BookClassForm>
         </>
       )}
     </>

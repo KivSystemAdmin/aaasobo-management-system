@@ -247,7 +247,8 @@ const ClassDetail = ({
             </div>
             <div>
               <p>
-                If you need to cancel today's classes, please contact our staff{" "}
+                If you need to cancel today&apos;s classes, please contact our
+                staff{" "}
                 <span className={styles.notification__span}>via LINE</span>.
                 Please note that{" "}
                 <span className={styles.notification__span}>

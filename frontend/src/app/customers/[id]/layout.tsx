@@ -65,7 +65,7 @@ export default function Layout({
       setCustomerName(customer.name);
     };
     fetchCustomer();
-  }, []);
+  }, [customerId]);
 
   const logout = async () => {
     const result = await logoutCustomer();

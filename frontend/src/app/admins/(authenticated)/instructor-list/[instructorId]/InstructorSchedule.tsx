@@ -1,6 +1,6 @@
 import styles from "./InstructorSchedule.module.scss";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import {
   getInstructorRecurringAvailability,
@@ -28,7 +28,7 @@ export default function InstructorSchedule({
     Sun: [],
   });
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const instructor = await getInstructorRecurringAvailability(
       instructorId,
       selectedDate,
@@ -38,11 +38,11 @@ export default function InstructorSchedule({
       return;
     }
     setSlots(instructor.recurringAvailabilities);
-  };
+  }, [instructorId, selectedDate]);
 
   useEffect(() => {
     fetchData();
-  }, [instructorId, selectedDate]);
+  }, [fetchData]);
 
   const save = async () => {
     await addRecurringAvailabilities(instructorId, slots, startFrom);

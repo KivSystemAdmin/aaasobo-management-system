@@ -15,7 +15,7 @@ export function useTabSelect(key: string) {
     };
 
     handleTabSelection();
-  }, []);
+  }, [key]);
 
   return { initialActiveTab, isTabInitialized };
 }

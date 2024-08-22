@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-import { AuthContext } from "@/app/admins/(authenticated)/layout";
+import { AuthContext } from "@/app/admins/(authenticated)/authContext";
 import BookClass from "@/app/components/customers-dashboard/classes/BookClass";
 
 function Page({ params }: { params: { customerId: string } }) {

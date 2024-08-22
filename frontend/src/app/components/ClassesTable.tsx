@@ -196,9 +196,9 @@ const ClassesTable = ({
               className={styles.classesTable__noticeIcon}
             />
             <div className={styles.classesTable__notice}>
-              If you need to cancel today's classes, please contact our staff
-              via LINE. Please note that no make-up classes will be available in
-              this case.
+              If you need to cancel today&apos;s classes, please contact our
+              staff via LINE. Please note that no make-up classes will be
+              available in this case.
             </div>
           </div>
         )}

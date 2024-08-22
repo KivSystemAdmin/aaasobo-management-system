@@ -46,13 +46,13 @@ const InstructorClassesTable = ({
   );
   const [selectedStatus, setSelectedStatus] = useState<StatusType>("booked");
 
-  if (!selectedDateClasses) {
-    return <div>No classes</div>;
-  }
-
   useEffect(() => {
     setClasses(selectedDateClasses);
   }, [selectedDateClasses]);
+
+  if (!selectedDateClasses) {
+    return <div>No classes</div>;
+  }
 
   const handleEditClick = (
     classId: number,

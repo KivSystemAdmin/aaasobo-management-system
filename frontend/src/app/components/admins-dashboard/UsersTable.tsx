@@ -104,7 +104,7 @@ function UsersTable({
               accessorKey: key,
               header: key,
               cell: (data) => {
-                const value = data.getValue();
+                const value = data.getValue() as any;
                 // If the item is not a link item, return the value
                 if (!linkItems.includes(key)) {
                   return value;

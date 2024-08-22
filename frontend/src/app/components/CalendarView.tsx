@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import FullCalendar from "@fullcalendar/react";
@@ -59,7 +59,7 @@ const CalendarView: React.FC<InstructorCalendarViewProps> = ({
   const [classDetail, setClassDetail] = useState<ClassType | null>(null);
   const router = useRouter();
 
-  const fetchClasses = async () => {
+  const fetchClasses = useCallback(async () => {
     if (!customerId) return;
 
     try {
@@ -70,11 +70,11 @@ const CalendarView: React.FC<InstructorCalendarViewProps> = ({
     } catch (error) {
       console.error("Failed to fetch classes:", error);
     }
-  };
+  }, [customerId]);
 
   useEffect(() => {
     fetchClasses();
-  }, [customerId, classes]);
+  }, [fetchClasses]);
 
   // Formats and displays the content of an event on the calendar view page
   const renderEventContent = (eventInfo: EventContentArg) => {

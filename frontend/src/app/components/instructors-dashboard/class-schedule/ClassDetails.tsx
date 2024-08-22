@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getClassesByInstructorId } from "@/app/helper/classesApi";
 import { formatDate } from "@/app/helper/dateUtils";
 import InstructorClassDetail from "@/app/components/instructors-dashboard/class-schedule/InstructorClassDetail";
@@ -32,7 +32,7 @@ function ClassDetails({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchClassDetail = async () => {
+  const fetchClassDetail = useCallback(async () => {
     if (!instructorId || !classId) return;
 
     try {
@@ -59,11 +59,11 @@ function ClassDetails({
     } finally {
       setLoading(false);
     }
-  };
+  }, [instructorId, classId]);
 
   useEffect(() => {
     fetchClassDetail();
-  }, [instructorId, classId]);
+  }, [fetchClassDetail]);
 
   const handleUpdateClassDetail = (
     completedClassId: number,

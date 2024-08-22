@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Calendar from "@/app/components/Calendar";
 import {
   getInstructor,
@@ -13,18 +13,18 @@ export default function AvailabilityCalendar({
 }) {
   const [instructor, setInstructor] = useState<Instructor | undefined>();
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     const instructor = await getInstructor(instructorId);
     if ("message" in instructor) {
       alert(instructor.message);
       return;
     }
     setInstructor(instructor.instructor);
-  };
+  }, [instructorId]);
 
   useEffect(() => {
     refresh();
-  }, [instructorId]);
+  }, [refresh]);
 
   if (!instructor) {
     return <>Loading...</>;

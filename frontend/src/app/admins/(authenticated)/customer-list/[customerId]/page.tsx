@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-import { AuthContext } from "@/app/admins/(authenticated)/layout";
+import { AuthContext } from "@/app/admins/(authenticated)/authContext";
 import TabFunction from "@/app/components/admins-dashboard/TabFunction";
 import ClassCalendar from "@/app/components/customers-dashboard/classes/ClassCalendar";
 import CustomerProfile from "@/app/components/customers-dashboard/profile/CustomerProfile";

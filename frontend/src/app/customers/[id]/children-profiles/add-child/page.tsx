@@ -17,7 +17,7 @@ function Page({ params }: { params: { id: string } }) {
                 href={`/customers/${customerId}/children-profiles`}
                 passHref
               >
-                Children's Profiles
+                Children&apos;s Profiles
               </Link>
             </li>
             <li className={styles.breadcrumb__separator}>{" >> "}</li>

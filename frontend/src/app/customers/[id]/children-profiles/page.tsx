@@ -8,7 +8,7 @@ function Page({ params }: { params: { id: string } }) {
 
   return (
     <>
-      <div className={styles.header}>Children's Profiles</div>
+      <div className={styles.header}>Children&apos;s Profiles</div>
       <ChildrenProfiles customerId={customerId} />
     </>
   );

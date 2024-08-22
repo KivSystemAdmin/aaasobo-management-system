@@ -59,7 +59,7 @@ export default function Layout({
       }
     };
     fetchInstructor();
-  }, []);
+  }, [instructorId]);
 
   const logout = async () => {
     const response = await logoutInstructor();

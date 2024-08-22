@@ -7,7 +7,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { getChildrenByCustomerId } from "@/app/helper/childrenApi";
 import BookingRegularClassCalendar from "./BookingRegularClassCalendar";
 import { formatDateTime } from "@/app/helper/dateUtils";
-import { addRecurringClass } from "@/app/helper/classesApi";
+import { addRecurringClass } from "@/app/helper/recurringClassesApi";
 
 function AddRegularClassForm({
   customerId,
@@ -50,7 +50,7 @@ function AddRegularClassForm({
 
     fetchInstructors();
     fetchChildrenByCustomerId(customerId);
-  }, []);
+  }, [customerId]);
 
   // Set the instructor depending on the selected instructor.
   const handleSelectedInstructor = (e: ChangeEvent<HTMLSelectElement>) => {
