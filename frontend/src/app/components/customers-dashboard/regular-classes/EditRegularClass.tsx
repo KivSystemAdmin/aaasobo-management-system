@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./EditRegularClass.module.scss";
 import { CalendarIcon, TagIcon } from "@heroicons/react/24/solid";
+import Loading from "../../Loading";
 
 function EditRegularClass({
   customerId,
@@ -38,12 +39,11 @@ function EditRegularClass({
   }, [subscriptionId]);
 
   if (!subscriptionData) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (
     <div>
-      <h3>Regular Classes Editing Page </h3>
       <div className={styles.container}>
         <div className={styles.planContainer}>
           <div>

@@ -5,7 +5,7 @@ import BookClassForm from "@/app/components/customers-dashboard/classes/BookClas
 import { getClassesByCustomerId } from "@/app/helper/classesApi";
 import { formatFiveMonthsLaterEndOfMonth } from "@/app/helper/dateUtils";
 import Breadcrumb from "../../Breadcrumb";
-import SimpleLoading from "../../SimpleLoading";
+import Loading from "../../Loading";
 
 function BookClass({
   customerId,
@@ -96,7 +96,7 @@ function BookClass({
   return (
     <>
       {isLoading ? (
-        <SimpleLoading />
+        <Loading />
       ) : (
         <>
           <Breadcrumb links={breadcrumbLinks} />

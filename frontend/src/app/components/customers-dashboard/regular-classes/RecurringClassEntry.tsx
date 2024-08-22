@@ -10,6 +10,7 @@ import { getRecurringClassesByInstructorId } from "@/app/helper/recurringClasses
 import { useEffect, useState } from "react";
 import styles from "./RecurringClassEntry.module.scss";
 import ActionButton from "../../ActionButton";
+import Loading from "../../Loading";
 
 function RecurringClassEntry({
   state,
@@ -150,7 +151,7 @@ function RecurringClassEntry({
   };
 
   if (!instructorsData || !childList) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (

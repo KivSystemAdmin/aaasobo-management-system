@@ -3,6 +3,7 @@
 import RegularClasses from "@/app/components/customers-dashboard/regular-classes/RegularClasses";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import styles from "./page.module.scss";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -24,6 +25,7 @@ function Page({ params }: { params: { id: string } }) {
   return (
     <div>
       <ToastContainer autoClose={3000} />
+      <div className={styles.header}>Regular Classes</div>
       <RegularClasses customerId={customerId} />
     </div>
   );

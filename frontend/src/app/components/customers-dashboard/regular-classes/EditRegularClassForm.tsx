@@ -14,6 +14,7 @@ import styles from "./EditRegularClassForm.module.scss";
 import RedirectButton from "../../RedirectButton";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loading from "../../Loading";
 
 function EditRegularClassForm({
   customerId,
@@ -152,7 +153,7 @@ function EditRegularClassForm({
   };
 
   if (!instructorsData || !children) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (

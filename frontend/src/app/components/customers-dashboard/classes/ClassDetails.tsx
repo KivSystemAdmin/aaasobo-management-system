@@ -7,6 +7,7 @@ import {
   isPastClassDateTime,
   isPastPreviousDayDeadline,
 } from "@/app/helper/dateUtils";
+import Loading from "../../Loading";
 
 function ClassDetails({
   customerId,
@@ -125,7 +126,7 @@ function ClassDetails({
     });
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />;
   if (error) return <div>{error}</div>;
 
   const handleModalClose = async () => {

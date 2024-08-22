@@ -11,6 +11,7 @@ import {
   UserCircleIcon,
   VideoCameraIcon,
 } from "@heroicons/react/24/outline";
+import Loading from "../../Loading";
 
 function InstructorProfile({
   instructorId,
@@ -116,7 +117,7 @@ function InstructorProfile({
             </div>
           </>
         ) : (
-          <div className={styles.loadingContainer}>Loading ...</div>
+          <Loading />
         )}
       </div>
     </>

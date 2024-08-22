@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import style from "./RegularClasses.module.scss";
+import styles from "./RegularClasses.module.scss";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { getSubscriptionsByCustomerId } from "@/app/helper/subscriptionsApi";
 import ActionButton from "@/app/components/ActionButton";
 import CurrentSubscription from "@/app/components/customers-dashboard/regular-classes/CurrentSubscription";
 import AddSubscription from "@/app/components/customers-dashboard/regular-classes/AddSubscription";
+import Loading from "../../Loading";
 
 function RegularClasses({
   customerId,
@@ -45,13 +46,13 @@ function RegularClasses({
   }, [customerId, updateCount]);
 
   if (!subscriptionsData) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (
     <>
       {isAdminAuthenticated ? (
-        <div className={style.addBtn}>
+        <div className={styles.addBtn}>
           <ActionButton
             onClick={handleAddRegularClass}
             btnText="Add New Subscription"

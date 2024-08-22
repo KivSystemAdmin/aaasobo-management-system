@@ -8,6 +8,7 @@ import CustomerProfile from "@/app/components/customers-dashboard/profile/Custom
 import ChildrenProfiles from "@/app/components/customers-dashboard/children-profiles/ChildrenProfiles";
 import RegularClasses from "@/app/components/customers-dashboard/regular-classes/RegularClasses";
 import { useTabSelect } from "@/app/hooks/useTabSelect";
+import Loading from "@/app/components/Loading";
 
 function Page({ params }: { params: { customerId: string } }) {
   const customerId = params.customerId;
@@ -62,7 +63,7 @@ function Page({ params }: { params: { customerId: string } }) {
 
   // Display a loading message while initializing the tab.
   if (!isTabInitialized) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (

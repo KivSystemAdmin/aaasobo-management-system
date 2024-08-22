@@ -16,6 +16,7 @@ import { formatBirthdateToISO, formatDateToISO } from "@/app/helper/dateUtils";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import RedirectButton from "../../RedirectButton";
+import Loading from "../../Loading";
 
 function ChildrenProfiles({
   customerId,
@@ -323,7 +324,7 @@ function ChildrenProfiles({
           ))}
         </div>
       ) : (
-        <p className={styles.loadingContainer}>Loading ...</p>
+        <Loading />
       )}
     </div>
   );

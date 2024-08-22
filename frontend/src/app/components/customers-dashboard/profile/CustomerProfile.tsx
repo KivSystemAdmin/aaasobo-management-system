@@ -13,6 +13,7 @@ import ActionButton from "../../ActionButton";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loading from "../../Loading";
 
 function CustomerProfile({ customerId }: { customerId: string }) {
   const [customer, setCustomer] = useState<Customer | undefined>();
@@ -194,7 +195,7 @@ function CustomerProfile({ customerId }: { customerId: string }) {
           )}
         </form>
       ) : (
-        <p className={styles.loadingContainer}>Loading ...</p>
+        <Loading />
       )}
     </>
   );

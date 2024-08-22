@@ -6,6 +6,7 @@ import styles from "./InstructorCalendar.module.scss";
 import FullCalendar from "@fullcalendar/react";
 import { fetchClassesForCalendar } from "@/app/helper/classesApi";
 import { fetchInstructorAvailabilitiesForTodayAndAfter } from "@/app/helper/instructorsApi";
+import Loading from "../../Loading";
 
 function InstructorCalendar({
   id,
@@ -109,7 +110,7 @@ function InstructorCalendar({
     // 'CalendarHeader' and 'CalendarView' are initially independent from each other, but 'Page' can connect them together
     // by passing 'calendarRef' to 'CalendarView' and retrieving the FullCalendar API instance from it and making the API available for 'CalendarHeader'using state
     <div className={styles.calendarContainer}>
-      {isLoading && <div className={styles.loadingContainer}>Loading ...</div>}
+      {isLoading && <Loading />}
       {!isLoading && !error && (
         <>
           {isAdminAuthenticated && name ? (

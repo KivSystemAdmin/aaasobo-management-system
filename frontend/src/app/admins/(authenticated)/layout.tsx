@@ -15,6 +15,7 @@ import { getCustomerById } from "@/app/helper/customersApi";
 import { AdminAuthentication } from "@/app/helper/authenticationUtils";
 import { AuthContext } from "./authContext";
 import { logoutAdmin } from "@/app/helper/adminsApi";
+import Loading from "@/app/components/Loading";
 
 type Link = {
   name: string;
@@ -54,7 +55,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   // Display a loading message while checking authentication.
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   const logout = async () => {

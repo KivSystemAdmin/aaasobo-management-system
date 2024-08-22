@@ -14,6 +14,7 @@ import { FC, SVGProps, useEffect, useState } from "react";
 import { getCustomerById, logoutCustomer } from "@/app/helper/customersApi";
 import { useRouter } from "next/navigation";
 import { CustomerAuthentication } from "@/app/helper/authenticationUtils";
+import Loading from "@/app/components/Loading";
 
 type Link = {
   name: string;
@@ -78,7 +79,7 @@ export default function Layout({
 
   // Display a loading message while checking authentication.
   // if (isLoading) {
-  //   return <div>Loading...</div>;
+  //   return <Loading />;
   // }
 
   return (

@@ -8,6 +8,7 @@ import { AuthContext } from "@/app/admins/(authenticated)/authContext";
 import { useTabSelect } from "@/app/hooks/useTabSelect";
 import AvailabilityCalendar from "./AvailabilityCalendar";
 import InstructorSchedule from "./InstructorSchedule";
+import Loading from "@/app/components/Loading";
 
 function Page({ params }: { params: { instructorId: string } }) {
   const instructorId = params.instructorId;
@@ -58,7 +59,7 @@ function Page({ params }: { params: { instructorId: string } }) {
 
   // Display a loading message while initializing the tab.
   if (!isTabInitialized) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (

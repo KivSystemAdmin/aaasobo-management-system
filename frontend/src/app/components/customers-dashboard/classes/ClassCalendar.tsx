@@ -14,6 +14,7 @@ import ActionButton from "../../ActionButton";
 import ClassesTable from "../../ClassesTable";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loading from "../../Loading";
 
 function ClassCalendar({
   customerId,
@@ -181,7 +182,7 @@ function ClassCalendar({
   return (
     <div className={styles.calendarContainer}>
       {isLoading ? (
-        <div className={styles.loadingContainer}>Loading ...</div>
+        <Loading />
       ) : (
         <>
           <div className={styles.calendarHeaderContainer}>

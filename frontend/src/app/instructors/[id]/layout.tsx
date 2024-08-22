@@ -9,6 +9,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import { InstructorAuthentication } from "@/app/helper/authenticationUtils";
+import Loading from "@/app/components/Loading";
 
 type Link = {
   name: string;
@@ -72,7 +73,7 @@ export default function Layout({
 
   // Display a loading message while checking authentication.
   // if (isLoading) {
-  //   return <div>Loading...</div>;
+  //   return <Loading />;
   // }
 
   return (

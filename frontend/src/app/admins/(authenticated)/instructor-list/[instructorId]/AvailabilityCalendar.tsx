@@ -5,6 +5,7 @@ import {
   registerUnavailability,
 } from "@/app/helper/instructorsApi";
 import ActionButton from "@/app/components/ActionButton";
+import Loading from "@/app/components/Loading";
 
 export default function AvailabilityCalendar({
   instructorId,
@@ -27,7 +28,7 @@ export default function AvailabilityCalendar({
   }, [refresh]);
 
   if (!instructor) {
-    return <>Loading...</>;
+    return <Loading />;
   }
   return (
     <AvailabilityCalendarInternal
