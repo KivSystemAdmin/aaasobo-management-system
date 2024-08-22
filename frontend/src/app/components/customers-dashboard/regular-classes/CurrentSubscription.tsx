@@ -15,36 +15,41 @@ function CurrentSubscription({
 }) {
   return (
     <div className={styles.outsideContainer}>
-      {subscriptionsData
-        ? subscriptionsData.subscriptions.map((subscription) => {
-            const { id, plan } = subscription;
-            return (
-              <div key={id} className={styles.container}>
-                <div className={styles.planContainer}>
-                  <div>
-                    <h4>Plan</h4>
-                    <div className={styles.planData}>
-                      <TagIcon className={styles.icon} />
-                      <p>{plan.name}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <h4>Number of classes a week</h4>
-                    <div className={styles.planData}>
-                      <CalendarIcon className={styles.icon} />
-                      <p>{plan.description}</p>
-                    </div>
+      {subscriptionsData && subscriptionsData.subscriptions.length > 0 ? (
+        subscriptionsData.subscriptions.map((subscription) => {
+          const { id, plan } = subscription;
+          return (
+            <div key={id} className={styles.container}>
+              <div className={styles.planContainer}>
+                <div>
+                  <h4>Plan</h4>
+                  <div className={styles.planData}>
+                    <TagIcon className={styles.icon} />
+                    <p>{plan.name}</p>
                   </div>
                 </div>
-                <RegularClassesTable
-                  subscriptionId={id}
-                  isAdminAuthenticated={isAdminAuthenticated}
-                  customerId={customerId}
-                />
+                <div>
+                  <h4>Number of classes a week</h4>
+                  <div className={styles.planData}>
+                    <CalendarIcon className={styles.icon} />
+                    <p>{plan.description}</p>
+                  </div>
+                </div>
               </div>
-            );
-          })
-        : null}
+              <RegularClassesTable
+                subscriptionId={id}
+                isAdminAuthenticated={isAdminAuthenticated}
+                customerId={customerId}
+              />
+            </div>
+          );
+        })
+      ) : (
+        <p>
+          You don&apos;t have any subscription yet. Please make a payment on
+          SelectType and let the staff know.
+        </p>
+      )}
     </div>
   );
 }
