@@ -37,7 +37,7 @@ type InstructorCalendarViewProps = {
       | "booked"
       | "completed"
       | "canceledByCustomer"
-      | "canceledByInsturctor";
+      | "canceledByInstructor";
   }>;
   holidays?: string[];
   customerId?: number;
@@ -175,7 +175,7 @@ const CalendarView: React.FC<InstructorCalendarViewProps> = ({
     }
   };
 
-  // To resoleve the VS code complaint
+  // To resolve the VS code complaint
   CalendarView.displayName = "CalendarView";
 
   const validRange = () => {

@@ -161,6 +161,17 @@ const InstructorClassesTable = ({
     setSelectedStatus("booked");
   };
 
+  const statusToString = (status: StatusType): string => {
+    switch (status) {
+      case "booked":
+        return "Booked";
+      case "completed":
+        return "Completed";
+      default:
+        return "Invalid Class Status";
+    }
+  };
+
   return (
     <div className={styles.instructorClasses}>
       <div className={styles.instructorClasses__classDate}>{classDate}</div>
@@ -173,14 +184,22 @@ const InstructorClassesTable = ({
             const dateTime = new Date(eachClass.dateTime);
             const philippineTime = formatTime(dateTime, timeZone);
 
-            const statusClass =
-              eachClass.status === "booked"
-                ? styles.statusBooked
-                : eachClass.status === "completed"
-                  ? styles.statusCompleted
-                  : eachClass.status === "canceledByInstructor"
-                    ? styles.statusCanceledByInstructor
-                    : styles.statusCanceled;
+            let statusClass;
+
+            switch (eachClass.status) {
+              case "booked":
+                statusClass = styles.statusBooked;
+                break;
+              case "completed":
+                statusClass = styles.statusCompleted;
+                break;
+              case "canceledByInstructor":
+                statusClass = styles.statusCanceledByInstructor;
+                break;
+              default:
+                statusClass = styles.statusCanceled;
+                break;
+            }
 
             return (
               <div
@@ -238,7 +257,7 @@ const InstructorClassesTable = ({
                         </div>
 
                         <div className={styles.instructorClasses__classStatus}>
-                          canceled by instructor
+                          Canceled by Instructor
                         </div>
                       </div>
                     ) : (
@@ -251,7 +270,7 @@ const InstructorClassesTable = ({
                           className={`${styles.instructorClasses__classStatusIcon} ${statusClass}`}
                         />
                         <div className={styles.instructorClasses__classStatus}>
-                          {eachClass.status}
+                          {statusToString(eachClass.status)}
                         </div>
                       </div>
                     )}

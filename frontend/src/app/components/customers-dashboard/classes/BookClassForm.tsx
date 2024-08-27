@@ -34,7 +34,7 @@ function BookClassForm({
   const [selectedChildrenIds, setSelectedChildrenIds] = useState<Set<number>>(
     new Set(),
   );
-  const [instructorAvailabilities, setInstrucotrAvailabilities] = useState<
+  const [instructorAvailabilities, setInstructorAvailabilities] = useState<
     string[]
   >([]);
 
@@ -48,7 +48,7 @@ function BookClassForm({
           selectedInstructorId,
         );
 
-      setInstrucotrAvailabilities(fetchedInstructorAvailabilities);
+      setInstructorAvailabilities(fetchedInstructorAvailabilities);
     };
     fetchInstructorAvailabilities();
   }, [selectedInstructorId]);
