@@ -9,7 +9,7 @@
     "dev": "nodemon --exec ts-node ./src/app.ts",
     "prisma:init": "npx prisma migrate reset && npx ts-node ./src/seed/dummy.ts",
     "prisma:init_demo": "npx prisma migrate reset && npx ts-node ./src/seed/dummy_demo.ts",
-    "prisma:init_vercel": "prisma generate && prisma db push && tsc ./src --outDir ./dist && ./dist/app.js",
+    "prisma:init_vercel": "prisma generate && prisma db push",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
