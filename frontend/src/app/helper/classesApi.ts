@@ -1,7 +1,10 @@
+const BACKEND_ORIGIN =
+  process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
+
 // GET classes by customer id
 export const getClassesByCustomerId = async (customerId: string) => {
   try {
-    const response = await fetch(`http://localhost:4000/classes/${customerId}`);
+    const response = await fetch(`${BACKEND_ORIGIN}/classes/${customerId}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -16,7 +19,7 @@ export const getClassesByCustomerId = async (customerId: string) => {
 // DELETE a class with class id
 export const deleteClass = async (classId: number) => {
   try {
-    const response = await fetch(`http://localhost:4000/classes/${classId}`, {
+    const response = await fetch(`${BACKEND_ORIGIN}/classes/${classId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -45,7 +48,7 @@ export const bookClass = async (classData: {
   recurringClassId: number;
 }) => {
   try {
-    const response = await fetch("http://localhost:4000/classes", {
+    const response = await fetch(`${BACKEND_ORIGIN}/classes`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(classData),
@@ -74,9 +77,7 @@ export const bookClass = async (classData: {
 // GET a class by id
 export const getClassById = async (classId: string) => {
   try {
-    const response = await fetch(
-      `http://localhost:4000/classes/class/${classId}`,
-    );
+    const response = await fetch(`${BACKEND_ORIGIN}/classes/class/${classId}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -102,7 +103,7 @@ export const editClass = async (editedClass: {
   isRebookable?: boolean;
 }) => {
   // Define the data to be sent to the server side.
-  const classURL = `http://localhost:4000/classes/${editedClass.classId}`;
+  const classURL = `${BACKEND_ORIGIN}/classes/${editedClass.classId}`;
   const headers = { "Content-Type": "application/json" };
   const body = JSON.stringify(editedClass);
 
@@ -128,7 +129,7 @@ export const fetchClassesForCalendar = async (
 ) => {
   try {
     const response = await fetch(
-      `http://localhost:4000/classes/calendar/${userType}/${userId}`,
+      `${BACKEND_ORIGIN}/classes/calendar/${userType}/${userId}`,
     );
 
     if (!response.ok) {
@@ -145,7 +146,7 @@ export const fetchClassesForCalendar = async (
 
 // Cancel a class: Change the state of the class from 'booked' to 'canceledByCustomer'
 export const cancelClass = async (classId: number) => {
-  const classURL = `http://localhost:4000/classes/${classId}/cancel`;
+  const classURL = `${BACKEND_ORIGIN}/classes/${classId}/cancel`;
 
   try {
     const response = await fetch(classURL, {
@@ -171,7 +172,7 @@ export const cancelClass = async (classId: number) => {
 export const getClassesByInstructorId = async (instructorId: number) => {
   try {
     const response = await fetch(
-      `http://localhost:4000/instructors/${instructorId}/classes`,
+      `${BACKEND_ORIGIN}/instructors/${instructorId}/classes`,
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -190,14 +191,11 @@ export const createMonthlyClasses = async (data: {
   month: string;
 }) => {
   try {
-    const response = await fetch(
-      "http://localhost:4000/classes/create-classes",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      },
-    );
+    const response = await fetch(`${BACKEND_ORIGIN}/classes/create-classes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error. status ${response.status}`);
@@ -221,7 +219,7 @@ export const checkDoubleBooking = async (
 }> => {
   try {
     const response = await fetch(
-      "http://localhost:4000/classes/check-double-booking",
+      `${BACKEND_ORIGIN}/classes/check-double-booking`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -260,7 +258,7 @@ export const checkChildrenAvailability = async (
 }> => {
   try {
     const response = await fetch(
-      "http://localhost:4000/classes/check-children-availability",
+      `${BACKEND_ORIGIN}/classes/check-children-availability`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

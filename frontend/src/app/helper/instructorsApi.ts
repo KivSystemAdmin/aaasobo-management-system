@@ -1,4 +1,6 @@
-const BASE_URL = "http://localhost:4000/instructors";
+const BACKEND_ORIGIN =
+  process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
+const BASE_URL = `${BACKEND_ORIGIN}/instructors`;
 
 export type Day = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 
@@ -224,7 +226,7 @@ export const fetchInstructorAvailabilitiesForTomorrowAndAfter = async (
 };
 
 export const logoutInstructor = async (): Promise<Response<undefined>> => {
-  const response = await fetch("http://localhost:4000/instructors/logout", {
+  const response = await fetch(`${BASE_URL}/logout`, {
     method: "POST",
     credentials: "include",
   });

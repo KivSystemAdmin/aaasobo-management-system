@@ -1,8 +1,11 @@
+const BACKEND_ORIGIN =
+  process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
+
 // GET children data by customer id
 export const getChildrenByCustomerId = async (customerId: string) => {
   try {
     const response = await fetch(
-      `http://localhost:4000/children?customerId=${customerId}`,
+      `${BACKEND_ORIGIN}/children?customerId=${customerId}`,
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -18,7 +21,7 @@ export const getChildrenByCustomerId = async (customerId: string) => {
 // GET a child data by the child's id
 export const getChildById = async (id: string) => {
   try {
-    const response = await fetch(`http://localhost:4000/children/${id}`);
+    const response = await fetch(`${BACKEND_ORIGIN}/children/${id}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -38,7 +41,7 @@ export const addChild = async (
   customerId: string,
 ) => {
   // Define the data to be sent to the server side.
-  const childrenURL = "http://localhost:4000/children";
+  const childrenURL = `${BACKEND_ORIGIN}/children`;
   const headers = { "Content-Type": "application/json" };
   const body = JSON.stringify({
     name: childName,
@@ -71,7 +74,7 @@ export const editChild = async (
   customerId: string,
 ) => {
   // Define the data to be sent to the server side.
-  const childrenURL = `http://localhost:4000/children/${childId}`;
+  const childrenURL = `${BACKEND_ORIGIN}/children/${childId}`;
   const headers = { "Content-Type": "application/json" };
   const body = JSON.stringify({
     name: childName,
@@ -99,7 +102,7 @@ export const editChild = async (
 export const deleteChild = async (childId: number) => {
   try {
     // Define the data to be sent to the server side.
-    const childrenURL = `http://localhost:4000/children/${childId}`;
+    const childrenURL = `${BACKEND_ORIGIN}/children/${childId}`;
     const headers = { "Content-Type": "application/json" };
 
     const response = await fetch(childrenURL, {

@@ -1,8 +1,11 @@
+const BACKEND_ORIGIN =
+  process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
+
 // GET subscriptions by a customer id
 export const getSubscriptionsByCustomerId = async (customerId: string) => {
   try {
     const response = await fetch(
-      `http://localhost:4000/customers/${customerId}/subscriptions`,
+      `${BACKEND_ORIGIN}/customers/${customerId}/subscriptions`,
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -23,7 +26,7 @@ export const registerSubscription = async (
 ) => {
   try {
     const response = await fetch(
-      `http://localhost:4000/customers/${customerId}/subscription`,
+      `${BACKEND_ORIGIN}/customers/${customerId}/subscription`,
       {
         method: "POST",
         headers: {
@@ -46,7 +49,7 @@ export const registerSubscription = async (
 export const getSubscriptionById = async (subscriptionId: number) => {
   try {
     const response = await fetch(
-      `http://localhost:4000/subscriptions/${subscriptionId}`,
+      `${BACKEND_ORIGIN}/subscriptions/${subscriptionId}`,
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

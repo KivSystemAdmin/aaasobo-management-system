@@ -51,7 +51,9 @@ function Register() {
     }
 
     // Define the data to be sent to the server side.
-    const registerURL = "http://localhost:4000/customers/register";
+    const BACKEND_ORIGIN =
+      process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
+    const registerURL = `${BACKEND_ORIGIN}/customers/register`;
     const headers = { "Content-Type": "application/json" };
     const body = JSON.stringify({
       name,

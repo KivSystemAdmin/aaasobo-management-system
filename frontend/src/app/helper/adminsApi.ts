@@ -1,4 +1,6 @@
-const BASE_URL = "http://localhost:4000/admins";
+const BACKEND_ORIGIN =
+  process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
+const BASE_URL = `${BACKEND_ORIGIN}/admins`;
 
 // GET all instructors data
 export const getAllInstructors = async () => {

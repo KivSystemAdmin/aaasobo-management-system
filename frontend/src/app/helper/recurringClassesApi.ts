@@ -1,4 +1,6 @@
-const BASE_URL = "http://localhost:4000/recurring-classes";
+const BACKEND_ORIGIN =
+  process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
+const BASE_URL = `${BACKEND_ORIGIN}/recurring-classes`;
 
 export const addRecurringClass = async (recurringClassData: {
   instructorId: number;

@@ -1,7 +1,10 @@
+const BACKEND_ORIGIN =
+  process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
+
 export const getCustomerById = async (customerId: string) => {
   try {
     const response = await fetch(
-      `http://localhost:4000/customers/${customerId}/customer`,
+      `${BACKEND_ORIGIN}/customers/${customerId}/customer`,
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -22,7 +25,7 @@ export const editCustomer = async (
   customerPrefecture: string,
 ) => {
   // Define the data to be sent to the server side.
-  const customerURL = `http://localhost:4000/customers/${customerId}`;
+  const customerURL = `${BACKEND_ORIGIN}/customers/${customerId}`;
   const headers = { "Content-Type": "application/json" };
   const body = JSON.stringify({
     name: customerName,
@@ -55,7 +58,7 @@ type Response<E> =
     };
 
 export const logoutCustomer = async (): Promise<Response<string>> => {
-  const response = await fetch("http://localhost:4000/customers/logout", {
+  const response = await fetch(`${BACKEND_ORIGIN}/customers/logout`, {
     method: "POST",
     credentials: "include",
   });

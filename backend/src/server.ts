@@ -14,7 +14,7 @@ import { subscriptionsRouter } from "./routes/subscriptionsRouter";
 export const server = express();
 
 const corsOptions = {
-  origin: "http://localhost:3000", // Allow only frontend
+  origin: process.env.FRONTEND_ORIGIN || "http://localhost:3000", // Allow only frontend
   credentials: true,
 };
 
