@@ -1,0 +1,162 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model Instructor {
+  id                              Int                               @id @default(autoincrement())
+  name                            String
+  email                           String                            @unique
+  password                        String
+  instructorAvailability          InstructorAvailability[]
+  classes                         Class[]
+  instructorRecurringAvailability InstructorRecurringAvailability[]
+  recurringClasses                RecurringClass[]
+  classURL                        String                            @unique
+  icon                            String                            @unique
+  nickname                        String                            @unique
+  meetingId                       String                            @unique
+  passcode                        String                            @unique
+  instructorUnavailability        InstructorUnavailability[]
+  introductionURL                 String                            @unique
+}
+
+model InstructorRecurringAvailability {
+  id                     Int                      @id @default(autoincrement())
+  instructorId           Int
+  startAt                DateTime
+  endAt                  DateTime?
+  instructor             Instructor               @relation(fields: [instructorId], references: [id])
+  instructorAvailability InstructorAvailability[]
+}
+
+model InstructorAvailability {
+  instructorId                      Int
+  instructorRecurringAvailabilityId Int
+  dateTime                          DateTime
+  instructor                        Instructor                       @relation(fields: [instructorId], references: [id])
+  instructorRecurringAvailability   InstructorRecurringAvailability? @relation(fields: [instructorRecurringAvailabilityId], references: [id])
+
+  @@id([instructorId, dateTime])
+}
+
+model InstructorUnavailability {
+  instructorId Int
+  dateTime     DateTime
+  instructor   Instructor @relation(fields: [instructorId], references: [id])
+
+  @@id([instructorId, dateTime])
+}
+
+model Customer {
+  id           Int            @id @default(autoincrement())
+  name         String
+  email        String         @unique
+  password     String
+  classes      Class[]
+  children     Children[]
+  subscription Subscription[]
+  prefecture   String
+}
+
+model Class {
+  id               Int               @id @default(autoincrement())
+  instructorId     Int
+  customerId       Int
+  recurringClassId Int
+  dateTime         DateTime
+  status           Status
+  instructor       Instructor        @relation(fields: [instructorId], references: [id])
+  customer         Customer          @relation(fields: [customerId], references: [id])
+  recurringClass   RecurringClass?   @relation(fields: [recurringClassId], references: [id])
+  classAttendance  ClassAttendance[]
+  subscriptionId   Int
+  subscription     Subscription      @relation(fields: [subscriptionId], references: [id])
+  isRebookable     Boolean           @default(true)
+}
+
+enum Status {
+  booked
+  completed
+  canceledByCustomer
+  canceledByInstructor
+}
+
+model Admins {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+}
+
+model Children {
+  id                       Int                        @id @default(autoincrement())
+  customerId               Int
+  name                     String
+  customer                 Customer                   @relation(fields: [customerId], references: [id])
+  classAttendance          ClassAttendance[]
+  recurringClassAttendance RecurringClassAttendance[]
+  birthdate                DateTime?
+  personalInfo             String?
+}
+
+model ClassAttendance {
+  classId    Int
+  childrenId Int
+  class      Class    @relation(fields: [classId], references: [id])
+  children   Children @relation(fields: [childrenId], references: [id])
+
+  @@id([classId, childrenId])
+}
+
+model Plan {
+  id               Int            @id @default(autoincrement())
+  name             String
+  description      String
+  weeklyClassTimes Int
+  subscription     Subscription[]
+}
+
+model Subscription {
+  id             Int              @id @default(autoincrement())
+  planId         Int
+  customerId     Int
+  startAt        DateTime
+  endAt          DateTime?
+  plan           Plan             @relation(fields: [planId], references: [id])
+  customer       Customer         @relation(fields: [customerId], references: [id])
+  class          Class[]
+  recurringClass RecurringClass[]
+}
+
+model RecurringClass {
+  id                       Int                        @id @default(autoincrement())
+  instructorId             Int?
+  subscriptionId           Int?
+  startAt                  DateTime?
+  endAt                    DateTime?
+  instructor               Instructor?                @relation(fields: [instructorId], references: [id])
+  subscription             Subscription?              @relation(fields: [subscriptionId], references: [id])
+  recurringClassAttendance RecurringClassAttendance[]
+  classes                  Class[]
+}
+
+model RecurringClassAttendance {
+  recurringClassId Int
+  childrenId       Int
+  recurringClass   RecurringClass @relation(fields: [recurringClassId], references: [id])
+  children         Children       @relation(fields: [childrenId], references: [id])
+
+  @@id([recurringClassId, childrenId])
+}

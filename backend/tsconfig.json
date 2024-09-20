@@ -1,3 +1,13 @@
 {
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "target": "es6",
+    "esModuleInterop": true,
+    "strict": true
+  },
+  "include": ["src/**/*.ts", "prisma/**/*"],
   "extends": "@tsconfig/node20/tsconfig.json"
 }
