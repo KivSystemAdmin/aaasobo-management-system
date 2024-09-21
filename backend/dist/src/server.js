@@ -28,7 +28,7 @@ const KEY1 = process.env.KEY1 || "";
 const KEY2 = process.env.KEY2 || "";
 // Middleware
 exports.server.use(express_1.default.json()); // to parse JSON bodies
-exports.server.use("*", (0, cors_1.default)(corsOptions)); // CORS settings for all routes
+exports.server.use((0, cors_1.default)(corsOptions)); // CORS settings for all routes
 // Cookie-session
 exports.server.use(
   (0, cookie_session_1.default)({
