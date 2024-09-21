@@ -13,10 +13,10 @@ import { subscriptionsRouter } from "./routes/subscriptionsRouter";
 
 export const server = express();
 
-const corsOptions = {
-  origin: process.env.FRONTEND_ORIGIN || "http://localhost:3000", // Allow only frontend
-  credentials: true,
-};
+// const corsOptions = {
+//   origin: process.env.FRONTEND_ORIGIN || "http://localhost:3000", // Allow only frontend
+//   credentials: true,
+// };
 
 // Environment Variables
 const KEY1 = process.env.KEY1 || "";
@@ -36,6 +36,7 @@ server.use(
       }
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   }),
 );
 

@@ -19,10 +19,10 @@ const recurringClassesRouter_1 = require("./routes/recurringClassesRouter");
 const plansRouter_1 = require("./routes/plansRouter");
 const subscriptionsRouter_1 = require("./routes/subscriptionsRouter");
 exports.server = (0, express_1.default)();
-const corsOptions = {
-  origin: process.env.FRONTEND_ORIGIN || "http://localhost:3000", // Allow only frontend
-  credentials: true,
-};
+// const corsOptions = {
+//   origin: process.env.FRONTEND_ORIGIN || "http://localhost:3000", // Allow only frontend
+//   credentials: true,
+// };
 // Environment Variables
 const KEY1 = process.env.KEY1 || "";
 const KEY2 = process.env.KEY2 || "";
@@ -40,6 +40,7 @@ exports.server.use(
       }
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   }),
 );
 // Cookie-session
