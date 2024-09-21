@@ -24,7 +24,7 @@ const KEY2 = process.env.KEY2 || "";
 
 // Middleware
 server.use(express.json()); // to parse JSON bodies
-server.use("*", cors(corsOptions)); // CORS settings for all routes
+server.use(cors(corsOptions)); // CORS settings for all routes
 // Cookie-session
 server.use(
   cookieSession({
