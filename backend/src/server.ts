@@ -31,11 +31,22 @@ server.use(
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-CSRF-Token",
+      "X-Requested-With",
+    ],
   }),
 );
 
-// Ensure handling of preflight OPTIONS requests
-server.options("*", cors()); // Allow preflight for all routes
+server.options("*", (_, res) => {
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigins.join(","));
+  res.sendStatus(200);
+});
 
 // Middleware
 server.use(express.json());
