@@ -7,7 +7,7 @@ const nextConfig = {
         headers: [
           {
             key: "Access-Control-Allow-Origin",
-            value: "https://aaasobo-managament-system-frontend.vercel.app",
+            value: process.env.NEXT_PUBLIC_FRONTEND_ORIGIN,
           },
           {
             key: "Access-Control-Allow-Methods",
