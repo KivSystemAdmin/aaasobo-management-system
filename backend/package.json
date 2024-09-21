@@ -20,6 +20,7 @@
     "build_bk1": "prisma generate && prisma migrate reset --force && node ./dist/src/app.js",
     "build_bk2": "prisma generate && prisma migrate deploy --force && echo 'Start executing dummy.js' && node ./dist/src/seed/dummy.js && echo 'Finish executing dummy.js' && node ./dist/src/app.js && echo 'Execute app.js'",
     "build_bk4": "prisma generate && prisma migrate deploy",
+    "build_bk5": "concurrently \"prisma generate && prisma migrate reset --force && echo 'Start executing dummy.js' && node ./dist/src/seed/dummy.js && echo 'Finish executing dummy.js'\" \"echo 'Execute app.js' && ./dist/src/app.js\"",
     "start": "cd ./dist && npx prisma generate && npx prisma migrate deploy && node ./dist/src/app.js"
   },
   "keywords": [],
