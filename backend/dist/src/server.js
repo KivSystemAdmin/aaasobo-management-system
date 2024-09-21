@@ -19,24 +19,16 @@ const recurringClassesRouter_1 = require("./routes/recurringClassesRouter");
 const plansRouter_1 = require("./routes/plansRouter");
 const subscriptionsRouter_1 = require("./routes/subscriptionsRouter");
 exports.server = (0, express_1.default)();
-// const corsOptions = {
-//   origin: process.env.FRONTEND_ORIGIN || "http://localhost:3000", // Allow only frontend
-//   credentials: true,
-// };
-// Environment Variables
-const KEY1 = process.env.KEY1 || "";
-const KEY2 = process.env.KEY2 || "";
-// Middleware
-exports.server.use(express_1.default.json()); // to parse JSON bodies
-// server.use(cors(corsOptions)); // CORS settings for all routes
+// List of allowed origins
 const allowedOrigins = [
   "https://aaasobo-managament-system-frontend.vercel.app",
   "http://localhost:3000",
 ];
+// CORS Configuration
 exports.server.use(
   (0, cors_1.default)({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error("CORS policy violation"));
@@ -46,7 +38,13 @@ exports.server.use(
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   }),
 );
-// Cookie-session
+// Ensure handling of preflight OPTIONS requests
+exports.server.options("*", (0, cors_1.default)()); // Allow preflight for all routes
+// Middleware
+exports.server.use(express_1.default.json());
+// Cookie-session setup
+const KEY1 = process.env.KEY1 || "";
+const KEY2 = process.env.KEY2 || "";
 exports.server.use(
   (0, cookie_session_1.default)({
     name: "auth-session",

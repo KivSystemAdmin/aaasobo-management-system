@@ -13,26 +13,17 @@ import { subscriptionsRouter } from "./routes/subscriptionsRouter";
 
 export const server = express();
 
-// const corsOptions = {
-//   origin: process.env.FRONTEND_ORIGIN || "http://localhost:3000", // Allow only frontend
-//   credentials: true,
-// };
-
-// Environment Variables
-const KEY1 = process.env.KEY1 || "";
-const KEY2 = process.env.KEY2 || "";
-
-// Middleware
-server.use(express.json()); // to parse JSON bodies
-// server.use(cors(corsOptions)); // CORS settings for all routes
+// List of allowed origins
 const allowedOrigins = [
   "https://aaasobo-managament-system-frontend.vercel.app",
   "http://localhost:3000",
 ];
+
+// CORS Configuration
 server.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error("CORS policy violation"));
@@ -43,7 +34,16 @@ server.use(
   }),
 );
 
-// Cookie-session
+// Ensure handling of preflight OPTIONS requests
+server.options("*", cors()); // Allow preflight for all routes
+
+// Middleware
+server.use(express.json());
+
+// Cookie-session setup
+const KEY1 = process.env.KEY1 || "";
+const KEY2 = process.env.KEY2 || "";
+
 server.use(
   cookieSession({
     name: "auth-session",
