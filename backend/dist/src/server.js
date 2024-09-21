@@ -28,6 +28,7 @@ const allowedOrigins = [
 exports.server.use(
   (0, cors_1.default)({
     origin: (origin, callback) => {
+      // Define res in the callback parameters
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -36,19 +37,18 @@ exports.server.use(
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-CSRF-Token",
-      "X-Requested-With",
-    ],
+    allowedHeaders: ["Content-Type"],
   }),
 );
-exports.server.options("*", (_, res) => {
+// Fix the `server.options` handler
+exports.server.options("*", (req, res) => {
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Origin", allowedOrigins.join(","));
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://aaasobo-managament-system-frontend.vercel.app",
+  );
   res.sendStatus(200);
 });
 // Middleware
