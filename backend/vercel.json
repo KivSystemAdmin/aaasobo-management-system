@@ -6,7 +6,7 @@
       "dest": "./dist/src/app.js",
       "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
       "headers": {
-        "Access-Control-Allow-Origin": "https://aaasobo-management-system-frontend.vercel.app",
+        "Access-Control-Allow-Origin": "https://aaasobo-managament-system-frontend.vercel.app",
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Headers": "Content-Type"
       }
