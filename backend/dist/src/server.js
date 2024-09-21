@@ -28,7 +28,20 @@ const KEY1 = process.env.KEY1 || "";
 const KEY2 = process.env.KEY2 || "";
 // Middleware
 exports.server.use(express_1.default.json()); // to parse JSON bodies
-exports.server.use((0, cors_1.default)(corsOptions)); // CORS settings for all routes
+// server.use(cors(corsOptions)); // CORS settings for all routes
+const allowedOrigins = [process.env.FRONTEND_ORIGIN, "http://localhost:3000"];
+exports.server.use(
+  (0, cors_1.default)({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS policy violation"));
+      }
+    },
+    credentials: true,
+  }),
+);
 // Cookie-session
 exports.server.use(
   (0, cookie_session_1.default)({

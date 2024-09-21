@@ -24,7 +24,21 @@ const KEY2 = process.env.KEY2 || "";
 
 // Middleware
 server.use(express.json()); // to parse JSON bodies
-server.use(cors(corsOptions)); // CORS settings for all routes
+// server.use(cors(corsOptions)); // CORS settings for all routes
+const allowedOrigins = [process.env.FRONTEND_ORIGIN, "http://localhost:3000"];
+server.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS policy violation"));
+      }
+    },
+    credentials: true,
+  }),
+);
+
 // Cookie-session
 server.use(
   cookieSession({
