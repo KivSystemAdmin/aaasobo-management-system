@@ -25,7 +25,10 @@ const KEY2 = process.env.KEY2 || "";
 // Middleware
 server.use(express.json()); // to parse JSON bodies
 // server.use(cors(corsOptions)); // CORS settings for all routes
-const allowedOrigins = [process.env.FRONTEND_ORIGIN, "http://localhost:3000"];
+const allowedOrigins = [
+  "https://aaasobo-managament-system-frontend.vercel.app",
+  "http://localhost:3000",
+];
 server.use(
   cors({
     origin: (origin, callback) => {
@@ -36,7 +39,7 @@ server.use(
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   }),
 );
 
