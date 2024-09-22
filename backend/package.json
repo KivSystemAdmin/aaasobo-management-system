@@ -50,34 +50,5 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "rrule": "^2.8.1"
-  },
-  "vercel": {
-    "version": 2,
-    "builds": [
-      {
-        "src": "./dist/src/app.js",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "./dist/src/app.js",
-        "methods": [
-          "GET",
-          "POST",
-          "PUT",
-          "DELETE",
-          "PATCH",
-          "OPTIONS"
-        ],
-        "headers": {
-          "Access-Control-Allow-Origin": "https://aaasobo-managament-system-frontend.vercel.app",
-          "Access-Control-Allow-Credentials": "true",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,PATCH,OPTIONS"
-        }
-      }
-    ]
   }
 }
