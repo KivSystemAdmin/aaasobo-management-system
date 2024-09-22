@@ -8,6 +8,6 @@
     "esModuleInterop": true,
     "strict": true
   },
-  "include": ["api/**/*.ts", "prisma/**/*"],
+  "include": ["api/**/*.ts", "prisma/**/*", "src/server.ts"],
   "extends": "@tsconfig/node20/tsconfig.json"
 }

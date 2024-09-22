@@ -2,15 +2,15 @@ import express from "express";
 import cors from "cors";
 import cookieSession from "cookie-session";
 import "dotenv/config";
-import { instructorsRouter } from "../src/routes/instructorsRouter";
-import { classesRouter } from "../src/routes/classesRouter";
-import { customersRouter } from "../src/routes/customersRouter";
-import { adminsRouter } from "../src/routes/adminsRouter";
-import { childrenRouter } from "../src/routes/childrenRouter";
-import { recurringClassesRouter } from "../src/routes/recurringClassesRouter";
-import { plansRouter } from "../src/routes/plansRouter";
-import { subscriptionsRouter } from "../src/routes/subscriptionsRouter";
-import { indexRouter } from "../src/routes/indexRouter";
+import { instructorsRouter } from "./routes/instructorsRouter";
+import { classesRouter } from "./routes/classesRouter";
+import { customersRouter } from "./routes/customersRouter";
+import { adminsRouter } from "./routes/adminsRouter";
+import { childrenRouter } from "./routes/childrenRouter";
+import { recurringClassesRouter } from "./routes/recurringClassesRouter";
+import { plansRouter } from "./routes/plansRouter";
+import { subscriptionsRouter } from "./routes/subscriptionsRouter";
+import { indexRouter } from "./routes/indexRouter";
 
 export const server = express();
 
@@ -33,6 +33,7 @@ server.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
+    preflightContinue: true,
   }),
 );
 
