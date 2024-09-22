@@ -5,7 +5,7 @@ import {
   registerChildController,
   updateChildController,
   getChildByIdController,
-} from "../controllers/childrenController";
+} from "../../src/controllers/childrenController";
 
 export const childrenRouter = express.Router();
 

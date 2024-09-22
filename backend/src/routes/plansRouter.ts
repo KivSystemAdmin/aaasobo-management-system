@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllPlansController } from "../controllers/plansController";
+import { getAllPlansController } from "../../src/controllers/plansController";
 
 export const plansRouter = express.Router();
 

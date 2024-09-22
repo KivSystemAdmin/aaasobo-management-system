@@ -10,18 +10,21 @@ import {
   getRecurringAvailabilityById,
   loginInstructorController,
   logoutInstructorController,
-} from "../controllers/instructorsController";
-import { type RequestWithId, parseId } from "../middlewares/parseId.middleware";
+} from "../../src/controllers/instructorsController";
+import {
+  type RequestWithId,
+  parseId,
+} from "../../src/middlewares/parseId.middleware";
 import {
   createInstructorUnavailability,
   getInstructorUnavailabilities,
-} from "../controllers/instructorsUnavailabilityController";
-import { authenticateInstructorSession } from "../middlewares/auth.middleware";
-import { getInstructorClasses } from "../controllers/classesController";
+} from "../../src/controllers/instructorsUnavailabilityController";
+import { authenticateInstructorSession } from "../../src/middlewares/auth.middleware";
+import { getInstructorClasses } from "../../src/controllers/classesController";
 import {
   getInstructorAvailabilitiesTodayAndAfter,
   getInstructorAvailabilitiesTomorrowAndAfter,
-} from "../controllers/instructorsAvailabilityController";
+} from "../../src/controllers/instructorsAvailabilityController";
 
 export const instructorsRouter = express.Router();
 

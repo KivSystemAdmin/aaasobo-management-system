@@ -7,11 +7,11 @@ import {
   getAllInstructorsController,
   getAllCustomersController,
   getAllChildrenController,
-} from "../controllers/adminsController";
+} from "../../src/controllers/adminsController";
 import {
   requireAuthentication,
   authenticateAdminSession,
-} from "../middlewares/auth.middleware";
+} from "../../src/middlewares/auth.middleware";
 
 export const adminsRouter = express.Router();
 

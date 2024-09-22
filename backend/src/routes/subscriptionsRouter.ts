@@ -1,6 +1,9 @@
 import express from "express";
-import { parseId, RequestWithId } from "../middlewares/parseId.middleware";
-import { getSubscriptionByIdController } from "../controllers/subscriptionsController";
+import {
+  parseId,
+  RequestWithId,
+} from "../../src/middlewares/parseId.middleware";
+import { getSubscriptionByIdController } from "../../src/controllers/subscriptionsController";
 
 export const subscriptionsRouter = express.Router();
 

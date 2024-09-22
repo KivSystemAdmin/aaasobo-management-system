@@ -13,7 +13,7 @@ import {
   getClassesForInstructorCalendar,
   nonRebookableCancelController,
   updateClassController,
-} from "../controllers/classesController";
+} from "../../src/controllers/classesController";
 
 export const classesRouter = express.Router();
 

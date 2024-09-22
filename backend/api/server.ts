@@ -2,28 +2,28 @@ import express from "express";
 import cors from "cors";
 import cookieSession from "cookie-session";
 import "dotenv/config";
-import { instructorsRouter } from "./routes/instructorsRouter";
-import { classesRouter } from "./routes/classesRouter";
-import { customersRouter } from "./routes/customersRouter";
-import { adminsRouter } from "./routes/adminsRouter";
-import { childrenRouter } from "./routes/childrenRouter";
-import { recurringClassesRouter } from "./routes/recurringClassesRouter";
-import { plansRouter } from "./routes/plansRouter";
-import { subscriptionsRouter } from "./routes/subscriptionsRouter";
+import { instructorsRouter } from "../src/routes/instructorsRouter";
+import { classesRouter } from "../src/routes/classesRouter";
+import { customersRouter } from "../src/routes/customersRouter";
+import { adminsRouter } from "../src/routes/adminsRouter";
+import { childrenRouter } from "../src/routes/childrenRouter";
+import { recurringClassesRouter } from "../src/routes/recurringClassesRouter";
+import { plansRouter } from "../src/routes/plansRouter";
+import { subscriptionsRouter } from "../src/routes/subscriptionsRouter";
+import { indexRouter } from "../src/routes/indexRouter";
 
 export const server = express();
 
 // List of allowed origins
 const allowedOrigins = [
-  "https://aaasobo-managament-system-frontend.vercel.app/",
-  "http://localhost:3000/",
+  "https://aaasobo-management-system-frontend.vercel.app",
+  "http://localhost:3000",
 ];
 
 // CORS Configuration
 server.use(
   cors({
     origin: (origin, callback) => {
-      // Define res in the callback parameters
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -36,21 +36,16 @@ server.use(
   }),
 );
 
-// Fix the `server.options` handler
-server.options("*", (req, res) => {
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.sendStatus(200);
-});
-
 // Middleware
 server.use(express.json());
 
 // Cookie-session setup
-const KEY1 = process.env.KEY1 || "";
-const KEY2 = process.env.KEY2 || "";
+const KEY1 = process.env.KEY1;
+const KEY2 = process.env.KEY2;
+
+if (!KEY1 || !KEY2) {
+  throw new Error("Session keys are missing.");
+}
 
 server.use(
   cookieSession({
@@ -62,6 +57,7 @@ server.use(
 );
 
 // Routes
+server.use("/", indexRouter);
 server.use("/instructors", instructorsRouter);
 server.use("/classes", classesRouter);
 server.use("/customers", customersRouter);

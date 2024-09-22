@@ -1,11 +1,14 @@
 import express from "express";
-import { parseId, RequestWithId } from "../middlewares/parseId.middleware";
+import {
+  parseId,
+  RequestWithId,
+} from "../../src/middlewares/parseId.middleware";
 import {
   addRecurringClassController,
   getRecurringClassesByInstructorIdController,
   getRecurringClassesBySubscriptionIdController,
   updateRecurringClassesController,
-} from "../controllers/recurringClassesController";
+} from "../../src/controllers/recurringClassesController";
 
 export const recurringClassesRouter = express.Router();
 

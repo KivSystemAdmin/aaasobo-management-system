@@ -8,8 +8,8 @@ import {
   updateCustomerProfile,
   registerSubscriptionController,
   logoutCustomer,
-} from "../controllers/customersController";
-import { authenticateCustomerSession } from "../middlewares/auth.middleware";
+} from "../../src/controllers/customersController";
+import { authenticateCustomerSession } from "../../src/middlewares/auth.middleware";
 
 export const customersRouter = express.Router();
 

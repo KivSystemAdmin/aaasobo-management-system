@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.ts",
   "scripts": {
     "format": "npx prettier --write . && npx prisma format",
     "format-check": "npx prettier --check .",
@@ -10,18 +10,18 @@
     "delete_prisma": "rm -rf ./dist/prisma",
     "cp_prisma": "cp -R ./prisma ./dist/prisma && rm -rf ./dist/prisma/prismaClient.ts",
     "start_dev": "nodemon ./dist/src/app.js",
-    "dev": "concurrently \"npm run delete_prisma && npm run cp_prisma && npm run build_dev\" \"npm run start_dev\"",
-    "dev2": "tsc && nodemon --exec ts-node ./src/app.ts",
-    "prisma:init": "npx prisma migrate reset && npx ts-node ./src/seed/dummy.ts",
+    "dev2": "concurrently \"npm run delete_prisma && npm run cp_prisma && npm run build_dev\" \"npm run start_dev\"",
+    "dev": "nodemon --exec ts-node ./api/app.ts",
+    "prisma:init": "npx prisma migrate reset && npx ts-node ./api/seed/dummy.ts",
     "prisma:init_demo": "npx prisma migrate reset && npx ts-node ./src/seed/dummy_demo.ts",
     "prisma:init_vercel": "prisma generate && prisma migrate reset && npx ts-node ./src/seed/dummy.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "prisma generate && prisma migrate reset --force && echo 'Start executing dummy.js' && node ./dist/src/seed/dummy.js && echo 'Finish executing dummy.js'",
+    "build": "prisma generate && prisma migrate reset --force && echo 'Start executing dummy.ts' && ts-node ./src/seed/dummy.ts && echo 'Finish executing dummy.ts'",
     "build_bk1": "prisma generate && prisma migrate reset --force && node ./dist/src/app.js",
     "build_bk2": "prisma generate && prisma migrate deploy --force && echo 'Start executing dummy.js' && node ./dist/src/seed/dummy.js && echo 'Finish executing dummy.js' && node ./dist/src/app.js && echo 'Execute app.js'",
     "build_bk3": "prisma generate && prisma migrate deploy",
     "build_bk5": "concurrently \"prisma generate && prisma migrate reset --force && echo 'Start executing dummy.js' && node ./dist/src/seed/dummy.js && echo 'Finish executing dummy.js'\" \"echo 'Execute app.js' && ./dist/src/app.js\"",
-    "start": "cd ./dist && npx prisma generate && npx prisma migrate deploy && node ./dist/src/app.js"
+    "start": "nodemon ./dist/src/app.js"
   },
   "keywords": [],
   "author": "",
@@ -55,7 +55,7 @@
     "version": 2,
     "builds": [
       {
-        "src": "dist/src/app.js",
+        "src": "./dist/src/app.js",
         "use": "@vercel/node"
       }
     ],
