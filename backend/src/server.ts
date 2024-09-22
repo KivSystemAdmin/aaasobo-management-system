@@ -15,8 +15,8 @@ export const server = express();
 
 // List of allowed origins
 const allowedOrigins = [
-  "https://aaasobo-managament-system-frontend.vercel.app",
-  "http://localhost:3000",
+  "https://aaasobo-managament-system-frontend.vercel.app/",
+  "http://localhost:3000/",
 ];
 
 // CORS Configuration
@@ -39,12 +39,9 @@ server.use(
 // Fix the `server.options` handler
 server.options("*", (req, res) => {
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://aaasobo-managament-system-frontend.vercel.app",
-  );
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.sendStatus(200);
 });
 

@@ -21,8 +21,8 @@ const subscriptionsRouter_1 = require("./routes/subscriptionsRouter");
 exports.server = (0, express_1.default)();
 // List of allowed origins
 const allowedOrigins = [
-  "https://aaasobo-managament-system-frontend.vercel.app",
-  "http://localhost:3000",
+  "https://aaasobo-managament-system-frontend.vercel.app/",
+  "http://localhost:3000/",
 ];
 // CORS Configuration
 exports.server.use(
@@ -43,12 +43,9 @@ exports.server.use(
 // Fix the `server.options` handler
 exports.server.options("*", (req, res) => {
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://aaasobo-managament-system-frontend.vercel.app",
-  );
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.sendStatus(200);
 });
 // Middleware
