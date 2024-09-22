@@ -5,6 +5,6 @@ export const indexRouter = express.Router();
 
 indexRouter.get("/", (_, res) => {
   res.json({
-    message: "Welcome to AaasoBo! Management System API.",
+    message: "Welcome to the API!",
   });
 });

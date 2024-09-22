@@ -14,20 +14,17 @@ import { indexRouter } from "./routes/indexRouter";
 
 export const server = express();
 
-// List of allowed origins
-const allowedOrigins = [
-  "https://aaasobo-managament-system-frontend.vercel.app",
-  "http://localhost:3000",
-];
+// Set up allowed origin
+const allowedOrigin = process.env.FRONTEND_ORIGIN;
 
 // CORS Configuration
 server.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || origin === allowedOrigin) {
         callback(null, true);
       } else {
-        callback(new Error("CORS policy violation!"));
+        callback(new Error("CORS policy violation"));
       }
     },
     credentials: true,
@@ -52,6 +49,8 @@ server.use(
   cookieSession({
     name: "auth-session",
     httpOnly: true,
+    secure: true,
+    sameSite: "none",
     maxAge: 24 * 60 * 60 * 1000,
     keys: [KEY1, KEY2],
   }),
