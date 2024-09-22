@@ -45,12 +45,14 @@ if (!KEY1 || !KEY2) {
   throw new Error("Session keys are missing.");
 }
 
+server.set("trust proxy", 1);
 server.use(
   cookieSession({
     name: "auth-session",
     httpOnly: true,
     secure: true,
     sameSite: "none",
+    domain: process.env.FRONTEND_ORIGIN,
     maxAge: 24 * 60 * 60 * 1000,
     keys: [KEY1, KEY2],
   }),
