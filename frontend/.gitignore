@@ -40,3 +40,6 @@ next-env.d.ts
 
 # styled-components
 .css*
+
+# backup files
+*_bk
