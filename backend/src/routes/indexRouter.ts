@@ -5,7 +5,5 @@ export const indexRouter = express.Router();
 // http://localhost:4000/
 
 indexRouter.get("/", (_, res) => {
-  res.json({
-    message: "AMS API!",
-  });
+  res.send("AMS API");
 });

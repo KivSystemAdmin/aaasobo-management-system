@@ -35,14 +35,5 @@
     "prettier": "^3.3.2",
     "sass": "^1.77.6",
     "typescript": "^5"
-  },
-  "vercel": {
-    "version": 2,
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "frontend/$1"
-      }
-    ]
   }
 }

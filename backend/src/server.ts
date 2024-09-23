@@ -23,46 +23,28 @@ const allowedOrigin = process.env.FRONTEND_ORIGIN || "";
 // CORS Configuration
 server.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || origin === allowedOrigin) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS policy violation"));
-      }
-    },
+    origin: allowedOrigin,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: ["Access-Control-Allow-Origin"],
-    preflightContinue: true,
   }),
 );
-
-server.use((_, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  next();
-});
 
 // Middleware
 server.use(express.json());
 server.use(cookieParser());
 
-// For production(Use vercel KV)
+// For production (Use vercel KV)
 if (process.env.NODE_ENV === "production") {
   const generateSessionId = () => randomBytes(16).toString("hex");
 
   server.use(async (req, res, next) => {
-    const sessionId = req.cookies ? req.cookies["session-id"] : undefined;
+    const sessionId = req.cookies["session-id"];
 
     if (sessionId) {
       const sessionData = await kv.get(sessionId);
-      if (sessionData) {
-        req.session = sessionData;
-      } else {
-        console.error("Error retrieving session:", Error);
-        req.session = {};
-      }
+      req.session = sessionData || {};
     } else {
       const newSessionId = generateSessionId();
       res.cookie("session-id", newSessionId, {
@@ -84,8 +66,6 @@ if (process.env.NODE_ENV === "production") {
     }
     next();
   });
-
-  // For local development(Use cookie-session)
 } else {
   const KEY1 = process.env.KEY1 || "";
   const KEY2 = process.env.KEY2 || "";
