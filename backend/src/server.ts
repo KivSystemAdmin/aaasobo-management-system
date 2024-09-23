@@ -54,6 +54,7 @@ if (process.env.NODE_ENV === "production") {
 
   server.use(async (req, res, next) => {
     const sessionId = req.cookies ? req.cookies["session-id"] : undefined;
+    console.log("Session ID:", sessionId);
 
     if (sessionId) {
       const sessionData = await kv.get(sessionId);
