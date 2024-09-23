@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { kv } from "@vercel/kv"; // For production
+import { kv } from "@vercel/kv";
 import { createAdmin, getAdmin } from "../services/adminsService";
 import {
   getAllInstructors,

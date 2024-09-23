@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
-import cookieSession from "cookie-session"; // For local development
-import { kv } from "@vercel/kv"; // For production
+import cookieSession from "cookie-session";
+import { kv } from "@vercel/kv";
 import { randomBytes } from "crypto";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
@@ -54,21 +54,17 @@ if (process.env.NODE_ENV === "production") {
 
   server.use(async (req, res, next) => {
     const sessionId = req.cookies ? req.cookies["session-id"] : undefined;
-    console.log("Session ID:", sessionId);
 
     if (sessionId) {
       const sessionData = await kv.get(sessionId);
-      console.log("Session Data:", sessionData);
       if (sessionData) {
         req.session = sessionData;
       } else {
         console.error("Error retrieving session:", Error);
         req.session = {};
       }
-      console.log("Session:", req.session);
     } else {
       const newSessionId = generateSessionId();
-      console.log("New Session ID:", newSessionId);
       res.cookie("session-id", newSessionId, {
         httpOnly: true,
         secure: true,
