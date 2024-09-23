@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
-import cookieSession from "cookie-session";
+import cookieSession from "cookie-session"; // For local development
+import { kv } from "@vercel/kv"; // For production
+import { randomBytes } from "crypto";
 import "dotenv/config";
 import { instructorsRouter } from "./routes/instructorsRouter";
 import { classesRouter } from "./routes/classesRouter";
@@ -37,26 +39,56 @@ server.use(
 // Middleware
 server.use(express.json());
 
-// Cookie-session setup
-const KEY1 = process.env.KEY1;
-const KEY2 = process.env.KEY2;
+// For production(Use vercel KV)
+if (process.env.NODE_ENV === "production") {
+  const generateSessionId = () => randomBytes(16).toString("hex");
 
-if (!KEY1 || !KEY2) {
-  throw new Error("Session keys are missing.");
+  server.use(async (req, res, next) => {
+    const sessionId = req.cookies["session-id"];
+
+    if (sessionId) {
+      const sessionData = await kv.get(sessionId);
+      if (sessionData) {
+        req.session = sessionData;
+      } else {
+        req.session = {};
+      }
+    } else {
+      const newSessionId = generateSessionId();
+      res.cookie("session-id", newSessionId, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+      req.session = {};
+    }
+
+    next();
+  });
+
+  server.use(async (req, _, next) => {
+    const sessionId = req.cookies["session-id"];
+    if (sessionId && req.session) {
+      await kv.set(sessionId, req.session, { ex: 24 * 60 * 60 });
+    }
+    next();
+  });
+
+  // For local development(Use cookie-session)
+} else {
+  const KEY1 = process.env.KEY1 || "";
+  const KEY2 = process.env.KEY2 || "";
+
+  server.use(
+    cookieSession({
+      name: "auth-session",
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      keys: [KEY1, KEY2],
+    }),
+  );
 }
-
-server.set("trust proxy", 1);
-server.use(
-  cookieSession({
-    name: "auth-session",
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    domain: process.env.FRONTEND_ORIGIN,
-    maxAge: 24 * 60 * 60 * 1000,
-    keys: [KEY1, KEY2],
-  }),
-);
 
 // Routes
 server.use("/", indexRouter);

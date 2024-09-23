@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.19.1",
+    "@vercel/kv": "^2.0.0",
     "@vercel/postgres": "^0.10.0",
     "bcrypt": "^5.1.1",
     "cookie-session": "^2.1.0",
