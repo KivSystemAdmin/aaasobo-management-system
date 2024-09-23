@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { kv } from "@vercel/kv"; // For production
 import { createAdmin, getAdmin } from "../services/adminsService";
 import {
   getAllInstructors,
@@ -34,11 +35,18 @@ export const loginAdminController = async (req: Request, res: Response) => {
       });
     }
 
-    // Set the session.
     req.session = {
       userId: admin.id,
       userType: "admin",
     };
+
+    // For production(Save session data to Vercel KV)
+    if (process.env.NODE_ENV === "production") {
+      const sessionId = req.cookies["session-id"];
+      if (sessionId) {
+        await kv.set(sessionId, req.session, { ex: 24 * 60 * 60 });
+      }
+    }
 
     res.status(200).json({
       message: "Admin logged in successfully",
