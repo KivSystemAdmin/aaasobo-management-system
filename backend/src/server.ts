@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieSession from "cookie-session"; // For local development
 import { kv } from "@vercel/kv"; // For production
 import { randomBytes } from "crypto";
+import cookieParser from "cookie-parser";
 import "dotenv/config";
 import { instructorsRouter } from "./routes/instructorsRouter";
 import { classesRouter } from "./routes/classesRouter";
@@ -17,7 +18,7 @@ import { indexRouter } from "./routes/indexRouter";
 export const server = express();
 
 // Set up allowed origin
-const allowedOrigin = process.env.FRONTEND_ORIGIN;
+const allowedOrigin = process.env.FRONTEND_ORIGIN || "";
 
 // CORS Configuration
 server.use(
@@ -32,25 +33,34 @@ server.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Access-Control-Allow-Origin"],
     preflightContinue: true,
   }),
 );
 
+server.use((_, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  next();
+});
+
 // Middleware
 server.use(express.json());
+server.use(cookieParser());
 
 // For production(Use vercel KV)
 if (process.env.NODE_ENV === "production") {
   const generateSessionId = () => randomBytes(16).toString("hex");
 
   server.use(async (req, res, next) => {
-    const sessionId = req.cookies["session-id"];
+    const sessionId = req.cookies ? req.cookies["session-id"] : undefined;
 
     if (sessionId) {
       const sessionData = await kv.get(sessionId);
       if (sessionData) {
         req.session = sessionData;
       } else {
+        console.error("Error retrieving session:", Error);
         req.session = {};
       }
     } else {
