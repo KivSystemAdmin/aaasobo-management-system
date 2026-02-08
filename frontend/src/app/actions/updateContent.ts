@@ -27,10 +27,12 @@ import {
 } from "@/lib/api/classesApi";
 import { revalidatePath } from "next/cache";
 import {
+  updateSelectTypeUrl,
   updateSubscriptionToAddClass,
   updateSubscriptionToTerminateClass,
 } from "@/lib/api/subscriptionsApi";
 import {
+  UpdateSelectTypeUrlRequest,
   UpdateSubscriptionToAddClassRequest,
   UpdateSubscriptionToTerminateClassRequest,
 } from "@shared/schemas/admins";
@@ -331,6 +333,30 @@ export async function updateSubscriptionToTerminateClassAction(
   try {
     const cookie = await getCookie();
     const response = await updateSubscriptionToTerminateClass(
+      subscriptionId,
+      updateDate,
+      cookie,
+    );
+
+    // Refresh cached subscription data for the subscription list page
+    revalidateSubscriptionList();
+
+    return response;
+  } catch (error) {
+    console.error("Unexpected error in updateContent server action:", error);
+    return {
+      errorMessage: GENERAL_ERROR_MESSAGE,
+    };
+  }
+}
+
+export async function updateSelectTypeUrlAction(
+  subscriptionId: number,
+  updateDate: UpdateSelectTypeUrlRequest,
+): Promise<DeleteFormState> {
+  try {
+    const cookie = await getCookie();
+    const response = await updateSelectTypeUrl(
       subscriptionId,
       updateDate,
       cookie,

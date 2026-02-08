@@ -188,6 +188,7 @@ function CurrentSubscription({
         adminId={adminId}
         customerId={customerId}
         customerTerminationAt={selectedSubscription?.customerTerminationAt}
+        plan={selectedSubscription?.plan}
         language={language}
       />
     </div>

@@ -372,6 +372,10 @@ export const UpdateSubscriptionToTerminateClassRequest = z.object({
   recurringClassIds: z.array(z.number()),
 });
 
+export const UpdateSelectTypeUrlRequest = z.object({
+  selectType: z.string(),
+});
+
 // Error response schemas
 export const ValidationErrorResponse = z.object({
   items: z.array(z.string()),
@@ -436,4 +440,7 @@ export type UpdateSubscriptionToAddClassRequest = z.infer<
 >;
 export type UpdateSubscriptionToTerminateClassRequest = z.infer<
   typeof UpdateSubscriptionToTerminateClassRequest
+>;
+export type UpdateSelectTypeUrlRequest = z.infer<
+  typeof UpdateSelectTypeUrlRequest
 >;
