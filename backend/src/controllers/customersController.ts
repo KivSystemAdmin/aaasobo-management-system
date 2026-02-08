@@ -263,14 +263,19 @@ export const registerSubscriptionController = async (
     }
     const subscriptionId = newSubscription.id;
 
-    // Create the same number of recurring class records as weekly class times
-    for (let i = 0; i < weeklyClassTimes; i++) {
-      const newRecurringClass = await createNewRecurringClass(subscriptionId);
-      if (!newRecurringClass) {
-        res.status(500).json({ error: "Failed to create recurring class" });
-        return;
+    await prisma.$transaction(async (tx) => {
+      // Create the same number of recurring class records as weekly class times
+      for (let i = 0; i < weeklyClassTimes; i++) {
+        const newRecurringClass = await createNewRecurringClass(
+          tx,
+          subscriptionId,
+        );
+        if (!newRecurringClass) {
+          res.status(500).json({ error: "Failed to create recurring class" });
+          return;
+        }
       }
-    }
+    });
 
     res.status(200).json({ newSubscription });
   } catch (error) {

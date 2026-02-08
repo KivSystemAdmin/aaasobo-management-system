@@ -25,8 +25,11 @@ export const createRegularClass = async (params: CreateRegularClassParams) => {
 };
 
 // Simple recurring class creation for subscription setup
-export const createNewRecurringClass = async (subscriptionId: number) => {
-  return await prisma.recurringClass.create({
+export const createNewRecurringClass = async (
+  tx: Prisma.TransactionClient,
+  subscriptionId: number,
+) => {
+  return await tx.recurringClass.create({
     data: {
       subscriptionId: subscriptionId,
     },

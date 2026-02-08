@@ -117,7 +117,7 @@ export const updateSubscriptionToAddClassController = async (
 
       // Add new recurring classes
       for (let i = 0; i < times; i++) {
-        await createNewRecurringClass(subscription.id);
+        await createNewRecurringClass(tx, subscription.id);
       }
 
       res.status(200).json({
