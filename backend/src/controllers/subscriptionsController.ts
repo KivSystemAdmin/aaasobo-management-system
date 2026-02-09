@@ -227,7 +227,7 @@ export const updateSelectTypeUrlController = async (
     }
 
     await prisma.$transaction(async (tx) => {
-      // Updata the plan id of the subscription.
+      // Updata the select type url.
       await updateSelectTypeUrl(tx, subscription.id, selectType);
     });
 
