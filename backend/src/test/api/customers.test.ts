@@ -23,7 +23,7 @@ async function createAdminAuthCookie() {
 }
 
 // Mock the resend email service to avoid sending real emails
-vi.mock("../../helper/resendClient", () => ({
+vi.mock("../../lib/email/resendClient", () => ({
   resend: {
     emails: {
       send: vi
@@ -34,10 +34,11 @@ vi.mock("../../helper/resendClient", () => ({
 }));
 
 // Mock the mail helper functions
-vi.mock("../../helper/mail", async (importOriginal) => {
+vi.mock("../../lib/email/mail", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../lib/email/mail")>();
   return {
     ...actual,
+    sendVerificationEmail: vi.fn().mockResolvedValue({ success: true }),
     resendVerificationEmail: vi.fn().mockResolvedValue({ success: true }),
     sendPasswordResetEmail: vi.fn().mockResolvedValue({ success: true }),
   };
