@@ -57,6 +57,11 @@ Full-stack class management system with separate backend and frontend applicatio
 
 ## Development Guidelines
 
+### Branch Strategy
+- Use `develop` as the base branch for all new pull requests.
+- Open and merge pull requests into `develop` (not `main`).
+- `main` is a release branch: only merge `develop` into `main` via pull request.
+
 ### Code Quality
 - Always run `npm run format` before committing changes
 - Run `npm run lint` on frontend for code quality checks
