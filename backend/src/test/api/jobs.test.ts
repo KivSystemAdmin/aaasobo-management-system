@@ -155,6 +155,7 @@ describe("/jobs", () => {
 
       const response = await request(server)
         .patch("/jobs/mask/instructors")
+        .set("Authorization", cronAuthHeader())
         .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
@@ -187,6 +188,7 @@ describe("/jobs", () => {
 
       const response = await request(server)
         .patch("/jobs/mask/instructors")
+        .set("Authorization", cronAuthHeader())
         .expect(200);
 
       expect(response.body).toEqual([]);

@@ -979,8 +979,10 @@ describe("GET /instructors/:id/schedules/:scheduleId", () => {
   });
 });
 
-describe("POST /instructors/schedules/post-termination", () => {
-  it("succeed creating post-termination schedules", async () => {
+describe("POST /instructors/:id/schedules", () => {
+  it("succeed creating schedules for instructor with future termination date", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
     const futureDate = faker.date.future();
     const testData = generateTestInstructor();
     const instructor = await createInstructor({
@@ -991,12 +993,24 @@ describe("POST /instructors/schedules/post-termination", () => {
     await createInstructorSchedule(instructor.id, {
       effectiveFrom: new Date("2024-01-01"),
       effectiveTo: null,
+      timezone: "Asia/Tokyo",
     });
 
     const response = await request(server)
-      .post("/instructors/schedules/post-termination")
+      .post(`/instructors/${instructor.id}/schedules`)
+      .set("Cookie", authCookie)
+      .send({
+        effectiveFrom: "2025-02-01",
+        timezone: "Asia/Tokyo",
+        slots: [{ weekday: 1, startTime: "09:00" }],
+      })
       .expect(201);
 
-    expect(response.body.message).toContain("successfully");
+    expect(response.body.data).toMatchObject({
+      instructorId: instructor.id,
+      effectiveFrom: "2025-02-01T00:00:00.000Z",
+      effectiveTo: null,
+      timezone: "Asia/Tokyo",
+    });
   });
 });
