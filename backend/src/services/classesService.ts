@@ -1,6 +1,6 @@
 import { Prisma, Status } from "../../generated/prisma";
 import { prisma } from "../../prisma/prismaClient";
-import { getJstDayRange, nHoursLater } from "../utils/dateUtils";
+import { getJstDayRange, nDaysLater, nHoursLater } from "../utils/dateUtils";
 import { NewClassToRebookType } from "../controllers/classesController";
 import {
   FREE_TRIAL_BOOKING_HOURS,
@@ -14,6 +14,7 @@ import {
   REBOOKED_CLASS_COLOR,
   REGULAR_CLASS_COLOR,
 } from "../utils/colors";
+import { getInstructorAvailableSlots } from "./instructorScheduleService";
 
 export class InstructorUnavailableError extends Error {
   constructor() {
@@ -627,13 +628,35 @@ const assertInstructorAvailable = async (
   newClass: NewClassToRebookType,
 ) => {
   if (!newClass.instructorId || !newClass.dateTime) return;
+
+  const targetDateTime = new Date(newClass.dateTime);
   const absence = await tx.instructorAbsence.findFirst({
     where: {
       instructorId: newClass.instructorId,
-      absentAt: new Date(newClass.dateTime),
+      absentAt: targetDateTime,
     },
   });
   if (absence) {
+    throw new InstructorUnavailableError();
+  }
+
+  const targetDate = targetDateTime.toISOString().slice(0, 10);
+  const nextDate = nDaysLater(1, new Date(`${targetDate}T00:00:00.000Z`))
+    .toISOString()
+    .slice(0, 10);
+
+  const availableSlots = await getInstructorAvailableSlots(
+    newClass.instructorId,
+    targetDate,
+    nextDate,
+    "Asia/Tokyo",
+    false,
+  );
+  const hasSlot = availableSlots.some(
+    (slot) => slot.dateTime === targetDateTime.toISOString(),
+  );
+
+  if (!hasSlot) {
     throw new InstructorUnavailableError();
   }
 };

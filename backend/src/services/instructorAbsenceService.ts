@@ -1,4 +1,5 @@
 import { prisma } from "../../prisma/prismaClient";
+import { nHoursLater } from "../utils/dateUtils";
 
 export const getInstructorAbsences = async (instructorId: number) => {
   try {
@@ -17,11 +18,37 @@ export const addInstructorAbsence = async (data: {
   absentAt: Date;
 }) => {
   try {
-    return await prisma.instructorAbsence.create({
-      data: {
-        instructorId: data.instructorId,
-        absentAt: data.absentAt,
-      },
+    return await prisma.$transaction(async (tx) => {
+      const lockKey = `instructor:${data.instructorId}:${data.absentAt.toISOString()}`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
+
+      await tx.class.updateMany({
+        where: {
+          instructorId: data.instructorId,
+          dateTime: data.absentAt,
+          status: {
+            in: ["booked", "rebooked"],
+          },
+        },
+        data: {
+          status: "canceledByInstructor",
+          rebookableUntil: nHoursLater(180 * 24, data.absentAt),
+        },
+      });
+
+      return await tx.instructorAbsence.upsert({
+        where: {
+          instructorId_absentAt: {
+            instructorId: data.instructorId,
+            absentAt: data.absentAt,
+          },
+        },
+        create: {
+          instructorId: data.instructorId,
+          absentAt: data.absentAt,
+        },
+        update: {},
+      });
     });
   } catch (error) {
     console.error("Database Error:", error);

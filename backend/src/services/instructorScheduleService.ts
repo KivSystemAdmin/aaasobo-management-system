@@ -1,6 +1,6 @@
 import { prisma } from "../../prisma/prismaClient";
 import { Prisma } from "../../generated/prisma";
-import { nDaysLater } from "../utils/dateUtils";
+import { nDaysLater, nHoursLater } from "../utils/dateUtils";
 
 export const getInstructorSchedules = async (instructorId: number) => {
   try {
@@ -86,7 +86,6 @@ export const createInstructorSchedule = async (data: {
     const { instructorId, effectiveFrom, timezone, slots } = data;
 
     return await prisma.$transaction(async (tx) => {
-      // Fetch all schedules for the instructor
       const existingSchedules = await tx.instructorSchedule.findMany({
         where: { instructorId: instructorId },
         select: {
@@ -98,7 +97,6 @@ export const createInstructorSchedule = async (data: {
         orderBy: { effectiveFrom: "asc" },
       });
 
-      // Find the target index to insert the new schedule
       const insertIndex = existingSchedules.findIndex(
         (s) => s.effectiveFrom > effectiveFrom,
       );
@@ -113,7 +111,6 @@ export const createInstructorSchedule = async (data: {
       let lastSchedule: InstructorSchedule;
       let nextSchedule: InstructorSchedule;
 
-      // Define lastSchedule and nextSchedule based on insertIndex
       lastSchedule = existingSchedules[insertIndex - 1];
       if (!lastSchedule) {
         lastSchedule = existingSchedules[existingSchedules.length - 1];
@@ -123,8 +120,50 @@ export const createInstructorSchedule = async (data: {
         nextSchedule = existingSchedules[insertIndex - 1];
       }
 
+      if (lastSchedule) {
+        const previousSlots = await tx.instructorSlot.findMany({
+          where: { scheduleId: lastSchedule.id },
+        });
+
+        const removedSlots = previousSlots.filter(
+          (previousSlot) =>
+            !slots.some(
+              (nextSlot) =>
+                nextSlot.weekday === previousSlot.weekday &&
+                nextSlot.startTime ===
+                  previousSlot.startTime.toISOString().slice(11, 16),
+            ),
+        );
+
+        const effectiveWeekday = effectiveFrom.getUTCDay();
+        const datePrefix = effectiveFrom.toISOString().slice(0, 10);
+
+        for (const removedSlot of removedSlots) {
+          if (removedSlot.weekday !== effectiveWeekday) continue;
+
+          const slotTime = removedSlot.startTime.toISOString().slice(11, 19);
+          const lockedSlotDateTime = new Date(`${datePrefix}T${slotTime}.000Z`);
+          const lockKey = `instructor:${instructorId}:${lockedSlotDateTime.toISOString()}`;
+          await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
+
+          await tx.class.updateMany({
+            where: {
+              instructorId,
+              dateTime: lockedSlotDateTime,
+              status: {
+                in: ["booked", "rebooked"],
+              },
+            },
+            data: {
+              status: "canceledByInstructor",
+              rebookableUntil: nHoursLater(180 * 24, lockedSlotDateTime),
+              updatedAt: new Date(),
+            },
+          });
+        }
+      }
+
       if (lastSchedule || nextSchedule) {
-        // Handle the logic if effectiveFrom date is the same as last or next schedule
         if (
           lastSchedule?.effectiveFrom.getTime() === effectiveFrom.getTime() ||
           nextSchedule?.effectiveFrom.getTime() === effectiveFrom.getTime()
@@ -147,7 +186,6 @@ export const createInstructorSchedule = async (data: {
         }
       }
 
-      // Create the new schedule
       newSchedule = await tx.instructorSchedule.create({
         data: {
           instructorId: instructorId,
@@ -157,7 +195,6 @@ export const createInstructorSchedule = async (data: {
         },
       });
 
-      // Create slots for the new schedule
       await tx.instructorSlot.createMany({
         data: slots.map((slot) => ({
           scheduleId: newSchedule.id,
