@@ -228,29 +228,44 @@ export const rebookClassController = async (
 
     res.sendStatus(201);
   } catch (error) {
+    const prismaErrorCode =
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      typeof (error as { code?: unknown }).code === "string"
+        ? (error as { code: string }).code
+        : null;
+    const message =
+      typeof error === "object" && error !== null && "message" in error
+        ? String((error as { message?: unknown }).message)
+        : "";
+
     if (error instanceof InstructorUnavailableError) {
       return res.status(400).json({ errorType: "instructor unavailable" });
     }
     if (error instanceof RebookControllerError) {
       return res.status(error.status).json({ errorType: error.errorType });
     }
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === "P2002") {
-        return res.status(400).json({
-          errorType: "instructor conflict",
-        });
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError ||
+      prismaErrorCode === "P2002" ||
+      prismaErrorCode === "P2034"
+    ) {
+      if (prismaErrorCode === "P2002") {
+        return res.status(400).json({ errorType: "instructor conflict" });
       }
-      if (error.code === "P2034") {
-        return res.status(409).json({
-          errorType: "likely instructor conflict",
-        });
+      if (prismaErrorCode === "P2034") {
+        return res
+          .status(409)
+          .json({ errorType: "likely instructor conflict" });
       }
     }
-
-    const message =
-      typeof error === "object" && error !== null && "message" in error
-        ? String((error as { message?: unknown }).message)
-        : "";
+    if (
+      message.includes("Unique constraint failed") ||
+      message.includes("duplicate key value violates unique constraint")
+    ) {
+      return res.status(400).json({ errorType: "instructor conflict" });
+    }
     if (
       message.includes("TransactionWriteConflict") ||
       message.includes("could not serialize access") ||

@@ -10,6 +10,8 @@ import {
   createCustomer,
   createInstructor,
   createInstructorAbsence,
+  createInstructorSchedule,
+  createInstructorSlot,
   createPlan,
   createSubscription,
   generateAuthCookie,
@@ -17,6 +19,25 @@ import {
 
 const daysFromNow = (days: number) =>
   new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+
+const utcDateAtMidnight = (date: Date) =>
+  new Date(`${date.toISOString().slice(0, 10)}T00:00:00.000Z`);
+
+const ensureInstructorSlotAt = async (instructorId: number, dateTime: Date) => {
+  const schedule = await createInstructorSchedule(instructorId, {
+    effectiveFrom: utcDateAtMidnight(dateTime),
+    effectiveTo: null,
+    timezone: "Asia/Tokyo",
+  });
+  const jstDateTime = new Date(dateTime.getTime() + 9 * 60 * 60 * 1000);
+  const jstHour = String(jstDateTime.getUTCHours()).padStart(2, "0");
+  const jstMinute = String(jstDateTime.getUTCMinutes()).padStart(2, "0");
+  await createInstructorSlot(
+    schedule.id,
+    dateTime.getUTCDay(),
+    new Date(`1970-01-01T${jstHour}:${jstMinute}:00.000Z`),
+  );
+};
 
 describe("GET /classes", () => {
   it("succeed returning classes summary for authenticated user", async () => {
@@ -164,7 +185,8 @@ describe("POST /classes/:id/rebook", () => {
       },
     });
 
-    const newClassDate = daysFromNow(7);
+    const newClassDate = utcDateAtMidnight(daysFromNow(7));
+    await ensureInstructorSlotAt(instructor.id, newClassDate);
     await request(server)
       .post(`/classes/${originalClass.id}/rebook`)
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
@@ -198,7 +220,8 @@ describe("POST /classes/:id/rebook", () => {
     const instructor = await createInstructor();
     const child = await createChild(customer.id);
 
-    const targetDate = daysFromNow(10);
+    const targetDate = utcDateAtMidnight(daysFromNow(10));
+    await ensureInstructorSlotAt(instructor.id, targetDate);
     await createClass(otherCustomer.id, instructor.id, targetDate);
 
     const classToRebook = await createClass(customer.id);
@@ -230,7 +253,8 @@ describe("POST /classes/:id/rebook", () => {
     const instructor = await createInstructor();
     const child = await createChild(customer.id);
 
-    const targetDate = daysFromNow(10);
+    const targetDate = utcDateAtMidnight(daysFromNow(10));
+    await ensureInstructorSlotAt(instructor.id, targetDate);
     await createInstructorAbsence(instructor.id, targetDate);
 
     const classToRebook = await createClass(customer.id);
