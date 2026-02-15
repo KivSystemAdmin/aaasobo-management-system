@@ -28,7 +28,7 @@
 
 ## Scenarios
 
-### C1. Double booking race (same instructor + same datetime)
+### Double booking race (same instructor + same datetime)
 
 **Intent**
 
@@ -50,7 +50,7 @@
 - Remaining requests fail with conflict-like response.
 - DB invariant: exactly one booked/rebooked class for that instructor+datetime.
 
-### C2. Absence creation vs booking race (same instructor + same datetime)
+### Absence creation vs booking race (same instructor + same datetime)
 
 **Intent**
 
@@ -68,14 +68,13 @@
 
 **Expected**
 
-- Only one path wins in a consistent way:
-  - booking succeeds and absence is rejected/conflicted, or
-  - absence succeeds and booking is rejected as unavailable/conflicted.
+- Absence operation succeeds for the target slot.
+- If booking/rebooking wins first, it is subsequently canceled by absence handling and made rebookable.
 - DB invariants after completion:
-  - no contradictory final state (no class confirmed at a slot that is effectively blocked by accepted absence logic).
-  - exactly one final truth for that instructor+datetime.
+  - absence exists for the target instructor+datetime.
+  - no class remains in `booked`/`rebooked` status for that slot.
 
-### C3. Schedule update vs booking race (slot being removed)
+### Schedule update vs booking race (slot being removed)
 
 **Intent**
 
@@ -93,9 +92,8 @@
 
 **Expected**
 
-- Only one path wins in a consistent way:
-  - booking/rebooking succeeds and schedule update is rejected/conflicted, or
-  - schedule update succeeds and booking/rebooking is rejected as unavailable/conflicted.
+- Schedule update operation succeeds for the target effective date.
+- If booking/rebooking wins first on a removed slot, it is subsequently canceled and made rebookable.
 - DB invariants after completion:
   - no class remains confirmed in a slot removed by the accepted schedule version.
   - final schedule and class records describe one consistent state for that instructor+datetime.
@@ -108,11 +106,10 @@
 
 ## Proposed command interface
 
-- `npm run test:concurrency`
+- `npm run test -- src/test/concurrency`
 - Optional flags/env:
   - `CONCURRENCY_REPETITIONS=1`
   - `CONCURRENCY_SEED=123456`
-  - `CONCURRENCY_SCENARIO=C1|C2|C3` (optional filter)
 
 ## CI policy
 
