@@ -124,7 +124,7 @@ function CurrentSubscription({
                     </div>
                     <div>
                       <a
-                        href={styles.dateText}
+                        href={subscription.selectType}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={styles.dateText}

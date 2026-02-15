@@ -109,7 +109,7 @@ export const updatePlanIdOfSubscription = async (
   }
 };
 
-// Update the
+// Update the SelectType URL
 export const updateSelectTypeUrl = async (
   tx: Prisma.TransactionClient,
   subscriptionId: number,
