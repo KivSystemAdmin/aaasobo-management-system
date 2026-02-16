@@ -6,6 +6,9 @@ import {
 } from "../controllers/maintenanceController";
 import { maskInstructorsController } from "../controllers/instructorsController";
 import { deleteOldClassesController } from "../controllers/classesController";
+import { deletePastCustomersController } from "../controllers/customersController";
+import { deletePastInstructorsController } from "../controllers/instructorsController";
+import { deleteOldBusinessCalendarController } from "../controllers/schedulesController";
 import { verifyCronJobAuthorization } from "../middlewares/auth.middleware";
 import { registerRoutes } from "../middlewares/validationMiddleware";
 import { RouteConfig } from "../openapi/routerRegistry";
@@ -16,6 +19,9 @@ import {
   UpdateSundayColorResponse,
   MaskInstructorsResponse,
   DeleteOldClassesResponse,
+  DeletePastCustomersResponse,
+  DeletePastInstructorsResponse,
+  DeleteOldBusinessCalendarResponse,
 } from "../../../shared/schemas/jobs";
 import { MessageErrorResponse } from "../../../shared/schemas/common";
 
@@ -134,6 +140,73 @@ const validatedRouteConfigs = {
           },
           "500": {
             description: "Error deleting old classes",
+            schema: MessageErrorResponse,
+          },
+        },
+      },
+    },
+  ] as const,
+  "/delete/past-customers": [
+    {
+      method: "delete",
+      middleware: [verifyCronJobAuthorization],
+      handler: deletePastCustomersController,
+      openapi: {
+        summary: "Delete past customers",
+        description:
+          "Deletes customers who have left the service more than 3 years ago. This is a scheduled cron job endpoint.",
+        responses: {
+          "200": {
+            description: "Past customers deleted successfully",
+            schema: DeletePastCustomersResponse,
+          },
+          "500": {
+            description: "Error deleting past customers",
+            schema: MessageErrorResponse,
+          },
+        },
+      },
+    },
+  ] as const,
+  "/delete/past-instructors": [
+    {
+      method: "delete",
+      middleware: [verifyCronJobAuthorization],
+      handler: deletePastInstructorsController,
+      openapi: {
+        summary: "Delete past instructors",
+        description:
+          "Deletes instructors who have left the service more than 3 years ago. This is a scheduled cron job endpoint.",
+        responses: {
+          "200": {
+            description: "Past instructors deleted successfully",
+            schema: DeletePastInstructorsResponse,
+          },
+          "500": {
+            description: "Error deleting past instructors",
+            schema: MessageErrorResponse,
+          },
+        },
+      },
+    },
+  ] as const,
+  "/delete/old-business-calendar": [
+    {
+      method: "delete",
+      middleware: [verifyCronJobAuthorization],
+      handler: deleteOldBusinessCalendarController,
+      openapi: {
+        summary: "Delete old business calendar",
+        description:
+          "Deletes business calendar older than a specified threshold. This is a scheduled cron job endpoint.",
+        responses: {
+          "200": {
+            description: "Old business calendar deleted successfully",
+            schema: DeleteOldBusinessCalendarResponse,
+          },
+          "500": {
+            description: "Error deleting old business calendar",
+            schema: MessageErrorResponse,
           },
         },
       },

@@ -585,3 +585,29 @@ export const declineFreeTrialClass = async (
     return { success: false, message: FREE_TRIAL_REMOVE_ERROR_MESSAGE };
   }
 };
+
+// Delete customers who have left the service more than 3 years ago (Only for Vercel Cron Job)
+export const deletePastCustomers = async (authorization: string) => {
+  try {
+    // From server component
+    const apiUrl = `${BACKEND_ORIGIN}/jobs/delete/past-customers`;
+    const method = "DELETE";
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: authorization,
+    };
+    const response = await fetch(apiUrl, {
+      method,
+      headers,
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return data.error;
+    }
+  } catch (error) {
+    console.error("API error while deleting past customers:", error);
+    throw error;
+  }
+};

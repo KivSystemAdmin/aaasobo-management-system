@@ -16,6 +16,7 @@ import {
   maskInstructors,
   getNonNativeInstructorProfiles,
   getNativeInstructorProfiles,
+  deletePastInstructors,
 } from "../services/instructorsService";
 import { type RequestWithId } from "../middlewares/parseId.middleware";
 import {
@@ -290,5 +291,24 @@ export const maskInstructorsController = async (_: Request, res: Response) => {
       },
     });
     return setErrorResponse(res, error);
+  }
+};
+
+// Delete instructors who have left the service more than 3 years ago
+export const deletePastInstructorsController = async (
+  _: Request,
+  res: Response,
+) => {
+  try {
+    const deletedInstructors = await deletePastInstructors();
+    res.status(200).json({ deletedInstructors });
+  } catch (error) {
+    console.error("Error deleting past instructors", {
+      error,
+      context: {
+        time: new Date().toISOString(),
+      },
+    });
+    res.sendStatus(500);
   }
 };

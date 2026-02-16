@@ -1,6 +1,7 @@
 import { Response } from "express";
 import {
   deleteCustomer,
+  deletePastCustomers,
   getCustomerByEmail,
   getCustomerById,
   registerCustomer,
@@ -466,6 +467,25 @@ export const declineFreeTrialClassController = async (
       error,
       context: {
         customerId,
+        time: new Date().toISOString(),
+      },
+    });
+    res.sendStatus(500);
+  }
+};
+
+// Delete customers who have left the service more than 3 years ago
+export const deletePastCustomersController = async (
+  _: Request,
+  res: Response,
+) => {
+  try {
+    const deletedCustomers = await deletePastCustomers();
+    res.status(200).json({ deletedCustomers });
+  } catch (error) {
+    console.error("Error deleting past customers", {
+      error,
+      context: {
         time: new Date().toISOString(),
       },
     });
