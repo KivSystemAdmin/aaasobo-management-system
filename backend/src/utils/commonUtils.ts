@@ -23,6 +23,7 @@ export const MONTHS_TO_DELETE_CLASSES = 13;
 export const MONTHS_TO_DELETE_BUSINESS_CALENDAR = 13;
 export const MONTHS_TO_DELETE_CUSTOMERS = 36;
 export const MONTHS_TO_DELETE_INSTRUCTORS = 36;
+export const MONTHS_TO_DELETE_PLANS = 36;
 
 // Masked user static values
 export const maskedHeadLetters = "Masked";
