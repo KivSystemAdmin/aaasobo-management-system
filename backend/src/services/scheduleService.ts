@@ -1,5 +1,6 @@
 import { Prisma } from "../../generated/prisma";
 import { prisma } from "../../prisma/prismaClient";
+import { MONTHS_TO_DELETE_BUSINESS_CALENDAR } from "../utils/commonUtils";
 
 // Fetch all schedules
 export const getAllSchedules = async () => {
@@ -62,4 +63,20 @@ export const updateSchedules = async (
     console.error("Database Error:", error);
     throw new Error("Failed to update schedules.");
   }
+};
+
+// Delete classes older than 1 year (13 months)
+export const deleteOldBusinessCalendar = async () => {
+  const thresholdDate = new Date();
+  thresholdDate.setMonth(
+    thresholdDate.getMonth() - MONTHS_TO_DELETE_BUSINESS_CALENDAR,
+  );
+
+  return await prisma.schedule.deleteMany({
+    where: {
+      date: {
+        lt: thresholdDate,
+      },
+    },
+  });
 };

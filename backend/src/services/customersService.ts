@@ -5,6 +5,7 @@ import {
   maskedHeadLetters,
   maskedSuffix,
   maskedBirthdate,
+  MONTHS_TO_DELETE_CUSTOMERS,
 } from "../utils/commonUtils";
 
 export const getCustomerById = async (customerId: number) => {
@@ -219,6 +220,20 @@ export const getCustomerContactById = async (id: number) => {
     select: {
       name: true,
       email: true,
+    },
+  });
+};
+
+// Delete customers who have left the service more than 3 years ago
+export const deletePastCustomers = async () => {
+  const thresholdDate = new Date();
+  thresholdDate.setMonth(thresholdDate.getMonth() - MONTHS_TO_DELETE_CUSTOMERS);
+
+  return await prisma.customer.deleteMany({
+    where: {
+      terminationAt: {
+        lt: thresholdDate,
+      },
     },
   });
 };

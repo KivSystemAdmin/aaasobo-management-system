@@ -7,6 +7,7 @@ import {
   maskedHeadLetters,
   maskedSuffix,
   maskedBirthdate,
+  MONTHS_TO_DELETE_INSTRUCTORS,
 } from "../utils/commonUtils";
 import { convertToUTCDate } from "../utils/dateUtils";
 import { put, del } from "@vercel/blob";
@@ -399,4 +400,20 @@ export const maskInstructors = async (instructors: Instructor[]) => {
     console.error("Error masking instructors:", error);
     throw new Error("Failed to mask instructors");
   }
+};
+
+// Delete instructors who have left the service more than 3 years ago
+export const deletePastInstructors = async () => {
+  const thresholdDate = new Date();
+  thresholdDate.setMonth(
+    thresholdDate.getMonth() - MONTHS_TO_DELETE_INSTRUCTORS,
+  );
+
+  return await prisma.instructor.deleteMany({
+    where: {
+      terminationAt: {
+        lt: thresholdDate,
+      },
+    },
+  });
 };

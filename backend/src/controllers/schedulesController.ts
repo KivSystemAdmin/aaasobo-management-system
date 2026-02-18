@@ -4,6 +4,7 @@ import {
   getAllSchedules,
   registerSchedules,
   updateSchedules,
+  deleteOldBusinessCalendar,
 } from "../services/scheduleService";
 import {
   getFirstDesignatedDayOfYear,
@@ -127,5 +128,24 @@ export const updateSundayColorController = async (
     res.status(200).json({ message: "Sunday colors updated successfully." });
   } catch (error) {
     res.status(500).json({ message: `${error}` });
+  }
+};
+
+// Delete business calendar older than 1 year (13 months)
+export const deleteOldBusinessCalendarController = async (
+  _: Request,
+  res: Response,
+) => {
+  try {
+    const deletedBusinessCalendar = await deleteOldBusinessCalendar();
+    res.status(200).json({ deletedBusinessCalendar });
+  } catch (error) {
+    console.error("Error deleting old business calendar", {
+      error,
+      context: {
+        time: new Date().toISOString(),
+      },
+    });
+    res.status(500).json({ error: "Failed to delete old business calendar." });
   }
 };

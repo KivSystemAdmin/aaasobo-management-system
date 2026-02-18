@@ -1,4 +1,5 @@
 import { prisma } from "../../prisma/prismaClient";
+import { MONTHS_TO_DELETE_PLANS } from "../utils/commonUtils";
 
 // Register a new plan in the DB
 export const registerPlan = async (data: {
@@ -102,4 +103,18 @@ export const deletePlan = async (id: number) => {
     console.error("Database Error:", error);
     throw new Error("Failed to delete the plan data.");
   }
+};
+
+// Delete unnecessary plans
+export const deleteUnnecessaryPlans = async () => {
+  const thresholdDate = new Date();
+  thresholdDate.setMonth(thresholdDate.getMonth() - MONTHS_TO_DELETE_PLANS);
+
+  return await prisma.plan.deleteMany({
+    where: {
+      terminationAt: {
+        lt: thresholdDate,
+      },
+    },
+  });
 };
