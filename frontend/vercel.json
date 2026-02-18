@@ -18,6 +18,10 @@
       "schedule": "10 22 * * 0"
     },
     {
+      "path": "/api/cron-job/delete-unnecessary-plans",
+      "schedule": "0 1 1 1 *"
+    },
+    {
       "path": "/api/cron-job/mask-instructor",
       "schedule": "0 22 * * *"
     },
