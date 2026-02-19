@@ -17,16 +17,23 @@ let prismaInitialized = false;
 await (async () => {
   try {
     const baseDatabaseUrl = await getBaseDatabaseUrl();
-    const workerId =
-      process.env.VITEST_WORKER_ID ?? process.env.VITEST_POOL_ID ?? "0";
-    const workerDbName = `aaasobo_test_${workerId}`;
-    requireSafeDbName(workerDbName);
+    const keepDatabase = process.env.KEEP_DATABASE === "1";
 
-    const workerDatabaseUrl = withDatabase(baseDatabaseUrl, workerDbName);
-    process.env.DATABASE_URL = workerDatabaseUrl;
-    process.env.POSTGRES_PRISMA_URL = workerDatabaseUrl;
+    if (keepDatabase) {
+      process.env.DATABASE_URL = baseDatabaseUrl;
+      process.env.POSTGRES_PRISMA_URL = baseDatabaseUrl;
+    } else {
+      const workerId =
+        process.env.VITEST_WORKER_ID ?? process.env.VITEST_POOL_ID ?? "0";
+      const workerDbName = `aaasobo_test_${workerId}`;
+      requireSafeDbName(workerDbName);
 
-    await ensureDatabaseExists(baseDatabaseUrl, workerDbName);
+      const workerDatabaseUrl = withDatabase(baseDatabaseUrl, workerDbName);
+      process.env.DATABASE_URL = workerDatabaseUrl;
+      process.env.POSTGRES_PRISMA_URL = workerDatabaseUrl;
+
+      await ensureDatabaseExists(baseDatabaseUrl, workerDbName);
+    }
 
     // Initialize Prisma client (engineType="client" requires a driver adapter)
     const adapter = new PrismaPg({
@@ -52,7 +59,7 @@ await (async () => {
         "Test database setup failed.",
         message,
         "Fix: start Docker, or set TEST_DATABASE_URL to a reachable PostgreSQL instance.",
-        "Note: the configured DB user must be able to create/drop databases for parallel tests.",
+        "Note: without KEEP_DATABASE=1, the configured DB user must be able to create/drop databases for parallel tests.",
       ].join("\n"),
       { cause: error },
     );

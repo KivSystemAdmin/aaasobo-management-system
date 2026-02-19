@@ -73,7 +73,7 @@ Collect and report per endpoint + aggregate:
   - `PERF_START_DATE=2025-01-01`
   - `PERF_END_DATE=2025-03-31`
   - `PERF_DAILY_OPERATIONS=<n>`
-  - `PERF_OUTPUT=./artifacts/performance-report.md`
+  - `PERF_OUTPUT=./logs/performance-report.md`
 
 ## Operational policy
 
