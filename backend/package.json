@@ -9,6 +9,7 @@
     "dev": "nodemon --exec ts-node ./api/app.ts",
     "prisma:init": "npx prisma migrate reset && npx ts-node ./src/seed/dummy.ts",
     "test": "vitest run",
+    "test:performance": "vitest run src/test/performance",
     "build": "cd ../shared && npm install && cd ../backend && prisma generate && prisma migrate reset --force && echo 'Start executing dummy.ts' && ts-node ./src/seed/dummy.ts && echo 'Finish executing dummy.ts'",
     "lint:unused": "knip"
   },

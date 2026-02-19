@@ -5,3 +5,5 @@ node_modules
 .env*.local
 .vitest
 .vitest-attachments
+
+logs/
