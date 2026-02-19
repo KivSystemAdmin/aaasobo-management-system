@@ -85,3 +85,16 @@ Collect and report per endpoint + aggregate:
 - Run against deployed environment with configurable server URL.
 - Externalized isolated DB configuration for shared staging-style runs.
 - Optional regression comparison reports.
+
+## Worklog / Change log
+
+### Planned for next PR
+
+- Replace manual class seeding (`createClass()`) with domain flow:
+  - call regular-class registration API
+  - let backend automatically generate classes from recurring class entries
+- Replace day-grouped in-memory class management with request-driven workload:
+  - for each simulated day, each instructor fetches target classes via GET
+  - then send completion requests (PATCH status=completed) for returned classes
+  - this adds GET load in addition to completion PATCH load
+  - remove explicit "classes grouped by day" tracking from test logic
