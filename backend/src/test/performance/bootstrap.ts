@@ -58,7 +58,7 @@ async function createInstructorSchedule(args: {
     .post(`/instructors/${args.instructorId}/schedules`)
     .set("Cookie", args.adminAuthCookie)
     .send({
-      effectiveFrom: toJstDateString(args.startDate),
+      effectiveFrom: args.startDate,
       timezone: "Asia/Tokyo",
       slots: args.slots,
     });
@@ -117,7 +117,7 @@ async function createRecurringClass(args: {
       customerId: args.customerId,
       childrenIds: [args.childId],
       subscriptionId: args.subscriptionId,
-      startDate: toJstDateString(args.startDate),
+      startDate: args.startDate,
       timezone: "Asia/Tokyo",
     });
 

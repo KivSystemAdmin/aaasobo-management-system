@@ -4,6 +4,7 @@ import { server } from "../../server";
 import { getPerformanceTestConfig } from "./config";
 import { initializePerformanceData } from "./bootstrap";
 import { writePerformanceReport } from "./report";
+import { InstructorCalendarClassesResponse } from "../../../../shared/schemas/instructors";
 
 vi.mock("../../lib/email/resendClient", () => ({
   resend: {
@@ -34,6 +35,8 @@ function* enumerateDays(startDate: string, endDate: string): Generator<Date> {
     current.setUTCDate(current.getUTCDate() + 1);
   }
 }
+
+const COMPLETABLE_CLASS_STATUSES = new Set(["pending", "booked", "rebooked"]);
 
 function calcLatencyStats(latencies: number[]) {
   if (latencies.length === 0) {
@@ -98,14 +101,13 @@ async function handleSimulationDay(args: {
       continue;
     }
 
-    for (const classRecord of result.body) {
+    const parsedClasses = InstructorCalendarClassesResponse.parse(result.body);
+    for (const classRecord of parsedClasses) {
       if (
-        classRecord?.status === "pending" &&
-        typeof classRecord?.dateTime === "string" &&
-        classRecord.dateTime.slice(0, 10) === dayDateKey &&
-        typeof classRecord?.id === "number"
+        COMPLETABLE_CLASS_STATUSES.has(classRecord.classStatus) &&
+        classRecord.start.slice(0, 10) === dayDateKey
       ) {
-        classIds.add(classRecord.id);
+        classIds.add(classRecord.classId);
       }
     }
   }
