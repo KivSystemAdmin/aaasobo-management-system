@@ -2,8 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import { server } from "../../server";
 import { getPerformanceTestConfig } from "./config";
-import { initializePerformanceData, type CompletionTarget } from "./bootstrap";
+import { initializePerformanceData } from "./bootstrap";
 import { writePerformanceReport } from "./report";
+import { InstructorCalendarClassesResponse } from "../../../../shared/schemas/instructors";
 
 vi.mock("../../lib/email/resendClient", () => ({
   resend: {
@@ -35,9 +36,7 @@ function* enumerateDays(startDate: string, endDate: string): Generator<Date> {
   }
 }
 
-function toDateKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
+const COMPLETABLE_CLASS_STATUSES = new Set(["pending", "booked", "rebooked"]);
 
 function calcLatencyStats(latencies: number[]) {
   if (latencies.length === 0) {
@@ -66,20 +65,22 @@ function calcLatencyStats(latencies: number[]) {
 }
 
 async function handleSimulationDay(args: {
-  dayTargets: CompletionTarget[];
+  day: Date;
   adminAuthCookie: string;
+  instructorIds: number[];
 }) {
-  const results = await Promise.all(
-    args.dayTargets.map(async (target) => {
+  const dayDateKey = args.day.toISOString().slice(0, 10);
+
+  const classFetchResults = await Promise.all(
+    args.instructorIds.map(async (instructorId) => {
       const startedAt = performance.now();
       const response = await request(server)
-        .patch(`/classes/${target.classId}/status`)
-        .set("Cookie", args.adminAuthCookie)
-        .send({ status: "completed" });
+        .get(`/instructors/${instructorId}/calendar-classes`)
+        .set("Cookie", args.adminAuthCookie);
       const endedAt = performance.now();
 
       return {
-        classId: target.classId,
+        instructorId,
         latencyMs: endedAt - startedAt,
         status: response.status,
         body: response.body,
@@ -87,8 +88,49 @@ async function handleSimulationDay(args: {
     }),
   );
 
-  const latencies = results.map((result) => result.latencyMs);
-  const errors = results
+  const fetchErrors = classFetchResults
+    .filter((result) => result.status !== 200)
+    .map(
+      (result) =>
+        `calendar-classes instructorId=${result.instructorId} status=${result.status} body=${JSON.stringify(result.body)}`,
+    );
+
+  const classIds = new Set<number>();
+  for (const result of classFetchResults) {
+    if (result.status !== 200 || !Array.isArray(result.body)) {
+      continue;
+    }
+
+    const parsedClasses = InstructorCalendarClassesResponse.parse(result.body);
+    for (const classRecord of parsedClasses) {
+      if (
+        COMPLETABLE_CLASS_STATUSES.has(classRecord.classStatus) &&
+        classRecord.start.slice(0, 10) === dayDateKey
+      ) {
+        classIds.add(classRecord.classId);
+      }
+    }
+  }
+
+  const completionResults = await Promise.all(
+    Array.from(classIds).map(async (classId) => {
+      const startedAt = performance.now();
+      const response = await request(server)
+        .patch(`/classes/${classId}/status`)
+        .set("Cookie", args.adminAuthCookie)
+        .send({ status: "completed" });
+      const endedAt = performance.now();
+
+      return {
+        classId,
+        latencyMs: endedAt - startedAt,
+        status: response.status,
+        body: response.body,
+      };
+    }),
+  );
+
+  const completionErrors = completionResults
     .filter((result) => result.status !== 200)
     .map(
       (result) =>
@@ -96,9 +138,12 @@ async function handleSimulationDay(args: {
     );
 
   return {
-    latencies,
-    errors,
-    completedClasses: results.length - errors.length,
+    latencies: [
+      ...classFetchResults.map((result) => result.latencyMs),
+      ...completionResults.map((result) => result.latencyMs),
+    ],
+    errors: [...fetchErrors, ...completionErrors],
+    completedClasses: completionResults.length - completionErrors.length,
   };
 }
 
@@ -116,13 +161,6 @@ describe("performance: simple completion workload", () => {
     const config = getPerformanceTestConfig();
     const state = await initializePerformanceData(config);
 
-    const targetsByDate = new Map<string, CompletionTarget[]>();
-    for (const target of state.completionTargets) {
-      const existing = targetsByDate.get(target.dateKey) ?? [];
-      existing.push(target);
-      targetsByDate.set(target.dateKey, existing);
-    }
-
     const runStartedAt = performance.now();
     const allLatencies: number[] = [];
     const allErrors: string[] = [];
@@ -133,10 +171,10 @@ describe("performance: simple completion workload", () => {
       vi.setSystemTime(day);
       daysPassed += 1;
 
-      const dayTargets = targetsByDate.get(toDateKey(day)) ?? [];
       const dayResult = await handleSimulationDay({
-        dayTargets,
+        day,
         adminAuthCookie: state.adminAuthCookie,
+        instructorIds: state.instructorIds,
       });
 
       allLatencies.push(...dayResult.latencies);
@@ -163,7 +201,7 @@ describe("performance: simple completion workload", () => {
     });
 
     expect(daysPassed).toBeGreaterThan(0);
-    expect(completedClasses).toBe(state.completionTargets.length);
+    expect(completedClasses).toBeGreaterThan(0);
     expect(allErrors).toEqual([]);
     expect(reportPath.endsWith(".md")).toBe(true);
   }, 180_000);

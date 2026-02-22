@@ -29,6 +29,7 @@ import {
   InstructorAvailableSlotsQuery,
   AvailableSlotsResponse,
   InstructorAvailableSlotsResponse,
+  InstructorCalendarClassesResponse,
   InstructorClassParams,
   ActiveScheduleQuery,
   ActiveScheduleResponse,
@@ -365,7 +366,7 @@ const calendarClassesConfig = {
     responses: {
       200: {
         description: "Successfully retrieved calendar classes",
-        // Using any schema for now since the response is complex class data
+        schema: InstructorCalendarClassesResponse,
       },
       400: {
         description: "Invalid instructor ID",

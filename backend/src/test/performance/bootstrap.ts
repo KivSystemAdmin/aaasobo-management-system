@@ -1,7 +1,8 @@
+import request from "supertest";
+import { server } from "../../server";
 import {
   createAdmin,
   createChild,
-  createClass,
   createCustomer,
   createInstructor,
   createPlan,
@@ -11,14 +12,9 @@ import type { PerformanceTestConfig } from "./config";
 
 type Slot = { weekday: number; startTime: string };
 
-export type CompletionTarget = {
-  classId: number;
-  dateKey: string;
-};
-
 type PerformanceBootstrapState = {
   adminAuthCookie: string;
-  completionTargets: CompletionTarget[];
+  instructorIds: number[];
 };
 
 const PERFORMANCE_ADMIN = {
@@ -26,20 +22,6 @@ const PERFORMANCE_ADMIN = {
   password: "AaasoBo!Admin",
   name: "Admin",
 };
-
-function* enumerateDays(startDate: string, endDate: string): Generator<Date> {
-  const current = new Date(`${startDate}T00:00:00.000Z`);
-  const end = new Date(`${endDate}T00:00:00.000Z`);
-
-  while (current <= end) {
-    yield new Date(current);
-    current.setUTCDate(current.getUTCDate() + 1);
-  }
-}
-
-function toDateKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
 
 function buildSlots(count: number): Slot[] {
   const weekdays = [1, 2, 3, 4, 5];
@@ -62,13 +44,88 @@ function buildSlots(count: number): Slot[] {
   return templateSlots.slice(0, count);
 }
 
-function toClassDateTime(day: Date, slot: Slot): Date {
-  const target = new Date(day);
-  const [hours, minutes] = slot.startTime
-    .split(":")
-    .map((value) => Number.parseInt(value, 10));
-  target.setUTCHours(hours ?? 0, minutes ?? 0, 0, 0);
-  return target;
+function toJstDateString(date: string): string {
+  return `${date}T00:00:00+09:00`;
+}
+
+async function createInstructorSchedule(args: {
+  adminAuthCookie: string;
+  instructorId: number;
+  slots: Slot[];
+  startDate: string;
+}) {
+  const response = await request(server)
+    .post(`/instructors/${args.instructorId}/schedules`)
+    .set("Cookie", args.adminAuthCookie)
+    .send({
+      effectiveFrom: args.startDate,
+      timezone: "Asia/Tokyo",
+      slots: args.slots,
+    });
+
+  if (response.status !== 201) {
+    throw new Error(
+      `failed to create instructor schedule: instructorId=${args.instructorId}, status=${response.status}, body=${JSON.stringify(response.body)}`,
+    );
+  }
+}
+
+async function registerSubscription(args: {
+  adminAuthCookie: string;
+  customerId: number;
+  planId: number;
+  startDate: string;
+}) {
+  const response = await request(server)
+    .post(`/customers/${args.customerId}/subscription`)
+    .set("Cookie", args.adminAuthCookie)
+    .send({
+      planId: args.planId,
+      startAt: toJstDateString(args.startDate),
+    });
+
+  if (response.status !== 200) {
+    throw new Error(
+      `failed to register subscription: customerId=${args.customerId}, status=${response.status}, body=${JSON.stringify(response.body)}`,
+    );
+  }
+
+  const subscriptionId = response.body?.newSubscription?.id;
+  if (typeof subscriptionId !== "number") {
+    throw new Error(
+      `missing subscription id in response: customerId=${args.customerId}, body=${JSON.stringify(response.body)}`,
+    );
+  }
+
+  return subscriptionId;
+}
+
+async function createRecurringClass(args: {
+  instructorId: number;
+  customerId: number;
+  childId: number;
+  subscriptionId: number;
+  slot: Slot;
+  startDate: string;
+}) {
+  const response = await request(server)
+    .post("/recurring-classes")
+    .send({
+      instructorId: args.instructorId,
+      weekday: args.slot.weekday,
+      startTime: args.slot.startTime,
+      customerId: args.customerId,
+      childrenIds: [args.childId],
+      subscriptionId: args.subscriptionId,
+      startDate: args.startDate,
+      timezone: "Asia/Tokyo",
+    });
+
+  if (response.status !== 201) {
+    throw new Error(
+      `failed to create recurring class: customerId=${args.customerId}, instructorId=${args.instructorId}, status=${response.status}, body=${JSON.stringify(response.body)}`,
+    );
+  }
 }
 
 export async function initializePerformanceData(
@@ -88,45 +145,48 @@ export async function initializePerformanceData(
   const instructors = await Promise.all(
     Array.from({ length: config.instructors }, () => createInstructor()),
   );
-  const customers = await Promise.all(
-    Array.from({ length: config.customers }, async () => {
-      const customer = await createCustomer();
-      const child = await createChild(customer.id);
-      return { customerId: customer.id, childId: child.id };
-    }),
-  );
 
   const slots = buildSlots(config.slotsPerInstructor);
-  const completionTargets: CompletionTarget[] = [];
+  await Promise.all(
+    instructors.map((instructor) =>
+      createInstructorSchedule({
+        adminAuthCookie,
+        instructorId: instructor.id,
+        slots,
+        startDate: config.startDate,
+      }),
+    ),
+  );
 
-  for (const day of enumerateDays(config.startDate, config.endDate)) {
-    const weekday = day.getUTCDay();
-    if (weekday === 0 || weekday === 6) continue;
+  for (
+    let customerIndex = 0;
+    customerIndex < config.customers;
+    customerIndex += 1
+  ) {
+    const customer = await createCustomer();
+    const child = await createChild(customer.id);
+    const instructor = instructors[customerIndex % instructors.length]!;
+    const slot = slots[customerIndex % slots.length]!;
 
-    for (
-      let customerIndex = 0;
-      customerIndex < customers.length;
-      customerIndex += 1
-    ) {
-      const instructor = instructors[customerIndex % instructors.length]!;
-      const slot = slots[customerIndex % slots.length]!;
-      const dateTime = toClassDateTime(day, slot);
+    const subscriptionId = await registerSubscription({
+      adminAuthCookie,
+      customerId: customer.id,
+      planId: plan.id,
+      startDate: config.startDate,
+    });
 
-      const classRecord = await createClass(
-        customers[customerIndex]!.customerId,
-        instructor.id,
-        dateTime,
-      );
-
-      completionTargets.push({
-        classId: classRecord.id,
-        dateKey: toDateKey(day),
-      });
-    }
+    await createRecurringClass({
+      instructorId: instructor.id,
+      customerId: customer.id,
+      childId: child.id,
+      subscriptionId,
+      slot,
+      startDate: config.startDate,
+    });
   }
 
   return {
     adminAuthCookie,
-    completionTargets,
+    instructorIds: instructors.map((instructor) => instructor.id),
   };
 }

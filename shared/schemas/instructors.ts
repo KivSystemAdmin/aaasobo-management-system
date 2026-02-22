@@ -241,6 +241,19 @@ export const AvailableSlotsResponse = z.object({
     .describe("Array of available time slots with instructor availability"),
 });
 
+export const InstructorCalendarClass = z.object({
+  classId: z.number().int().positive().describe("Class ID"),
+  start: z.iso.datetime().describe("Class start time"),
+  end: z.iso.datetime().describe("Class end time"),
+  title: z.string().describe("Class title"),
+  color: z.string().describe("Class color code"),
+  classStatus: z.string().describe("Class status"),
+});
+
+export const InstructorCalendarClassesResponse = z
+  .array(InstructorCalendarClass)
+  .describe("Array of instructor calendar classes");
+
 // Dual parameter schemas for complex routes
 export const InstructorClassParams = z.object({
   id: z
@@ -373,6 +386,10 @@ export type InstructorAvailableSlotsResponse = z.infer<
   typeof InstructorAvailableSlotsResponse
 >;
 export type AvailableSlotsResponse = z.infer<typeof AvailableSlotsResponse>;
+export type InstructorCalendarClass = z.infer<typeof InstructorCalendarClass>;
+export type InstructorCalendarClassesResponse = z.infer<
+  typeof InstructorCalendarClassesResponse
+>;
 export type InstructorClassParams = z.infer<typeof InstructorClassParams>;
 export type InstructorScheduleParams = z.infer<typeof InstructorScheduleParams>;
 export type CreateSlotRequest = z.infer<typeof CreateSlotRequest>;
