@@ -62,24 +62,11 @@ async function dropLeakedTestDatabases(baseDatabaseUrl: string) {
 export default async function globalSetup() {
   dotenv.config();
   await mkdir(stateDir, { recursive: true });
-  const keepDatabase = process.env.KEEP_DATABASE === "1";
 
   let container: StartedPostgreSqlContainer | undefined;
   let baseDatabaseUrlForTeardown: string | undefined;
 
   const baseDatabaseUrl = await (async () => {
-    if (keepDatabase) {
-      if (process.env.POSTGRES_PRISMA_URL)
-        return process.env.POSTGRES_PRISMA_URL;
-      if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
-      throw new Error(
-        [
-          "KEEP_DATABASE=1 requires backend/.env database settings.",
-          "Fix: set POSTGRES_PRISMA_URL or DATABASE_URL in `backend/.env`.",
-        ].join("\n"),
-      );
-    }
-
     if (process.env.TEST_DATABASE_URL) return process.env.TEST_DATABASE_URL;
     if (process.env.POSTGRES_PRISMA_URL) return process.env.POSTGRES_PRISMA_URL;
     if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
@@ -108,19 +95,15 @@ export default async function globalSetup() {
 
   baseDatabaseUrlForTeardown = baseDatabaseUrl;
   await writeFile(baseDatabaseUrlFile, baseDatabaseUrl, "utf8");
-  if (!keepDatabase) {
-    try {
-      await dropLeakedTestDatabases(baseDatabaseUrl);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.warn(
-        ["Test DB cleanup skipped due to error.", message].join("\n"),
-      );
-    }
+  try {
+    await dropLeakedTestDatabases(baseDatabaseUrl);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(["Test DB cleanup skipped due to error.", message].join("\n"));
   }
 
   return async () => {
-    if (baseDatabaseUrlForTeardown && !keepDatabase) {
+    if (baseDatabaseUrlForTeardown) {
       try {
         await dropLeakedTestDatabases(baseDatabaseUrlForTeardown);
       } catch (error) {
