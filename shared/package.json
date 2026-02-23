@@ -6,6 +6,9 @@
     "format": "npx prettier --write .",
     "format-check": "npx prettier --check ."
   },
+  "engines": {
+    "node": "20.x || ^22.0.0"
+  },
   "dependencies": {
     "zod": "4.1.11"
   },
