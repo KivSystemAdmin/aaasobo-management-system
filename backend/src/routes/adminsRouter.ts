@@ -24,6 +24,7 @@ import {
   getAllEventsController,
   getClassesWithinPeriodController,
 } from "../../src/controllers/adminsController";
+import { normalizeImportSourceController } from "../controllers/adminsImportController";
 import {
   getAllSchedulesController,
   updateBusinessScheduleController,
@@ -68,6 +69,7 @@ import {
   ValidationErrorResponse,
   ConflictErrorResponse,
   InstructorUpdateErrorResponse,
+  ImportNormalizeResponse,
 } from "../../../shared/schemas/admins";
 
 import { AUTH_ROLES } from "../utils/commonUtils";
@@ -793,6 +795,38 @@ const getAllSchedulesConfig = {
   },
 } as const;
 
+const normalizeImportSourceConfig = {
+  method: "post" as const,
+  middleware: [
+    verifyAuthentication(AUTH_ROLES.A),
+    upload.single("file"),
+  ] as RequestHandler[],
+  handler: normalizeImportSourceController,
+  openapi: {
+    summary: "Normalize raw import CSV",
+    description:
+      "Normalize a raw spreadsheet-export CSV into the v1 normalized CSV package",
+    responses: {
+      200: {
+        description: "Normalization succeeded",
+        schema: ImportNormalizeResponse,
+      },
+      400: {
+        description: "Invalid or unsupported source file",
+        schema: MessageErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
 const validatedRouteConfigs = {
   "/:id": [updateAdminConfig],
   "/admin-list": [getAllAdminsConfig],
@@ -815,6 +849,7 @@ const validatedRouteConfigs = {
   "/instructor-list/register/withIcon": [registerInstructorWithIconConfig],
   "/instructor-list/update/:id": [updateInstructorConfig],
   "/instructor-list/update/:id/withIcon": [updateInstructorWithIconConfig],
+  "/import/normalize": [normalizeImportSourceConfig],
   "/plan-list": [getAllPlansConfig],
   "/plan-list/delete/:id": [deletePlanConfig],
   "/plan-list/register": [registerPlanConfig],
