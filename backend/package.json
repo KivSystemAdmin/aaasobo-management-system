@@ -14,7 +14,7 @@
     "lint:unused": "knip"
   },
   "engines": {
-    "node": "20.x"
+    "node": "20.x || ^22.0.0"
   },
   "keywords": [],
   "author": "",
