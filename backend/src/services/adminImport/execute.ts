@@ -1,4 +1,7 @@
 import JSZip from "jszip";
+import { Prisma, Status } from "../../../generated/prisma";
+import { prisma } from "../../../prisma/prismaClient";
+import { hashPassword } from "../../utils/commonUtils";
 import {
   MANDATORY_NORMALIZED_FILES,
   NORMALIZED_HEADERS,
@@ -154,6 +157,31 @@ interface RowEnvelope<T> {
   rowNumber: number;
   data: T;
 }
+
+type ParsedNormalizedRows = {
+  "plans.csv": RowEnvelope<RowByFile["plans.csv"]>[];
+  "customers.csv": RowEnvelope<RowByFile["customers.csv"]>[];
+  "children.csv": RowEnvelope<RowByFile["children.csv"]>[];
+  "subscriptions.csv": RowEnvelope<RowByFile["subscriptions.csv"]>[];
+  "instructors.csv": RowEnvelope<RowByFile["instructors.csv"]>[];
+  "instructor_schedules.csv": RowEnvelope<
+    RowByFile["instructor_schedules.csv"]
+  >[];
+  "instructor_absences.csv": RowEnvelope<
+    RowByFile["instructor_absences.csv"]
+  >[];
+  "events.csv": RowEnvelope<RowByFile["events.csv"]>[];
+  "schedules.csv": RowEnvelope<RowByFile["schedules.csv"]>[];
+  "system_status.csv": RowEnvelope<RowByFile["system_status.csv"]>[];
+  "recurring_classes.csv": RowEnvelope<RowByFile["recurring_classes.csv"]>[];
+  "recurring_class_attendance.csv": RowEnvelope<
+    RowByFile["recurring_class_attendance.csv"]
+  >[];
+  "classes.csv": RowEnvelope<RowByFile["classes.csv"]>[];
+  "class_attendance.csv": RowEnvelope<RowByFile["class_attendance.csv"]>[];
+};
+
+type TxClient = Prisma.TransactionClient;
 
 function isValidDate(value: string): boolean {
   if (!DATE_PATTERN.test(value)) {
@@ -409,41 +437,11 @@ function parseFileRows<K extends NormalizedFileName>(
   return rows;
 }
 
-export async function extractNormalizedFilesFromZip(
-  zipBuffer: Buffer,
-): Promise<Partial<Record<NormalizedFileName, string>>> {
-  const zip = await JSZip.loadAsync(zipBuffer);
-  const files: Partial<Record<NormalizedFileName, string>> = {};
-
-  for (const fileName of MANDATORY_NORMALIZED_FILES) {
-    const entry = zip.file(fileName);
-    if (!entry) {
-      continue;
-    }
-    files[fileName] = await entry.async("string");
-  }
-
-  return files;
-}
-
-export function validateNormalizedImportFiles(
+function parseNormalizedRows(
   files: Partial<Record<NormalizedFileName, string>>,
-): ImportValidationResult {
-  const issues: ImportValidationIssue[] = [];
-
-  for (const fileName of MANDATORY_NORMALIZED_FILES) {
-    if (typeof files[fileName] !== "string") {
-      addIssue(
-        issues,
-        fileName,
-        null,
-        null,
-        `Missing required file: ${fileName}`,
-      );
-    }
-  }
-
-  const parsed = {
+  issues: ImportValidationIssue[],
+): ParsedNormalizedRows {
+  return {
     "plans.csv": parseFileRows("plans.csv", files["plans.csv"] ?? "", issues),
     "customers.csv": parseFileRows(
       "customers.csv",
@@ -511,6 +509,43 @@ export function validateNormalizedImportFiles(
       issues,
     ),
   };
+}
+
+export async function extractNormalizedFilesFromZip(
+  zipBuffer: Buffer,
+): Promise<Partial<Record<NormalizedFileName, string>>> {
+  const zip = await JSZip.loadAsync(zipBuffer);
+  const files: Partial<Record<NormalizedFileName, string>> = {};
+
+  for (const fileName of MANDATORY_NORMALIZED_FILES) {
+    const entry = zip.file(fileName);
+    if (!entry) {
+      continue;
+    }
+    files[fileName] = await entry.async("string");
+  }
+
+  return files;
+}
+
+export function validateNormalizedImportFiles(
+  files: Partial<Record<NormalizedFileName, string>>,
+): ImportValidationResult {
+  const issues: ImportValidationIssue[] = [];
+
+  for (const fileName of MANDATORY_NORMALIZED_FILES) {
+    if (typeof files[fileName] !== "string") {
+      addIssue(
+        issues,
+        fileName,
+        null,
+        null,
+        `Missing required file: ${fileName}`,
+      );
+    }
+  }
+
+  const parsed = parseNormalizedRows(files, issues);
 
   const rowsByFile: Record<NormalizedFileName, number> = {
     "plans.csv": parsed["plans.csv"].length,
@@ -1475,5 +1510,336 @@ export function validateNormalizedImportFiles(
     isValid: issues.length === 0,
     issues,
     report: { rowsByFile },
+  };
+}
+
+const DEFAULT_SEED_ADMIN_EMAILS = ["admin@example.com", "admin2@example.com"];
+
+function parseOptionalDate(value: string): Date | null {
+  if (!value) {
+    return null;
+  }
+  return new Date(`${value}T00:00:00.000Z`);
+}
+
+function parseOptionalDateTime(value: string): Date | null {
+  if (!value) {
+    return null;
+  }
+  return new Date(value);
+}
+
+function parseTimeAsDate(value: string): Date {
+  return new Date(`1970-01-01T${value}:00.000Z`);
+}
+
+function parseSeedAdminEmails(): string[] {
+  const configured =
+    process.env.IMPORT_SEED_ADMIN_EMAILS ?? process.env.SEED_ADMIN_EMAILS;
+  const source = configured
+    ? configured
+        .split(",")
+        .map((email) => email.trim().toLowerCase())
+        .filter((email) => email.length > 0)
+    : DEFAULT_SEED_ADMIN_EMAILS;
+  return Array.from(new Set(source));
+}
+
+async function resetImportTargetData(tx: TxClient) {
+  const seedAdminEmails = parseSeedAdminEmails();
+  const seedAdmins = await tx.admin.findMany({
+    where: {
+      email: {
+        in: seedAdminEmails,
+      },
+    },
+    select: {
+      name: true,
+      email: true,
+      password: true,
+    },
+  });
+
+  await tx.classAttendance.deleteMany();
+  await tx.class.deleteMany();
+  await tx.recurringClassAttendance.deleteMany();
+  await tx.recurringClass.deleteMany();
+  await tx.subscription.deleteMany();
+  await tx.child.deleteMany();
+  await tx.customer.deleteMany();
+  await tx.instructorAbsence.deleteMany();
+  await tx.instructorSlot.deleteMany();
+  await tx.instructorSchedule.deleteMany();
+  await tx.instructor.deleteMany();
+  await tx.schedule.deleteMany();
+  await tx.event.deleteMany();
+  await tx.plan.deleteMany();
+  await tx.systemStatus.deleteMany();
+  await tx.passwordResetToken.deleteMany();
+  await tx.verificationToken.deleteMany();
+  await tx.admin.deleteMany();
+
+  if (seedAdmins.length > 0) {
+    await tx.admin.createMany({
+      data: seedAdmins,
+    });
+  }
+}
+
+async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
+  const planIdByRef = new Map<string, number>();
+  for (const row of parsed["plans.csv"]) {
+    const created = await tx.plan.create({
+      data: {
+        name: row.data.name,
+        description: row.data.description,
+        weeklyClassTimes: Number(row.data.weekly_class_times),
+        isNative: row.data.is_native === "true",
+        terminationAt: parseOptionalDateTime(row.data.termination_at),
+      },
+    });
+    planIdByRef.set(row.data.plan_ref, created.id);
+  }
+
+  const customerIdByRef = new Map<string, number>();
+  for (const row of parsed["customers.csv"]) {
+    const created = await tx.customer.create({
+      data: {
+        name: row.data.name,
+        email: row.data.email,
+        password: await hashPassword(row.data.temp_password),
+        prefecture: row.data.prefecture,
+        hasSeenWelcome: row.data.has_seen_welcome === "true",
+        terminationAt: parseOptionalDateTime(row.data.termination_at),
+      },
+    });
+    customerIdByRef.set(row.data.customer_ref, created.id);
+  }
+
+  const childIdByRef = new Map<string, number>();
+  for (const row of parsed["children.csv"]) {
+    const created = await tx.child.create({
+      data: {
+        customerId: customerIdByRef.get(row.data.customer_ref)!,
+        name: row.data.name,
+        birthdate: parseOptionalDate(row.data.birthdate),
+        personalInfo: row.data.personal_info || null,
+      },
+    });
+    childIdByRef.set(row.data.child_ref, created.id);
+  }
+
+  const subscriptionIdByRef = new Map<string, number>();
+  for (const row of parsed["subscriptions.csv"]) {
+    const created = await tx.subscription.create({
+      data: {
+        customerId: customerIdByRef.get(row.data.customer_ref)!,
+        planId: planIdByRef.get(row.data.plan_ref)!,
+        startAt: new Date(row.data.start_at),
+        endAt: parseOptionalDateTime(row.data.end_at),
+      },
+    });
+    subscriptionIdByRef.set(row.data.subscription_ref, created.id);
+  }
+
+  const instructorIdByRef = new Map<string, number>();
+  for (const row of parsed["instructors.csv"]) {
+    const created = await tx.instructor.create({
+      data: {
+        name: row.data.name,
+        email: row.data.email,
+        password: await hashPassword(row.data.temp_password),
+        classURL: row.data.class_url,
+        icon: row.data.icon,
+        nickname: row.data.nickname,
+        meetingId: row.data.meeting_id,
+        passcode: row.data.passcode,
+        birthdate: new Date(`${row.data.birthdate}T00:00:00.000Z`),
+        favoriteFood: row.data.favorite_food,
+        hobby: row.data.hobby,
+        lifeHistory: row.data.life_history,
+        messageForChildren: row.data.message_for_children,
+        skill: row.data.skill,
+        workingTime: row.data.working_time,
+        isNative: row.data.is_native === "true",
+        terminationAt: parseOptionalDateTime(row.data.termination_at),
+      },
+    });
+    instructorIdByRef.set(row.data.instructor_ref, created.id);
+  }
+
+  const scheduleGroups = new Map<
+    string,
+    {
+      instructorId: number;
+      effectiveFrom: Date;
+      effectiveTo: Date | null;
+      timezone: string;
+      slots: Array<{ weekday: number; startTime: Date }>;
+    }
+  >();
+
+  for (const row of parsed["instructor_schedules.csv"]) {
+    const key = [
+      row.data.instructor_ref,
+      row.data.effective_from,
+      row.data.effective_to,
+      row.data.timezone,
+    ].join("\u0000");
+    if (!scheduleGroups.has(key)) {
+      scheduleGroups.set(key, {
+        instructorId: instructorIdByRef.get(row.data.instructor_ref)!,
+        effectiveFrom: parseOptionalDate(row.data.effective_from)!,
+        effectiveTo: parseOptionalDate(row.data.effective_to),
+        timezone: row.data.timezone,
+        slots: [],
+      });
+    }
+    scheduleGroups.get(key)!.slots.push({
+      weekday: Number(row.data.weekday),
+      startTime: parseTimeAsDate(row.data.start_time),
+    });
+  }
+
+  for (const group of scheduleGroups.values()) {
+    const createdSchedule = await tx.instructorSchedule.create({
+      data: {
+        instructorId: group.instructorId,
+        effectiveFrom: group.effectiveFrom,
+        effectiveTo: group.effectiveTo,
+        timezone: group.timezone,
+      },
+    });
+
+    if (group.slots.length > 0) {
+      await tx.instructorSlot.createMany({
+        data: group.slots.map((slot) => ({
+          scheduleId: createdSchedule.id,
+          weekday: slot.weekday,
+          startTime: slot.startTime,
+        })),
+      });
+    }
+  }
+
+  if (parsed["instructor_absences.csv"].length > 0) {
+    await tx.instructorAbsence.createMany({
+      data: parsed["instructor_absences.csv"].map((row) => ({
+        instructorId: instructorIdByRef.get(row.data.instructor_ref)!,
+        absentAt: new Date(row.data.absent_at),
+      })),
+    });
+  }
+
+  const eventIdByRef = new Map<string, number>();
+  for (const row of parsed["events.csv"]) {
+    const created = await tx.event.create({
+      data: {
+        name: row.data.name,
+        color: row.data.color,
+      },
+    });
+    eventIdByRef.set(row.data.event_ref, created.id);
+  }
+
+  for (const row of parsed["schedules.csv"]) {
+    await tx.schedule.create({
+      data: {
+        date: parseOptionalDate(row.data.date)!,
+        eventId: eventIdByRef.get(row.data.event_ref)!,
+      },
+    });
+  }
+
+  await tx.systemStatus.create({
+    data: {
+      status: parsed["system_status.csv"][0].data.status,
+    },
+  });
+
+  const recurringClassIdByRef = new Map<string, number>();
+  for (const row of parsed["recurring_classes.csv"]) {
+    const created = await tx.recurringClass.create({
+      data: {
+        subscriptionId: row.data.subscription_ref
+          ? subscriptionIdByRef.get(row.data.subscription_ref)!
+          : null,
+        instructorId: row.data.instructor_ref
+          ? instructorIdByRef.get(row.data.instructor_ref)!
+          : null,
+        startAt: parseOptionalDateTime(row.data.start_at),
+        endAt: parseOptionalDateTime(row.data.end_at),
+      },
+    });
+    recurringClassIdByRef.set(row.data.recurring_class_ref, created.id);
+  }
+
+  if (parsed["recurring_class_attendance.csv"].length > 0) {
+    await tx.recurringClassAttendance.createMany({
+      data: parsed["recurring_class_attendance.csv"].map((row) => ({
+        recurringClassId: recurringClassIdByRef.get(
+          row.data.recurring_class_ref,
+        )!,
+        childrenId: childIdByRef.get(row.data.child_ref)!,
+      })),
+    });
+  }
+
+  const classIdByRef = new Map<string, number>();
+  for (const row of parsed["classes.csv"]) {
+    const created = await tx.class.create({
+      data: {
+        customerId: customerIdByRef.get(row.data.customer_ref)!,
+        instructorId: row.data.instructor_ref
+          ? instructorIdByRef.get(row.data.instructor_ref)!
+          : null,
+        recurringClassId: row.data.recurring_class_ref
+          ? recurringClassIdByRef.get(row.data.recurring_class_ref)!
+          : null,
+        subscriptionId: row.data.subscription_ref
+          ? subscriptionIdByRef.get(row.data.subscription_ref)!
+          : null,
+        dateTime: parseOptionalDateTime(row.data.date_time),
+        status: row.data.status as Status,
+        rebookableUntil: parseOptionalDateTime(row.data.rebookable_until),
+        classCode: row.data.class_code,
+        isFreeTrial: row.data.is_free_trial === "true",
+        updatedAt: new Date(),
+      },
+    });
+    classIdByRef.set(row.data.class_ref, created.id);
+  }
+
+  if (parsed["class_attendance.csv"].length > 0) {
+    await tx.classAttendance.createMany({
+      data: parsed["class_attendance.csv"].map((row) => ({
+        classId: classIdByRef.get(row.data.class_ref)!,
+        childrenId: childIdByRef.get(row.data.child_ref)!,
+      })),
+    });
+  }
+}
+
+export async function executeNormalizedImportFiles(
+  files: Partial<Record<NormalizedFileName, string>>,
+) {
+  const validation = validateNormalizedImportFiles(files);
+  if (!validation.isValid) {
+    throw new Error("Normalized import validation failed");
+  }
+
+  const parseIssues: ImportValidationIssue[] = [];
+  const parsed = parseNormalizedRows(files, parseIssues);
+  if (parseIssues.length > 0) {
+    throw new Error("Normalized import parsing failed");
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await resetImportTargetData(tx);
+    await insertValidatedRows(tx, parsed);
+  });
+
+  return {
+    report: validation.report,
   };
 }

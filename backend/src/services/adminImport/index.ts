@@ -4,6 +4,7 @@ export {
 } from "./normalize";
 
 export {
+  executeNormalizedImportFiles,
   extractNormalizedFilesFromZip,
   validateNormalizedImportFiles,
 } from "./execute";
