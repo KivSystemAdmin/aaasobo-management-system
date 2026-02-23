@@ -228,6 +228,9 @@ export const rebookClassController = async (
 
     res.sendStatus(201);
   } catch (error) {
+    const isPrismaError =
+      error instanceof Prisma.PrismaClientKnownRequestError ||
+      error instanceof Prisma.PrismaClientUnknownRequestError;
     const prismaErrorCode =
       typeof error === "object" &&
       error !== null &&
@@ -247,14 +250,20 @@ export const rebookClassController = async (
       return res.status(error.status).json({ errorType: error.errorType });
     }
     if (
-      error instanceof Prisma.PrismaClientKnownRequestError ||
+      isPrismaError ||
       prismaErrorCode === "P2002" ||
-      prismaErrorCode === "P2034"
+      prismaErrorCode === "P2034" ||
+      prismaErrorCode === "P2028"
     ) {
       if (prismaErrorCode === "P2002") {
         return res.status(400).json({ errorType: "instructor conflict" });
       }
-      if (prismaErrorCode === "P2034") {
+      if (prismaErrorCode === "P2034" || prismaErrorCode === "P2028") {
+        return res
+          .status(409)
+          .json({ errorType: "likely instructor conflict" });
+      }
+      if (prismaErrorCode === "P2025") {
         return res
           .status(409)
           .json({ errorType: "likely instructor conflict" });
@@ -269,7 +278,13 @@ export const rebookClassController = async (
     if (
       message.includes("TransactionWriteConflict") ||
       message.includes("could not serialize access") ||
-      message.includes("SQLSTATE 40001")
+      message.includes("SQLSTATE 40001") ||
+      message.includes("serialization failure") ||
+      message.includes("deadlock detected") ||
+      message.includes("transaction is aborted") ||
+      message.includes("lock timeout") ||
+      message.includes("statement timeout") ||
+      message.includes("Transaction API error")
     ) {
       return res.status(409).json({
         errorType: "likely instructor conflict",
