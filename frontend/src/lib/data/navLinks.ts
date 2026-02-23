@@ -8,6 +8,7 @@ import {
   ClockIcon,
   AcademicCapIcon,
   BellIcon,
+  ArrowUpOnSquareIcon,
   ClipboardDocumentCheckIcon,
 } from "@heroicons/react/24/outline";
 
@@ -93,6 +94,11 @@ export function getLinks(
       name: "AaasoBo! Calendar",
       href: `/admins/${userId}/business-calendar`,
       icon: CalendarDaysIcon,
+    },
+    {
+      name: "Data Import",
+      href: `/admins/${userId}/data-import`,
+      icon: ArrowUpOnSquareIcon,
     },
     // Not in use for now
     // {
