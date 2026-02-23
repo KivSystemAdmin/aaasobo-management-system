@@ -12,7 +12,10 @@ export async function GET(
     const jobId = params.jobId?.trim();
 
     if (!jobId) {
-      return NextResponse.json({ message: "jobId is required" }, { status: 400 });
+      return NextResponse.json(
+        { message: "jobId is required" },
+        { status: 400 },
+      );
     }
 
     const cookie = await getCookie();

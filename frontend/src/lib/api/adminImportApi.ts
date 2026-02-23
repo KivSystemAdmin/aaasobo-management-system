@@ -44,9 +44,12 @@ export const normalizeAdminImportSource = async (
 export const downloadNormalizedImportPackage = async (
   jobId: string,
 ): Promise<Blob> => {
-  const response = await fetch(`/api/admin-import/normalized/${jobId}/download`, {
-    method: "GET",
-  });
+  const response = await fetch(
+    `/api/admin-import/normalized/${jobId}/download`,
+    {
+      method: "GET",
+    },
+  );
 
   if (!response.ok) {
     throw new Error(downloadErrorMessage);
@@ -69,7 +72,9 @@ export const executeNormalizedImport = async ({
   } else if (jobId) {
     formData.append("jobId", jobId);
   } else {
-    throw new Error("Provide either a normalization job or normalized zip file.");
+    throw new Error(
+      "Provide either a normalization job or normalized zip file.",
+    );
   }
 
   const response = await fetch(PROXY_URL, {

@@ -673,11 +673,7 @@ function rowsToCsvWithHeaders<K extends NormalizedFileName, R extends object>(
   const csvRows: string[][] = [
     [...headers],
     ...rows.map((row) =>
-      headers.map(
-        (h) =>
-          (row as Record<string, string | undefined>)[h] ??
-          "",
-      ),
+      headers.map((h) => (row as Record<string, string | undefined>)[h] ?? ""),
     ),
   ];
   return toCsv(csvRows);

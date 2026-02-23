@@ -20,9 +20,8 @@ export default function DataImportDashboard({ adminId }: { adminId: number }) {
   const [normalizedZipFile, setNormalizedZipFile] = useState<File | null>(null);
   const [normalizeResult, setNormalizeResult] =
     useState<ImportNormalizeResponse | null>(null);
-  const [executeResult, setExecuteResult] = useState<ImportExecuteResponse | null>(
-    null,
-  );
+  const [executeResult, setExecuteResult] =
+    useState<ImportExecuteResponse | null>(null);
   const [executeIssues, setExecuteIssues] = useState<
     ImportExecuteErrorResponse["issues"]
   >([]);
@@ -102,7 +101,8 @@ export default function DataImportDashboard({ adminId }: { adminId: number }) {
       const blob = await downloadNormalizedImportPackage(normalizeResult.jobId);
       triggerDownload(blob, `normalized-import-${normalizeResult.jobId}.zip`);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Download failed";
+      const message =
+        error instanceof Error ? error.message : "Download failed";
       setErrorMessage(message);
     } finally {
       setIsDownloadingZip(false);
@@ -257,7 +257,10 @@ export default function DataImportDashboard({ adminId }: { adminId: number }) {
       <div className={styles.formSection}>
         <h2>2) Execute import</h2>
         <form className={styles.form}>
-          <label className={styles.fileInputLabel} htmlFor="normalized-zip-file">
+          <label
+            className={styles.fileInputLabel}
+            htmlFor="normalized-zip-file"
+          >
             Normalized package zip (optional if you already normalized above)
           </label>
           <input
@@ -278,7 +281,9 @@ export default function DataImportDashboard({ adminId }: { adminId: number }) {
         </form>
       </div>
 
-      {executeErrorMessage && <p className={styles.error}>{executeErrorMessage}</p>}
+      {executeErrorMessage && (
+        <p className={styles.error}>{executeErrorMessage}</p>
+      )}
 
       {executeIssues.length > 0 && (
         <div className={styles.report}>
@@ -286,8 +291,8 @@ export default function DataImportDashboard({ adminId }: { adminId: number }) {
           <ul className={styles.list}>
             {executeIssues.map((issue, index) => (
               <li key={`${issue.file}:${issue.row}:${issue.column}:${index}`}>
-                [{issue.file}] row {issue.row ?? "-"}, column {issue.column ?? "-"}
-                : {issue.message}
+                [{issue.file}] row {issue.row ?? "-"}, column{" "}
+                {issue.column ?? "-"}: {issue.message}
               </li>
             ))}
           </ul>
@@ -325,11 +330,12 @@ export default function DataImportDashboard({ adminId }: { adminId: number }) {
         <div className={styles.confirmModal}>
           <h3>Confirm destructive import</h3>
           <p>
-            This will fully reset existing import-target data and replace it with
-            this package.
+            This will fully reset existing import-target data and replace it
+            with this package.
           </p>
           <p>
-            Seed admins are preserved, but other data may be permanently removed.
+            Seed admins are preserved, but other data may be permanently
+            removed.
           </p>
           <div className={styles.modalActions}>
             <button
