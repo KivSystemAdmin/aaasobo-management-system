@@ -33,7 +33,7 @@ interface NormalizationReport {
   warnings: string[];
 }
 
-export interface NormalizeRawScheduleResult {
+interface NormalizeRawScheduleResult {
   files: NormalizedFileMap;
   report: NormalizationReport;
 }
