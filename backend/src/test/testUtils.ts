@@ -3,6 +3,10 @@ import { hashPasswordSync } from "../utils/commonUtils";
 import { prisma } from "./setup";
 import { Status } from "../../generated/prisma";
 
+export function setTestDataSeed(seed: number) {
+  faker.seed(seed);
+}
+
 /**
  * Generate a test admin
  */
