@@ -12,9 +12,16 @@ import type { PerformanceTestConfig } from "./config";
 
 type Slot = { weekday: number; startTime: string };
 
+export type PerformanceCustomerState = {
+  customerId: number;
+  customerAuthCookie: string;
+  childIds: number[];
+};
+
 type PerformanceBootstrapState = {
   adminAuthCookie: string;
   instructorIds: number[];
+  customers: PerformanceCustomerState[];
 };
 
 const PERFORMANCE_ADMIN = {
@@ -158,6 +165,7 @@ export async function initializePerformanceData(
     ),
   );
 
+  const customers: PerformanceCustomerState[] = [];
   for (
     let customerIndex = 0;
     customerIndex < config.customers;
@@ -183,10 +191,19 @@ export async function initializePerformanceData(
       slot,
       startDate: config.startDate,
     });
+
+    customers.push({
+      customerId: customer.id,
+      customerAuthCookie: await generateAuthCookie(customer.id, "customer", {
+        expirationTime: "180d",
+      }),
+      childIds: [child.id],
+    });
   }
 
   return {
     adminAuthCookie,
     instructorIds: instructors.map((instructor) => instructor.id),
+    customers,
   };
 }
