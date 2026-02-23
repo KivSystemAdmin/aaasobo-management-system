@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import {
   buildNormalizedPackageZip,
+  executeNormalizedImportFiles,
   extractNormalizedFilesFromZip,
   getNormalizedImportJobZip,
   normalizeRawScheduleCsvToPackage,
@@ -99,16 +100,17 @@ export const executeNormalizedImportController = async (
       });
     }
 
+    await executeNormalizedImportFiles(files);
+
     return res.status(200).json({
-      message: "Normalized import package validated successfully",
-      imported: false,
+      message: "Normalized import executed successfully",
+      imported: true,
       report: validationResult.report,
     });
   } catch (error) {
     console.error("Failed to execute normalized import", { error });
-    return res.status(400).json({
-      message:
-        error instanceof Error ? error.message : "Import execution failed",
+    return res.status(500).json({
+      error: error instanceof Error ? error.message : "Import execution failed",
     });
   }
 };
