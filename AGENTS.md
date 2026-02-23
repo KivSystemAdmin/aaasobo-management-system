@@ -65,5 +65,6 @@ Full-stack class management system with separate backend and frontend applicatio
 ### Code Quality
 - Always run `npm run format` before committing changes
 - Run `npm run lint` on frontend for code quality checks
+- Run `npm run lint:unused` to detect dead code and unused exports in both backend and frontend
 - Keep code self-explanatory and avoid unnecessary comments
 - Run tests and builds before committing
