@@ -31,7 +31,7 @@ export const UpdateCustomerProfileRequest = z.object({
 export const RegisterSubscriptionRequest = z.object({
   planId: z.number().int().positive().describe("Plan ID for the subscription"),
   startAt: z.string().describe("Subscription start date"),
-  selectType: z.string().describe("Select type URL"),
+  selectType: z.string().describe("SelectType URL"),
 });
 
 export const VerifyEmailRequest = z.object({

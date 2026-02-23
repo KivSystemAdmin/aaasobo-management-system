@@ -142,8 +142,8 @@ const updateSelectTypeUrl = {
   handler: updateSelectTypeUrlController,
   paramsSchema: SubscriptionIdParams,
   openapi: {
-    summary: "Update a select type url",
-    description: "Update a select type url",
+    summary: "Update a SelectType url",
+    description: "Update a SelectType url",
     responses: {
       "200": {
         description: "Subscription updated successfully",

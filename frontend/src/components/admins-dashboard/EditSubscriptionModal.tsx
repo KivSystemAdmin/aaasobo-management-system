@@ -106,7 +106,7 @@ function EditSubscriptionModal({
       subscription?.selectType === selectTypeValue
     ) {
       setError(
-        "Select a different plan from the current one or change a select type URL.",
+        "Select a different plan from the current one or change a SelectType URL.",
       );
       setLoading(false);
       return;
@@ -119,7 +119,7 @@ function EditSubscriptionModal({
     }
 
     if (!selectTypeValue) {
-      setError("Please enter a select type URL");
+      setError("Please enter a SelectType URL");
       setLoading(false);
       return;
     }
@@ -215,17 +215,17 @@ function EditSubscriptionModal({
             </div>
           </div>
 
-          {/* Select Type URL */}
+          {/* SelectType URL */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <PencilIcon className={styles.sectionIcon} />
-              <h3>Change a select type URL</h3>
+              <h3>Change a SelectType URL</h3>
             </div>
             <div className={styles.sectionContent}>
               <input
-                id="select type url"
+                id="SelectType url"
                 type="text"
-                name="select type url"
+                name="SelectType url"
                 placeholder="https://..."
                 value={selectTypeValue}
                 onChange={(e) => setSelectTypeValue(e.target.value)}

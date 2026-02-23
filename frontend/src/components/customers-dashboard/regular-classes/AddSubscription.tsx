@@ -131,11 +131,11 @@ function AddSubscription({
                 </div>
               </div>
               <div className={styles.inputContainer}>
-                <h4>Select Type URL</h4>
+                <h4>SelectType URL</h4>
                 <input
-                  id="select type url"
+                  id="SelectType url"
                   type="text"
-                  name="select type url"
+                  name="SelectType url"
                   placeholder="https://..."
                   value={selectTypeValue}
                   onChange={(e) => setSelectTypeValue(e.target.value)}

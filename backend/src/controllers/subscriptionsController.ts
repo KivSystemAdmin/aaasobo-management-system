@@ -102,7 +102,7 @@ export const updateSubscriptionToAddClassController = async (
     }
 
     if (!selectType) {
-      return res.status(404).json({ error: "Select type URL not found." });
+      return res.status(404).json({ error: "SelectType URL not found." });
     }
 
     if (times !== plan.weeklyClassTimes - subscription.plan.weeklyClassTimes) {
@@ -163,7 +163,7 @@ export const updateSubscriptionToTerminateClassController = async (
     }
 
     if (!selectType) {
-      return res.status(404).json({ error: "Select type URL not found." });
+      return res.status(404).json({ error: "SelectType URL not found." });
     }
 
     if (
@@ -223,11 +223,11 @@ export const updateSelectTypeUrlController = async (
     }
 
     if (!selectType) {
-      return res.status(404).json({ error: "Select type URL not found." });
+      return res.status(404).json({ error: "SelectType URL not found." });
     }
 
     await prisma.$transaction(async (tx) => {
-      // Updata the select type url.
+      // Updata the SelectType url.
       await updateSelectTypeUrl(tx, subscription.id, selectType);
     });
 
