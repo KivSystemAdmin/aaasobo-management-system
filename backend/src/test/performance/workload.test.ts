@@ -174,7 +174,10 @@ async function handleSimulationDay(args: {
 
   const generationErrors: string[] = [];
 
-  if (isEndOfMonth(args.day) && args.day.getTime() < args.simulationEndDate.getTime()) {
+  if (
+    isEndOfMonth(args.day) &&
+    args.day.getTime() < args.simulationEndDate.getTime()
+  ) {
     const { year, month } = getNextMonthParams(args.day);
     const generationResponse = await request(server)
       .post("/classes/create-classes")
