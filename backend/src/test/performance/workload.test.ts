@@ -36,6 +36,40 @@ function* enumerateDays(startDate: string, endDate: string): Generator<Date> {
   }
 }
 
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
+
+function isEndOfMonth(day: Date): boolean {
+  const nextDay = new Date(day);
+  nextDay.setUTCDate(day.getUTCDate() + 1);
+  return nextDay.getUTCDate() === 1;
+}
+
+function getNextMonthParams(day: Date): {
+  year: number;
+  month: (typeof MONTH_NAMES)[number];
+} {
+  const nextMonthDate = new Date(
+    Date.UTC(day.getUTCFullYear(), day.getUTCMonth() + 1, 1),
+  );
+  return {
+    year: nextMonthDate.getUTCFullYear(),
+    month: MONTH_NAMES[nextMonthDate.getUTCMonth()]!,
+  };
+}
+
 const COMPLETABLE_CLASS_STATUSES = new Set(["pending", "booked", "rebooked"]);
 
 function calcLatencyStats(latencies: number[]) {
@@ -137,12 +171,28 @@ async function handleSimulationDay(args: {
         `classId=${result.classId} status=${result.status} body=${JSON.stringify(result.body)}`,
     );
 
+  const generationErrors: string[] = [];
+
+  if (isEndOfMonth(args.day)) {
+    const { year, month } = getNextMonthParams(args.day);
+    const generationResponse = await request(server)
+      .post("/classes/create-classes")
+      .set("Cookie", args.adminAuthCookie)
+      .send({ year, month });
+
+    if (generationResponse.status !== 201) {
+      generationErrors.push(
+        `create-classes year=${year} month=${month} status=${generationResponse.status} body=${JSON.stringify(generationResponse.body)}`,
+      );
+    }
+  }
+
   return {
     latencies: [
       ...classFetchResults.map((result) => result.latencyMs),
       ...completionResults.map((result) => result.latencyMs),
     ],
-    errors: [...fetchErrors, ...completionErrors],
+    errors: [...fetchErrors, ...completionErrors, ...generationErrors],
     completedClasses: completionResults.length - completionErrors.length,
   };
 }
