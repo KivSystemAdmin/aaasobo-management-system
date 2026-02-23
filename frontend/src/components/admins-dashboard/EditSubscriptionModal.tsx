@@ -15,6 +15,7 @@ import {
   updateSubscriptionToAddClassAction,
   updateSubscriptionToTerminateClassAction,
 } from "@/app/actions/updateContent";
+import InputField from "../elements/inputField/InputField";
 
 type EditSubscriptionModalProps = {
   isOpen: boolean;
@@ -222,12 +223,12 @@ function EditSubscriptionModal({
               <h3>Change a SelectType URL</h3>
             </div>
             <div className={styles.sectionContent}>
-              <input
-                id="SelectType url"
-                type="text"
+              <InputField
                 name="SelectType url"
+                type="text"
                 placeholder="https://..."
                 value={selectTypeValue}
+                maxLength={50}
                 onChange={(e) => setSelectTypeValue(e.target.value)}
                 className={styles.selectTypeInput}
               />

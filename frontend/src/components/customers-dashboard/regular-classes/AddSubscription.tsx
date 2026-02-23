@@ -7,6 +7,7 @@ import styles from "./AddSubscription.module.scss";
 import { getAllPlans } from "@/lib/api/plansApi";
 import { registerSubscription } from "@/lib/api/subscriptionsApi";
 import ActionButton from "@/components/elements/buttons/actionButton/ActionButton";
+import InputField from "@/components/elements/inputField/InputField";
 
 function AddSubscription({
   customerId,
@@ -132,12 +133,12 @@ function AddSubscription({
               </div>
               <div className={styles.inputContainer}>
                 <h4>SelectType URL</h4>
-                <input
-                  id="SelectType url"
+                <InputField
                   type="text"
                   name="SelectType url"
                   placeholder="https://..."
                   value={selectTypeValue}
+                  maxLength={50}
                   onChange={(e) => setSelectTypeValue(e.target.value)}
                   className={styles.selectTypeInput}
                 />
