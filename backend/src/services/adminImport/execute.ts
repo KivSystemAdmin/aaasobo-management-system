@@ -383,7 +383,7 @@ function parseFileRows<K extends NormalizedFileName>(
     return [];
   }
 
-  const expectedHeaders = NORMALIZED_HEADERS[file] as string[];
+  const expectedHeaders = NORMALIZED_HEADERS[file] as readonly string[];
   const actualHeaders = (parsedRows[0] ?? []).map((cell) =>
     normalizeCell(cell),
   );

@@ -665,14 +665,20 @@ function buildRawRows(allRows: CsvRow[]): RawClassRow[] {
   return out;
 }
 
-function rowsToCsvWithHeaders(
-  fileName: NormalizedFileName,
-  rows: Array<Record<string, string>>,
+function rowsToCsvWithHeaders<K extends NormalizedFileName, R extends object>(
+  fileName: K,
+  rows: R[],
 ): string {
-  const headers = NORMALIZED_HEADERS[fileName];
+  const headers = NORMALIZED_HEADERS[fileName] as readonly string[];
   const csvRows: string[][] = [
     [...headers],
-    ...rows.map((row) => headers.map((h) => row[h] ?? "")),
+    ...rows.map((row) =>
+      headers.map(
+        (h) =>
+          (row as Record<string, string | undefined>)[h] ??
+          "",
+      ),
+    ),
   ];
   return toCsv(csvRows);
 }
