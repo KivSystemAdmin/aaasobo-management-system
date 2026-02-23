@@ -5,6 +5,7 @@ const DEFAULT_PERFORMANCE_CONFIG = {
   instructors: 5,
   slotsPerInstructor: 10,
   customers: 10,
+  cancelProbability: 0.25,
   outputPath: "./logs/performance-report.md",
 };
 
@@ -22,6 +23,14 @@ function parseDate(value: string | undefined, fallback: string): string {
   return value;
 }
 
+function parseProbability(value: string | undefined, fallback: number): number {
+  if (!value) return fallback;
+  const parsed = Number.parseFloat(value);
+  if (Number.isNaN(parsed)) return fallback;
+  if (parsed < 0 || parsed > 1) return fallback;
+  return parsed;
+}
+
 export type PerformanceTestConfig = {
   seed: number;
   startDate: string;
@@ -29,6 +38,7 @@ export type PerformanceTestConfig = {
   instructors: number;
   slotsPerInstructor: number;
   customers: number;
+  cancelProbability: number;
   outputPath: string;
 };
 
@@ -57,6 +67,10 @@ export function getPerformanceTestConfig(): PerformanceTestConfig {
     customers: parsePositiveInt(
       process.env.PERF_CUSTOMERS,
       DEFAULT_PERFORMANCE_CONFIG.customers,
+    ),
+    cancelProbability: parseProbability(
+      process.env.PERF_CANCEL_PROBABILITY,
+      DEFAULT_PERFORMANCE_CONFIG.cancelProbability,
     ),
     outputPath:
       process.env.PERF_OUTPUT || DEFAULT_PERFORMANCE_CONFIG.outputPath,
