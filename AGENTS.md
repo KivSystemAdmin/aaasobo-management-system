@@ -26,6 +26,7 @@ AaasoBo! is an online English conversation service run by a Japanese NPO that ta
   - Start PostgreSQL: `npm run db:start` (Docker container)
   - Initialize/Reset DB: `npm run prisma:init` (runs migrations + seed)
 - **Testing**: `npm run test` (Vitest)
+- **Unused Code Check**: `npm run lint:unused`
 - **Formatting**: `npm run format` (Prettier + Prisma format)
 - **Build**: `npm run build` (generates Prisma client, resets DB, runs dummy seed)
 
@@ -34,6 +35,7 @@ AaasoBo! is an online English conversation service run by a Japanese NPO that ta
 - **Development**: `npm run dev` (Next.js dev server)
 - **Build**: `npm run build`
 - **Linting**: `npm run lint`
+- **Unused Code Check**: `npm run lint:unused`
 - **Formatting**: `npm run format`
 
 ## Architecture Overview

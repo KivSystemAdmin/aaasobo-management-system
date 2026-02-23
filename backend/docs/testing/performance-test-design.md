@@ -4,7 +4,7 @@
 
 - Verify that class-related workflows run reliably at realistic-to-heavy local scale.
 - Surface practical latency/throughput/error signals.
-- Keep initial model simple (uniform traffic), domain-aware, and runnable on developer machines.
+- Keep initial model simple, domain-aware, and runnable on developer machines.
 
 ## Non-goals
 
@@ -14,7 +14,7 @@
 
 ## Test suite placement
 
-- New suite directory: `backend/src/test/performance/`
+- Suite directory: `backend/src/test/performance/`
 - Reuse bootstrap patterns from existing simulation helpers where practical.
 
 ## Workload model
@@ -22,17 +22,25 @@
 The workload follows domain flow rather than synthetic random endpoint spam.
 
 1. Bootstrap data:
-   - customers: `1000`
-   - instructors: `250`
-   - slots per instructor: `10`
-   - multiple plans with different weekly class counts
-   - each customer gets random subscriptions count in `1..3`
-2. Register recurring classes.
-3. Simulate time period day-by-day (example: `2025-01-01` to `2025-03-31`).
-4. For each simulated day:
-   - execute configured count of operations (uniform selection)
-   - ensure scheduled classes for the day are fully processed (complete or cancel) before advancing day
-5. At month boundaries, trigger class generation for upcoming period.
+   - customers: configurable via `PERF_CUSTOMERS`
+   - instructors: configurable via `PERF_INSTRUCTORS`
+   - slots per instructor: configurable via `PERF_SLOTS_PER_INSTRUCTOR`
+   - one recurring-class setup per customer to generate ongoing classes
+2. Simulate time period day-by-day (example: `2025-01-01` to `2025-01-31`).
+3. For each simulated day:
+   - customer daily operation (except last week of run):
+     - each customer rolls a random chance (`PERF_CANCEL_PROBABILITY`)
+     - on success, pick one random cancel target among customer future classes
+       (`status in [pending, booked, rebooked]`, at least 24h ahead)
+     - cancel it via API
+     - fetch next-7-day available slots and pick one random slot/instructor
+     - rebook canceled class to the picked slot
+   - admin daily operation:
+     - each instructor fetches calendar classes
+     - classes scheduled on that day and in completable statuses are marked completed
+4. During the final 7 simulated days, customer cancel/rebook operation is skipped so
+   no new classes are created outside the completion horizon.
+5. After the final day, count and report rebookable classes for all customers.
 
 ## Execution model
 
@@ -43,58 +51,51 @@ The workload follows domain flow rather than synthetic random endpoint spam.
 
 ## Metrics (application-level only)
 
-Collect and report per endpoint + aggregate:
+Collect and report aggregate metrics including:
 
-- total request count
-- success/failure counts
-- error breakdown (HTTP status + errorType when available)
-- latency p50/p95/p99
-- throughput (requests/sec)
+- total completion count
+- cancel attempts/success/skipped-no-target
+- rebook attempts/success/skipped-no-slot/business-errors
+- rebookable class count at end of run
+- overall latency stats (min/max/avg/median)
+- operation-level average latency (fetch/complete/cancel/rebook)
+- operation errors
 
 ## Invariants (checked at end of full run)
 
-- No double-booked instructor slot (same instructor+datetime).
-- No class assigned to an unavailable instructor slot.
-- No unresolved invalid states for processed classes in the simulated period.
+- No unexpected operation errors (5xx-level or malformed responses).
+- Workload completes full day range.
+- Class completion workload continues to function while customer cancel/rebook traffic is present.
 
 ## Output format
 
 - Human-readable markdown report written to file.
 - Include:
-  - test config snapshot (seed, scale, period, operation budget)
-  - summary table of endpoint metrics
-  - invariant check results
+  - test config snapshot (seed, scale, period, probabilities)
+  - summary counters and latency metrics
+  - detailed error list
 
 ## Proposed command interface
 
 - `npm run test:performance`
-- Optional flags/env:
+- Optional env:
   - `PERF_SEED=123456`
   - `PERF_START_DATE=2025-01-01`
-  - `PERF_END_DATE=2025-03-31`
-  - `PERF_DAILY_OPERATIONS=<n>`
+  - `PERF_END_DATE=2025-01-31`
+  - `PERF_CUSTOMERS=<n>`
+  - `PERF_INSTRUCTORS=<n>`
+  - `PERF_SLOTS_PER_INSTRUCTOR=<n>`
+  - `PERF_CANCEL_PROBABILITY=0.25`
   - `PERF_OUTPUT=./logs/performance-report.md`
 
 ## Operational policy
 
 - Run locally (developer machine), non-blocking.
-- Any exception or unexpected operation error should fail the run.
+- Unexpected server errors should fail the run.
 
-## Future extensions (post-v1)
+## Future extensions
 
+- Add multiple-seed batch runs for bug-hunting mode.
 - Run against deployed environment with configurable server URL.
 - Externalized isolated DB configuration for shared staging-style runs.
 - Optional regression comparison reports.
-
-## Worklog / Change log
-
-### Planned for next PR
-
-- Replace manual class seeding (`createClass()`) with domain flow:
-  - call regular-class registration API
-  - let backend automatically generate classes from recurring class entries
-- Replace day-grouped in-memory class management with request-driven workload:
-  - for each simulated day, each instructor fetches target classes via GET
-  - then send completion requests (PATCH status=completed) for returned classes
-  - this adds GET load in addition to completion PATCH load
-  - remove explicit "classes grouped by day" tracking from test logic
