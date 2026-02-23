@@ -100,6 +100,7 @@ function calcLatencyStats(latencies: number[]) {
 
 async function handleSimulationDay(args: {
   day: Date;
+  simulationEndDate: Date;
   adminAuthCookie: string;
   instructorIds: number[];
 }) {
@@ -173,7 +174,7 @@ async function handleSimulationDay(args: {
 
   const generationErrors: string[] = [];
 
-  if (isEndOfMonth(args.day)) {
+  if (isEndOfMonth(args.day) && args.day.getTime() < args.simulationEndDate.getTime()) {
     const { year, month } = getNextMonthParams(args.day);
     const generationResponse = await request(server)
       .post("/classes/create-classes")
@@ -210,6 +211,7 @@ describe("performance: simple completion workload", () => {
   it("ticks day-by-day and completes scheduled classes", async () => {
     const config = getPerformanceTestConfig();
     const state = await initializePerformanceData(config);
+    const simulationEndDate = new Date(`${config.endDate}T00:00:00.000Z`);
 
     const runStartedAt = performance.now();
     const allLatencies: number[] = [];
@@ -223,6 +225,7 @@ describe("performance: simple completion workload", () => {
 
       const dayResult = await handleSimulationDay({
         day,
+        simulationEndDate,
         adminAuthCookie: state.adminAuthCookie,
         instructorIds: state.instructorIds,
       });
