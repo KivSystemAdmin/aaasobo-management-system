@@ -33,7 +33,7 @@ export type PerformanceTestConfig = {
 };
 
 export function getPerformanceTestConfig(): PerformanceTestConfig {
-  return {
+  const config = {
     seed: parsePositiveInt(
       process.env.PERF_SEED,
       DEFAULT_PERFORMANCE_CONFIG.seed,
@@ -61,4 +61,14 @@ export function getPerformanceTestConfig(): PerformanceTestConfig {
     outputPath:
       process.env.PERF_OUTPUT || DEFAULT_PERFORMANCE_CONFIG.outputPath,
   };
+
+  const startDate = new Date(`${config.startDate}T00:00:00.000Z`);
+  const endDate = new Date(`${config.endDate}T00:00:00.000Z`);
+  if (startDate.getTime() > endDate.getTime()) {
+    throw new Error(
+      `Invalid performance date range: PERF_START_DATE (${config.startDate}) must be on or before PERF_END_DATE (${config.endDate}).`,
+    );
+  }
+
+  return config;
 }

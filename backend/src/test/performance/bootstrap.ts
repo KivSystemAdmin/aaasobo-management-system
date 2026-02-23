@@ -7,6 +7,7 @@ import {
   createInstructor,
   createPlan,
   generateAuthCookie,
+  setTestDataSeed,
 } from "../testUtils";
 import type { PerformanceTestConfig } from "./config";
 
@@ -22,6 +23,17 @@ const PERFORMANCE_ADMIN = {
   password: "AaasoBo!Admin",
   name: "Admin",
 };
+
+function createSeededRandom(seed: number): () => number {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 function buildSlots(count: number): Slot[] {
   const weekdays = [1, 2, 3, 4, 5];
@@ -42,6 +54,25 @@ function buildSlots(count: number): Slot[] {
   }
 
   return templateSlots.slice(0, count);
+}
+
+function buildShuffledAssignments(args: {
+  instructors: Array<{ id: number }>;
+  slots: Slot[];
+  random: () => number;
+}) {
+  const assignments = args.instructors.flatMap((instructor) =>
+    args.slots.map((slot) => ({ instructorId: instructor.id, slot })),
+  );
+
+  for (let i = assignments.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(args.random() * (i + 1));
+    const tmp = assignments[i]!;
+    assignments[i] = assignments[j]!;
+    assignments[j] = tmp;
+  }
+
+  return assignments;
 }
 
 function toJstDateString(date: string): string {
@@ -131,6 +162,9 @@ async function createRecurringClass(args: {
 export async function initializePerformanceData(
   config: PerformanceTestConfig,
 ): Promise<PerformanceBootstrapState> {
+  setTestDataSeed(config.seed);
+  const random = createSeededRandom(config.seed);
+
   const admin = await createAdmin(PERFORMANCE_ADMIN);
   const adminAuthCookie = await generateAuthCookie(admin.id, "admin", {
     expirationTime: "180d",
@@ -158,6 +192,17 @@ export async function initializePerformanceData(
     ),
   );
 
+  const assignments = buildShuffledAssignments({
+    instructors,
+    slots,
+    random,
+  });
+  if (config.customers > assignments.length) {
+    throw new Error(
+      `PERF_CUSTOMERS=${config.customers} exceeds unique instructor-slot capacity ${assignments.length}.`,
+    );
+  }
+
   for (
     let customerIndex = 0;
     customerIndex < config.customers;
@@ -165,8 +210,7 @@ export async function initializePerformanceData(
   ) {
     const customer = await createCustomer();
     const child = await createChild(customer.id);
-    const instructor = instructors[customerIndex % instructors.length]!;
-    const slot = slots[customerIndex % slots.length]!;
+    const assignment = assignments[customerIndex]!;
 
     const subscriptionId = await registerSubscription({
       adminAuthCookie,
@@ -176,11 +220,11 @@ export async function initializePerformanceData(
     });
 
     await createRecurringClass({
-      instructorId: instructor.id,
+      instructorId: assignment.instructorId,
       customerId: customer.id,
       childId: child.id,
       subscriptionId,
-      slot,
+      slot: assignment.slot,
       startDate: config.startDate,
     });
   }
