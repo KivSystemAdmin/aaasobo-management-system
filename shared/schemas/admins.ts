@@ -389,7 +389,12 @@ export const ImportNormalizeGeneratedEmailItem = z.object({
   generatedEmail: z.string(),
 });
 
+export const ImportNormalizedDownloadParams = z.object({
+  jobId: z.string().min(1, "jobId is required"),
+});
+
 export const ImportNormalizeResponse = z.object({
+  jobId: z.string(),
   files: z.record(z.string(), z.string()),
   report: z.object({
     rawRows: z.number().int().nonnegative(),
@@ -454,3 +459,6 @@ export type UpdateSubscriptionToTerminateClassRequest = z.infer<
   typeof UpdateSubscriptionToTerminateClassRequest
 >;
 export type ImportNormalizeResponse = z.infer<typeof ImportNormalizeResponse>;
+export type ImportNormalizedDownloadParams = z.infer<
+  typeof ImportNormalizedDownloadParams
+>;

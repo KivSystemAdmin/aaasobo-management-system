@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import request from "supertest";
+import JSZip from "jszip";
 import { server } from "../../../server";
 import { createAdmin, generateAuthCookie } from "../../testUtils";
 
@@ -96,6 +97,7 @@ describe("POST /admins/import/normalize", () => {
       .expect(200);
 
     expect(response.body.files).toBeTruthy();
+    expect(response.body.jobId).toEqual(expect.any(String));
     expect(Object.keys(response.body.files).sort()).toEqual([
       "children.csv",
       "class_attendance.csv",
@@ -143,6 +145,74 @@ describe("POST /admins/import/normalize", () => {
     expect(plansCsv).toContain("plan_ref,name,description,weekly_class_times");
     expect(plansCsv).toContain("1980円（週1回25分）");
     expect(plansCsv).toContain("1480円（月2回25分）");
+  });
+
+  it("downloads normalized files as a zip bundle by jobId", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+
+    const normalizeResponse = await request(server)
+      .post("/admins/import/normalize")
+      .set("Cookie", authCookie)
+      .attach("file", Buffer.from(`${RAW_HEADER}\n`, "utf-8"), {
+        filename: "raw-schedule.csv",
+        contentType: "text/csv",
+      })
+      .expect(200);
+
+    const jobId = normalizeResponse.body.jobId as string;
+
+    const downloadResponse = await request(server)
+      .get(`/admins/import/normalized/${jobId}/download`)
+      .set("Cookie", authCookie)
+      .buffer(true)
+      .parse((res, callback) => {
+        const chunks: Buffer[] = [];
+        res.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+        res.on("end", () => callback(null, Buffer.concat(chunks)));
+      })
+      .expect(200);
+
+    expect(downloadResponse.headers["content-type"]).toContain(
+      "application/zip",
+    );
+    expect(downloadResponse.headers["content-disposition"]).toContain(
+      `normalized-import-${jobId}.zip`,
+    );
+
+    const zip = await JSZip.loadAsync(downloadResponse.body as Buffer);
+    const entryNames = Object.keys(zip.files).sort();
+    expect(entryNames).toEqual([
+      "children.csv",
+      "class_attendance.csv",
+      "classes.csv",
+      "customers.csv",
+      "events.csv",
+      "instructor_absences.csv",
+      "instructor_schedules.csv",
+      "instructors.csv",
+      "plans.csv",
+      "recurring_class_attendance.csv",
+      "recurring_classes.csv",
+      "schedules.csv",
+      "subscriptions.csv",
+      "system_status.csv",
+    ]);
+
+    const plansCsv = await zip.file("plans.csv")!.async("string");
+    expect(plansCsv).toBe(
+      "plan_ref,name,description,weekly_class_times,is_native,termination_at",
+    );
+  });
+
+  it("returns 404 when normalized package jobId does not exist", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+
+    await request(server)
+      .get("/admins/import/normalized/not-a-real-job/download")
+      .set("Cookie", authCookie)
+      .expect(404);
   });
 
   it("returns 400 when upload is missing", async () => {
