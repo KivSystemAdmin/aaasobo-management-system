@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import {
   buildNormalizedPackageZip,
-  normalizeRawScheduleCsvToPackage,
-} from "../services/adminImportService";
-import {
+  extractNormalizedFilesFromZip,
   getNormalizedImportJobZip,
+  normalizeRawScheduleCsvToPackage,
   storeNormalizedImportJob,
-} from "../services/adminImportJobStore";
+  validateNormalizedImportFiles,
+} from "../services/adminImport";
 
 export const normalizeImportSourceController = async (
   req: Request,
@@ -59,4 +59,56 @@ export const downloadNormalizedImportPackageController = async (
       `attachment; filename="normalized-import-${jobId}.zip"`,
     )
     .send(zipBuffer);
+};
+
+export const executeNormalizedImportController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const file = req.file;
+    const jobId = typeof req.body?.jobId === "string" ? req.body.jobId : "";
+
+    let zipBuffer: Buffer | null = null;
+    if (file) {
+      zipBuffer = file.buffer;
+    } else if (jobId) {
+      zipBuffer = getNormalizedImportJobZip(jobId);
+      if (!zipBuffer) {
+        return res.status(404).json({
+          message: `Normalized import package "${jobId}" was not found or expired`,
+        });
+      }
+    }
+
+    if (!zipBuffer) {
+      return res.status(400).json({
+        message:
+          'Missing normalized package. Upload zip via field "file" or provide "jobId".',
+      });
+    }
+
+    const files = await extractNormalizedFilesFromZip(zipBuffer);
+    const validationResult = validateNormalizedImportFiles(files);
+
+    if (!validationResult.isValid) {
+      return res.status(400).json({
+        message: "Normalized import validation failed",
+        report: validationResult.report,
+        issues: validationResult.issues,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Normalized import package validated successfully",
+      imported: false,
+      report: validationResult.report,
+    });
+  } catch (error) {
+    console.error("Failed to execute normalized import", { error });
+    return res.status(400).json({
+      message:
+        error instanceof Error ? error.message : "Import execution failed",
+    });
+  }
 };

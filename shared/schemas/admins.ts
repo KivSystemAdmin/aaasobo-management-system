@@ -404,6 +404,33 @@ export const ImportNormalizeResponse = z.object({
   }),
 });
 
+export const ImportExecuteRequest = z.object({
+  jobId: z.string().min(1).optional(),
+});
+
+export const ImportExecuteValidationIssue = z.object({
+  file: z.string(),
+  row: z.number().int().positive().nullable(),
+  column: z.string().nullable(),
+  message: z.string(),
+});
+
+export const ImportExecuteReport = z.object({
+  rowsByFile: z.record(z.string(), z.number().int().nonnegative()),
+});
+
+export const ImportExecuteResponse = z.object({
+  message: z.string(),
+  imported: z.boolean(),
+  report: ImportExecuteReport,
+});
+
+export const ImportExecuteErrorResponse = z.object({
+  message: z.string(),
+  report: ImportExecuteReport,
+  issues: z.array(ImportExecuteValidationIssue),
+});
+
 export type AdminIdParams = z.infer<typeof AdminIdParams>;
 export type CustomerIdParams = z.infer<typeof CustomerIdParams>;
 export type InstructorIdParams = z.infer<typeof InstructorIdParams>;
@@ -461,4 +488,9 @@ export type UpdateSubscriptionToTerminateClassRequest = z.infer<
 export type ImportNormalizeResponse = z.infer<typeof ImportNormalizeResponse>;
 export type ImportNormalizedDownloadParams = z.infer<
   typeof ImportNormalizedDownloadParams
+>;
+export type ImportExecuteRequest = z.infer<typeof ImportExecuteRequest>;
+export type ImportExecuteResponse = z.infer<typeof ImportExecuteResponse>;
+export type ImportExecuteErrorResponse = z.infer<
+  typeof ImportExecuteErrorResponse
 >;
