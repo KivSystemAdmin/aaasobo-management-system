@@ -3,7 +3,7 @@ import JSZip from "jszip";
 
 type CsvRow = string[];
 
-export type NormalizedFileName =
+type NormalizedFileName =
   | "plans.csv"
   | "customers.csv"
   | "children.csv"
@@ -19,7 +19,7 @@ export type NormalizedFileName =
   | "classes.csv"
   | "class_attendance.csv";
 
-export type NormalizedFileMap = Record<NormalizedFileName, string>;
+type NormalizedFileMap = Record<NormalizedFileName, string>;
 
 interface GeneratedEmailReportItem {
   row: number;
@@ -34,7 +34,7 @@ interface NormalizationReport {
   warnings: string[];
 }
 
-export interface NormalizeRawScheduleResult {
+interface NormalizeRawScheduleResult {
   files: NormalizedFileMap;
   report: NormalizationReport;
 }
