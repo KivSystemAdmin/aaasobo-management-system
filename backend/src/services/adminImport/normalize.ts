@@ -3,7 +3,7 @@ import JSZip from "jszip";
 
 type CsvRow = string[];
 
-type NormalizedFileName =
+export type NormalizedFileName =
   | "plans.csv"
   | "customers.csv"
   | "children.csv"
@@ -131,7 +131,7 @@ const RAW_COLUMN = {
   email: 17,
 } as const;
 
-const NORMALIZED_HEADERS: Record<NormalizedFileName, string[]> = {
+export const NORMALIZED_HEADERS = {
   "plans.csv": [
     "plan_ref",
     "name",
@@ -216,7 +216,11 @@ const NORMALIZED_HEADERS: Record<NormalizedFileName, string[]> = {
     "is_free_trial",
   ],
   "class_attendance.csv": ["class_ref", "child_ref"],
-};
+} as const satisfies Record<NormalizedFileName, readonly string[]>;
+
+export const MANDATORY_NORMALIZED_FILES = Object.keys(
+  NORMALIZED_HEADERS,
+) as NormalizedFileName[];
 
 class RefSequence {
   private value = 1;
@@ -233,7 +237,7 @@ class RefSequence {
   }
 }
 
-function parseCsv(content: string): CsvRow[] {
+export function parseCsv(content: string): CsvRow[] {
   const rows: CsvRow[] = [];
   let row: string[] = [];
   let field = "";
@@ -304,6 +308,10 @@ function toCsv(rows: string[][]): string {
 
 function trimOrEmpty(value: string | undefined): string {
   return (value ?? "").trim();
+}
+
+export function normalizeCsvCell(value: string | undefined): string {
+  return trimOrEmpty(value);
 }
 
 function isHeaderRow(row: CsvRow): boolean {
@@ -662,8 +670,8 @@ function rowsToCsvWithHeaders(
   rows: Array<Record<string, string>>,
 ): string {
   const headers = NORMALIZED_HEADERS[fileName];
-  const csvRows = [
-    headers,
+  const csvRows: string[][] = [
+    [...headers],
     ...rows.map((row) => headers.map((h) => row[h] ?? "")),
   ];
   return toCsv(csvRows);

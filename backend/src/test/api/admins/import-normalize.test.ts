@@ -235,3 +235,102 @@ describe("POST /admins/import/normalize", () => {
       .expect(401);
   });
 });
+
+describe("POST /admins/import/execute", () => {
+  it("validates normalized package by jobId", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+
+    const normalizeResponse = await request(server)
+      .post("/admins/import/normalize")
+      .set("Cookie", authCookie)
+      .attach("file", Buffer.from(`${RAW_HEADER}\n`, "utf-8"), {
+        filename: "raw-schedule.csv",
+        contentType: "text/csv",
+      })
+      .expect(200);
+
+    const response = await request(server)
+      .post("/admins/import/execute")
+      .set("Cookie", authCookie)
+      .send({ jobId: normalizeResponse.body.jobId })
+      .expect(200);
+
+    expect(response.body.imported).toBe(false);
+    expect(response.body.report.rowsByFile["system_status.csv"]).toBe(1);
+  });
+
+  it("returns validation issues when required files are missing in zip", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+
+    const zip = new JSZip();
+    zip.file(
+      "plans.csv",
+      "plan_ref,name,description,weekly_class_times,is_native,termination_at\n",
+    );
+    const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
+
+    const response = await request(server)
+      .post("/admins/import/execute")
+      .set("Cookie", authCookie)
+      .attach("file", zipBuffer, {
+        filename: "normalized.zip",
+        contentType: "application/zip",
+      })
+      .expect(400);
+
+    expect(response.body.message).toBe("Normalized import validation failed");
+    expect(response.body.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          file: "customers.csv",
+          message: expect.stringContaining("Missing required file"),
+        }),
+      ]),
+    );
+  });
+
+  it("returns validation issues when cross-file references are broken", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+
+    const normalizeResponse = await request(server)
+      .post("/admins/import/normalize")
+      .set("Cookie", authCookie)
+      .attach("file", Buffer.from(`${RAW_HEADER}\n`, "utf-8"), {
+        filename: "raw-schedule.csv",
+        contentType: "text/csv",
+      })
+      .expect(200);
+
+    const zip = new JSZip();
+    for (const [name, csv] of Object.entries(normalizeResponse.body.files)) {
+      zip.file(name, csv as string);
+    }
+    zip.file(
+      "children.csv",
+      "child_ref,customer_ref,name,birthdate,personal_info\nCH0001,CU9999,Child,2015-01-01,\n",
+    );
+    const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
+
+    const response = await request(server)
+      .post("/admins/import/execute")
+      .set("Cookie", authCookie)
+      .attach("file", zipBuffer, {
+        filename: "normalized.zip",
+        contentType: "application/zip",
+      })
+      .expect(400);
+
+    expect(response.body.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          file: "children.csv",
+          column: "customer_ref",
+          message: expect.stringContaining("does not exist in customers.csv"),
+        }),
+      ]),
+    );
+  });
+});

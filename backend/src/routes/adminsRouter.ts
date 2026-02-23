@@ -26,6 +26,7 @@ import {
 } from "../../src/controllers/adminsController";
 import {
   downloadNormalizedImportPackageController,
+  executeNormalizedImportController,
   normalizeImportSourceController,
 } from "../controllers/adminsImportController";
 import {
@@ -73,6 +74,9 @@ import {
   ConflictErrorResponse,
   InstructorUpdateErrorResponse,
   ImportNormalizeResponse,
+  ImportExecuteRequest,
+  ImportExecuteResponse,
+  ImportExecuteErrorResponse,
   ImportNormalizedDownloadParams,
 } from "../../../shared/schemas/admins";
 
@@ -860,6 +864,43 @@ const downloadNormalizedImportPackageConfig = {
   },
 } as const;
 
+const executeNormalizedImportConfig = {
+  method: "post" as const,
+  bodySchema: ImportExecuteRequest,
+  middleware: [
+    verifyAuthentication(AUTH_ROLES.A),
+    upload.single("file"),
+  ] as RequestHandler[],
+  handler: executeNormalizedImportController,
+  openapi: {
+    summary: "Execute normalized import",
+    description:
+      "Validate a normalized import package from uploaded zip or prior normalization job",
+    responses: {
+      200: {
+        description: "Normalized import package validated",
+        schema: ImportExecuteResponse,
+      },
+      400: {
+        description: "Normalized package validation failed",
+        schema: ImportExecuteErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Job not found or expired",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
 const validatedRouteConfigs = {
   "/:id": [updateAdminConfig],
   "/admin-list": [getAllAdminsConfig],
@@ -883,6 +924,7 @@ const validatedRouteConfigs = {
   "/instructor-list/update/:id": [updateInstructorConfig],
   "/instructor-list/update/:id/withIcon": [updateInstructorWithIconConfig],
   "/import/normalize": [normalizeImportSourceConfig],
+  "/import/execute": [executeNormalizedImportConfig],
   "/import/normalized/:jobId/download": [downloadNormalizedImportPackageConfig],
   "/plan-list": [getAllPlansConfig],
   "/plan-list/delete/:id": [deletePlanConfig],

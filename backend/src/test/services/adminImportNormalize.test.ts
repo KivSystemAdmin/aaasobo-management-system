@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildNormalizedPackageZip,
   normalizeRawScheduleCsvToPackage,
-} from "../../services/adminImportService";
+} from "../../services/adminImport";
 import JSZip from "jszip";
 
 const RAW_HEADER =
@@ -24,7 +24,7 @@ function rawRow(columns: string[]): string {
   return columns.map(csvEscape).join(",");
 }
 
-describe("adminImportService", () => {
+describe("adminImport normalize service", () => {
   it("throws when raw header row is missing", () => {
     expect(() => normalizeRawScheduleCsvToPackage("a,b,c\n1,2,3")).toThrow(
       "Header row for raw schedule CSV not found",

@@ -46,6 +46,40 @@ function* enumerateDays(startDate: string, endDate: string): Generator<Date> {
   }
 }
 
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
+
+function isEndOfMonth(day: Date): boolean {
+  const nextDay = new Date(day);
+  nextDay.setUTCDate(day.getUTCDate() + 1);
+  return nextDay.getUTCDate() === 1;
+}
+
+function getNextMonthParams(day: Date): {
+  year: number;
+  month: (typeof MONTH_NAMES)[number];
+} {
+  const nextMonthDate = new Date(
+    Date.UTC(day.getUTCFullYear(), day.getUTCMonth() + 1, 1),
+  );
+  return {
+    year: nextMonthDate.getUTCFullYear(),
+    month: MONTH_NAMES[nextMonthDate.getUTCMonth()]!,
+  };
+}
+
 const COMPLETABLE_CLASS_STATUSES = new Set(["pending", "booked", "rebooked"]);
 const CANCEL_TARGET_STATUSES = new Set(["pending", "booked", "rebooked"]);
 const REBOOK_BUSINESS_ERROR_STATUSES = new Set([400, 403, 404, 409]);
@@ -102,8 +136,8 @@ function toDateString(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-function isLastWeekOfRun(day: Date, endDate: Date): boolean {
-  return addDays(day, 7).getTime() > endDate.getTime();
+function isLastWeekOfRun(day: Date, simulationEndDate: Date): boolean {
+  return addDays(day, 7).getTime() > simulationEndDate.getTime();
 }
 
 type CustomerDailyResult = {
@@ -290,7 +324,7 @@ type DayResult = {
 
 async function handleSimulationDay(args: {
   day: Date;
-  endDate: Date;
+  simulationEndDate: Date;
   adminAuthCookie: string;
   instructorIds: number[];
   customers: PerformanceCustomerState[];
@@ -300,7 +334,7 @@ async function handleSimulationDay(args: {
   const dayDateKey = args.day.toISOString().slice(0, 10);
 
   const customerResults: CustomerDailyResult[] = [];
-  if (!isLastWeekOfRun(args.day, args.endDate)) {
+  if (!isLastWeekOfRun(args.day, args.simulationEndDate)) {
     for (const customer of args.customers) {
       customerResults.push(
         await handleCustomerDailyOperation({
@@ -379,6 +413,24 @@ async function handleSimulationDay(args: {
         `classId=${result.classId} status=${result.status} body=${JSON.stringify(result.body)}`,
     );
 
+  const generationErrors: string[] = [];
+  if (
+    isEndOfMonth(args.day) &&
+    args.day.getTime() < args.simulationEndDate.getTime()
+  ) {
+    const { year, month } = getNextMonthParams(args.day);
+    const generationResponse = await request(server)
+      .post("/classes/create-classes")
+      .set("Cookie", args.adminAuthCookie)
+      .send({ year, month });
+
+    if (generationResponse.status !== 201) {
+      generationErrors.push(
+        `create-classes year=${year} month=${month} status=${generationResponse.status} body=${JSON.stringify(generationResponse.body)}`,
+      );
+    }
+  }
+
   return {
     latencies: [
       ...classFetchResults.map((result) => result.latencyMs),
@@ -396,6 +448,7 @@ async function handleSimulationDay(args: {
       ...fetchErrors,
       ...completionErrors,
       ...customerResults.flatMap((result) => result.errors),
+      ...generationErrors,
     ],
     completedClasses: completionResults.length - completionErrors.length,
     cancelAttempts: customerResults.reduce(
@@ -471,6 +524,7 @@ describe("performance: completion + customer cancel/rebook workload", () => {
     const config = getPerformanceTestConfig();
     const state = await initializePerformanceData(config);
     const rng = createSeededRng(config.seed);
+    const simulationEndDate = new Date(`${config.endDate}T00:00:00.000Z`);
 
     const runStartedAt = performance.now();
     const allLatencies: number[] = [];
@@ -489,15 +543,13 @@ describe("performance: completion + customer cancel/rebook workload", () => {
     let rebookSkippedNoSlot = 0;
     let rebookBusinessErrors = 0;
 
-    const runEndDate = new Date(`${config.endDate}T00:00:00.000Z`);
-
     for (const day of enumerateDays(config.startDate, config.endDate)) {
       vi.setSystemTime(day);
       daysPassed += 1;
 
       const dayResult = await handleSimulationDay({
         day,
-        endDate: runEndDate,
+        simulationEndDate,
         adminAuthCookie: state.adminAuthCookie,
         instructorIds: state.instructorIds,
         customers: state.customers,
