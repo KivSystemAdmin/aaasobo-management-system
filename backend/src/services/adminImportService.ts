@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import JSZip from "jszip";
 
 type CsvRow = string[];
 
@@ -735,4 +736,22 @@ export function normalizeRawScheduleCsvToPackage(
       warnings: mapped.warnings,
     },
   };
+}
+
+export async function buildNormalizedPackageZip(
+  files: NormalizedFileMap,
+): Promise<Buffer> {
+  const zip = new JSZip();
+
+  for (const fileName of Object.keys(files) as NormalizedFileName[]) {
+    zip.file(fileName, files[fileName], { binary: false });
+  }
+
+  return zip.generateAsync({
+    type: "nodebuffer",
+    compression: "DEFLATE",
+    compressionOptions: {
+      level: 9,
+    },
+  });
 }

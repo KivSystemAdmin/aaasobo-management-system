@@ -24,7 +24,10 @@ import {
   getAllEventsController,
   getClassesWithinPeriodController,
 } from "../../src/controllers/adminsController";
-import { normalizeImportSourceController } from "../controllers/adminsImportController";
+import {
+  downloadNormalizedImportPackageController,
+  normalizeImportSourceController,
+} from "../controllers/adminsImportController";
 import {
   getAllSchedulesController,
   updateBusinessScheduleController,
@@ -70,6 +73,7 @@ import {
   ConflictErrorResponse,
   InstructorUpdateErrorResponse,
   ImportNormalizeResponse,
+  ImportNormalizedDownloadParams,
 } from "../../../shared/schemas/admins";
 
 import { AUTH_ROLES } from "../utils/commonUtils";
@@ -827,6 +831,35 @@ const normalizeImportSourceConfig = {
   },
 } as const;
 
+const downloadNormalizedImportPackageConfig = {
+  method: "get" as const,
+  paramsSchema: ImportNormalizedDownloadParams,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: downloadNormalizedImportPackageController,
+  openapi: {
+    summary: "Download normalized import zip",
+    description:
+      "Download normalized CSV package zip by job ID generated from normalization",
+    responses: {
+      200: {
+        description: "Normalized package zip file",
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Job not found or expired",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
 const validatedRouteConfigs = {
   "/:id": [updateAdminConfig],
   "/admin-list": [getAllAdminsConfig],
@@ -850,6 +883,7 @@ const validatedRouteConfigs = {
   "/instructor-list/update/:id": [updateInstructorConfig],
   "/instructor-list/update/:id/withIcon": [updateInstructorWithIconConfig],
   "/import/normalize": [normalizeImportSourceConfig],
+  "/import/normalized/:jobId/download": [downloadNormalizedImportPackageConfig],
   "/plan-list": [getAllPlansConfig],
   "/plan-list/delete/:id": [deletePlanConfig],
   "/plan-list/register": [registerPlanConfig],
