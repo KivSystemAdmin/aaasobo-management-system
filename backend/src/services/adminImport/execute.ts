@@ -118,18 +118,18 @@ type AssertNever<T extends never> = T;
 type _CheckMissingRowKeysInHeaders = AssertNever<MissingRowKeysInHeaders>;
 type _CheckExtraHeaderKeysNotInRows = AssertNever<ExtraHeaderKeysNotInRows>;
 
-export interface ImportValidationIssue {
+interface ImportValidationIssue {
   file: NormalizedFileName;
   row: number | null;
   column: string | null;
   message: string;
 }
 
-export interface ImportValidationReport {
+interface ImportValidationReport {
   rowsByFile: Record<NormalizedFileName, number>;
 }
 
-export interface ImportValidationResult {
+interface ImportValidationResult {
   isValid: boolean;
   issues: ImportValidationIssue[];
   report: ImportValidationReport;

@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import JSZip from "jszip";
 
-export type CsvRow = string[];
+type CsvRow = string[];
 
 export type NormalizedFileName =
   | "plans.csv"
@@ -19,7 +19,7 @@ export type NormalizedFileName =
   | "classes.csv"
   | "class_attendance.csv";
 
-export type NormalizedFileMap = Record<NormalizedFileName, string>;
+type NormalizedFileMap = Record<NormalizedFileName, string>;
 
 interface GeneratedEmailReportItem {
   row: number;
@@ -285,7 +285,7 @@ export function parseCsv(content: string): CsvRow[] {
   return rows;
 }
 
-export function toCsv(rows: string[][]): string {
+function toCsv(rows: string[][]): string {
   return rows
     .map((line) =>
       line
