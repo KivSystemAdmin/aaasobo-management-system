@@ -383,6 +383,22 @@ export const ConflictErrorResponse = z.object({
 
 export const InstructorUpdateErrorResponse = z.record(z.string(), z.string());
 
+export const ImportNormalizeGeneratedEmailItem = z.object({
+  row: z.number().int().positive(),
+  customerName: z.string(),
+  generatedEmail: z.string(),
+});
+
+export const ImportNormalizeResponse = z.object({
+  files: z.record(z.string(), z.string()),
+  report: z.object({
+    rawRows: z.number().int().nonnegative(),
+    normalizedRowsByFile: z.record(z.string(), z.number().int().nonnegative()),
+    generatedCustomerEmails: z.array(ImportNormalizeGeneratedEmailItem),
+    warnings: z.array(z.string()),
+  }),
+});
+
 export type AdminIdParams = z.infer<typeof AdminIdParams>;
 export type CustomerIdParams = z.infer<typeof CustomerIdParams>;
 export type InstructorIdParams = z.infer<typeof InstructorIdParams>;
@@ -437,3 +453,4 @@ export type UpdateSubscriptionToAddClassRequest = z.infer<
 export type UpdateSubscriptionToTerminateClassRequest = z.infer<
   typeof UpdateSubscriptionToTerminateClassRequest
 >;
+export type ImportNormalizeResponse = z.infer<typeof ImportNormalizeResponse>;
