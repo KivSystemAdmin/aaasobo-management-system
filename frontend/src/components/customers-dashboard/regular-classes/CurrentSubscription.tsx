@@ -122,16 +122,21 @@ function CurrentSubscription({
                         - {PRESENT_LABEL[language]}
                       </span>
                     </div>
-                    <div>
-                      <a
-                        href={subscription.selectType}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.dateText}
-                      >
-                        {subscription.selectType}
-                      </a>
-                    </div>
+
+                    {userSessionType === "admin" ? (
+                      <div>
+                        <a
+                          href={subscription.selectType}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.dateText}
+                        >
+                          {subscription.selectType}
+                        </a>
+                      </div>
+                    ) : (
+                      <></>
+                    )}
                   </div>
 
                   {userSessionType === "admin" &&
@@ -139,7 +144,7 @@ function CurrentSubscription({
                     <div className={styles.buttons}>
                       <ActionButton
                         onClick={() => handleEditSubscription(id)}
-                        btnText={"Edit"}
+                        btnText={"EDIT"}
                         className="editBtn"
                       />
                       <ActionButton
