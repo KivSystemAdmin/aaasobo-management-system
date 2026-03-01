@@ -1240,13 +1240,6 @@ export function validateNormalizedImportFiles(
     issues,
     "instructor_schedules.csv",
     parsed["instructor_schedules.csv"],
-    ["instructor_ref", "effective_from", "effective_to", "timezone"],
-    "(instructor_ref,effective_from,effective_to,timezone)",
-  );
-  assertUnique(
-    issues,
-    "instructor_schedules.csv",
-    parsed["instructor_schedules.csv"],
     [
       "instructor_ref",
       "effective_from",

@@ -490,6 +490,39 @@ describe("POST /admins/import/execute", () => {
     expect(importedCustomer.password.startsWith("$2")).toBe(true);
   });
 
+  it("accepts multiple slot rows that share the same instructor schedule key", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+
+    const files = buildMinimalNormalizedFiles();
+    files["instructor_schedules.csv"] = [
+      "instructor_ref,effective_from,effective_to,timezone,weekday,start_time",
+      "IN0001,2025-01-01,2025-12-31,Asia/Tokyo,1,09:00",
+      "IN0001,2025-01-01,2025-12-31,Asia/Tokyo,3,09:30",
+      "",
+    ].join("\n");
+    const zipBuffer = await buildZipBuffer(files);
+
+    const response = await request(server)
+      .post("/admins/import/execute")
+      .set("Cookie", authCookie)
+      .attach("file", zipBuffer, {
+        filename: "normalized.zip",
+        contentType: "application/zip",
+      })
+      .expect(200);
+
+    expect(response.body.imported).toBe(true);
+
+    const [scheduleCount, slotCount] = await Promise.all([
+      prisma.instructorSchedule.count(),
+      prisma.instructorSlot.count(),
+    ]);
+
+    expect(scheduleCount).toBe(1);
+    expect(slotCount).toBe(2);
+  });
+
   it("preserves only seed admins during full reset import", async () => {
     const seedAdmin1 = await createAdmin({
       name: "Seed Admin 1",
