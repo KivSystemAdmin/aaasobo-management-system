@@ -263,6 +263,26 @@ Exact table order should be finalized against Prisma schema, but expected depend
 6. bookings/registrations
 7. other dependent operational records
 
+## Progress / Worklog
+
+### Completed
+
+1. Phase 0 discovery/design baseline captured in this document.
+2. Phase 1 backend normalization implemented (raw CSV parsing, mapping, normalized artifact generation, zip packaging, unit tests).
+3. Phase 2 backend import implemented (normalized validation, dependency-ordered import, full reset with seed-admin preservation, transactional safety, integration tests).
+4. Phase 3 admin UI implemented (normalize flow, report display, zip download, destructive confirmation, execute + result summary).
+5. Phase 4.2 guardrails for large uploads implemented:
+   - 50MB upload limit enforced on `/admins/import/normalize` and `/admins/import/execute`.
+   - Oversized uploads return HTTP 413.
+6. Phase 4.1 strict error-granularity expansion is intentionally de-scoped for v1.
+7. Rollback applied for strict execute-side issue granularity changes from PR #451 to keep the feature simpler for bootstrap/testing usage.
+
+### Current Direction (Confirmed)
+
+1. Prioritize simplicity and easy customization over highly strict/fully modeled error structures.
+2. Keep backend validation pragmatic: enough to prevent broken imports, without over-constraining data migration workflows.
+3. Backend should return human-readable parse/validation errors; frontend should display those details directly.
+
 ## TODO (Implementation Plan)
 
 ### Phase 0: Discovery
@@ -298,8 +318,10 @@ Exact table order should be finalized against Prisma schema, but expected depend
 
 ### Phase 4: Hardening
 
-1. Improve error reporting granularity (file/row/column).
+1. Improve error reporting granularity (file/row/column) only where low-cost and high-value; avoid heavy schema complexity.
+   - Status: strict/fully-structured 4.1 approach is intentionally not planned for current v1 scope.
 2. Add guardrails for very large uploads.
+   - Status: done (50MB limit + HTTP 413 on oversized uploads).
 3. Add operational docs and runbook.
 4. Evaluate whether to disable/remove feature in production release process.
 
@@ -321,13 +343,14 @@ None at this stage.
 10. Temporary passwords are regenerated on every normalization run.
 11. Import feature is always available to authenticated admins in v1 (no environment kill-switch).
 12. Missing emails are auto-generated during normalization (no toggle), and normalization output/report must list which rows were assigned generated emails.
+13. For v1 bootstrap/testing usage, prioritize simple, human-readable backend errors over deeply structured error contracts.
 
 ## Risks and Mitigations
 
 1. Risk: accidental destructive execution.
    - Mitigation: strong modal warning and explicit admin-only access.
 2. Risk: source data quality issues.
-   - Mitigation: strict normalization validation and actionable error reports.
+   - Mitigation: pragmatic normalization/import validation with actionable backend errors.
 3. Risk: broken relationships across entities.
    - Mitigation: generated stable references + cross-file validation before write.
 4. Risk: large-batch performance.

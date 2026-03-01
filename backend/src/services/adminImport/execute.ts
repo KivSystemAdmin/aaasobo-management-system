@@ -221,10 +221,6 @@ function addIssue(
   issues.push({ file, row, column, message });
 }
 
-function formatExtraColumn(position: number): string {
-  return `column:${position}`;
-}
-
 function assertRequired(
   issues: ImportValidationIssue[],
   file: NormalizedFileName,
@@ -398,43 +394,13 @@ function parseFileRows<K extends NormalizedFileName>(
   );
 
   if (!sameLength || !sameOrder) {
-    const maxColumns = Math.max(expectedHeaders.length, actualHeaders.length);
-    for (let index = 0; index < maxColumns; index += 1) {
-      const expected = expectedHeaders[index];
-      const actual = actualHeaders[index];
-
-      if (expected && !actual) {
-        addIssue(
-          issues,
-          file,
-          1,
-          expected,
-          `Missing header column "${expected}" at position ${index + 1}`,
-        );
-        continue;
-      }
-
-      if (!expected && actual) {
-        addIssue(
-          issues,
-          file,
-          1,
-          formatExtraColumn(index + 1),
-          `Unexpected extra header "${actual}" at position ${index + 1}`,
-        );
-        continue;
-      }
-
-      if (expected && actual && expected !== actual) {
-        addIssue(
-          issues,
-          file,
-          1,
-          expected,
-          `Header mismatch at position ${index + 1}: expected "${expected}" but got "${actual}"`,
-        );
-      }
-    }
+    addIssue(
+      issues,
+      file,
+      1,
+      null,
+      `Header mismatch. Expected: ${expectedHeaders.join(",")}`,
+    );
     return [];
   }
 
@@ -450,8 +416,8 @@ function parseFileRows<K extends NormalizedFileName>(
         issues,
         file,
         i + 1,
-        formatExtraColumn(expectedHeaders.length + 1),
-        `Row has too many columns. Expected ${expectedHeaders.length}, got ${row.length}`,
+        null,
+        `Row has too many columns. Expected ${expectedHeaders.length}`,
       );
       continue;
     }
