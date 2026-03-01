@@ -11,6 +11,7 @@ import { prisma } from "../../setup";
 
 const RAW_HEADER =
   ",英語村,,2020.10.,name,child name,plan,講師名,date,time,class,お子さま誕生日,兄弟お子さま誕生日,年齢,詳細,備考※月2回の場合は週を記入,favorite,,,";
+const IMPORT_FILE_SIZE_LIMIT_BYTES = 50 * 1024 * 1024;
 
 function rawRow(columns: string[]) {
   return columns.join(",");
@@ -266,6 +267,20 @@ describe("POST /admins/import/normalize", () => {
       .expect(400);
   });
 
+  it("returns 413 when uploaded source CSV exceeds max size", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+
+    await request(server)
+      .post("/admins/import/normalize")
+      .set("Cookie", authCookie)
+      .attach("file", Buffer.alloc(IMPORT_FILE_SIZE_LIMIT_BYTES + 1, "a"), {
+        filename: "raw-schedule.csv",
+        contentType: "text/csv",
+      })
+      .expect(413);
+  });
+
   it("returns 401 when unauthenticated", async () => {
     await request(server)
       .post("/admins/import/normalize")
@@ -341,6 +356,20 @@ describe("POST /admins/import/execute", () => {
         }),
       ]),
     );
+  });
+
+  it("returns 413 when uploaded normalized zip exceeds max size", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+
+    await request(server)
+      .post("/admins/import/execute")
+      .set("Cookie", authCookie)
+      .attach("file", Buffer.alloc(IMPORT_FILE_SIZE_LIMIT_BYTES + 1, "a"), {
+        filename: "normalized.zip",
+        contentType: "application/zip",
+      })
+      .expect(413);
   });
 
   it("returns validation issues when cross-file references are broken", async () => {

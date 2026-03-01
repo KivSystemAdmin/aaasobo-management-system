@@ -82,7 +82,7 @@ import {
 
 import { AUTH_ROLES } from "../utils/commonUtils";
 import { verifyAuthentication } from "../middlewares/auth.middleware";
-import upload from "../middlewares/upload.middleware";
+import upload, { uploadAdminImportFile } from "../middlewares/upload.middleware";
 
 // Route configurations
 const registerAdminConfig = {
@@ -807,7 +807,7 @@ const normalizeImportSourceConfig = {
   method: "post" as const,
   middleware: [
     verifyAuthentication(AUTH_ROLES.A),
-    upload.single("file"),
+    uploadAdminImportFile,
   ] as RequestHandler[],
   handler: normalizeImportSourceController,
   openapi: {
@@ -825,6 +825,10 @@ const normalizeImportSourceConfig = {
       },
       401: {
         description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      413: {
+        description: "Uploaded file exceeds size limit",
         schema: MessageErrorResponse,
       },
       500: {
@@ -869,7 +873,7 @@ const executeNormalizedImportConfig = {
   bodySchema: ImportExecuteRequest,
   middleware: [
     verifyAuthentication(AUTH_ROLES.A),
-    upload.single("file"),
+    uploadAdminImportFile,
   ] as RequestHandler[],
   handler: executeNormalizedImportController,
   openapi: {
@@ -887,6 +891,10 @@ const executeNormalizedImportConfig = {
       },
       401: {
         description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      413: {
+        description: "Uploaded file exceeds size limit",
         schema: MessageErrorResponse,
       },
       404: {
