@@ -322,8 +322,15 @@ Exact table order should be finalized against Prisma schema, but expected depend
    - Status: strict/fully-structured 4.1 approach is intentionally not planned for current v1 scope.
 2. Add guardrails for very large uploads.
    - Status: done (50MB limit + HTTP 413 on oversized uploads).
-3. Add operational docs and runbook.
-4. Evaluate whether to disable/remove feature in production release process.
+3. Add operational docs and runbook. *(Out of scope for v1 simplicity)*
+4. Evaluate whether to disable/remove feature in production release process. *(Out of scope for v1 simplicity)*
+
+### Next Step (Post-Implementation Validation)
+
+1. Run end-to-end validation using a sample source export converted to CSV:
+   normalize -> download normalized zip -> execute import.
+2. Verify key outcomes in DB/UI (entity counts, core relationships, seed admin preservation).
+3. Create and commit a sanitized simplified CSV fixture set (no real customer data) for repeatable test sharing.
 
 ## Open Questions
 
@@ -344,6 +351,7 @@ None at this stage.
 11. Import feature is always available to authenticated admins in v1 (no environment kill-switch).
 12. Missing emails are auto-generated during normalization (no toggle), and normalization output/report must list which rows were assigned generated emails.
 13. For v1 bootstrap/testing usage, prioritize simple, human-readable backend errors over deeply structured error contracts.
+14. Hardening scope for v1 is intentionally reduced to upload-size guardrails only; other hardening items are deferred.
 
 ## Risks and Mitigations
 
