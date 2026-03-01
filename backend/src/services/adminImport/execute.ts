@@ -152,6 +152,7 @@ const STATUS_VALUES = new Set([
   "rebooked",
   "declined",
 ]);
+const IMPORT_TRANSACTION_TIMEOUT_MS = 180_000;
 
 interface RowEnvelope<T> {
   rowNumber: number;
@@ -1827,10 +1828,13 @@ export async function executeNormalizedImportFiles(
     throw new Error("Normalized import parsing failed");
   }
 
-  await prisma.$transaction(async (tx) => {
-    await resetImportTargetData(tx);
-    await insertValidatedRows(tx, parsed);
-  });
+  await prisma.$transaction(
+    async (tx) => {
+      await resetImportTargetData(tx);
+      await insertValidatedRows(tx, parsed);
+    },
+    { timeout: IMPORT_TRANSACTION_TIMEOUT_MS },
+  );
 
   return {
     report: validation.report,
