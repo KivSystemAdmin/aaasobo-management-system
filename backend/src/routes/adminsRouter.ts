@@ -82,7 +82,9 @@ import {
 
 import { AUTH_ROLES } from "../utils/commonUtils";
 import { verifyAuthentication } from "../middlewares/auth.middleware";
-import upload, { uploadAdminImportFile } from "../middlewares/upload.middleware";
+import upload, {
+  uploadAdminImportFile,
+} from "../middlewares/upload.middleware";
 
 // Route configurations
 const registerAdminConfig = {

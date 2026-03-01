@@ -15,7 +15,10 @@ export const uploadAdminImportFile = (
   next: NextFunction,
 ) => {
   importUpload.single("file")(req, res, (error: unknown) => {
-    if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") {
+    if (
+      error instanceof multer.MulterError &&
+      error.code === "LIMIT_FILE_SIZE"
+    ) {
       return res.status(413).json({
         message: `Uploaded file exceeds max size of ${Math.floor(IMPORT_FILE_SIZE_LIMIT_BYTES / (1024 * 1024))}MB.`,
       });
