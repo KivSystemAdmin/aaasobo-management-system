@@ -274,7 +274,8 @@ Exact table order should be finalized against Prisma schema, but expected depend
 5. Phase 4.2 guardrails for large uploads implemented:
    - 50MB upload limit enforced on `/admins/import/normalize` and `/admins/import/execute`.
    - Oversized uploads return HTTP 413.
-6. Rollback applied for strict execute-side issue granularity changes from PR #451 to keep the feature simpler for bootstrap/testing usage.
+6. Phase 4.1 strict error-granularity expansion is intentionally de-scoped for v1.
+7. Rollback applied for strict execute-side issue granularity changes from PR #451 to keep the feature simpler for bootstrap/testing usage.
 
 ### Current Direction (Confirmed)
 
@@ -318,7 +319,9 @@ Exact table order should be finalized against Prisma schema, but expected depend
 ### Phase 4: Hardening
 
 1. Improve error reporting granularity (file/row/column) only where low-cost and high-value; avoid heavy schema complexity.
+   - Status: strict/fully-structured 4.1 approach is intentionally not planned for current v1 scope.
 2. Add guardrails for very large uploads.
+   - Status: done (50MB limit + HTTP 413 on oversized uploads).
 3. Add operational docs and runbook.
 4. Evaluate whether to disable/remove feature in production release process.
 
@@ -347,7 +350,7 @@ None at this stage.
 1. Risk: accidental destructive execution.
    - Mitigation: strong modal warning and explicit admin-only access.
 2. Risk: source data quality issues.
-   - Mitigation: strict normalization validation and actionable error reports.
+   - Mitigation: pragmatic normalization/import validation with actionable backend errors.
 3. Risk: broken relationships across entities.
    - Mitigation: generated stable references + cross-file validation before write.
 4. Risk: large-batch performance.
