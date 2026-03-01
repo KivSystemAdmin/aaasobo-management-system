@@ -386,6 +386,66 @@ describe("POST /admins/import/execute", () => {
     );
   });
 
+  it("returns header mismatch issues with expected column names", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+
+    const files = buildMinimalNormalizedFiles();
+    files["customers.csv"] =
+      "customer_ref,name,wrong_email,temp_password,prefecture,termination_at,has_seen_welcome\nCU0001,Customer One,customer.one@example.com,TempPass123!,Tokyo,,false\n";
+    const zipBuffer = await buildZipBuffer(files);
+
+    const response = await request(server)
+      .post("/admins/import/execute")
+      .set("Cookie", authCookie)
+      .attach("file", zipBuffer, {
+        filename: "normalized.zip",
+        contentType: "application/zip",
+      })
+      .expect(400);
+
+    expect(response.body.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          file: "customers.csv",
+          row: 1,
+          column: "email",
+          message: expect.stringContaining("Header mismatch"),
+        }),
+      ]),
+    );
+  });
+
+  it("returns extra-column issues with column position details", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+
+    const files = buildMinimalNormalizedFiles();
+    files["events.csv"] =
+      "event_ref,name,color\nEV0001,Regular,#00AAFF,EXTRA\n";
+    const zipBuffer = await buildZipBuffer(files);
+
+    const response = await request(server)
+      .post("/admins/import/execute")
+      .set("Cookie", authCookie)
+      .attach("file", zipBuffer, {
+        filename: "normalized.zip",
+        contentType: "application/zip",
+      })
+      .expect(400);
+
+    expect(response.body.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          file: "events.csv",
+          row: 2,
+          column: "column:4",
+          message: expect.stringContaining("too many columns"),
+        }),
+      ]),
+    );
+  });
+
   it("imports a normalized zip and persists cross-entity relationships", async () => {
     const admin = await createAdmin();
     const authCookie = await generateAuthCookie(admin.id, "admin");
