@@ -263,6 +263,25 @@ Exact table order should be finalized against Prisma schema, but expected depend
 6. bookings/registrations
 7. other dependent operational records
 
+## Progress / Worklog
+
+### Completed
+
+1. Phase 0 discovery/design baseline captured in this document.
+2. Phase 1 backend normalization implemented (raw CSV parsing, mapping, normalized artifact generation, zip packaging, unit tests).
+3. Phase 2 backend import implemented (normalized validation, dependency-ordered import, full reset with seed-admin preservation, transactional safety, integration tests).
+4. Phase 3 admin UI implemented (normalize flow, report display, zip download, destructive confirmation, execute + result summary).
+5. Phase 4.2 guardrails for large uploads implemented:
+   - 50MB upload limit enforced on `/admins/import/normalize` and `/admins/import/execute`.
+   - Oversized uploads return HTTP 413.
+6. Rollback applied for strict execute-side issue granularity changes from PR #451 to keep the feature simpler for bootstrap/testing usage.
+
+### Current Direction (Confirmed)
+
+1. Prioritize simplicity and easy customization over highly strict/fully modeled error structures.
+2. Keep backend validation pragmatic: enough to prevent broken imports, without over-constraining data migration workflows.
+3. Backend should return human-readable parse/validation errors; frontend should display those details directly.
+
 ## TODO (Implementation Plan)
 
 ### Phase 0: Discovery
@@ -298,7 +317,7 @@ Exact table order should be finalized against Prisma schema, but expected depend
 
 ### Phase 4: Hardening
 
-1. Improve error reporting granularity (file/row/column).
+1. Improve error reporting granularity (file/row/column) only where low-cost and high-value; avoid heavy schema complexity.
 2. Add guardrails for very large uploads.
 3. Add operational docs and runbook.
 4. Evaluate whether to disable/remove feature in production release process.
@@ -321,6 +340,7 @@ None at this stage.
 10. Temporary passwords are regenerated on every normalization run.
 11. Import feature is always available to authenticated admins in v1 (no environment kill-switch).
 12. Missing emails are auto-generated during normalization (no toggle), and normalization output/report must list which rows were assigned generated emails.
+13. For v1 bootstrap/testing usage, prioritize simple, human-readable backend errors over deeply structured error contracts.
 
 ## Risks and Mitigations
 
