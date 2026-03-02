@@ -152,6 +152,7 @@ const STATUS_VALUES = new Set([
   "rebooked",
   "declined",
 ]);
+const IMPORT_TRANSACTION_TIMEOUT_MS = 180_000;
 
 interface RowEnvelope<T> {
   rowNumber: number;
@@ -1240,13 +1241,6 @@ export function validateNormalizedImportFiles(
     issues,
     "instructor_schedules.csv",
     parsed["instructor_schedules.csv"],
-    ["instructor_ref", "effective_from", "effective_to", "timezone"],
-    "(instructor_ref,effective_from,effective_to,timezone)",
-  );
-  assertUnique(
-    issues,
-    "instructor_schedules.csv",
-    parsed["instructor_schedules.csv"],
     [
       "instructor_ref",
       "effective_from",
@@ -1834,10 +1828,13 @@ export async function executeNormalizedImportFiles(
     throw new Error("Normalized import parsing failed");
   }
 
-  await prisma.$transaction(async (tx) => {
-    await resetImportTargetData(tx);
-    await insertValidatedRows(tx, parsed);
-  });
+  await prisma.$transaction(
+    async (tx) => {
+      await resetImportTargetData(tx);
+      await insertValidatedRows(tx, parsed);
+    },
+    { timeout: IMPORT_TRANSACTION_TIMEOUT_MS },
+  );
 
   return {
     report: validation.report,
