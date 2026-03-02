@@ -1689,7 +1689,10 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
     },
   });
   parsed["instructors.csv"].forEach((row, index) => {
-    instructorIdByRef.set(row.data.instructor_ref, createdInstructors[index].id);
+    instructorIdByRef.set(
+      row.data.instructor_ref,
+      createdInstructors[index].id,
+    );
   });
 
   const scheduleGroups = new Map<
