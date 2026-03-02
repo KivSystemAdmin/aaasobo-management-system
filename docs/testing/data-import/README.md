@@ -32,3 +32,30 @@ When normalized by `normalizeRawScheduleCsvToPackage`:
   - `children.csv`: 120
   - `subscriptions.csv`: 100
   - `instructors.csv`: 10
+
+## Next Fixture Direction
+
+- Deterministic generator spec: [normalized-fixture-generator-spec.md](./normalized-fixture-generator-spec.md)
+- Policy:
+  - Commit generator code and docs only.
+  - Do not commit generated normalized `.csv` or `.zip` files.
+
+## Deterministic Generator
+
+Run from `backend/`:
+
+```sh
+npm run fixture:generate:normalized-import -- \
+  --from 2025-01-01 \
+  --completed-until 2025-01-20 \
+  --to 2025-02-28
+```
+
+- Required arguments:
+  - `--from`
+  - `--completed-until`
+  - `--to`
+- Optional:
+  - `--out-dir` (default: `../docs/testing/data-import/generated`)
+
+The generator creates all mandatory normalized CSV files and one deterministic zip file in the output directory.
