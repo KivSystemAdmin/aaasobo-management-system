@@ -1582,85 +1582,111 @@ async function resetImportTargetData(tx: TxClient) {
 
 async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
   const planIdByRef = new Map<string, number>();
-  for (const row of parsed["plans.csv"]) {
-    const created = await tx.plan.create({
-      data: {
-        name: row.data.name,
-        description: row.data.description,
-        weeklyClassTimes: Number(row.data.weekly_class_times),
-        isNative: row.data.is_native === "true",
-        terminationAt: parseOptionalDateTime(row.data.termination_at),
-      },
-    });
-    planIdByRef.set(row.data.plan_ref, created.id);
-  }
+  const createdPlans = await tx.plan.createManyAndReturn({
+    data: parsed["plans.csv"].map((row) => ({
+      name: row.data.name,
+      description: row.data.description,
+      weeklyClassTimes: Number(row.data.weekly_class_times),
+      isNative: row.data.is_native === "true",
+      terminationAt: parseOptionalDateTime(row.data.termination_at),
+    })),
+    select: {
+      id: true,
+    },
+  });
+  parsed["plans.csv"].forEach((row, index) => {
+    planIdByRef.set(row.data.plan_ref, createdPlans[index].id);
+  });
 
   const customerIdByRef = new Map<string, number>();
-  for (const row of parsed["customers.csv"]) {
-    const created = await tx.customer.create({
-      data: {
-        name: row.data.name,
-        email: row.data.email,
-        password: await hashPassword(row.data.temp_password),
-        prefecture: row.data.prefecture,
-        hasSeenWelcome: row.data.has_seen_welcome === "true",
-        terminationAt: parseOptionalDateTime(row.data.termination_at),
-      },
-    });
-    customerIdByRef.set(row.data.customer_ref, created.id);
-  }
+  const customerPasswords = await Promise.all(
+    parsed["customers.csv"].map((row) => hashPassword(row.data.temp_password)),
+  );
+  const createdCustomers = await tx.customer.createManyAndReturn({
+    data: parsed["customers.csv"].map((row, index) => ({
+      name: row.data.name,
+      email: row.data.email,
+      password: customerPasswords[index],
+      prefecture: row.data.prefecture,
+      hasSeenWelcome: row.data.has_seen_welcome === "true",
+      terminationAt: parseOptionalDateTime(row.data.termination_at),
+    })),
+    select: {
+      id: true,
+    },
+  });
+  parsed["customers.csv"].forEach((row, index) => {
+    customerIdByRef.set(row.data.customer_ref, createdCustomers[index].id);
+  });
 
   const childIdByRef = new Map<string, number>();
-  for (const row of parsed["children.csv"]) {
-    const created = await tx.child.create({
-      data: {
-        customerId: customerIdByRef.get(row.data.customer_ref)!,
-        name: row.data.name,
-        birthdate: parseOptionalDate(row.data.birthdate),
-        personalInfo: row.data.personal_info || null,
-      },
-    });
-    childIdByRef.set(row.data.child_ref, created.id);
-  }
+  const createdChildren = await tx.child.createManyAndReturn({
+    data: parsed["children.csv"].map((row) => ({
+      customerId: customerIdByRef.get(row.data.customer_ref)!,
+      name: row.data.name,
+      birthdate: parseOptionalDate(row.data.birthdate),
+      personalInfo: row.data.personal_info || null,
+    })),
+    select: {
+      id: true,
+    },
+  });
+  parsed["children.csv"].forEach((row, index) => {
+    childIdByRef.set(row.data.child_ref, createdChildren[index].id);
+  });
 
   const subscriptionIdByRef = new Map<string, number>();
-  for (const row of parsed["subscriptions.csv"]) {
-    const created = await tx.subscription.create({
-      data: {
-        customerId: customerIdByRef.get(row.data.customer_ref)!,
-        planId: planIdByRef.get(row.data.plan_ref)!,
-        startAt: new Date(row.data.start_at),
-        endAt: parseOptionalDateTime(row.data.end_at),
-      },
-    });
-    subscriptionIdByRef.set(row.data.subscription_ref, created.id);
-  }
+  const createdSubscriptions = await tx.subscription.createManyAndReturn({
+    data: parsed["subscriptions.csv"].map((row) => ({
+      customerId: customerIdByRef.get(row.data.customer_ref)!,
+      planId: planIdByRef.get(row.data.plan_ref)!,
+      startAt: new Date(row.data.start_at),
+      endAt: parseOptionalDateTime(row.data.end_at),
+    })),
+    select: {
+      id: true,
+    },
+  });
+  parsed["subscriptions.csv"].forEach((row, index) => {
+    subscriptionIdByRef.set(
+      row.data.subscription_ref,
+      createdSubscriptions[index].id,
+    );
+  });
 
   const instructorIdByRef = new Map<string, number>();
-  for (const row of parsed["instructors.csv"]) {
-    const created = await tx.instructor.create({
-      data: {
-        name: row.data.name,
-        email: row.data.email,
-        password: await hashPassword(row.data.temp_password),
-        classURL: row.data.class_url,
-        icon: row.data.icon,
-        nickname: row.data.nickname,
-        meetingId: row.data.meeting_id,
-        passcode: row.data.passcode,
-        birthdate: new Date(`${row.data.birthdate}T00:00:00.000Z`),
-        favoriteFood: row.data.favorite_food,
-        hobby: row.data.hobby,
-        lifeHistory: row.data.life_history,
-        messageForChildren: row.data.message_for_children,
-        skill: row.data.skill,
-        workingTime: row.data.working_time,
-        isNative: row.data.is_native === "true",
-        terminationAt: parseOptionalDateTime(row.data.termination_at),
-      },
-    });
-    instructorIdByRef.set(row.data.instructor_ref, created.id);
-  }
+  const instructorPasswords = await Promise.all(
+    parsed["instructors.csv"].map((row) =>
+      hashPassword(row.data.temp_password),
+    ),
+  );
+  const createdInstructors = await tx.instructor.createManyAndReturn({
+    data: parsed["instructors.csv"].map((row, index) => ({
+      name: row.data.name,
+      email: row.data.email,
+      password: instructorPasswords[index],
+      classURL: row.data.class_url,
+      icon: row.data.icon,
+      nickname: row.data.nickname,
+      meetingId: row.data.meeting_id,
+      passcode: row.data.passcode,
+      birthdate: new Date(`${row.data.birthdate}T00:00:00.000Z`),
+      favoriteFood: row.data.favorite_food,
+      hobby: row.data.hobby,
+      lifeHistory: row.data.life_history,
+      messageForChildren: row.data.message_for_children,
+      skill: row.data.skill,
+      workingTime: row.data.working_time,
+      isNative: row.data.is_native === "true",
+      terminationAt: parseOptionalDateTime(row.data.termination_at),
+    })),
+    select: {
+      id: true,
+    },
+  });
+  parsed["instructors.csv"].forEach((row, index) => {
+    instructorIdByRef.set(row.data.instructor_ref, createdInstructors[index].id);
+  });
 
   const scheduleGroups = new Map<
     string,
@@ -1695,25 +1721,30 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
     });
   }
 
-  for (const group of scheduleGroups.values()) {
-    const createdSchedule = await tx.instructorSchedule.create({
-      data: {
-        instructorId: group.instructorId,
-        effectiveFrom: group.effectiveFrom,
-        effectiveTo: group.effectiveTo,
-        timezone: group.timezone,
-      },
-    });
+  const scheduleRows = Array.from(scheduleGroups.values());
+  const createdSchedules = await tx.instructorSchedule.createManyAndReturn({
+    data: scheduleRows.map((group) => ({
+      instructorId: group.instructorId,
+      effectiveFrom: group.effectiveFrom,
+      effectiveTo: group.effectiveTo,
+      timezone: group.timezone,
+    })),
+    select: {
+      id: true,
+    },
+  });
 
-    if (group.slots.length > 0) {
-      await tx.instructorSlot.createMany({
-        data: group.slots.map((slot) => ({
-          scheduleId: createdSchedule.id,
-          weekday: slot.weekday,
-          startTime: slot.startTime,
-        })),
-      });
-    }
+  const slotRows = scheduleRows.flatMap((group, index) =>
+    group.slots.map((slot) => ({
+      scheduleId: createdSchedules[index].id,
+      weekday: slot.weekday,
+      startTime: slot.startTime,
+    })),
+  );
+  if (slotRows.length > 0) {
+    await tx.instructorSlot.createMany({
+      data: slotRows,
+    });
   }
 
   if (parsed["instructor_absences.csv"].length > 0) {
@@ -1726,22 +1757,25 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
   }
 
   const eventIdByRef = new Map<string, number>();
-  for (const row of parsed["events.csv"]) {
-    const created = await tx.event.create({
-      data: {
-        name: row.data.name,
-        color: row.data.color,
-      },
-    });
-    eventIdByRef.set(row.data.event_ref, created.id);
-  }
+  const createdEvents = await tx.event.createManyAndReturn({
+    data: parsed["events.csv"].map((row) => ({
+      name: row.data.name,
+      color: row.data.color,
+    })),
+    select: {
+      id: true,
+    },
+  });
+  parsed["events.csv"].forEach((row, index) => {
+    eventIdByRef.set(row.data.event_ref, createdEvents[index].id);
+  });
 
-  for (const row of parsed["schedules.csv"]) {
-    await tx.schedule.create({
-      data: {
+  if (parsed["schedules.csv"].length > 0) {
+    await tx.schedule.createMany({
+      data: parsed["schedules.csv"].map((row) => ({
         date: parseOptionalDate(row.data.date)!,
         eventId: eventIdByRef.get(row.data.event_ref)!,
-      },
+      })),
     });
   }
 
@@ -1752,21 +1786,27 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
   });
 
   const recurringClassIdByRef = new Map<string, number>();
-  for (const row of parsed["recurring_classes.csv"]) {
-    const created = await tx.recurringClass.create({
-      data: {
-        subscriptionId: row.data.subscription_ref
-          ? subscriptionIdByRef.get(row.data.subscription_ref)!
-          : null,
-        instructorId: row.data.instructor_ref
-          ? instructorIdByRef.get(row.data.instructor_ref)!
-          : null,
-        startAt: parseOptionalDateTime(row.data.start_at),
-        endAt: parseOptionalDateTime(row.data.end_at),
-      },
-    });
-    recurringClassIdByRef.set(row.data.recurring_class_ref, created.id);
-  }
+  const createdRecurringClasses = await tx.recurringClass.createManyAndReturn({
+    data: parsed["recurring_classes.csv"].map((row) => ({
+      subscriptionId: row.data.subscription_ref
+        ? subscriptionIdByRef.get(row.data.subscription_ref)!
+        : null,
+      instructorId: row.data.instructor_ref
+        ? instructorIdByRef.get(row.data.instructor_ref)!
+        : null,
+      startAt: parseOptionalDateTime(row.data.start_at),
+      endAt: parseOptionalDateTime(row.data.end_at),
+    })),
+    select: {
+      id: true,
+    },
+  });
+  parsed["recurring_classes.csv"].forEach((row, index) => {
+    recurringClassIdByRef.set(
+      row.data.recurring_class_ref,
+      createdRecurringClasses[index].id,
+    );
+  });
 
   if (parsed["recurring_class_attendance.csv"].length > 0) {
     await tx.recurringClassAttendance.createMany({
@@ -1780,29 +1820,33 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
   }
 
   const classIdByRef = new Map<string, number>();
-  for (const row of parsed["classes.csv"]) {
-    const created = await tx.class.create({
-      data: {
-        customerId: customerIdByRef.get(row.data.customer_ref)!,
-        instructorId: row.data.instructor_ref
-          ? instructorIdByRef.get(row.data.instructor_ref)!
-          : null,
-        recurringClassId: row.data.recurring_class_ref
-          ? recurringClassIdByRef.get(row.data.recurring_class_ref)!
-          : null,
-        subscriptionId: row.data.subscription_ref
-          ? subscriptionIdByRef.get(row.data.subscription_ref)!
-          : null,
-        dateTime: parseOptionalDateTime(row.data.date_time),
-        status: row.data.status as Status,
-        rebookableUntil: parseOptionalDateTime(row.data.rebookable_until),
-        classCode: row.data.class_code,
-        isFreeTrial: row.data.is_free_trial === "true",
-        updatedAt: new Date(),
-      },
-    });
-    classIdByRef.set(row.data.class_ref, created.id);
-  }
+  const classUpdatedAt = new Date();
+  const createdClasses = await tx.class.createManyAndReturn({
+    data: parsed["classes.csv"].map((row) => ({
+      customerId: customerIdByRef.get(row.data.customer_ref)!,
+      instructorId: row.data.instructor_ref
+        ? instructorIdByRef.get(row.data.instructor_ref)!
+        : null,
+      recurringClassId: row.data.recurring_class_ref
+        ? recurringClassIdByRef.get(row.data.recurring_class_ref)!
+        : null,
+      subscriptionId: row.data.subscription_ref
+        ? subscriptionIdByRef.get(row.data.subscription_ref)!
+        : null,
+      dateTime: parseOptionalDateTime(row.data.date_time),
+      status: row.data.status as Status,
+      rebookableUntil: parseOptionalDateTime(row.data.rebookable_until),
+      classCode: row.data.class_code,
+      isFreeTrial: row.data.is_free_trial === "true",
+      updatedAt: classUpdatedAt,
+    })),
+    select: {
+      id: true,
+    },
+  });
+  parsed["classes.csv"].forEach((row, index) => {
+    classIdByRef.set(row.data.class_ref, createdClasses[index].id);
+  });
 
   if (parsed["class_attendance.csv"].length > 0) {
     await tx.classAttendance.createMany({
