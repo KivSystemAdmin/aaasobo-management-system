@@ -14,18 +14,19 @@ const FAKER_SEED = 20250301;
 const INSTRUCTOR_COUNT = 10;
 const CUSTOMER_COUNT = 100;
 const DOUBLE_CHILD_CUSTOMER_COUNT = 10;
-const SINGLE_CHILD_CUSTOMER_COUNT = CUSTOMER_COUNT - DOUBLE_CHILD_CUSTOMER_COUNT;
+const SINGLE_CHILD_CUSTOMER_COUNT =
+  CUSTOMER_COUNT - DOUBLE_CHILD_CUSTOMER_COUNT;
 
-const PATTERN_A_SLOTS: SlotDef[] = buildPatternSlots([1, 2, 3], [
-  "16:00",
-  "16:30",
-  "17:00",
-  "17:30",
-  "18:00",
-]);
+const PATTERN_A_SLOTS: SlotDef[] = buildPatternSlots(
+  [1, 2, 3],
+  ["16:00", "16:30", "17:00", "17:30", "18:00"],
+);
 const PATTERN_B_SLOTS: SlotDef[] = [
   ...buildPatternSlots([4, 5], ["18:30", "19:00", "19:30", "20:00", "20:30"]),
-  ...buildPatternSlots([6], ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"]),
+  ...buildPatternSlots(
+    [6],
+    ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"],
+  ),
 ];
 
 type SlotDef = {
@@ -335,7 +336,10 @@ function csvEscape(value: string): string {
   return value;
 }
 
-function toCsv(fileName: NormalizedFileName, rows: Record<string, string>[]): string {
+function toCsv(
+  fileName: NormalizedFileName,
+  rows: Record<string, string>[],
+): string {
   const headers = NORMALIZED_HEADERS[fileName];
   const lines = [
     headers.join(","),
@@ -485,7 +489,11 @@ function customerRows(fakerJa: FakerLike): CustomerDef[] {
 function childRows(fakerEn: FakerLike): ChildDef[] {
   const rows: ChildDef[] = [];
   let childSeq = 1;
-  for (let customerIndex = 1; customerIndex <= CUSTOMER_COUNT; customerIndex += 1) {
+  for (
+    let customerIndex = 1;
+    customerIndex <= CUSTOMER_COUNT;
+    customerIndex += 1
+  ) {
     const customerRef = ref("CU", customerIndex);
     const childCount = customerIndex <= SINGLE_CHILD_CUSTOMER_COUNT ? 1 : 2;
     for (let j = 1; j <= childCount; j += 1) {
@@ -609,7 +617,9 @@ function assignRecurringClasses(
   return rows;
 }
 
-function recurringRows(assignments: RecurringAssignment[]): RecurringClassDef[] {
+function recurringRows(
+  assignments: RecurringAssignment[],
+): RecurringClassDef[] {
   return assignments.map((item) => ({
     recurring_class_ref: item.recurringClassRef,
     subscription_ref: item.subscriptionRef,
