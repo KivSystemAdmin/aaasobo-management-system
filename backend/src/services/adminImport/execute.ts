@@ -153,6 +153,27 @@ const STATUS_VALUES = new Set([
   "declined",
 ]);
 const IMPORT_TRANSACTION_TIMEOUT_MS = 180_000;
+const IMPORT_RESET_TABLES = [
+  "ClassAttendance",
+  "Class",
+  "RecurringClassAttendance",
+  "RecurringClass",
+  "Subscription",
+  "Child",
+  "Customer",
+  "InstructorAbsence",
+  "InstructorSlot",
+  "InstructorSchedule",
+  "Instructor",
+  "Schedule",
+  "Event",
+  "Plan",
+  "SystemStatus",
+  "PasswordResetToken",
+  "VerificationToken",
+  "Admin",
+] as const;
+const IMPORT_RESET_TRUNCATE_SQL = `TRUNCATE TABLE ${IMPORT_RESET_TABLES.map((table) => `"${table}"`).join(", ")} RESTART IDENTITY CASCADE`;
 
 interface RowEnvelope<T> {
   rowNumber: number;
@@ -1554,24 +1575,7 @@ async function resetImportTargetData(tx: TxClient) {
     },
   });
 
-  await tx.classAttendance.deleteMany();
-  await tx.class.deleteMany();
-  await tx.recurringClassAttendance.deleteMany();
-  await tx.recurringClass.deleteMany();
-  await tx.subscription.deleteMany();
-  await tx.child.deleteMany();
-  await tx.customer.deleteMany();
-  await tx.instructorAbsence.deleteMany();
-  await tx.instructorSlot.deleteMany();
-  await tx.instructorSchedule.deleteMany();
-  await tx.instructor.deleteMany();
-  await tx.schedule.deleteMany();
-  await tx.event.deleteMany();
-  await tx.plan.deleteMany();
-  await tx.systemStatus.deleteMany();
-  await tx.passwordResetToken.deleteMany();
-  await tx.verificationToken.deleteMany();
-  await tx.admin.deleteMany();
+  await tx.$executeRawUnsafe(IMPORT_RESET_TRUNCATE_SQL);
 
   if (seedAdmins.length > 0) {
     await tx.admin.createMany({
