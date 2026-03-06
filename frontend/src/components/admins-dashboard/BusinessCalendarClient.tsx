@@ -5,7 +5,7 @@ import FullCalendar from "@fullcalendar/react";
 import multiMonthPlugin from "@fullcalendar/multimonth";
 import interactionPlugin from "@fullcalendar/interaction";
 import { DateSelectArg } from "@fullcalendar/core";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Modal from "@/components/elements/modal/Modal";
@@ -131,20 +131,22 @@ const BusinessCalendarClient = ({
     }
   };
 
-  // Get the initial date to display the appropriate year in the calendar
-  const getInitialDate = () => {
+  const initialDate = useMemo(() => {
+    if (typeof window === "undefined") {
+      return new Date().toISOString();
+    }
+
     const saved = localStorage.getItem("calendarPosition");
+
     switch (saved) {
       case "prev":
         return new Date(new Date().getFullYear() - 1, 1, 0).toISOString();
       case "next":
         return new Date(new Date().getFullYear() + 1, 1, 0).toISOString();
-      case "default":
-        return new Date().toISOString();
       default:
         return new Date().toISOString();
     }
-  };
+  }, []);
 
   // Fetch the schedule data when the schedule is updated
   const fetchSchedule = async () => {
@@ -203,7 +205,7 @@ const BusinessCalendarClient = ({
           ref={calendarRef}
           plugins={[interactionPlugin, multiMonthPlugin]}
           initialView="multiMonthYear"
-          initialDate={getInitialDate()}
+          initialDate={initialDate}
           headerToolbar={{
             left: "prev,next today",
             center: "title",
