@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+
 import TabFunction from "@/components/admins-dashboard/TabFunction";
 import InstructorProfile from "@/components/instructors-dashboard/instructor-profile/InstructorProfile";
 import { useTabSelect } from "@/hooks/useTabSelect";
@@ -31,25 +33,31 @@ export default function InstructorTabs({
   classScheduleComponent: React.ReactNode;
 }) {
   const nickname = typeof instructor !== "string" ? instructor.nickname : null;
-  // Get the previous list page from local storage to set the breadcrumb.
-  const previousListPage = localStorage.getItem("previousListPage");
-  let breadcrumb: string[] = [];
-  switch (previousListPage) {
-    case "instructor-list":
-      breadcrumb = [
-        "Instructor List",
-        `/admins/${adminId}/instructor-list`,
-        `Instructor Page (${nickname || "Unknown"})`,
-      ];
-      break;
-    case "class-list":
-      breadcrumb = [
-        "Class List",
-        `/admins/${adminId}/class-list`,
-        `Instructor Page (${nickname || "Unknown"})`,
-      ];
-      break;
-  }
+  const previousListPage = useMemo(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    return localStorage.getItem("previousListPage");
+  }, []);
+
+  const breadcrumb = useMemo(() => {
+    switch (previousListPage) {
+      case "instructor-list":
+        return [
+          "Instructor List",
+          `/admins/${adminId}/instructor-list`,
+          `Instructor Page (${nickname || "Unknown"})`,
+        ];
+      case "class-list":
+        return [
+          "Class List",
+          `/admins/${adminId}/class-list`,
+          `Instructor Page (${nickname || "Unknown"})`,
+        ];
+      default:
+        return [];
+    }
+  }, [adminId, nickname, previousListPage]);
   const activeTabName = "activeInstructorTab";
 
   // Get the active tab from the local storage.

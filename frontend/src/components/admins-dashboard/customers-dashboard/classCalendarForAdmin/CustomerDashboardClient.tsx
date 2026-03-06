@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import TabFunction from "@/components/admins-dashboard/TabFunction";
 import CustomerProfile from "@/components/customers-dashboard/profile/CustomerProfile";
 import ChildrenProfiles from "@/components/customers-dashboard/children-profiles/ChildrenProfiles";
@@ -23,12 +23,12 @@ function CustomerDashboardClient({
   customerProfile: CustomerProfile;
   childProfiles: Child[];
 }) {
-  const [previousListPage] = useState<string | null>(() => {
+  const previousListPage = useMemo(() => {
     if (typeof window === "undefined") {
       return null;
     }
     return localStorage.getItem("previousListPage");
-  });
+  }, []);
 
   const breadcrumb = useMemo(() => {
     switch (previousListPage) {
