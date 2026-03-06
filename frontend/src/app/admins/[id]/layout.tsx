@@ -1,6 +1,6 @@
-import styles from "./layout.module.scss";
 import SideNav from "@/components/layouts/sideNav/SideNav";
 import { getUserSession } from "@/lib/auth/sessionUtils";
+import AdminLayout from "./AdminLayout";
 
 export default async function Layout(props: {
   children: React.ReactNode;
@@ -21,11 +21,8 @@ export default async function Layout(props: {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.sidebar}>
-        <SideNav userId={adminId} userType="admin" />
-      </div>
-      <div className={styles.content}>{props.children}</div>
-    </div>
+    <AdminLayout sideNav={<SideNav userId={adminId} userType="admin" />}>
+      {props.children}
+    </AdminLayout>
   );
 }
