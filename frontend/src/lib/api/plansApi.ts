@@ -215,3 +215,29 @@ export const deletePlan = async (planId: number, cookie: string) => {
     };
   }
 };
+
+// Delete plans that are no longer necessary
+export const deleteUnnecessaryPlans = async (authorization: string) => {
+  try {
+    // From server component
+    const apiUrl = `${BACKEND_ORIGIN}/jobs/delete/unnecessary-plans`;
+    const method = "DELETE";
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: authorization,
+    };
+    const response = await fetch(apiUrl, {
+      method,
+      headers,
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return data.error;
+    }
+  } catch (error) {
+    console.error("API error while deleting unnecessary plans:", error);
+    throw error;
+  }
+};

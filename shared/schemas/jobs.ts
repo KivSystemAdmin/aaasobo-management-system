@@ -48,6 +48,30 @@ export const DeleteOldClassesResponse = z.object({
   }),
 });
 
+export const DeletePastCustomersResponse = z.object({
+  deletedCustomers: z.object({
+    count: z.number().describe("Number of deleted customers"),
+  }),
+});
+
+export const DeletePastInstructorsResponse = z.object({
+  deletedInstructors: z.object({
+    count: z.number().describe("Number of deleted instructors"),
+  }),
+});
+
+export const DeleteOldBusinessCalendarResponse = z.object({
+  deletedBusinessCalendar: z.object({
+    count: z.number().describe("Number of deleted business calendar"),
+  }),
+});
+
+export const DeleteUnnecessaryPlansResponse = z.object({
+  deletedPlans: z.object({
+    count: z.number().describe("Number of deleted plans"),
+  }),
+});
+
 // Inferred TypeScript types
 export type UpdateSundayColorRequest = z.infer<typeof UpdateSundayColorRequest>;
 export type SystemStatusResponse = z.infer<typeof SystemStatusResponse>;
@@ -59,3 +83,15 @@ export type UpdateSundayColorResponse = z.infer<
 >;
 export type MaskInstructorsResponse = z.infer<typeof MaskInstructorsResponse>;
 export type DeleteOldClassesResponse = z.infer<typeof DeleteOldClassesResponse>;
+export type DeletePastCustomersResponse = z.infer<
+  typeof DeletePastCustomersResponse
+>;
+export type DeletePastInstructorsResponse = z.infer<
+  typeof DeletePastInstructorsResponse
+>;
+export type DeleteOldBusinessCalendarResponse = z.infer<
+  typeof DeleteOldBusinessCalendarResponse
+>;
+export type DeleteUnnecessaryPlansResponse = z.infer<
+  typeof DeleteUnnecessaryPlansResponse
+>;

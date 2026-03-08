@@ -20,6 +20,10 @@ export const AUTH_ROLES = {
 export const FREE_TRIAL_BOOKING_HOURS = 72;
 export const REGULAR_REBOOKING_HOURS = 3;
 export const MONTHS_TO_DELETE_CLASSES = 13;
+export const MONTHS_TO_DELETE_BUSINESS_CALENDAR = 13;
+export const MONTHS_TO_DELETE_CUSTOMERS = 36;
+export const MONTHS_TO_DELETE_INSTRUCTORS = 36;
+export const MONTHS_TO_DELETE_PLANS = 36;
 
 // Masked user static values
 export const maskedHeadLetters = "Masked";

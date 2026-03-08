@@ -55,6 +55,7 @@ export const addInstructorAbsenceController = async (
     });
   } catch (error) {
     console.error("Error adding instructor absence:", error);
+
     res.status(500).json({
       message: "Failed to add instructor absence",
       error: error instanceof Error ? error.message : "Unknown error",

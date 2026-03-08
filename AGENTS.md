@@ -26,6 +26,7 @@ AaasoBo! is an online English conversation service run by a Japanese NPO that ta
   - Start PostgreSQL: `npm run db:start` (Docker container)
   - Initialize/Reset DB: `npm run prisma:init` (runs migrations + seed)
 - **Testing**: `npm run test` (Vitest)
+- **Unused Code Check**: `npm run lint:unused`
 - **Formatting**: `npm run format` (Prettier + Prisma format)
 - **Build**: `npm run build` (generates Prisma client, resets DB, runs dummy seed)
 
@@ -34,6 +35,7 @@ AaasoBo! is an online English conversation service run by a Japanese NPO that ta
 - **Development**: `npm run dev` (Next.js dev server)
 - **Build**: `npm run build`
 - **Linting**: `npm run lint`
+- **Unused Code Check**: `npm run lint:unused`
 - **Formatting**: `npm run format`
 
 ## Architecture Overview
@@ -57,8 +59,14 @@ Full-stack class management system with separate backend and frontend applicatio
 
 ## Development Guidelines
 
+### Branch Strategy
+- Use `develop` as the base branch for all new pull requests.
+- Open and merge pull requests into `develop` (not `main`).
+- `main` is a release branch: only merge `develop` into `main` via pull request.
+
 ### Code Quality
 - Always run `npm run format` before committing changes
 - Run `npm run lint` on frontend for code quality checks
+- Run `npm run lint:unused` to detect dead code and unused exports in both backend and frontend
 - Keep code self-explanatory and avoid unnecessary comments
 - Run tests and builds before committing

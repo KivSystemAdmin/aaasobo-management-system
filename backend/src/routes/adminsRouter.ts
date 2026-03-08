@@ -25,6 +25,11 @@ import {
   getClassesWithinPeriodController,
 } from "../../src/controllers/adminsController";
 import {
+  downloadNormalizedImportPackageController,
+  executeNormalizedImportController,
+  normalizeImportSourceController,
+} from "../controllers/adminsImportController";
+import {
   getAllSchedulesController,
   updateBusinessScheduleController,
 } from "../../src/controllers/schedulesController";
@@ -68,11 +73,18 @@ import {
   ValidationErrorResponse,
   ConflictErrorResponse,
   InstructorUpdateErrorResponse,
+  ImportNormalizeResponse,
+  ImportExecuteRequest,
+  ImportExecuteResponse,
+  ImportExecuteErrorResponse,
+  ImportNormalizedDownloadParams,
 } from "../../../shared/schemas/admins";
 
 import { AUTH_ROLES } from "../utils/commonUtils";
 import { verifyAuthentication } from "../middlewares/auth.middleware";
-import upload from "../middlewares/upload.middleware";
+import upload, {
+  uploadAdminImportFile,
+} from "../middlewares/upload.middleware";
 
 // Route configurations
 const registerAdminConfig = {
@@ -793,6 +805,112 @@ const getAllSchedulesConfig = {
   },
 } as const;
 
+const normalizeImportSourceConfig = {
+  method: "post" as const,
+  middleware: [
+    verifyAuthentication(AUTH_ROLES.A),
+    uploadAdminImportFile,
+  ] as RequestHandler[],
+  handler: normalizeImportSourceController,
+  openapi: {
+    summary: "Normalize raw import CSV",
+    description:
+      "Normalize a raw spreadsheet-export CSV into the v1 normalized CSV package",
+    responses: {
+      200: {
+        description: "Normalization succeeded",
+        schema: ImportNormalizeResponse,
+      },
+      400: {
+        description: "Invalid or unsupported source file",
+        schema: MessageErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      413: {
+        description: "Uploaded file exceeds size limit",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const downloadNormalizedImportPackageConfig = {
+  method: "get" as const,
+  paramsSchema: ImportNormalizedDownloadParams,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: downloadNormalizedImportPackageController,
+  openapi: {
+    summary: "Download normalized import zip",
+    description:
+      "Download normalized CSV package zip by job ID generated from normalization",
+    responses: {
+      200: {
+        description: "Normalized package zip file",
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Job not found or expired",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const executeNormalizedImportConfig = {
+  method: "post" as const,
+  bodySchema: ImportExecuteRequest,
+  middleware: [
+    verifyAuthentication(AUTH_ROLES.A),
+    uploadAdminImportFile,
+  ] as RequestHandler[],
+  handler: executeNormalizedImportController,
+  openapi: {
+    summary: "Execute normalized import",
+    description:
+      "Validate a normalized import package from uploaded zip or prior normalization job",
+    responses: {
+      200: {
+        description: "Normalized import package validated",
+        schema: ImportExecuteResponse,
+      },
+      400: {
+        description: "Normalized package validation failed",
+        schema: ImportExecuteErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      413: {
+        description: "Uploaded file exceeds size limit",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Job not found or expired",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
 const validatedRouteConfigs = {
   "/:id": [updateAdminConfig],
   "/admin-list": [getAllAdminsConfig],
@@ -815,6 +933,9 @@ const validatedRouteConfigs = {
   "/instructor-list/register/withIcon": [registerInstructorWithIconConfig],
   "/instructor-list/update/:id": [updateInstructorConfig],
   "/instructor-list/update/:id/withIcon": [updateInstructorWithIconConfig],
+  "/import/normalize": [normalizeImportSourceConfig],
+  "/import/execute": [executeNormalizedImportConfig],
+  "/import/normalized/:jobId/download": [downloadNormalizedImportPackageConfig],
   "/plan-list": [getAllPlansConfig],
   "/plan-list/delete/:id": [deletePlanConfig],
   "/plan-list/register": [registerPlanConfig],

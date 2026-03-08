@@ -3,3 +3,6 @@
 
 # Temporary development files
 TEMP-*.md
+
+# Generated data-import fixtures (reproducible from generator)
+docs/testing/data-import/generated/

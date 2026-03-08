@@ -17,6 +17,7 @@ let prismaInitialized = false;
 await (async () => {
   try {
     const baseDatabaseUrl = await getBaseDatabaseUrl();
+
     const workerId =
       process.env.VITEST_WORKER_ID ?? process.env.VITEST_POOL_ID ?? "0";
     const workerDbName = `aaasobo_test_${workerId}`;

@@ -92,6 +92,7 @@ export const createInstructorScheduleController = async (
     });
   } catch (error) {
     console.error("Error creating schedule version:", error);
+
     res.status(500).json({
       message: "Failed to create schedule version",
       error: error instanceof Error ? error.message : "Unknown error",
