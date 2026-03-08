@@ -144,12 +144,12 @@ function CurrentSubscription({
                     <div className={styles.buttons}>
                       <ActionButton
                         onClick={() => handleEditSubscription(id)}
-                        btnText={"EDIT"}
+                        btnText={"Edit"}
                         className="editBtn"
                       />
                       <ActionButton
                         onClick={() => handleDeleteSubscription(id)}
-                        btnText={deletingId === id ? "DELETING..." : "DELETE"}
+                        btnText={deletingId === id ? "DELETING..." : "Delete"}
                         className="deleteBtn"
                         disabled={deletingId === id}
                       />
