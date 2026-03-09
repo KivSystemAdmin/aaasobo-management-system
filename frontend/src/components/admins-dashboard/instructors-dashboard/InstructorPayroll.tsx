@@ -100,6 +100,16 @@ const formatPeriodLabel = (from: string, to: string) => {
   return `${from} to ${to}`;
 };
 
+const formatFeeCoverageEnd = (value: string | null) => {
+  if (!value) {
+    return "Onwards";
+  }
+
+  const date = new Date(`${value}T00:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() - 1);
+  return date.toISOString().slice(0, 10);
+};
+
 function DailyBreakdownTable({
   rows,
   currency,
@@ -215,7 +225,8 @@ function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
               >
                 <div className={styles.feeCardHeader}>
                   <strong>
-                    {fee.effectiveFrom} to {fee.effectiveTo ?? "Onwards"}
+                    {fee.effectiveFrom} to{" "}
+                    {formatFeeCoverageEnd(fee.effectiveTo)}
                   </strong>
                 </div>
                 <dl className={styles.feeGrid}>

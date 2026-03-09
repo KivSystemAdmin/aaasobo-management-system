@@ -20,7 +20,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
 
     await createInstructorFee(instructor.id, {
       effectiveFrom: new Date("2026-03-01T00:00:00.000Z"),
-      effectiveTo: new Date("2026-03-15T00:00:00.000Z"),
+      effectiveTo: new Date("2026-03-16T00:00:00.000Z"),
       trialFee: 1000,
       regularFee: 2000,
       cancelFee: 500,
@@ -160,7 +160,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
             {
               currency: "JPY",
               effectiveFrom: "2026-03-01",
-              effectiveTo: "2026-03-15",
+              effectiveTo: "2026-03-16",
               trialFee: 1000,
               regularFee: 2000,
               cancelFee: 500,
@@ -244,7 +244,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
 
     await createInstructorFee(instructor.id, {
       effectiveFrom: new Date("2026-03-01T00:00:00.000Z"),
-      effectiveTo: new Date("2026-03-07T00:00:00.000Z"),
+      effectiveTo: new Date("2026-03-08T00:00:00.000Z"),
       trialFee: 1000,
       regularFee: 2000,
       cancelFee: 500,
@@ -252,7 +252,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     });
     await createInstructorFee(instructor.id, {
       effectiveFrom: new Date("2026-03-08T00:00:00.000Z"),
-      effectiveTo: new Date("2026-03-15T00:00:00.000Z"),
+      effectiveTo: new Date("2026-03-16T00:00:00.000Z"),
       trialFee: 1200,
       regularFee: 2200,
       cancelFee: 600,
@@ -338,7 +338,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
         {
           currency: "JPY",
           effectiveFrom: "2026-03-01",
-          effectiveTo: "2026-03-07",
+          effectiveTo: "2026-03-08",
           trialFee: 1000,
           regularFee: 2000,
           cancelFee: 500,
@@ -347,7 +347,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
         {
           currency: "JPY",
           effectiveFrom: "2026-03-08",
-          effectiveTo: "2026-03-15",
+          effectiveTo: "2026-03-16",
           trialFee: 1200,
           regularFee: 2200,
           cancelFee: 600,
@@ -357,6 +357,56 @@ describe("GET /admins/instructors/:id/payroll", () => {
     });
     expect(response.body.periods[1].dailyBreakdown).toEqual([]);
     expect(response.body.periods[1].appliedFeePeriods).toEqual([]);
+  });
+
+  it("uses the new fee rate on the effectiveTo boundary date", async () => {
+    const admin = await createAdmin();
+    const instructor = await createInstructor();
+    const customer = await createCustomer();
+
+    await createInstructorFee(instructor.id, {
+      effectiveFrom: new Date("2026-03-01T00:00:00.000Z"),
+      effectiveTo: new Date("2026-03-16T00:00:00.000Z"),
+      regularFee: 2000,
+    });
+    await createInstructorFee(instructor.id, {
+      effectiveFrom: new Date("2026-03-16T00:00:00.000Z"),
+      effectiveTo: null,
+      regularFee: 2500,
+    });
+
+    await createClass(
+      customer.id,
+      instructor.id,
+      jstDateTime("2026-03-16T10:00:00+09:00"),
+      {
+        status: "completed",
+        isFreeTrial: false,
+      },
+    );
+
+    const response = await request(server)
+      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .query({ month: "2026-03" })
+      .set("Cookie", await generateAuthCookie(admin.id, "admin"))
+      .expect(200);
+
+    expect(response.body.periods[1]).toEqual(
+      expect.objectContaining({
+        currency: "JPY",
+        subtotals: expect.objectContaining({
+          regular: 2500,
+        }),
+        total: 2500,
+        appliedFeePeriods: [
+          expect.objectContaining({
+            effectiveFrom: "2026-03-16",
+            effectiveTo: null,
+            regularFee: 2500,
+          }),
+        ],
+      }),
+    );
   });
 
   it("returns 404 when instructor does not exist", async () => {
@@ -403,7 +453,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     await createInstructorFee(instructor.id, {
       currency: "JPY",
       effectiveFrom: new Date("2026-03-01T00:00:00.000Z"),
-      effectiveTo: new Date("2026-03-10T00:00:00.000Z"),
+      effectiveTo: new Date("2026-03-11T00:00:00.000Z"),
     });
     await createInstructorFee(instructor.id, {
       currency: "USD",
