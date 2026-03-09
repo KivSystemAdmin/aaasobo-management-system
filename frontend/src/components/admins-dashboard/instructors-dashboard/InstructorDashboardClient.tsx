@@ -73,7 +73,7 @@ export default function InstructorTabs({
       content: classScheduleComponent,
     },
     {
-      label: "Instructor's Profile",
+      label: "Profile",
       content: (
         <InstructorProfile
           instructor={instructor}
@@ -83,11 +83,11 @@ export default function InstructorTabs({
       ),
     },
     {
-      label: "Instructor's Availability",
+      label: "Availability",
       content: <AvailabilityCalendar instructorId={instructorId} />,
     },
     {
-      label: "Instructor's Schedule",
+      label: "Schedule",
       content: (
         <InstructorSchedule
           instructorId={instructorId}
