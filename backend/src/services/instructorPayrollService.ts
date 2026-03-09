@@ -182,6 +182,14 @@ const getCategoryFee = (fee: PayrollFeeRecord, category: PayrollCategory) => {
   }
 };
 
+const getCategoryTotalImpact = (
+  fee: PayrollFeeRecord,
+  category: PayrollCategory,
+) => {
+  const amount = getCategoryFee(fee, category);
+  return category === "trial" || category === "regular" ? amount : -amount;
+};
+
 const summarizePeriod = (
   periodName: "1-15" | "16-last",
   from: string,
@@ -207,10 +215,11 @@ const summarizePeriod = (
     const classDateInJst = formatDateInJst(payrollClass.dateTime);
     const fee = resolveApplicableFee(classDateInJst, feeRecords);
     const feeAmount = getCategoryFee(fee, category);
+    const totalImpact = getCategoryTotalImpact(fee, category);
 
     counts[category] += 1;
     subtotals[category] += feeAmount;
-    total += feeAmount;
+    total += totalImpact;
     currencies.add(fee.currency);
     appliedFeePeriods.set(
       `${fee.currency}:${fee.effectiveFrom}:${fee.effectiveTo ?? "open"}`,
@@ -226,7 +235,7 @@ const summarizePeriod = (
       total: 0,
     };
     daySummary.counts[category] += 1;
-    daySummary.total += feeAmount;
+    daySummary.total += totalImpact;
     dailyBreakdown.set(classDateInJst, daySummary);
   }
 

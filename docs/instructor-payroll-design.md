@@ -188,7 +188,7 @@ Rules:
 4. Classify each class into one payroll category or exclude it.
 5. For included classes, resolve the applicable fee by `dateTime`.
 6. Aggregate counts and subtotals by category.
-7. Sum the subtotals into the final total.
+7. Calculate the final total as `trial + regular - cancel - cancelWithoutNotice`.
 8. Calculate `sourceLastUpdatedAt` from used class rows only.
 9. Return both period summaries in a single response.
 
@@ -245,7 +245,7 @@ Query params:
         "cancel": 500,
         "cancelWithoutNotice": 0
       },
-      "total": 20500,
+      "total": 19500,
       "appliedFeePeriods": [
         {
           "currency": "JPY",
@@ -330,6 +330,7 @@ Current tab container:
 - unit fee information
 - subtotals by category
 - final total
+  - net of cancel fees
 - `sourceLastUpdatedAt`
 - applied fee period summary
 
@@ -506,4 +507,5 @@ Use this section to update progress during implementation.
 - Verified the payroll API test passes, frontend lint passes, and the payroll tab renders in Playwright.
 - Added deterministic dummy seed data for payroll UI verification and updated the seed reset flow to use `deleteMany()` instead of Prisma raw `TRUNCATE`.
 - Refined the payroll tab labels and layout with a month selector and compact daily breakdown tables.
+- Updated payroll totals so instructor cancel fees are subtracted from the displayed total.
 - Confirmed instructor fee create/edit management is not part of this scope and remains the next follow-up task.

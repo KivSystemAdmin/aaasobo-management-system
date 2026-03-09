@@ -223,7 +223,7 @@ export const InstructorPayrollDailyBreakdown = z.object({
     cancel: z.number().int().nonnegative(),
     cancelWithoutNotice: z.number().int().nonnegative(),
   }),
-  total: z.number().int().nonnegative(),
+  total: z.number().int(),
 });
 
 export const InstructorPayrollPeriod = z.object({
@@ -246,7 +246,7 @@ export const InstructorPayrollPeriod = z.object({
     cancel: z.number().int().nonnegative(),
     cancelWithoutNotice: z.number().int().nonnegative(),
   }),
-  total: z.number().int().nonnegative(),
+  total: z.number().int(),
   dailyBreakdown: z.array(InstructorPayrollDailyBreakdown),
   appliedFeePeriods: z.array(InstructorPayrollFeePeriod),
 });
