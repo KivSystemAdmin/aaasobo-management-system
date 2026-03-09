@@ -123,7 +123,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
             cancel: 500,
             cancelWithoutNotice: 0,
           },
-          total: 3500,
+          total: 2500,
           dailyBreakdown: [
             {
               date: "2026-03-02",
@@ -153,7 +153,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
                 cancel: 1,
                 cancelWithoutNotice: 0,
               },
-              total: 500,
+              total: -500,
             },
           ],
           appliedFeePeriods: [
@@ -185,7 +185,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
             cancel: 0,
             cancelWithoutNotice: 300,
           },
-          total: 2800,
+          total: 2200,
           dailyBreakdown: [
             {
               date: "2026-03-16",
@@ -205,7 +205,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
                 cancel: 0,
                 cancelWithoutNotice: 1,
               },
-              total: 300,
+              total: -300,
             },
           ],
           appliedFeePeriods: [
