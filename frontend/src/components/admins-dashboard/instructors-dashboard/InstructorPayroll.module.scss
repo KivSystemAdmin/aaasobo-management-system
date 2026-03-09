@@ -1,0 +1,196 @@
+@use "@/styles/variables.module.scss" as *;
+
+.container {
+  display: grid;
+  gap: 1rem;
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: flex-start;
+  align-items: start;
+  gap: 1rem;
+}
+
+.monthInput {
+  min-width: 9rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.6rem;
+  padding: 0.55rem 0.75rem;
+  font: inherit;
+  background: #fff;
+}
+
+.pendingMessage {
+  margin: 0;
+  color: #475569;
+}
+
+.periodGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.periodCard {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.periodSummary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+  margin-bottom: 0.85rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    color: #0f172a;
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    color: #475569;
+  }
+}
+
+.summaryStats {
+  display: grid;
+  justify-items: end;
+
+  strong {
+    font-size: 1.05rem;
+    color: #0f172a;
+  }
+}
+
+.breakdownSection,
+.feePeriodsSection {
+  h4 {
+    margin: 0 0 0.75rem;
+    color: #0f172a;
+  }
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.dailyBreakdownTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+
+  th,
+  td {
+    padding: 0.7rem;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  thead th {
+    background: #f8fafc;
+    color: #334155;
+    font-size: 0.95rem;
+  }
+
+  tbody th,
+  tfoot th {
+    color: #0f172a;
+    font-weight: 600;
+  }
+
+  tfoot th,
+  tfoot td {
+    border-bottom: none;
+    font-weight: 700;
+  }
+}
+
+.feePeriodsList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.feeCard {
+  border: 1px solid #dbeafe;
+  border-radius: 0.75rem;
+  background: linear-gradient(180deg, #f8fbff 0%, #eff6ff 100%);
+  padding: 0.9rem;
+}
+
+.feeCardHeader {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  color: #1e3a8a;
+}
+
+.feeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+
+  dt {
+    font-size: 0.85rem;
+    color: #475569;
+  }
+
+  dd {
+    margin: 0.2rem 0 0;
+    font-weight: 600;
+    color: #0f172a;
+  }
+}
+
+.emptyMessage {
+  margin: 0 0 1rem;
+  color: #475569;
+}
+
+.errorBox {
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #9f1239;
+  border-radius: 0.75rem;
+  padding: 1rem;
+
+  strong {
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .pageHeader,
+  .periodSummary {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .summaryStats {
+    justify-items: start;
+  }
+
+  .feeGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1200px) {
+  .periodGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}

@@ -7,6 +7,8 @@ import { ERROR_PAGE_MESSAGE_EN } from "../messages/generalMessages";
 import {
   type AdminResponse,
   type AdminsListResponse,
+  type InstructorPayrollErrorResponse,
+  type InstructorPayrollResponse,
   type InstructorsListResponse,
   type PastInstructorsListResponse,
   type CustomersListResponse,
@@ -28,6 +30,9 @@ const BACKEND_ORIGIN =
 const BASE_URL = `${BACKEND_ORIGIN}/admins`;
 
 type Response<T> = T | { message: string };
+export type InstructorPayrollApiError = InstructorPayrollErrorResponse & {
+  status: number;
+};
 
 export const getAdminById = async (
   id: number,
@@ -576,6 +581,66 @@ export const getAllBusinessSchedules = async (
   } catch (error) {
     console.error("Failed to fetch schedules:", error);
     throw error;
+  }
+};
+
+export const getInstructorPayroll = async (
+  instructorId: number,
+  month: string,
+  cookie?: string,
+): Promise<InstructorPayrollResponse | InstructorPayrollApiError> => {
+  try {
+    let apiURL;
+    let headers;
+    let response;
+    const method = "GET";
+    const backendEndpoint = `/admins/instructors/${instructorId}/payroll?month=${month}`;
+
+    if (cookie) {
+      apiURL = `${BACKEND_ORIGIN}${backendEndpoint}`;
+      headers = { "Content-Type": "application/json", Cookie: cookie };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+        cache: "no-store",
+      });
+    } else {
+      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+      headers = {
+        "Content-Type": "application/json",
+        "backend-endpoint": backendEndpoint,
+        "no-cache": "true",
+      };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+      });
+    }
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return {
+        status: response.status,
+        code:
+          typeof data?.code === "string"
+            ? data.code
+            : "INSTRUCTOR_PAYROLL_ERROR",
+        message:
+          typeof data?.message === "string"
+            ? data.message
+            : `HTTP error! status: ${response.status}`,
+      };
+    }
+
+    return data as InstructorPayrollResponse;
+  } catch (error) {
+    console.error("Failed to fetch instructor payroll:", error);
+    return {
+      status: 500,
+      code: "INSTRUCTOR_PAYROLL_ERROR",
+      message: GENERAL_ERROR_MESSAGE,
+    };
   }
 };
 

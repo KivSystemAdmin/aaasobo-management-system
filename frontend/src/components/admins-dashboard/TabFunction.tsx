@@ -33,6 +33,7 @@ const TabFunction: React.FC<{
   initialActiveTab?: number;
 }> = ({ tabs, breadcrumb, activeTabName, initialActiveTab = 0 }) => {
   const [activeTabIndex, setActiveTabIndex] = useState(initialActiveTab);
+  const hasBreadcrumb = breadcrumb.length >= 3;
 
   const handleTabClick = (index: number, activeTabName: string) => {
     setActiveTabIndex(index);
@@ -41,17 +42,19 @@ const TabFunction: React.FC<{
 
   return (
     <>
-      <nav className={styles.breadcrumb}>
-        <ul className={styles.breadcrumb__list}>
-          <li className={styles.breadcrumb__item}>
-            <Link href={breadcrumb[1]} passHref>
-              {breadcrumb[0]}{" "}
-            </Link>
-          </li>
-          <li className={styles.breadcrumb__separator}>{" >> "}</li>
-          <li className={styles.breadcrumb__item}>{breadcrumb[2]}</li>
-        </ul>
-      </nav>
+      {hasBreadcrumb && (
+        <nav className={styles.breadcrumb}>
+          <ul className={styles.breadcrumb__list}>
+            <li className={styles.breadcrumb__item}>
+              <Link href={breadcrumb[1]} passHref>
+                {breadcrumb[0]}{" "}
+              </Link>
+            </li>
+            <li className={styles.breadcrumb__separator}>{" >> "}</li>
+            <li className={styles.breadcrumb__item}>{breadcrumb[2]}</li>
+          </ul>
+        </nav>
+      )}
       <div className={styles.tabWrapper}>
         <div className={styles.tabContainer}>
           {tabs.map((tab, index) => (

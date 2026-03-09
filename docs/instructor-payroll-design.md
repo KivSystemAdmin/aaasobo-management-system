@@ -342,7 +342,7 @@ Tasks:
 
 Status:
 
-- [ ] not started
+- [x] completed
 
 ### Phase 1: Data model
 
@@ -360,7 +360,7 @@ Tasks:
 
 Status:
 
-- [ ] not started
+- [x] completed
 
 ### Phase 2: Cancellation timestamp propagation
 
@@ -377,7 +377,7 @@ Tasks:
 
 Status:
 
-- [ ] not started
+- [x] completed
 
 ### Phase 3: Payroll backend
 
@@ -397,7 +397,7 @@ Tasks:
 
 Status:
 
-- [ ] not started
+- [x] completed
 
 ### Phase 4: Admin API
 
@@ -414,7 +414,7 @@ Tasks:
 
 Status:
 
-- [ ] not started
+- [x] completed
 
 ### Phase 5: Admin UI
 
@@ -432,7 +432,7 @@ Tasks:
 
 Status:
 
-- [ ] not started
+- [x] completed
 
 ### Phase 6: Verification and cleanup
 
@@ -449,7 +449,7 @@ Tasks:
 
 Status:
 
-- [ ] not started
+- [x] completed
 
 ## Task Log
 
@@ -467,3 +467,11 @@ Use this section to update progress during implementation.
 - Decided `422` errors return a short `code` and `message`.
 - Decided currency is stored as a string validated by `^[A-Z]{3}$`.
 - Decided no backfill is needed for missing `canceledAt` because the app is not yet released.
+- Merged backend payroll API work and fixed follow-up TypeScript issues in `instructorPayrollService`.
+- Added the admin instructor `Payroll` tab and frontend payroll fetch integration.
+- Added payroll loading and error states plus summary rendering for both payroll halves.
+- Fixed the instructor page tab container to tolerate missing breadcrumb context.
+- Verified the payroll API test passes, frontend lint passes, and the payroll tab renders in Playwright.
+- Added deterministic dummy seed data for payroll UI verification and updated the seed reset flow to use `deleteMany()` instead of Prisma raw `TRUNCATE`.
+- Refined the payroll tab labels and layout with a month selector and compact daily breakdown tables.
+- Confirmed instructor fee create/edit management is not part of this scope and remains the next follow-up task.
