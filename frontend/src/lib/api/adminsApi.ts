@@ -7,6 +7,11 @@ import { ERROR_PAGE_MESSAGE_EN } from "../messages/generalMessages";
 import {
   type AdminResponse,
   type AdminsListResponse,
+  type CreateInstructorFeeRequest,
+  type CreateInstructorFeeResponse,
+  type DeleteLatestInstructorFeeResponse,
+  type InstructorFeeErrorResponse,
+  type InstructorFeeRatesResponse,
   type InstructorPayrollErrorResponse,
   type InstructorPayrollResponse,
   type InstructorsListResponse,
@@ -31,6 +36,9 @@ const BASE_URL = `${BACKEND_ORIGIN}/admins`;
 
 type Response<T> = T | { message: string };
 export type InstructorPayrollApiError = InstructorPayrollErrorResponse & {
+  status: number;
+};
+type InstructorFeeApiError = InstructorFeeErrorResponse & {
   status: number;
 };
 
@@ -639,6 +647,143 @@ export const getInstructorPayroll = async (
     return {
       status: 500,
       code: "INSTRUCTOR_PAYROLL_ERROR",
+      message: GENERAL_ERROR_MESSAGE,
+    };
+  }
+};
+
+export const getInstructorFees = async (
+  instructorId: number,
+  cookie?: string,
+): Promise<InstructorFeeRatesResponse | InstructorFeeApiError> => {
+  try {
+    let apiURL;
+    let headers;
+    let response;
+    const method = "GET";
+    const backendEndpoint = `/admins/instructors/${instructorId}/fees`;
+
+    if (cookie) {
+      apiURL = `${BACKEND_ORIGIN}${backendEndpoint}`;
+      headers = { "Content-Type": "application/json", Cookie: cookie };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+        cache: "no-store",
+      });
+    } else {
+      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+      headers = {
+        "Content-Type": "application/json",
+        "backend-endpoint": backendEndpoint,
+        "no-cache": "true",
+      };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+      });
+    }
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return {
+        status: response.status,
+        code:
+          typeof data?.code === "string" ? data.code : "INSTRUCTOR_FEE_ERROR",
+        message:
+          typeof data?.message === "string"
+            ? data.message
+            : `HTTP error! status: ${response.status}`,
+      };
+    }
+
+    return data as InstructorFeeRatesResponse;
+  } catch (error) {
+    console.error("Failed to fetch instructor fees:", error);
+    return {
+      status: 500,
+      code: "INSTRUCTOR_FEE_ERROR",
+      message: GENERAL_ERROR_MESSAGE,
+    };
+  }
+};
+
+export const createInstructorFee = async (
+  instructorId: number,
+  feeData: CreateInstructorFeeRequest,
+): Promise<CreateInstructorFeeResponse | InstructorFeeApiError> => {
+  try {
+    const backendEndpoint = `/admins/instructors/${instructorId}/fees`;
+    const apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+    const response = await fetch(apiURL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "backend-endpoint": backendEndpoint,
+      },
+      body: JSON.stringify(feeData),
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 201) {
+      return {
+        status: response.status,
+        code:
+          typeof data?.code === "string" ? data.code : "INSTRUCTOR_FEE_ERROR",
+        message:
+          typeof data?.message === "string"
+            ? data.message
+            : `HTTP error! status: ${response.status}`,
+      };
+    }
+
+    return data as CreateInstructorFeeResponse;
+  } catch (error) {
+    console.error("Failed to create instructor fee:", error);
+    return {
+      status: 500,
+      code: "INSTRUCTOR_FEE_ERROR",
+      message: GENERAL_ERROR_MESSAGE,
+    };
+  }
+};
+
+export const deleteLatestInstructorFee = async (
+  instructorId: number,
+): Promise<DeleteLatestInstructorFeeResponse | InstructorFeeApiError> => {
+  try {
+    const backendEndpoint = `/admins/instructors/${instructorId}/fees/latest`;
+    const apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+    const response = await fetch(apiURL, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "backend-endpoint": backendEndpoint,
+      },
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return {
+        status: response.status,
+        code:
+          typeof data?.code === "string" ? data.code : "INSTRUCTOR_FEE_ERROR",
+        message:
+          typeof data?.message === "string"
+            ? data.message
+            : `HTTP error! status: ${response.status}`,
+      };
+    }
+
+    return data as DeleteLatestInstructorFeeResponse;
+  } catch (error) {
+    console.error("Failed to delete latest instructor fee:", error);
+    return {
+      status: 500,
+      code: "INSTRUCTOR_FEE_ERROR",
       message: GENERAL_ERROR_MESSAGE,
     };
   }
