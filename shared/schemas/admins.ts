@@ -27,6 +27,17 @@ export const InstructorPayrollQuery = z.object({
     .regex(/^\d{4}-(0[1-9]|1[0-2])$/, "month must be in YYYY-MM format"),
 });
 
+export const CreateInstructorFeeRequest = z.object({
+  currency: z.string().regex(/^[A-Z]{3}$/, "currency must be a 3-letter code"),
+  effectiveFrom: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "effectiveFrom must be in YYYY-MM-DD format"),
+  trialFee: z.number().int().nonnegative(),
+  regularFee: z.number().int().nonnegative(),
+  cancelFee: z.number().int().nonnegative(),
+  cancelWithoutNoticeFee: z.number().int().nonnegative(),
+});
+
 export const PlanIdParams = z.object({
   id: z
     .string()
@@ -248,6 +259,41 @@ export const InstructorPayrollResponse = z.object({
 });
 
 export const InstructorPayrollErrorResponse = z.object({
+  code: z.string(),
+  message: z.string(),
+});
+
+export const InstructorFeeRate = z.object({
+  id: z.number().int().positive(),
+  currency: z.string().regex(/^[A-Z]{3}$/),
+  effectiveFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  effectiveTo: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable(),
+  trialFee: z.number().int().nonnegative(),
+  regularFee: z.number().int().nonnegative(),
+  cancelFee: z.number().int().nonnegative(),
+  cancelWithoutNoticeFee: z.number().int().nonnegative(),
+});
+
+export const InstructorFeeRatesResponse = z.object({
+  instructorId: z.number().int().positive(),
+  fees: z.array(InstructorFeeRate),
+});
+
+export const CreateInstructorFeeResponse = z.object({
+  message: z.string(),
+  fee: InstructorFeeRate,
+});
+
+export const DeleteLatestInstructorFeeResponse = z.object({
+  message: z.string(),
+  deletedFeeId: z.number().int().positive(),
+  reactivatedFeeId: z.number().int().positive(),
+});
+
+export const InstructorFeeErrorResponse = z.object({
   code: z.string(),
   message: z.string(),
 });
@@ -502,6 +548,9 @@ export type AdminIdParams = z.infer<typeof AdminIdParams>;
 export type CustomerIdParams = z.infer<typeof CustomerIdParams>;
 export type InstructorIdParams = z.infer<typeof InstructorIdParams>;
 export type InstructorPayrollQuery = z.infer<typeof InstructorPayrollQuery>;
+export type CreateInstructorFeeRequest = z.infer<
+  typeof CreateInstructorFeeRequest
+>;
 export type PlanIdParams = z.infer<typeof PlanIdParams>;
 export type EventIdParams = z.infer<typeof EventIdParams>;
 
@@ -535,6 +584,19 @@ export type InstructorPayrollResponse = z.infer<
 >;
 export type InstructorPayrollErrorResponse = z.infer<
   typeof InstructorPayrollErrorResponse
+>;
+export type InstructorFeeRate = z.infer<typeof InstructorFeeRate>;
+export type InstructorFeeRatesResponse = z.infer<
+  typeof InstructorFeeRatesResponse
+>;
+export type CreateInstructorFeeResponse = z.infer<
+  typeof CreateInstructorFeeResponse
+>;
+export type DeleteLatestInstructorFeeResponse = z.infer<
+  typeof DeleteLatestInstructorFeeResponse
+>;
+export type InstructorFeeErrorResponse = z.infer<
+  typeof InstructorFeeErrorResponse
 >;
 export type PastInstructorsListResponse = z.infer<
   typeof PastInstructorsListResponse

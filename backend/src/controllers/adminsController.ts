@@ -27,6 +27,12 @@ import {
   getInstructorPayroll,
   InstructorPayrollError,
 } from "../services/instructorPayrollService";
+import {
+  createInstructorFee,
+  deleteLatestInstructorFee,
+  getInstructorFees,
+  InstructorFeeError,
+} from "../services/instructorFeeService";
 import { getClassesWithinPeriod } from "../services/classesService";
 import {
   getAllCustomers,
@@ -58,6 +64,7 @@ import type {
   CustomerIdParams,
   InstructorIdParams,
   InstructorPayrollQuery,
+  CreateInstructorFeeRequest,
   PlanIdParams,
   EventIdParams,
   RegisterAdminRequest,
@@ -375,6 +382,82 @@ export const getInstructorPayrollController = async (
       error,
       instructorId: req.params.id,
       month: req.query.month,
+    });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getInstructorFeesController = async (
+  req: RequestWithParams<InstructorIdParams>,
+  res: Response,
+) => {
+  try {
+    const fees = await getInstructorFees(req.params.id);
+    return res.status(200).json(fees);
+  } catch (error) {
+    if (error instanceof InstructorFeeError) {
+      return res.status(error.statusCode).json({
+        code: error.code,
+        message: error.message,
+      });
+    }
+
+    console.error("Failed to fetch instructor fees", {
+      error,
+      instructorId: req.params.id,
+    });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const createInstructorFeeController = async (
+  req: RequestWith<InstructorIdParams, CreateInstructorFeeRequest>,
+  res: Response,
+) => {
+  try {
+    const fee = await createInstructorFee(req.params.id, req.body);
+    return res.status(201).json({
+      message: "Instructor fee rate created successfully",
+      fee,
+    });
+  } catch (error) {
+    if (error instanceof InstructorFeeError) {
+      return res.status(error.statusCode).json({
+        code: error.code,
+        message: error.message,
+      });
+    }
+
+    console.error("Failed to create instructor fee", {
+      error,
+      instructorId: req.params.id,
+      body: req.body,
+    });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteLatestInstructorFeeController = async (
+  req: RequestWithParams<InstructorIdParams>,
+  res: Response,
+) => {
+  try {
+    const result = await deleteLatestInstructorFee(req.params.id);
+    return res.status(200).json({
+      message: "Latest instructor fee rate deleted successfully",
+      ...result,
+    });
+  } catch (error) {
+    if (error instanceof InstructorFeeError) {
+      return res.status(error.statusCode).json({
+        code: error.code,
+        message: error.message,
+      });
+    }
+
+    console.error("Failed to delete latest instructor fee", {
+      error,
+      instructorId: req.params.id,
     });
     return res.status(500).json({ message: "Internal server error" });
   }

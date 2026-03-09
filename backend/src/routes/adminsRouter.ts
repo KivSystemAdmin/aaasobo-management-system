@@ -16,6 +16,9 @@ import {
   getAllAdminsController,
   getAllInstructorsController,
   getInstructorPayrollController,
+  getInstructorFeesController,
+  createInstructorFeeController,
+  deleteLatestInstructorFeeController,
   getAllPastInstructorsController,
   getAllCustomersController,
   getAllPastCustomersController,
@@ -44,8 +47,13 @@ import {
   CustomerIdParams,
   InstructorIdParams,
   InstructorPayrollQuery,
+  CreateInstructorFeeRequest,
   InstructorPayrollResponse,
   InstructorPayrollErrorResponse,
+  InstructorFeeRatesResponse,
+  CreateInstructorFeeResponse,
+  DeleteLatestInstructorFeeResponse,
+  InstructorFeeErrorResponse,
   PlanIdParams,
   EventIdParams,
   RegisterAdminRequest,
@@ -420,6 +428,106 @@ const getInstructorPayrollConfig = {
       422: {
         description: "Payroll data cannot be resolved",
         schema: InstructorPayrollErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const getInstructorFeesConfig = {
+  method: "get" as const,
+  paramsSchema: InstructorIdParams,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: getInstructorFeesController,
+  openapi: {
+    summary: "Get instructor fee history",
+    description: "Get fee history for one instructor",
+    responses: {
+      200: {
+        description: "Instructor fee history retrieved successfully",
+        schema: InstructorFeeRatesResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Instructor not found",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const createInstructorFeeConfig = {
+  method: "post" as const,
+  paramsSchema: InstructorIdParams,
+  bodySchema: CreateInstructorFeeRequest,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: createInstructorFeeController,
+  openapi: {
+    summary: "Create instructor fee rate",
+    description: "Create a new latest instructor fee rate",
+    responses: {
+      201: {
+        description: "Instructor fee rate created successfully",
+        schema: CreateInstructorFeeResponse,
+      },
+      400: {
+        description: "Invalid request data",
+        schema: MessageErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Instructor not found",
+        schema: MessageErrorResponse,
+      },
+      409: {
+        description: "Fee rate cannot be created",
+        schema: InstructorFeeErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const deleteLatestInstructorFeeConfig = {
+  method: "delete" as const,
+  paramsSchema: InstructorIdParams,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: deleteLatestInstructorFeeController,
+  openapi: {
+    summary: "Delete latest instructor fee rate",
+    description: "Delete the latest instructor fee rate and reopen the previous one",
+    responses: {
+      200: {
+        description: "Latest instructor fee rate deleted successfully",
+        schema: DeleteLatestInstructorFeeResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Instructor not found",
+        schema: MessageErrorResponse,
+      },
+      409: {
+        description: "Latest fee rate cannot be deleted",
+        schema: InstructorFeeErrorResponse,
       },
       500: {
         description: "Internal server error",
@@ -970,6 +1078,8 @@ const validatedRouteConfigs = {
   "/event-list/register": [registerEventConfig],
   "/event-list/update/:id": [updateEventConfig],
   "/instructor-list": [getAllInstructorsConfig],
+  "/instructors/:id/fees": [getInstructorFeesConfig, createInstructorFeeConfig],
+  "/instructors/:id/fees/latest": [deleteLatestInstructorFeeConfig],
   "/instructors/:id/payroll": [getInstructorPayrollConfig],
   "/instructor-list/past": [getAllPastInstructorsConfig],
   "/instructor-list/register": [registerInstructorConfig],

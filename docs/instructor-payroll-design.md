@@ -43,6 +43,7 @@ The feature must show not only the total amount to pay, but also the reasoning b
 6. `canceledAt` is used only to classify instructor cancellations as normal cancel vs cancel without notice.
 7. `canceledByCustomer` does not contribute to instructor pay.
 8. Payroll boundaries and cancellation deadline use Japan time (`Asia/Tokyo`).
+9. Fee history editing may change historical payroll inputs. v1 does not guarantee payroll consistency after fee edits; admins are responsible for reviewing and correcting any downstream impact.
 
 ## Business Rules
 
@@ -138,6 +139,13 @@ Proposed constraints:
 - no overlapping fee periods for the same instructor
 - open-ended active period allowed via `effectiveTo = null`
 - every payable class must match exactly one fee record
+
+Editing behavior:
+
+- admins can add a new fee record with a new `effectiveFrom`
+- admins can delete only the latest fee record as an undo operation
+- deleting the latest fee record reopens the previous fee record by setting its `effectiveTo` back to `null`
+- v1 does not block fee edits or deletes based on payroll impact; admins are responsible for maintaining payroll consistency after changes
 
 Currency behavior:
 
@@ -451,6 +459,26 @@ Status:
 
 - [x] completed
 
+### Phase 7: Fee Rate Management UI
+
+Goal:
+
+- allow admins to manage instructor fee history from the instructor admin page
+
+Tasks:
+
+- show the current active fee rate in the `Instructor's Profile` tab
+- show fee rate history with effective periods in a collapsed-by-default section
+- add a compact form to create a new fee rate with a new `effectiveFrom`
+- add latest-rate delete as an undo operation
+- when deleting the latest fee rate, set the previous rate `effectiveTo` back to `null`
+- show loading, success, and error states for fee rate mutations
+- document that admins are responsible for any payroll consistency impact caused by fee edits
+
+Status:
+
+- [x] completed
+
 ## Task Log
 
 Use this section to update progress during implementation.
@@ -460,6 +488,10 @@ Use this section to update progress during implementation.
 - Drafted v1 design and agreed product decisions.
 - Clarified that cancel penalties apply only to `canceledByInstructor`.
 - Confirmed current cancellation deadline rule is based on JST same-day boundary, not rolling 24 hours.
+- Added Phase 7 for fee rate management in the admin instructor profile.
+- Implemented admin instructor fee history endpoints for list, create-latest, and delete-latest undo flows.
+- Added the fee rate section to the admin `Instructor's Profile` tab with current rate, collapsed history, and compact mutation UI.
+- Verified instructor fee API tests, existing payroll API tests, and frontend lint pass.
 - Agreed that fee record selection uses class `dateTime`.
 - Agreed to add `Class.canceledAt`.
 - Added fee `currency` to the payroll design. No conversion in v1.

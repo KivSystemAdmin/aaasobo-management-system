@@ -31,6 +31,7 @@ import Uploader from "../../features/registerForm/uploadImages/Uploader";
 import { defaultUserImageUrl } from "@/lib/data/data";
 import Image from "next/image";
 import { confirmAlert } from "@/lib/utils/alertUtils";
+import InstructorFeeRates from "./InstructorFeeRates";
 
 // Define the specific string fields that are editable in this component
 type EditableInstructorFields =
@@ -612,6 +613,10 @@ function InstructorProfile({
                   </div>
                 </div>
               </div>
+            )}
+
+            {userSessionType === "admin" && latestInstructor && (
+              <InstructorFeeRates instructorId={latestInstructor.id} />
             )}
 
             {/* Instructor introduction URL */}
