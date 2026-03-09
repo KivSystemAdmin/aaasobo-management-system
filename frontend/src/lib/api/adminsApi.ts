@@ -38,7 +38,7 @@ type Response<T> = T | { message: string };
 export type InstructorPayrollApiError = InstructorPayrollErrorResponse & {
   status: number;
 };
-export type InstructorFeeApiError = InstructorFeeErrorResponse & {
+type InstructorFeeApiError = InstructorFeeErrorResponse & {
   status: number;
 };
 
