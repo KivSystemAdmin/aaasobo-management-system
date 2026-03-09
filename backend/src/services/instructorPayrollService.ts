@@ -149,7 +149,7 @@ const resolveApplicableFee = (
   const matches = feeRecords.filter(
     (fee) =>
       fee.effectiveFrom <= classDateInJst &&
-      (fee.effectiveTo === null || fee.effectiveTo >= classDateInJst),
+      (fee.effectiveTo === null || fee.effectiveTo > classDateInJst),
   );
 
   if (matches.length !== 1) {
@@ -306,7 +306,7 @@ export const getInstructorPayroll = async (
         OR: [
           { effectiveTo: null },
           {
-            effectiveTo: { gte: new Date(`${bounds.firstDay}T00:00:00.000Z`) },
+            effectiveTo: { gt: new Date(`${bounds.firstDay}T00:00:00.000Z`) },
           },
         ],
       },

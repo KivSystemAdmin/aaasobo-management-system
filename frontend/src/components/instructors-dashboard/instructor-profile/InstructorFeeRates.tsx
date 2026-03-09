@@ -15,6 +15,16 @@ import styles from "./InstructorProfile.module.scss";
 
 const DEFAULT_CURRENCY = "JPY";
 
+const formatExclusiveEndDate = (value: string | null) => {
+  if (!value) {
+    return "Onwards";
+  }
+
+  const date = new Date(`${value}T00:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() - 1);
+  return date.toISOString().slice(0, 10);
+};
+
 const formatMoney = (amount: number, currency: string) => {
   try {
     return new Intl.NumberFormat("en-US", {
@@ -28,7 +38,7 @@ const formatMoney = (amount: number, currency: string) => {
 };
 
 const formatPeriod = (fee: InstructorFeeRate) =>
-  `${fee.effectiveFrom} to ${fee.effectiveTo ?? "Onwards"}`;
+  `${fee.effectiveFrom} to ${formatExclusiveEndDate(fee.effectiveTo)}`;
 
 const createFormState = (fee?: InstructorFeeRate | null) => ({
   currency: fee?.currency ?? DEFAULT_CURRENCY,

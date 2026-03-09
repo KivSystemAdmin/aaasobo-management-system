@@ -137,12 +137,14 @@ Proposed constraints:
 
 - one currency per fee record
 - no overlapping fee periods for the same instructor
+- `effectiveTo` is exclusive
 - open-ended active period allowed via `effectiveTo = null`
 - every payable class must match exactly one fee record
 
 Editing behavior:
 
 - admins can add a new fee record with a new `effectiveFrom`
+- creating a new fee record sets the previous latest record `effectiveTo` to the same date as the new `effectiveFrom`
 - admins can delete only the latest fee record as an undo operation
 - deleting the latest fee record reopens the previous fee record by setting its `effectiveTo` back to `null`
 - v1 does not block fee edits or deletes based on payroll impact; admins are responsible for maintaining payroll consistency after changes
