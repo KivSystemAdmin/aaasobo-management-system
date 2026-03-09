@@ -47,7 +47,10 @@ const formatMoney = (amount: number, currency: string | null) => {
   }
 };
 
-const formatMoneyWithCurrencyCode = (amount: number, currency: string | null) => {
+const formatMoneyWithCurrencyCode = (
+  amount: number,
+  currency: string | null,
+) => {
   const formattedAmount = formatMoney(amount, currency);
 
   if (!currency) {
@@ -174,11 +177,7 @@ function DailyBreakdownTable({
   );
 }
 
-function PeriodCard({
-  period,
-}: {
-  period: InstructorPayrollPeriod;
-}) {
+function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
   return (
     <section className={styles.periodCard}>
       <div className={styles.periodSummary}>
