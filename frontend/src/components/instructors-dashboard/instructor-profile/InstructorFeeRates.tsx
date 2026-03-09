@@ -41,8 +41,14 @@ const createFormState = (fee?: InstructorFeeRate | null) => ({
 
 function FeeRateCard({
   fee,
+  isLatest = false,
+  onDelete,
+  isDeleteDisabled = false,
 }: {
   fee: InstructorFeeRate;
+  isLatest?: boolean;
+  onDelete?: () => void;
+  isDeleteDisabled?: boolean;
 }) {
   return (
     <article className={styles.feeCard}>
@@ -50,7 +56,17 @@ function FeeRateCard({
         <div>
           <strong>{formatPeriod(fee)}</strong>
         </div>
-        <span className={styles.feeCurrency}>{fee.currency}</span>
+        <div className={styles.feeCardActions}>
+          {isLatest && onDelete && (
+            <ActionButton
+              type="button"
+              onClick={onDelete}
+              btnText="Delete"
+              className="deleteBtn"
+              disabled={isDeleteDisabled}
+            />
+          )}
+        </div>
       </div>
       <dl className={styles.feeGrid}>
         <div>
@@ -138,6 +154,16 @@ export default function InstructorFeeRates({
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleOpenForm = () => {
+    setFormState(createFormState(activeFee ?? null));
+    setIsFormOpen(true);
+  };
+
+  const handleCancelForm = () => {
+    setFormState(createFormState(activeFee ?? null));
+    setIsFormOpen(false);
+  };
+
   const handleCreateFee = async () => {
     const trialFee = Number(formState.trialFee);
     const regularFee = Number(formState.regularFee);
@@ -212,30 +238,19 @@ export default function InstructorFeeRates({
           {isLoading ? (
             <p className={styles.feeMutedText}>Loading fee rates...</p>
           ) : activeFee ? (
-            <FeeRateCard fee={activeFee} />
+            <FeeRateCard
+              fee={activeFee}
+              isLatest={true}
+              onDelete={handleDeleteLatest}
+              isDeleteDisabled={isSubmitting || fees.length < 2}
+            />
           ) : (
             <p className={styles.feeMutedText}>No fee rates registered yet.</p>
           )}
 
-          <div className={styles.feeActions}>
-            <ActionButton
-              type="button"
-              onClick={() => setIsFormOpen((prev) => !prev)}
-              btnText={isFormOpen ? "Cancel new rate" : "Change fee rate"}
-              className={isFormOpen ? "cancelBtn" : "addBtn"}
-              disabled={isSubmitting}
-            />
-            <ActionButton
-              type="button"
-              onClick={handleDeleteLatest}
-              btnText="Delete latest rate"
-              className="deleteBtn"
-              disabled={isSubmitting || fees.length < 2}
-            />
-          </div>
-
           {isFormOpen && (
             <div className={styles.feeForm}>
+              <h4 className={styles.feeFormTitle}>New fee rate</h4>
               <div className={styles.feeFormGrid}>
                 <label>
                   Currency
@@ -247,7 +262,7 @@ export default function InstructorFeeRates({
                     placeholder="JPY"
                   />
                   <span className={styles.feeFieldHint}>
-                    Use a 3-letter currency code, for example "JPY".
+                    Use a 3-letter currency code, for example &quot;JPY&quot;.
                   </span>
                 </label>
                 <label>
@@ -304,7 +319,19 @@ export default function InstructorFeeRates({
                   />
                 </label>
               </div>
-              <div className={styles.feeActions}>
+            </div>
+          )}
+
+          <div className={styles.feeActions}>
+            {isFormOpen ? (
+              <>
+                <ActionButton
+                  type="button"
+                  onClick={handleCancelForm}
+                  btnText="Cancel"
+                  className="cancelBtn"
+                  disabled={isSubmitting}
+                />
                 <ActionButton
                   type="button"
                   onClick={handleCreateFee}
@@ -312,9 +339,17 @@ export default function InstructorFeeRates({
                   className="saveBtn"
                   disabled={isSubmitting}
                 />
-              </div>
-            </div>
-          )}
+              </>
+            ) : (
+              <ActionButton
+                type="button"
+                onClick={handleOpenForm}
+                btnText="Change fee rate"
+                className="addBtn"
+                disabled={isSubmitting}
+              />
+            )}
+          </div>
 
           <details className={styles.feeHistory}>
             <summary>Rate history</summary>
