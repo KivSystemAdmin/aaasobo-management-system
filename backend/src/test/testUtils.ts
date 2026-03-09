@@ -1,7 +1,7 @@
 const { faker } = require("@faker-js/faker");
 import { hashPasswordSync } from "../utils/commonUtils";
 import { prisma } from "./setup";
-import { Status } from "../../generated/prisma";
+import { Prisma, Status } from "../../generated/prisma";
 
 export function setTestDataSeed(seed: number) {
   faker.seed(seed);
@@ -242,9 +242,40 @@ export async function createClass(
   customerId: number,
   instructorId?: number,
   dateTime?: Date,
+  overrides?: Partial<Prisma.ClassUncheckedCreateInput>,
 ) {
   return await prisma.class.create({
-    data: generateTestClass(customerId, instructorId, dateTime),
+    data: {
+      ...generateTestClass(customerId, instructorId, dateTime),
+      ...overrides,
+    },
+  });
+}
+
+export async function createInstructorFee(
+  instructorId: number,
+  data?: Partial<{
+    currency: string;
+    effectiveFrom: Date;
+    effectiveTo: Date | null;
+    trialFee: number;
+    regularFee: number;
+    cancelFee: number;
+    cancelWithoutNoticeFee: number;
+  }>,
+) {
+  return await prisma.instructorFee.create({
+    data: {
+      instructorId,
+      currency: data?.currency ?? "JPY",
+      effectiveFrom:
+        data?.effectiveFrom ?? new Date("2026-01-01T00:00:00.000Z"),
+      effectiveTo: data?.effectiveTo === undefined ? null : data.effectiveTo,
+      trialFee: data?.trialFee ?? 1000,
+      regularFee: data?.regularFee ?? 1000,
+      cancelFee: data?.cancelFee ?? 500,
+      cancelWithoutNoticeFee: data?.cancelWithoutNoticeFee ?? 0,
+    },
   });
 }
 

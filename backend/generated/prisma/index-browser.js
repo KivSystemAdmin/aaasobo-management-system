@@ -163,6 +163,7 @@ exports.Prisma.ClassScalarFieldEnum = {
   recurringClassId: 'recurringClassId',
   dateTime: 'dateTime',
   status: 'status',
+  canceledAt: 'canceledAt',
   subscriptionId: 'subscriptionId',
   rebookableUntil: 'rebookableUntil',
   classCode: 'classCode',
@@ -253,6 +254,18 @@ exports.Prisma.InstructorAbsenceScalarFieldEnum = {
   absentAt: 'absentAt'
 };
 
+exports.Prisma.InstructorFeeScalarFieldEnum = {
+  id: 'id',
+  instructorId: 'instructorId',
+  currency: 'currency',
+  effectiveFrom: 'effectiveFrom',
+  effectiveTo: 'effectiveTo',
+  trialFee: 'trialFee',
+  regularFee: 'regularFee',
+  cancelFee: 'cancelFee',
+  cancelWithoutNoticeFee: 'cancelWithoutNoticeFee'
+};
+
 exports.Prisma.SystemStatusScalarFieldEnum = {
   id: 'id',
   status: 'status',
@@ -319,6 +332,7 @@ exports.Prisma.ModelName = {
   InstructorSchedule: 'InstructorSchedule',
   InstructorSlot: 'InstructorSlot',
   InstructorAbsence: 'InstructorAbsence',
+  InstructorFee: 'InstructorFee',
   SystemStatus: 'SystemStatus',
   Admin: 'Admin',
   Child: 'Child'

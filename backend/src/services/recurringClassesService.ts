@@ -298,7 +298,9 @@ async function cancelConflictingNewClasses(
 ): Promise<void> {
   await tx.$executeRaw`
     UPDATE "Class" 
-    SET status = 'canceledByInstructor' 
+    SET status = 'canceledByInstructor',
+        "canceledAt" = NOW(),
+        "updatedAt" = NOW()
     WHERE id IN (
       SELECT c1.id
       FROM "Class" as c1
@@ -318,7 +320,9 @@ async function cancelClassesDuringAbsences(
 ): Promise<void> {
   await tx.$executeRaw`
     UPDATE "Class" 
-    SET status = 'canceledByInstructor' 
+    SET status = 'canceledByInstructor',
+        "canceledAt" = NOW(),
+        "updatedAt" = NOW()
     WHERE id IN (
       SELECT c.id
       FROM "Class" as c

@@ -19,6 +19,7 @@ export const addInstructorAbsence = async (data: {
 }) => {
   try {
     return await prisma.$transaction(async (tx) => {
+      const now = new Date();
       const lockKey = `instructor:${data.instructorId}:${data.absentAt.toISOString()}`;
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
 
@@ -32,7 +33,9 @@ export const addInstructorAbsence = async (data: {
         },
         data: {
           status: "canceledByInstructor",
+          canceledAt: now,
           rebookableUntil: nHoursLater(180 * 24, data.absentAt),
+          updatedAt: now,
         },
       });
 

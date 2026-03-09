@@ -3,8 +3,10 @@ import request from "supertest";
 import { server } from "../../../server";
 import { prisma } from "../../setup";
 import {
-  createInstructor,
   createAdmin,
+  createClass,
+  createCustomer,
+  createInstructor,
   createInstructorAbsence,
   generateAuthCookie,
 } from "../../testUtils";
@@ -49,6 +51,31 @@ describe("POST /instructors/:id/absences", () => {
       },
     });
     expect(absence).toBeTruthy();
+  });
+
+  it("sets canceledAt on existing booked classes at the absent slot", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+    const instructor = await createInstructor();
+    const customer = await createCustomer();
+    const absentAt = new Date("2024-07-01T00:00:00.000Z");
+    const scheduledClass = await createClass(
+      customer.id,
+      instructor.id,
+      absentAt,
+    );
+
+    await request(server)
+      .post(`/instructors/${instructor.id}/absences`)
+      .set("Cookie", authCookie)
+      .send({ absentAt: absentAt.toISOString() })
+      .expect(201);
+
+    const updatedClass = await prisma.class.findUnique({
+      where: { id: scheduledClass.id },
+    });
+    expect(updatedClass?.status).toBe("canceledByInstructor");
+    expect(updatedClass?.canceledAt).toBeTruthy();
   });
 
   it("fail for unauthenticated request", async () => {

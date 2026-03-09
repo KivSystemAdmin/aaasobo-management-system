@@ -378,6 +378,7 @@ describe("PATCH /classes/:id/cancel", () => {
       where: { id: classToCancel.id },
     });
     expect(updatedClass?.status).toBe("canceledByCustomer");
+    expect(updatedClass?.canceledAt).toBeTruthy();
     expect(
       await prisma.classAttendance.count({
         where: { classId: classToCancel.id },
@@ -411,6 +412,30 @@ describe("PATCH /classes/:id/status", () => {
       where: { id: classRecord.id },
     });
     expect(updatedClass?.status).toBe("completed");
+    expect(updatedClass?.canceledAt).toBeNull();
+  });
+
+  it("sets canceledAt when class is canceled by instructor", async () => {
+    const admin = await createAdmin();
+    const customer = await createCustomer();
+    const instructor = await createInstructor();
+    const classRecord = await createClass(
+      customer.id,
+      instructor.id,
+      daysFromNow(3),
+    );
+
+    await request(server)
+      .patch(`/classes/${classRecord.id}/status`)
+      .set("Cookie", await generateAuthCookie(admin.id, "admin"))
+      .send({ status: "canceledByInstructor" })
+      .expect(200);
+
+    const updatedClass = await prisma.class.findUnique({
+      where: { id: classRecord.id },
+    });
+    expect(updatedClass?.status).toBe("canceledByInstructor");
+    expect(updatedClass?.canceledAt).toBeTruthy();
   });
 
   it("fail without authentication", async () => {
@@ -582,11 +607,17 @@ describe("POST /classes/cancel-classes", () => {
 
     const updatedStatuses = await prisma.class.findMany({
       where: { id: { in: [firstClass.id, secondClass.id] } },
-      select: { status: true },
+      select: { status: true, canceledAt: true },
     });
-    expect(updatedStatuses.map((entry) => entry.status)).toEqual([
-      "canceledByCustomer",
-      "canceledByCustomer",
+    expect(updatedStatuses).toEqual([
+      expect.objectContaining({
+        status: "canceledByCustomer",
+        canceledAt: expect.any(Date),
+      }),
+      expect.objectContaining({
+        status: "canceledByCustomer",
+        canceledAt: expect.any(Date),
+      }),
     ]);
     expect(
       await prisma.classAttendance.count({
