@@ -90,6 +90,17 @@ type InstructorDef = {
   termination_at: string;
 };
 
+type InstructorFeeDef = {
+  instructor_ref: string;
+  currency: string;
+  effective_from: string;
+  effective_to: string;
+  trial_fee: string;
+  regular_fee: string;
+  cancel_fee: string;
+  cancel_without_notice_fee: string;
+};
+
 type InstructorScheduleDef = {
   instructor_ref: string;
   effective_from: string;
@@ -152,6 +163,7 @@ type RowMap = {
   "children.csv": ChildDef[];
   "subscriptions.csv": SubscriptionDef[];
   "instructors.csv": InstructorDef[];
+  "instructor_fees.csv": InstructorFeeDef[];
   "instructor_schedules.csv": InstructorScheduleDef[];
   "instructor_absences.csv": { instructor_ref: string; absent_at: string }[];
   "events.csv": EventDef[];
@@ -445,6 +457,23 @@ function instructorRows(fakerEn: FakerLike): InstructorDef[] {
 
 function slotsForInstructor(instructorIndexOneBased: number): SlotDef[] {
   return instructorIndexOneBased % 2 === 1 ? PATTERN_A_SLOTS : PATTERN_B_SLOTS;
+}
+
+function instructorFeeRows(from: string): InstructorFeeDef[] {
+  const rows: InstructorFeeDef[] = [];
+  for (let i = 1; i <= INSTRUCTOR_COUNT; i += 1) {
+    rows.push({
+      instructor_ref: ref("IN", i),
+      currency: "PHP",
+      effective_from: from,
+      effective_to: "",
+      trial_fee: "75",
+      regular_fee: "100",
+      cancel_fee: "50",
+      cancel_without_notice_fee: "100",
+    });
+  }
+  return rows;
 }
 
 function instructorScheduleRows(from: string): InstructorScheduleDef[] {
@@ -762,6 +791,7 @@ async function main(): Promise<void> {
     "children.csv": children,
     "subscriptions.csv": subscriptions,
     "instructors.csv": instructors,
+    "instructor_fees.csv": instructorFeeRows(args.from),
     "instructor_schedules.csv": instructorScheduleRows(args.from),
     "instructor_absences.csv": [],
     "events.csv": eventRows(),

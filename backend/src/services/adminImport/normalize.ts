@@ -9,6 +9,7 @@ export type NormalizedFileName =
   | "children.csv"
   | "subscriptions.csv"
   | "instructors.csv"
+  | "instructor_fees.csv"
   | "instructor_schedules.csv"
   | "instructor_absences.csv"
   | "events.csv"
@@ -118,6 +119,17 @@ interface InstructorScheduleRow {
   start_time: string;
 }
 
+interface InstructorFeeRow {
+  instructor_ref: string;
+  currency: string;
+  effective_from: string;
+  effective_to: string;
+  trial_fee: string;
+  regular_fee: string;
+  cancel_fee: string;
+  cancel_without_notice_fee: string;
+}
+
 const RAW_COLUMN = {
   prefecture: 2,
   customerName: 4,
@@ -182,6 +194,16 @@ export const NORMALIZED_HEADERS = {
     "working_time",
     "is_native",
     "termination_at",
+  ],
+  "instructor_fees.csv": [
+    "instructor_ref",
+    "currency",
+    "effective_from",
+    "effective_to",
+    "trial_fee",
+    "regular_fee",
+    "cancel_fee",
+    "cancel_without_notice_fee",
   ],
   "instructor_schedules.csv": [
     "instructor_ref",
@@ -415,6 +437,7 @@ function toRecordSet(rows: RawClassRow[]): {
   children: ChildRow[];
   subscriptions: SubscriptionRow[];
   instructors: InstructorRow[];
+  instructorFees: InstructorFeeRow[];
   instructorSchedules: InstructorScheduleRow[];
   generatedCustomerEmails: GeneratedEmailReportItem[];
   warnings: string[];
@@ -430,6 +453,7 @@ function toRecordSet(rows: RawClassRow[]): {
   const children: ChildRow[] = [];
   const subscriptions: SubscriptionRow[] = [];
   const instructors: InstructorRow[] = [];
+  const instructorFees: InstructorFeeRow[] = [];
   const instructorSchedules: InstructorScheduleRow[] = [];
   const generatedCustomerEmails: GeneratedEmailReportItem[] = [];
   const warnings: string[] = [];
@@ -541,6 +565,16 @@ function toRecordSet(rows: RawClassRow[]): {
         };
         instructorsByName.set(row.instructorName, instructor);
         instructors.push(instructor);
+        instructorFees.push({
+          instructor_ref: instructorRef,
+          currency: "PHP",
+          effective_from: "2020-01-01",
+          effective_to: "",
+          trial_fee: "75",
+          regular_fee: "100",
+          cancel_fee: "50",
+          cancel_without_notice_fee: "100",
+        });
       }
 
       if (row.weekday === null) {
@@ -576,6 +610,7 @@ function toRecordSet(rows: RawClassRow[]): {
     children,
     subscriptions,
     instructors,
+    instructorFees,
     instructorSchedules,
     generatedCustomerEmails,
     warnings,
@@ -698,6 +733,10 @@ export function normalizeRawScheduleCsvToPackage(
       "instructors.csv",
       mapped.instructors,
     ),
+    "instructor_fees.csv": rowsToCsvWithHeaders(
+      "instructor_fees.csv",
+      mapped.instructorFees,
+    ),
     "instructor_schedules.csv": rowsToCsvWithHeaders(
       "instructor_schedules.csv",
       mapped.instructorSchedules,
@@ -726,6 +765,7 @@ export function normalizeRawScheduleCsvToPackage(
     "children.csv": mapped.children.length,
     "subscriptions.csv": mapped.subscriptions.length,
     "instructors.csv": mapped.instructors.length,
+    "instructor_fees.csv": mapped.instructorFees.length,
     "instructor_schedules.csv": mapped.instructorSchedules.length,
     "instructor_absences.csv": 0,
     "events.csv": 0,
