@@ -511,7 +511,8 @@ const deleteLatestInstructorFeeConfig = {
   handler: deleteLatestInstructorFeeController,
   openapi: {
     summary: "Delete latest instructor fee rate",
-    description: "Delete the latest instructor fee rate and reopen the previous one",
+    description:
+      "Delete the latest instructor fee rate and reopen the previous one",
     responses: {
       200: {
         description: "Latest instructor fee rate deleted successfully",

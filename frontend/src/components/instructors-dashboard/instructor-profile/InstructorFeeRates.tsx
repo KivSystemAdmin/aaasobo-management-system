@@ -355,7 +355,9 @@ export default function InstructorFeeRates({
             <summary>Rate history</summary>
             <div className={styles.feeHistoryList}>
               {historicalFees.length > 0 ? (
-                historicalFees.map((fee) => <FeeRateCard key={fee.id} fee={fee} />)
+                historicalFees.map((fee) => (
+                  <FeeRateCard key={fee.id} fee={fee} />
+                ))
               ) : (
                 <p className={styles.feeMutedText}>No past fee rates.</p>
               )}
