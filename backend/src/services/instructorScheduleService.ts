@@ -143,6 +143,7 @@ export const createInstructorSchedule = async (data: {
 
           const slotTime = removedSlot.startTime.toISOString().slice(11, 19);
           const lockedSlotDateTime = new Date(`${datePrefix}T${slotTime}.000Z`);
+          const now = new Date();
           const lockKey = `instructor:${instructorId}:${lockedSlotDateTime.toISOString()}`;
           await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
 
@@ -156,8 +157,9 @@ export const createInstructorSchedule = async (data: {
             },
             data: {
               status: "canceledByInstructor",
+              canceledAt: now,
               rebookableUntil: nHoursLater(180 * 24, lockedSlotDateTime),
-              updatedAt: new Date(),
+              updatedAt: now,
             },
           });
         }

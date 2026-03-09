@@ -261,6 +261,7 @@ describe("POST /recurring-classes", () => {
     });
 
     expect(conflicted?.status).toBe("canceledByInstructor");
+    expect(conflicted?.canceledAt).toBeTruthy();
   });
 
   it("cancel created classes that fall on instructor absences", async () => {
@@ -300,6 +301,7 @@ describe("POST /recurring-classes", () => {
     });
 
     expect(absentClass?.status).toBe("canceledByInstructor");
+    expect(absentClass?.canceledAt).toBeTruthy();
   });
 });
 

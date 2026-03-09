@@ -23,6 +23,10 @@ import {
   getInstructorByMeetingId,
   getInstructorByPasscode,
 } from "../services/instructorsService";
+import {
+  getInstructorPayroll,
+  InstructorPayrollError,
+} from "../services/instructorPayrollService";
 import { getClassesWithinPeriod } from "../services/classesService";
 import {
   getAllCustomers,
@@ -53,6 +57,7 @@ import type {
   AdminIdParams,
   CustomerIdParams,
   InstructorIdParams,
+  InstructorPayrollQuery,
   PlanIdParams,
   EventIdParams,
   RegisterAdminRequest,
@@ -344,6 +349,34 @@ export const getAllInstructorsController = async (
     res.json({ data });
   } catch (error) {
     res.status(500).json({ error });
+  }
+};
+
+export const getInstructorPayrollController = async (
+  req: RequestWith<InstructorIdParams, never, InstructorPayrollQuery>,
+  res: Response,
+) => {
+  try {
+    const payroll = await getInstructorPayroll(req.params.id, req.query.month);
+    return res.status(200).json(payroll);
+  } catch (error) {
+    if (error instanceof InstructorPayrollError) {
+      if (error.statusCode === 404) {
+        return res.status(404).json({ message: error.message });
+      }
+
+      return res.status(error.statusCode).json({
+        code: error.code,
+        message: error.message,
+      });
+    }
+
+    console.error("Failed to fetch instructor payroll", {
+      error,
+      instructorId: req.params.id,
+      month: req.query.month,
+    });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 

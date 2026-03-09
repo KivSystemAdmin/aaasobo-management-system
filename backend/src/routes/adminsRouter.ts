@@ -15,6 +15,7 @@ import {
   getAdminController,
   getAllAdminsController,
   getAllInstructorsController,
+  getInstructorPayrollController,
   getAllPastInstructorsController,
   getAllCustomersController,
   getAllPastCustomersController,
@@ -42,6 +43,9 @@ import {
   AdminIdParams,
   CustomerIdParams,
   InstructorIdParams,
+  InstructorPayrollQuery,
+  InstructorPayrollResponse,
+  InstructorPayrollErrorResponse,
   PlanIdParams,
   EventIdParams,
   RegisterAdminRequest,
@@ -378,6 +382,44 @@ const getAllInstructorsConfig = {
       200: {
         description: "Instructors list retrieved successfully",
         schema: InstructorsListResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const getInstructorPayrollConfig = {
+  method: "get" as const,
+  paramsSchema: InstructorIdParams,
+  querySchema: InstructorPayrollQuery,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: getInstructorPayrollController,
+  openapi: {
+    summary: "Get instructor payroll",
+    description: "Get current payroll summary for one instructor and month",
+    responses: {
+      200: {
+        description: "Instructor payroll retrieved successfully",
+        schema: InstructorPayrollResponse,
+      },
+      400: {
+        description: "Invalid query parameters",
+        schema: MessageErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Instructor not found",
+        schema: MessageErrorResponse,
+      },
+      422: {
+        description: "Payroll data cannot be resolved",
+        schema: InstructorPayrollErrorResponse,
       },
       500: {
         description: "Internal server error",
@@ -928,6 +970,7 @@ const validatedRouteConfigs = {
   "/event-list/register": [registerEventConfig],
   "/event-list/update/:id": [updateEventConfig],
   "/instructor-list": [getAllInstructorsConfig],
+  "/instructors/:id/payroll": [getInstructorPayrollConfig],
   "/instructor-list/past": [getAllPastInstructorsConfig],
   "/instructor-list/register": [registerInstructorConfig],
   "/instructor-list/register/withIcon": [registerInstructorWithIconConfig],
