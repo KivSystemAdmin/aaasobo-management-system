@@ -32,6 +32,7 @@ When normalized by `normalizeRawScheduleCsvToPackage`:
   - `children.csv`: 120
   - `subscriptions.csv`: 100
   - `instructors.csv`: 10
+  - `instructor_fees.csv`: 10
 
 ## Next Fixture Direction
 
@@ -59,3 +60,11 @@ npm run fixture:generate:normalized-import -- \
   - `--out-dir` (default: `../docs/testing/data-import/generated`)
 
 The generator creates all mandatory normalized CSV files and one deterministic zip file in the output directory.
+
+It also emits `instructor_fees.csv` with one active fee row per instructor using:
+
+- `currency = PHP`
+- `trial_fee = 75`
+- `regular_fee = 100`
+- `cancel_fee = 50`
+- `cancel_without_notice_fee = 100`

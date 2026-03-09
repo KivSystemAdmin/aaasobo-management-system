@@ -29,6 +29,8 @@ function buildMinimalNormalizedFiles() {
       "subscription_ref,customer_ref,plan_ref,start_at,end_at\nSU0001,CU0001,PL0001,2025-01-01T00:00:00+09:00,2025-12-31T00:00:00+09:00\n",
     "instructors.csv":
       "instructor_ref,name,email,temp_password,class_url,icon,nickname,meeting_id,passcode,birthdate,favorite_food,hobby,life_history,message_for_children,skill,working_time,is_native,termination_at\nIN0001,Instructor One,instructor.one@example.com,TempPass456!,https://import.local/class/in0001,https://import.local/icon/in0001.png,instructor_in0001,11111111111,PASS0001,1990-01-01,Sushi,Reading,Life history,Message,Skill,Weekdays,false,\n",
+    "instructor_fees.csv":
+      "instructor_ref,currency,effective_from,effective_to,trial_fee,regular_fee,cancel_fee,cancel_without_notice_fee\nIN0001,PHP,2025-01-01,,75,100,50,100\n",
     "instructor_schedules.csv":
       "instructor_ref,effective_from,effective_to,timezone,weekday,start_time\nIN0001,2025-01-01,2025-12-31,Asia/Tokyo,1,09:00\n",
     "instructor_absences.csv": "instructor_ref,absent_at\n",
@@ -147,6 +149,7 @@ describe("POST /admins/import/normalize", () => {
       "customers.csv",
       "events.csv",
       "instructor_absences.csv",
+      "instructor_fees.csv",
       "instructor_schedules.csv",
       "instructors.csv",
       "plans.csv",
@@ -168,6 +171,9 @@ describe("POST /admins/import/normalize", () => {
       3,
     );
     expect(
+      response.body.report.normalizedRowsByFile["instructor_fees.csv"],
+    ).toBe(3);
+    expect(
       response.body.report.normalizedRowsByFile["instructor_schedules.csv"],
     ).toBe(3);
     expect(response.body.report.generatedCustomerEmails).toHaveLength(1);
@@ -187,6 +193,14 @@ describe("POST /admins/import/normalize", () => {
     expect(plansCsv).toContain("plan_ref,name,description,weekly_class_times");
     expect(plansCsv).toContain("1980円（週1回25分）");
     expect(plansCsv).toContain("1480円（月2回25分）");
+
+    const instructorFeesCsv = response.body.files[
+      "instructor_fees.csv"
+    ] as string;
+    expect(instructorFeesCsv).toContain(
+      "instructor_ref,currency,effective_from,effective_to,trial_fee,regular_fee,cancel_fee,cancel_without_notice_fee",
+    );
+    expect(instructorFeesCsv).toContain("PHP,2020-01-01,,75,100,50,100");
   });
 
   it("downloads normalized files as a zip bundle by jobId", async () => {
@@ -231,6 +245,7 @@ describe("POST /admins/import/normalize", () => {
       "customers.csv",
       "events.csv",
       "instructor_absences.csv",
+      "instructor_fees.csv",
       "instructor_schedules.csv",
       "instructors.csv",
       "plans.csv",
@@ -315,15 +330,18 @@ describe("POST /admins/import/execute", () => {
     expect(response.body.imported).toBe(true);
     expect(response.body.report.rowsByFile["system_status.csv"]).toBe(1);
 
-    const [customers, children, instructors, statuses] = await Promise.all([
-      prisma.customer.count(),
-      prisma.child.count(),
-      prisma.instructor.count(),
-      prisma.systemStatus.count(),
-    ]);
+    const [customers, children, instructors, instructorFees, statuses] =
+      await Promise.all([
+        prisma.customer.count(),
+        prisma.child.count(),
+        prisma.instructor.count(),
+        prisma.instructorFee.count(),
+        prisma.systemStatus.count(),
+      ]);
     expect(customers).toBe(0);
     expect(children).toBe(0);
     expect(instructors).toBe(0);
+    expect(instructorFees).toBe(0);
     expect(statuses).toBe(1);
   });
 
@@ -438,6 +456,7 @@ describe("POST /admins/import/execute", () => {
       children,
       subscriptions,
       instructors,
+      instructorFees,
       schedules,
       recurringClasses,
       classes,
@@ -450,6 +469,7 @@ describe("POST /admins/import/execute", () => {
       prisma.child.count(),
       prisma.subscription.count(),
       prisma.instructor.count(),
+      prisma.instructorFee.count(),
       prisma.schedule.count(),
       prisma.recurringClass.count(),
       prisma.class.count(),
@@ -463,6 +483,7 @@ describe("POST /admins/import/execute", () => {
     expect(children).toBe(1);
     expect(subscriptions).toBe(1);
     expect(instructors).toBe(1);
+    expect(instructorFees).toBe(1);
     expect(schedules).toBe(1);
     expect(recurringClasses).toBe(1);
     expect(classes).toBe(1);
@@ -488,6 +509,19 @@ describe("POST /admins/import/execute", () => {
     });
     expect(importedCustomer.password).not.toBe("TempPass123!");
     expect(importedCustomer.password.startsWith("$2")).toBe(true);
+
+    const importedInstructorFee = await prisma.instructorFee.findFirstOrThrow({
+      include: { instructor: true },
+    });
+    expect(importedInstructorFee.instructor.email).toBe(
+      "instructor.one@example.com",
+    );
+    expect(importedInstructorFee.currency).toBe("PHP");
+    expect(importedInstructorFee.effectiveTo).toBeNull();
+    expect(importedInstructorFee.trialFee).toBe(75);
+    expect(importedInstructorFee.regularFee).toBe(100);
+    expect(importedInstructorFee.cancelFee).toBe(50);
+    expect(importedInstructorFee.cancelWithoutNoticeFee).toBe(100);
   });
 
   it("accepts multiple slot rows that share the same instructor schedule key", async () => {

@@ -45,22 +45,25 @@ Two-step workflow:
 3. `children.csv`
 4. `subscriptions.csv`
 5. `instructors.csv`
-6. `instructor_schedules.csv` (domain-combined: schedule + slot data)
-7. `instructor_absences.csv`
-8. `events.csv`
-9. `schedules.csv`
-10. `system_status.csv`
-11. `recurring_classes.csv`
-12. `recurring_class_attendance.csv`
-13. `classes.csv`
-14. `class_attendance.csv`
+6. `instructor_fees.csv`
+7. `instructor_schedules.csv` (domain-combined: schedule + slot data)
+8. `instructor_absences.csv`
+9. `events.csv`
+10. `schedules.csv`
+11. `system_status.csv`
+12. `recurring_classes.csv`
+13. `recurring_class_attendance.csv`
+14. `classes.csv`
+15. `class_attendance.csv`
 
 Notes:
 
 - `instructor_schedules.csv` is intentionally domain-combined and fans out internally to `InstructorSchedule` and `InstructorSlot`.
+- `instructor_fees.csv` imports `InstructorFee` history rows per instructor.
 - All mandatory files must exist even if empty (header-only allowed where applicable).
 - `customers.csv` and `instructors.csv` include `temp_password` columns in normalized outputs.
 - Importer must hash temporary passwords before database write; plain text is never stored in DB.
+- Raw schedule normalization does not have source fee history, so it emits one default active fee row per instructor with currency `PHP`, `trial_fee = 75`, `regular_fee = 100`, `cancel_fee = 50`, and `cancel_without_notice_fee = 100`. Admins must review and adjust imported fee history as needed.
 - Support both:
   - Import from normalized files generated in the same session.
   - Re-upload/import previously downloaded normalized bundles.
@@ -124,52 +127,57 @@ Notes:
    - Keys:
      - `instructor_ref` unique.
      - `email`, `class_url`, `icon`, `nickname`, `meeting_id`, `passcode` unique.
-6. `instructor_schedules.csv`
+6. `instructor_fees.csv`
+   - Required columns: `instructor_ref,currency,effective_from,effective_to,trial_fee,regular_fee,cancel_fee,cancel_without_notice_fee`
+   - Keys:
+     - `instructor_ref` must exist in `instructors.csv`.
+     - `(instructor_ref,effective_from)` unique.
+7. `instructor_schedules.csv`
    - Required columns: `instructor_ref,effective_from,effective_to,timezone,weekday,start_time`
    - Keys:
      - `instructor_ref` must exist in `instructors.csv`.
      - `(instructor_ref,effective_from,effective_to,timezone)` defines one schedule.
      - `(instructor_ref,effective_from,effective_to,timezone,weekday,start_time)` unique for slots.
-7. `instructor_absences.csv`
+8. `instructor_absences.csv`
    - Required columns: `instructor_ref,absent_at`
    - Keys:
      - `instructor_ref` must exist in `instructors.csv`.
      - `(instructor_ref,absent_at)` unique.
-8. `events.csv`
+9. `events.csv`
    - Required columns: `event_ref,name,color`
    - Keys:
      - `event_ref` unique.
      - `name` unique.
      - `color` unique.
-9. `schedules.csv`
+10. `schedules.csv`
    - Required columns: `schedule_ref,date,event_ref`
    - Keys:
      - `schedule_ref` unique.
      - `date` unique.
      - `event_ref` must exist in `events.csv`.
-10. `system_status.csv`
+11. `system_status.csv`
    - Required columns: `status`
    - Rules:
      - Exactly one row required in v1.
-11. `recurring_classes.csv`
+12. `recurring_classes.csv`
    - Required columns: `recurring_class_ref,subscription_ref,instructor_ref,start_at,end_at`
    - Keys:
      - `recurring_class_ref` unique.
      - `subscription_ref` must exist in `subscriptions.csv` when provided.
      - `instructor_ref` must exist in `instructors.csv` when provided.
-12. `recurring_class_attendance.csv`
+13. `recurring_class_attendance.csv`
    - Required columns: `recurring_class_ref,child_ref`
    - Keys:
      - `recurring_class_ref` must exist in `recurring_classes.csv`.
      - `child_ref` must exist in `children.csv`.
      - `(recurring_class_ref,child_ref)` unique.
-13. `classes.csv`
+14. `classes.csv`
    - Required columns: `class_ref,customer_ref,instructor_ref,recurring_class_ref,subscription_ref,date_time,status,rebookable_until,class_code,is_free_trial`
    - Keys:
      - `class_ref` unique.
      - `customer_ref` must exist in `customers.csv`.
      - `instructor_ref`, `recurring_class_ref`, `subscription_ref` must exist in their files when provided.
-14. `class_attendance.csv`
+15. `class_attendance.csv`
    - Required columns: `class_ref,child_ref`
    - Keys:
      - `class_ref` must exist in `classes.csv`.
@@ -181,6 +189,8 @@ Notes:
 1. Date-only columns:
    - `children.birthdate`
    - `instructors.birthdate`
+   - `instructor_fees.effective_from`
+   - `instructor_fees.effective_to`
    - `instructor_schedules.effective_from`
    - `instructor_schedules.effective_to`
    - `schedules.date`
@@ -347,6 +357,7 @@ None at this stage.
 7. Normalization is all-or-nothing: any validation error fails the whole normalization and no partial outputs are produced.
 8. Import reference keys use uniform 2-letter + 4-digit format (e.g., `CU0001`).
 9. Temporary passwords are generated during normalization and included inline as plain text in `customers.csv` and `instructors.csv`.
+10. Raw schedule normalization also generates one default `instructor_fees.csv` row per imported instructor because the current source CSV does not carry fee history.
 10. Temporary passwords are regenerated on every normalization run.
 11. Import feature is always available to authenticated admins in v1 (no environment kill-switch).
 12. Missing emails are auto-generated during normalization (no toggle), and normalization output/report must list which rows were assigned generated emails.
