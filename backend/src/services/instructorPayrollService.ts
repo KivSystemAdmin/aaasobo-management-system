@@ -1,5 +1,8 @@
 import { prisma } from "../../prisma/prismaClient";
-import type { InstructorPayrollResponse } from "../../../shared/schemas/admins";
+import type {
+  InstructorPayrollPeriod,
+  InstructorPayrollResponse,
+} from "../../../shared/schemas/admins";
 import type { Status } from "../../generated/prisma";
 
 const PAYROLL_TIMEZONE = "Asia/Tokyo";
@@ -21,7 +24,7 @@ type PayrollClass = {
   isFreeTrial: boolean;
 };
 
-type PayrollPeriodSummary = InstructorPayrollResponse["periods"][number];
+type PayrollPeriodSummary = InstructorPayrollPeriod;
 type PayrollClassWithDateTime = PayrollClass & { dateTime: Date };
 type PayrollTotals = {
   trial: number;
