@@ -523,6 +523,13 @@ export type AdminProfile = z.infer<typeof AdminProfile>;
 export type AdminResponse = z.infer<typeof AdminResponse>;
 export type AdminsListResponse = z.infer<typeof AdminsListResponse>;
 export type InstructorsListResponse = z.infer<typeof InstructorsListResponse>;
+export type InstructorPayrollFeePeriod = z.infer<
+  typeof InstructorPayrollFeePeriod
+>;
+export type InstructorPayrollDailyBreakdown = z.infer<
+  typeof InstructorPayrollDailyBreakdown
+>;
+export type InstructorPayrollPeriod = z.infer<typeof InstructorPayrollPeriod>;
 export type InstructorPayrollResponse = z.infer<
   typeof InstructorPayrollResponse
 >;
