@@ -1,8 +1,6 @@
 import { prisma } from "../../prisma/prismaClient";
-import type {
-  InstructorPayrollResponse,
-  InstructorPayrollPeriod,
-} from "../../../shared/schemas/admins";
+import type { InstructorPayrollResponse } from "../../../shared/schemas/admins";
+import type { Status } from "../../generated/prisma";
 
 const PAYROLL_TIMEZONE = "Asia/Tokyo";
 const MONTH_FORMATTER = new Intl.DateTimeFormat("en-CA", {
@@ -16,11 +14,20 @@ type PayrollCategory = "trial" | "regular" | "cancel" | "cancelWithoutNotice";
 
 type PayrollClass = {
   id: number;
-  dateTime: Date;
+  dateTime: Date | null;
   updatedAt: Date;
   canceledAt: Date | null;
-  status: string;
+  status: Status;
   isFreeTrial: boolean;
+};
+
+type PayrollPeriodSummary = InstructorPayrollResponse["periods"][number];
+type PayrollClassWithDateTime = PayrollClass & { dateTime: Date };
+type PayrollTotals = {
+  trial: number;
+  regular: number;
+  cancel: number;
+  cancelWithoutNotice: number;
 };
 
 type PayrollFeeRecord = {
@@ -89,7 +96,7 @@ const getMonthBounds = (month: string) => {
 };
 
 const classifyPayrollCategory = (
-  payrollClass: PayrollClass,
+  payrollClass: PayrollClassWithDateTime,
 ): PayrollCategory | null => {
   if (payrollClass.status === "completed") {
     return payrollClass.isFreeTrial ? "trial" : "regular";
@@ -160,6 +167,8 @@ const emptyPeriodTotals = () => ({
   cancelWithoutNotice: 0,
 });
 
+const cloneTotals = (totals: PayrollTotals): PayrollTotals => ({ ...totals });
+
 const getCategoryFee = (fee: PayrollFeeRecord, category: PayrollCategory) => {
   switch (category) {
     case "trial":
@@ -177,12 +186,16 @@ const summarizePeriod = (
   periodName: "1-15" | "16-last",
   from: string,
   to: string,
-  classes: PayrollClass[],
+  classes: PayrollClassWithDateTime[],
   feeRecords: PayrollFeeRecord[],
-): InstructorPayrollPeriod => {
+): PayrollPeriodSummary => {
   const counts = emptyPeriodTotals();
   const subtotals = emptyPeriodTotals();
   const appliedFeePeriods = new Map<string, PayrollFeeRecord>();
+  const dailyBreakdown = new Map<
+    string,
+    { counts: PayrollTotals; total: number }
+  >();
   const currencies = new Set<string>();
   let total = 0;
   let sourceLastUpdatedAt: Date | null = null;
@@ -207,6 +220,14 @@ const summarizePeriod = (
     if (!sourceLastUpdatedAt || payrollClass.updatedAt > sourceLastUpdatedAt) {
       sourceLastUpdatedAt = payrollClass.updatedAt;
     }
+
+    const daySummary = dailyBreakdown.get(classDateInJst) ?? {
+      counts: emptyPeriodTotals(),
+      total: 0,
+    };
+    daySummary.counts[category] += 1;
+    daySummary.total += feeAmount;
+    dailyBreakdown.set(classDateInJst, daySummary);
   }
 
   if (currencies.size > 1) {
@@ -225,6 +246,13 @@ const summarizePeriod = (
     counts,
     subtotals,
     total,
+    dailyBreakdown: Array.from(dailyBreakdown.entries())
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([date, day]) => ({
+        date,
+        counts: cloneTotals(day.counts),
+        total: day.total,
+      })),
     appliedFeePeriods: Array.from(appliedFeePeriods.values()).sort((a, b) =>
       a.effectiveFrom.localeCompare(b.effectiveFrom),
     ),
@@ -292,14 +320,11 @@ export const getInstructorPayroll = async (
   }
 
   const feeRecords = fees.map(formatFeeRecord);
-  const payableClasses = classes
-    .filter(
-      (payrollClass): payrollClass is PayrollClass & { dateTime: Date } =>
-        payrollClass.dateTime !== null,
-    )
+  const payableClasses: PayrollClassWithDateTime[] = classes
+    .filter((payrollClass) => payrollClass.dateTime instanceof Date)
     .map((payrollClass) => ({
       ...payrollClass,
-      dateTime: payrollClass.dateTime,
+      dateTime: payrollClass.dateTime as Date,
     }));
 
   const firstHalfClasses = payableClasses.filter(

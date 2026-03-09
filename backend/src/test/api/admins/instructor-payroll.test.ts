@@ -124,6 +124,38 @@ describe("GET /admins/instructors/:id/payroll", () => {
             cancelWithoutNotice: 0,
           },
           total: 3500,
+          dailyBreakdown: [
+            {
+              date: "2026-03-02",
+              counts: {
+                trial: 1,
+                regular: 0,
+                cancel: 0,
+                cancelWithoutNotice: 0,
+              },
+              total: 1000,
+            },
+            {
+              date: "2026-03-10",
+              counts: {
+                trial: 0,
+                regular: 1,
+                cancel: 0,
+                cancelWithoutNotice: 0,
+              },
+              total: 2000,
+            },
+            {
+              date: "2026-03-14",
+              counts: {
+                trial: 0,
+                regular: 0,
+                cancel: 1,
+                cancelWithoutNotice: 0,
+              },
+              total: 500,
+            },
+          ],
           appliedFeePeriods: [
             {
               currency: "JPY",
@@ -154,6 +186,28 @@ describe("GET /admins/instructors/:id/payroll", () => {
             cancelWithoutNotice: 300,
           },
           total: 2800,
+          dailyBreakdown: [
+            {
+              date: "2026-03-16",
+              counts: {
+                trial: 0,
+                regular: 1,
+                cancel: 0,
+                cancelWithoutNotice: 0,
+              },
+              total: 2500,
+            },
+            {
+              date: "2026-03-20",
+              counts: {
+                trial: 0,
+                regular: 0,
+                cancel: 0,
+                cancelWithoutNotice: 1,
+              },
+              total: 300,
+            },
+          ],
           appliedFeePeriods: [
             {
               currency: "JPY",
@@ -258,6 +312,28 @@ describe("GET /admins/instructors/:id/payroll", () => {
         cancelWithoutNotice: 0,
       },
       total: 4200,
+      dailyBreakdown: [
+        {
+          date: "2026-03-05",
+          counts: {
+            trial: 0,
+            regular: 1,
+            cancel: 0,
+            cancelWithoutNotice: 0,
+          },
+          total: 2000,
+        },
+        {
+          date: "2026-03-12",
+          counts: {
+            trial: 0,
+            regular: 1,
+            cancel: 0,
+            cancelWithoutNotice: 0,
+          },
+          total: 2200,
+        },
+      ],
       appliedFeePeriods: [
         {
           currency: "JPY",
@@ -279,6 +355,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
         },
       ],
     });
+    expect(response.body.periods[1].dailyBreakdown).toEqual([]);
     expect(response.body.periods[1].appliedFeePeriods).toEqual([]);
   });
 

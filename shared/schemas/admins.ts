@@ -204,6 +204,17 @@ export const InstructorPayrollFeePeriod = z.object({
   cancelWithoutNoticeFee: z.number().int(),
 });
 
+export const InstructorPayrollDailyBreakdown = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  counts: z.object({
+    trial: z.number().int().nonnegative(),
+    regular: z.number().int().nonnegative(),
+    cancel: z.number().int().nonnegative(),
+    cancelWithoutNotice: z.number().int().nonnegative(),
+  }),
+  total: z.number().int().nonnegative(),
+});
+
 export const InstructorPayrollPeriod = z.object({
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -225,6 +236,7 @@ export const InstructorPayrollPeriod = z.object({
     cancelWithoutNotice: z.number().int().nonnegative(),
   }),
   total: z.number().int().nonnegative(),
+  dailyBreakdown: z.array(InstructorPayrollDailyBreakdown),
   appliedFeePeriods: z.array(InstructorPayrollFeePeriod),
 });
 
