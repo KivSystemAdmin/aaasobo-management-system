@@ -185,7 +185,7 @@ exports.Prisma.PlanScalarFieldEnum = {
   createdAt: 'createdAt',
   terminationAt: 'terminationAt',
   updatedAt: 'updatedAt',
-  isNative: 'isNative'
+  englishBackground: 'englishBackground'
 };
 
 exports.Prisma.SubscriptionScalarFieldEnum = {

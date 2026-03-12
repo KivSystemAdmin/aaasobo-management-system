@@ -759,7 +759,7 @@ async function insertInstructors() {
         password: "$2b$12$WzRyanExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-06T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "kana.watanabe@example.com",
@@ -2178,25 +2178,25 @@ async function insertPlans() {
         name: "月3,180円プラン / 3,180 yen/month Plan",
         description: "2 classes per week",
         weeklyClassTimes: 2,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         name: "月7,980円プラン / 7,980 yen/month Plan",
         description: "5 classes per week",
         weeklyClassTimes: 5,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         name: "月5,980円プラン / 5,980 yen/month Plan",
         description: "1 classes per week",
         weeklyClassTimes: 1,
-        isNative: true,
+        englishBackground: 1,
       },
       {
         name: "月10,800円プラン / 10,800 yen/month Plan",
         description: "2 classes per week",
         weeklyClassTimes: 2,
-        isNative: true,
+        englishBackground: 2,
       },
     ],
   });

@@ -102,15 +102,15 @@ model ClassAttendance {
 }
 
 model Plan {
-  id               Int            @id @default(autoincrement())
-  name             String
-  description      String
-  weeklyClassTimes Int
-  createdAt        DateTime       @default(now())
-  terminationAt    DateTime?
-  updatedAt        DateTime       @default(now()) @updatedAt
-  isNative         Boolean
-  subscription     Subscription[]
+  id                Int            @id @default(autoincrement())
+  name              String
+  description       String
+  weeklyClassTimes  Int
+  createdAt         DateTime       @default(now())
+  terminationAt     DateTime?
+  updatedAt         DateTime       @default(now()) @updatedAt
+  englishBackground Int // 0: non-native, 1: native-A, 2: native-B
+  subscription      Subscription[]
 }
 
 model Subscription {
