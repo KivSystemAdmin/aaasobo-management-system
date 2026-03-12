@@ -29,7 +29,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu", // AaasoBo!Helen
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "elian@example.com",
@@ -49,7 +49,7 @@ async function insertInstructors() {
         password:
           "$2b$12$pNrLSRYlTIwTl//Tz3KMA.K2gdqRWA2/aikJ9ilr0ItQZWe1bJoay", // password: AaasoBo!Elian
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "lori@example.com",
@@ -69,7 +69,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "kaori@example.com",
@@ -89,7 +89,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "winnie@example.com",
@@ -109,7 +109,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "claude@example.com",
@@ -129,7 +129,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "jdy@example.com",
@@ -149,7 +149,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "mae@example.com",
@@ -169,7 +169,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "eiyd@example.com",
@@ -189,7 +189,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "kechia@example.com",
@@ -209,7 +209,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "yasmin@example.com",
@@ -229,7 +229,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "dani@example.com",
@@ -249,7 +249,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "angela@example.com",
@@ -269,7 +269,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "ronilo@example.com",
@@ -289,7 +289,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "sheryll@example.com",
@@ -309,7 +309,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu", // AaasoBo!Helen
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "rina@example.com",
@@ -329,7 +329,7 @@ async function insertInstructors() {
         passcode: "rina",
         password: "$2b$12$WzRinaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "tina@example.com",
@@ -350,7 +350,7 @@ async function insertInstructors() {
         password: "$2b$12$WzTinaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-08-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "mark@example.com",
@@ -370,7 +370,7 @@ async function insertInstructors() {
         password: "$2b$12$WzMarkExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-08-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "liza@example.com",
@@ -390,7 +390,7 @@ async function insertInstructors() {
         password: "$2b$12$WzLizaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-09-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "paolo@example.com",
@@ -410,7 +410,7 @@ async function insertInstructors() {
         password: "$2b$12$WzPaoloExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-04-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "marie@example.com",
@@ -430,7 +430,7 @@ async function insertInstructors() {
         password: "$2b$12$WzMarieExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-06-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "justin@example.com",
@@ -451,7 +451,7 @@ async function insertInstructors() {
           "$2b$12$WzJustinExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2024-08-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "carla@example.com",
@@ -471,7 +471,7 @@ async function insertInstructors() {
         password: "$2b$12$WzCarlaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-08-31T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "gem@example.com",
@@ -491,7 +491,7 @@ async function insertInstructors() {
         password: "$2b$12$WzGemExampleHash000000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-08-07T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "aileen@example.com",
@@ -512,7 +512,7 @@ async function insertInstructors() {
           "$2b$12$WzAileenExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-04-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "niko@example.com",
@@ -533,7 +533,7 @@ async function insertInstructors() {
           "$2b$12$WzNikoExampleHash000000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-06-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "jonah@example.com",
@@ -553,7 +553,7 @@ async function insertInstructors() {
         password: "$2b$12$WzJonahExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-03-11T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "grace@example.com",
@@ -573,7 +573,7 @@ async function insertInstructors() {
         password: "$2b$12$WzGraceExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-01-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "andy@example.com",
@@ -593,7 +593,7 @@ async function insertInstructors() {
         password: "$2b$12$WzAndyExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-02-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "fame@example.com",
@@ -613,7 +613,7 @@ async function insertInstructors() {
         password: "$2b$12$WzFameExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2024-12-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "faith@example.com",
@@ -633,7 +633,7 @@ async function insertInstructors() {
         password: "$2b$12$WzFaithExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2024-12-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "yuki.nakamura@example.com",
@@ -653,7 +653,7 @@ async function insertInstructors() {
         password: "$2b$12$WzYukiExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "alex.thompson@example.com",
@@ -674,7 +674,7 @@ async function insertInstructors() {
         password: "$2b$12$WzAlexExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-02T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "mina.sato@example.com",
@@ -695,7 +695,7 @@ async function insertInstructors() {
         password: "$2b$12$WzMinaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-03T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "daniel.green@example.com",
@@ -716,7 +716,7 @@ async function insertInstructors() {
           "$2b$12$WzDanielExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-04T00:00:00.000Z",
         terminationAt: "2025-03-30T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "haruka.fujimoto@example.com",
@@ -738,7 +738,7 @@ async function insertInstructors() {
           "$2b$12$WzHarukaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-05T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "ryan.chen@example.com",
@@ -780,7 +780,7 @@ async function insertInstructors() {
         password: "$2b$12$WzKanaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-07T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "thomas.walker@example.com",
@@ -802,7 +802,7 @@ async function insertInstructors() {
           "$2b$12$WzThomasExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-08T00:00:00.000Z",
         terminationAt: "2025-02-14T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "miyu.takahashi@example.com",
@@ -822,7 +822,7 @@ async function insertInstructors() {
         password: "$2b$12$WzMiyuExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-09T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "ethan.rivera@example.com",
@@ -842,7 +842,7 @@ async function insertInstructors() {
         password: "$2b$12$WzEthanExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-10T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "aoi.suzuki@example.com",
@@ -863,7 +863,7 @@ async function insertInstructors() {
         password: "$2b$12$WzAoiExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-11T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "logan.wright@example.com",
@@ -884,7 +884,7 @@ async function insertInstructors() {
         password: "$2b$12$WzLoganExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-12T00:00:00.000Z",
         terminationAt: "2025-06-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "sayaka.kobayashi@example.com",
@@ -905,7 +905,7 @@ async function insertInstructors() {
           "$2b$12$WzSayakaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-13T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "george.adams@example.com",
@@ -927,7 +927,7 @@ async function insertInstructors() {
           "$2b$12$WzGeorgeExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-14T00:00:00.000Z",
         terminationAt: null,
-        isNative: true,
+        englishBackground: 1,
       },
       {
         email: "emi.nakagawa@example.com",
@@ -947,7 +947,7 @@ async function insertInstructors() {
         passcode: "emi",
         password: "$2b$12$WzEmiExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-15T00:00:00.000Z",
-        isNative: true,
+        englishBackground: 1,
       },
       {
         email: "niki.alvarez@example.com",
@@ -967,7 +967,7 @@ async function insertInstructors() {
         password:
           "$2b$12$WzNikiExampleHash000000000000000000000000000000000000",
         createdAt: "2024-08-22T00:00:00.000Z",
-        isNative: true,
+        englishBackground: 2,
       },
     ],
   });

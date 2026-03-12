@@ -28,7 +28,7 @@ model Instructor {
   workingTime         String
   terminationAt       DateTime?
   updatedAt           DateTime             @default(now()) @updatedAt
-  isNative            Boolean
+  englishBackground   Int // 0: non-native, 1: native-A, 2: native-B
   classes             Class[]
   instructorAbsences  InstructorAbsence[]
   instructorFees      InstructorFee[]
