@@ -271,28 +271,34 @@ export const FREE_TRIAL_REMOVE_ERROR_MESSAGE = {
 };
 
 export const WELCOME_MODAL_TITLE1 = {
-  ja: "オンラインこども英会話プログラム",
-  en: "Welcome to AaasoBo!,",
-};
-
-export const WELCOME_MODAL_TITLE2 = {
-  ja: "AaasoBo! へようこそ",
-  en: "the Online English Conversation Program for Kids",
+  ja: "オンラインこども英会話 AaasoBo! へようこそ！",
+  en: "Welcome to AaasoBo! – Online English Classes for Kids",
 };
 
 export const FREE_TRIAL_BOOKING_INSTRUCTION_MESSAGE = {
-  ja: "無料トライアルクラスのご予約は、ページ右上の『クラスを予約』ボタンからできます。",
-  en: "You can book your free trial class by clicking the 'Book Class' button at the top right of the page.",
+  ja: "無料トライアルは、画面右上の「クラスを予約」からご予約ください。",
+  en: "To book your free trial class, click the 'Book Class' button at the top right of the page.",
 };
 
 export const CHILD_PROFILE_UPDATE_INSTRUCTION_MESSAGE = {
-  ja: "クラスに参加するお子さまを追加する場合は、左サイドメニューの『お子さまプロフィール』から変更できます。",
-  en: "To add children who will join the class, please go to 'Children Profiles' in the left-hand side menu.",
+  ja: "お子さまを追加する場合は、左メニューの「お子さまプロフィール」から変更できます。",
+  en: "To add a child, go to 'Children Profiles' in the left-hand menu.",
 };
 
 export const MEMBERSHIP_INSTRUCTION_MESSAGE = {
-  ja: `有料クラスを受講される場合は、Eメール (${CONTACT_EMAIL}) またはLINE (${LINE_QR_CODE_URL}) までご連絡下さい。`,
-  en: `To continue using AaasoBo! for paid classes, please us by Email (${CONTACT_EMAIL}) or LINE(${LINE_QR_CODE_URL}).`,
+  ja: {
+    beforeLine: "レギュラークラスをご希望の方は、LINE(",
+    lineText: "こちら",
+    middle: ")またはメール(",
+    afterEmail: ") にてご連絡ください。",
+  },
+  en: {
+    beforeLine:
+      "If you would like to take regular classes, please contact us via LINE (",
+    lineText: "here",
+    middle: ") or email (",
+    afterEmail: ").",
+  },
 };
 
 // Regular Classes Page Messages

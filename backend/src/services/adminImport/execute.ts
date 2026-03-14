@@ -59,6 +59,17 @@ type RowByFile = {
     | "termination_at",
     string
   >;
+  "instructor_fees.csv": Record<
+    | "instructor_ref"
+    | "currency"
+    | "effective_from"
+    | "effective_to"
+    | "trial_fee"
+    | "regular_fee"
+    | "cancel_fee"
+    | "cancel_without_notice_fee",
+    string
+  >;
   "instructor_schedules.csv": Record<
     | "instructor_ref"
     | "effective_from"
@@ -164,6 +175,7 @@ const IMPORT_RESET_TABLES = [
   "InstructorAbsence",
   "InstructorSlot",
   "InstructorSchedule",
+  "InstructorFee",
   "Instructor",
   "Schedule",
   "Event",
@@ -186,6 +198,7 @@ type ParsedNormalizedRows = {
   "children.csv": RowEnvelope<RowByFile["children.csv"]>[];
   "subscriptions.csv": RowEnvelope<RowByFile["subscriptions.csv"]>[];
   "instructors.csv": RowEnvelope<RowByFile["instructors.csv"]>[];
+  "instructor_fees.csv": RowEnvelope<RowByFile["instructor_fees.csv"]>[];
   "instructor_schedules.csv": RowEnvelope<
     RowByFile["instructor_schedules.csv"]
   >[];
@@ -485,6 +498,11 @@ function parseNormalizedRows(
       files["instructors.csv"] ?? "",
       issues,
     ),
+    "instructor_fees.csv": parseFileRows(
+      "instructor_fees.csv",
+      files["instructor_fees.csv"] ?? "",
+      issues,
+    ),
     "instructor_schedules.csv": parseFileRows(
       "instructor_schedules.csv",
       files["instructor_schedules.csv"] ?? "",
@@ -575,6 +593,7 @@ export function validateNormalizedImportFiles(
     "children.csv": parsed["children.csv"].length,
     "subscriptions.csv": parsed["subscriptions.csv"].length,
     "instructors.csv": parsed["instructors.csv"].length,
+    "instructor_fees.csv": parsed["instructor_fees.csv"].length,
     "instructor_schedules.csv": parsed["instructor_schedules.csv"].length,
     "instructor_absences.csv": parsed["instructor_absences.csv"].length,
     "events.csv": parsed["events.csv"].length,
@@ -802,6 +821,104 @@ export function validateNormalizedImportFiles(
       "termination_at",
       row.data.termination_at,
     );
+  }
+
+  for (const row of parsed["instructor_fees.csv"]) {
+    assertRequired(
+      issues,
+      "instructor_fees.csv",
+      row.rowNumber,
+      "instructor_ref",
+      row.data.instructor_ref,
+    );
+    assertRequired(
+      issues,
+      "instructor_fees.csv",
+      row.rowNumber,
+      "currency",
+      row.data.currency,
+    );
+    assertRequired(
+      issues,
+      "instructor_fees.csv",
+      row.rowNumber,
+      "effective_from",
+      row.data.effective_from,
+    );
+    assertRequired(
+      issues,
+      "instructor_fees.csv",
+      row.rowNumber,
+      "trial_fee",
+      row.data.trial_fee,
+    );
+    assertRequired(
+      issues,
+      "instructor_fees.csv",
+      row.rowNumber,
+      "regular_fee",
+      row.data.regular_fee,
+    );
+    assertRequired(
+      issues,
+      "instructor_fees.csv",
+      row.rowNumber,
+      "cancel_fee",
+      row.data.cancel_fee,
+    );
+    assertRequired(
+      issues,
+      "instructor_fees.csv",
+      row.rowNumber,
+      "cancel_without_notice_fee",
+      row.data.cancel_without_notice_fee,
+    );
+    assertRefFormat(
+      issues,
+      "instructor_fees.csv",
+      row.rowNumber,
+      "instructor_ref",
+      row.data.instructor_ref,
+    );
+    assertDate(
+      issues,
+      "instructor_fees.csv",
+      row.rowNumber,
+      "effective_from",
+      row.data.effective_from,
+    );
+    assertDate(
+      issues,
+      "instructor_fees.csv",
+      row.rowNumber,
+      "effective_to",
+      row.data.effective_to,
+    );
+    if (row.data.currency && !/^[A-Z]{3}$/.test(row.data.currency)) {
+      addIssue(
+        issues,
+        "instructor_fees.csv",
+        row.rowNumber,
+        "currency",
+        "currency must be a 3-letter uppercase code",
+      );
+    }
+    for (const [column, value] of [
+      ["trial_fee", row.data.trial_fee],
+      ["regular_fee", row.data.regular_fee],
+      ["cancel_fee", row.data.cancel_fee],
+      ["cancel_without_notice_fee", row.data.cancel_without_notice_fee],
+    ] as const) {
+      if (value && !/^\d+$/.test(value)) {
+        addIssue(
+          issues,
+          "instructor_fees.csv",
+          row.rowNumber,
+          column,
+          `${column} must be a non-negative integer`,
+        );
+      }
+    }
   }
 
   for (const row of parsed["instructor_schedules.csv"]) {
@@ -1260,6 +1377,13 @@ export function validateNormalizedImportFiles(
   );
   assertUnique(
     issues,
+    "instructor_fees.csv",
+    parsed["instructor_fees.csv"],
+    ["instructor_ref", "effective_from"],
+    "(instructor_ref,effective_from)",
+  );
+  assertUnique(
+    issues,
     "instructor_schedules.csv",
     parsed["instructor_schedules.csv"],
     [
@@ -1380,6 +1504,18 @@ export function validateNormalizedImportFiles(
       row.data.plan_ref,
       planRefs,
       "plans.csv",
+    );
+  }
+
+  for (const row of parsed["instructor_fees.csv"]) {
+    assertExists(
+      issues,
+      "instructor_fees.csv",
+      row.rowNumber,
+      "instructor_ref",
+      row.data.instructor_ref,
+      instructorRefs,
+      "instructors.csv",
     );
   }
 
@@ -1694,6 +1830,21 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       createdInstructors[index].id,
     );
   });
+
+  if (parsed["instructor_fees.csv"].length > 0) {
+    await tx.instructorFee.createMany({
+      data: parsed["instructor_fees.csv"].map((row) => ({
+        instructorId: instructorIdByRef.get(row.data.instructor_ref)!,
+        currency: row.data.currency,
+        effectiveFrom: parseOptionalDate(row.data.effective_from)!,
+        effectiveTo: parseOptionalDate(row.data.effective_to),
+        trialFee: Number(row.data.trial_fee),
+        regularFee: Number(row.data.regular_fee),
+        cancelFee: Number(row.data.cancel_fee),
+        cancelWithoutNoticeFee: Number(row.data.cancel_without_notice_fee),
+      })),
+    });
+  }
 
   const scheduleGroups = new Map<
     string,

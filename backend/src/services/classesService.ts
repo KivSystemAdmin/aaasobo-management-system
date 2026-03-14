@@ -129,17 +129,17 @@ export const updateClass = async (
   status: Status,
   classDateTime: Date | string,
 ) => {
+  const now = new Date();
+
   if (status === "canceledByInstructor") {
     await prisma.$transaction(async (tx) => {
       await tx.class.update({
         where: { id },
         data: {
           status,
-          updatedAt: new Date(),
-          rebookableUntil: nHoursLater(
-            180 * 24,
-            new Date(classDateTime),
-          ).toISOString(), // If the class is canceled by the instructor, set rebookableUntil to 180 days (* 24 * 60 minutes) after the class dateTime
+          canceledAt: now,
+          updatedAt: now,
+          rebookableUntil: nHoursLater(180 * 24, new Date(classDateTime)),
         },
       });
 
@@ -153,7 +153,8 @@ export const updateClass = async (
       where: { id },
       data: {
         status,
-        updatedAt: new Date(),
+        canceledAt: status === "canceledByCustomer" ? now : null,
+        updatedAt: now,
         ...(status === "completed" && { rebookableUntil: null }),
       },
     });
@@ -163,13 +164,19 @@ export const updateClass = async (
 // Cancel a class
 export const cancelClassById = async (classId: number) => {
   await prisma.$transaction(async (tx) => {
+    const now = new Date();
+
     await tx.classAttendance.deleteMany({
       where: { classId },
     });
 
     await tx.class.update({
       where: { id: classId },
-      data: { status: "canceledByCustomer", updatedAt: new Date() },
+      data: {
+        status: "canceledByCustomer",
+        canceledAt: now,
+        updatedAt: now,
+      },
     });
   });
 };
@@ -406,13 +413,19 @@ export const getUpcomingClasses = async (customerId: number) => {
 
 export const cancelClasses = async (classIds: number[]) => {
   return prisma.$transaction(async (tx) => {
+    const now = new Date();
+
     await tx.classAttendance.deleteMany({
       where: { classId: { in: classIds } },
     });
 
     await tx.class.updateMany({
       where: { id: { in: classIds } },
-      data: { status: "canceledByCustomer", updatedAt: new Date() },
+      data: {
+        status: "canceledByCustomer",
+        canceledAt: now,
+        updatedAt: now,
+      },
     });
 
     return true;

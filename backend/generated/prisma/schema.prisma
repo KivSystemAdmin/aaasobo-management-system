@@ -31,6 +31,7 @@ model Instructor {
   isNative            Boolean
   classes             Class[]
   instructorAbsences  InstructorAbsence[]
+  instructorFees      InstructorFee[]
   instructorSchedules InstructorSchedule[]
   recurringClasses    RecurringClass[]
 
@@ -62,6 +63,7 @@ model Class {
   recurringClassId Int?
   dateTime         DateTime?
   status           Status
+  canceledAt       DateTime?
   subscriptionId   Int?
   rebookableUntil  DateTime?
   classCode        String
@@ -85,6 +87,7 @@ model Class {
   @@index([instructorId, status, dateTime])
   @@index([recurringClassId, dateTime])
   @@index([rebookableUntil])
+  @@index([canceledAt])
 }
 
 model ClassAttendance {
@@ -216,6 +219,19 @@ model InstructorAbsence {
   @@id([instructorId, absentAt])
   @@index([instructorId])
   @@index([absentAt])
+}
+
+model InstructorFee {
+  id                     Int        @id @default(autoincrement())
+  instructorId           Int
+  currency               String
+  effectiveFrom          DateTime   @db.Date
+  effectiveTo            DateTime?  @db.Date
+  trialFee               Int
+  regularFee             Int
+  cancelFee              Int
+  cancelWithoutNoticeFee Int
+  instructor             Instructor @relation(fields: [instructorId], references: [id])
 }
 
 model SystemStatus {

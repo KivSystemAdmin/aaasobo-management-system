@@ -1593,11 +1593,52 @@ async function insertAdmins() {
   });
 }
 
+async function insertInstructorFees() {
+  const helen = await getInstructor("Helen");
+
+  await prisma.instructorFee.createMany({
+    data: [
+      {
+        instructorId: helen.id,
+        currency: "JPY",
+        effectiveFrom: new Date("2026-03-01T00:00:00.000Z"),
+        effectiveTo: new Date("2026-03-15T00:00:00.000Z"),
+        trialFee: 1000,
+        regularFee: 2000,
+        cancelFee: 500,
+        cancelWithoutNoticeFee: 250,
+      },
+      {
+        instructorId: helen.id,
+        currency: "JPY",
+        effectiveFrom: new Date("2026-03-16T00:00:00.000Z"),
+        effectiveTo: null,
+        trialFee: 1500,
+        regularFee: 2500,
+        cancelFee: 600,
+        cancelWithoutNoticeFee: 300,
+      },
+    ],
+  });
+}
+
 async function insertClasses() {
   const alice = await getCustomer("Alice");
   const bob = await getCustomer("Bob");
   const helen = await getInstructor("Helen");
   const elian = await getInstructor("Elian");
+  const aliceHelenRecurringClass = await prisma.recurringClass.findFirst({
+    where: {
+      subscriptionId: alice.subscription[0].id,
+      instructorId: helen.id,
+      endAt: null,
+    },
+    select: { id: true },
+  });
+
+  if (!aliceHelenRecurringClass) {
+    throw new Error("Active recurring class for Alice and Helen not found");
+  }
 
   await prisma.class.createMany({
     data: [
@@ -1695,7 +1736,7 @@ async function insertClasses() {
         dateTime: "2026-01-06T07:00:00Z",
         status: "booked",
         subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
+        recurringClassId: aliceHelenRecurringClass.id,
         rebookableUntil: "2026-04-30T09:00:00Z",
         createdAt: "2025-05-20T07:00:00Z",
         updatedAt: "2025-05-20T07:00:00Z",
@@ -1708,7 +1749,7 @@ async function insertClasses() {
         dateTime: "2026-01-06T08:00:00Z",
         status: "rebooked",
         subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
+        recurringClassId: aliceHelenRecurringClass.id,
         rebookableUntil: "2026-04-30T09:00:00Z",
         createdAt: "2025-05-20T07:00:00Z",
         updatedAt: "2025-05-20T07:00:00Z",
@@ -1721,7 +1762,7 @@ async function insertClasses() {
         dateTime: "2026-01-06T09:00:00Z",
         status: "canceledByCustomer",
         subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
+        recurringClassId: aliceHelenRecurringClass.id,
         rebookableUntil: "2026-04-30T09:00:00Z",
         createdAt: "2025-05-20T07:00:00Z",
         updatedAt: "2025-05-20T07:00:00Z",
@@ -1734,7 +1775,7 @@ async function insertClasses() {
         dateTime: "2026-01-06T10:00:00Z",
         status: "canceledByInstructor",
         subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
+        recurringClassId: aliceHelenRecurringClass.id,
         rebookableUntil: "2026-04-30T09:00:00Z",
         createdAt: "2025-05-20T07:00:00Z",
         updatedAt: "2025-05-20T07:00:00Z",
@@ -1747,7 +1788,7 @@ async function insertClasses() {
         dateTime: "2026-01-06T06:00:00Z",
         status: "completed",
         subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
+        recurringClassId: aliceHelenRecurringClass.id,
         rebookableUntil: "2026-04-30T09:00:00Z",
         createdAt: "2025-05-20T07:00:00Z",
         updatedAt: "2025-05-20T07:00:00Z",
@@ -1773,6 +1814,63 @@ async function insertClasses() {
         updatedAt: "2025-05-20T07:00:00Z",
         classCode: "ft-0-2",
         isFreeTrial: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2026-03-02T01:00:00Z",
+        status: "completed",
+        subscriptionId: alice.subscription[0].id,
+        createdAt: "2026-03-02T01:00:00Z",
+        updatedAt: "2026-03-05T10:00:00.000Z",
+        classCode: "payroll-1",
+        isFreeTrial: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2026-03-10T03:00:00Z",
+        status: "completed",
+        subscriptionId: alice.subscription[0].id,
+        createdAt: "2026-03-10T03:00:00Z",
+        updatedAt: "2026-03-12T10:00:00.000Z",
+        classCode: "payroll-2",
+        isFreeTrial: false,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2026-03-14T00:00:00Z",
+        status: "canceledByInstructor",
+        canceledAt: "2026-03-13T14:00:00Z",
+        subscriptionId: alice.subscription[0].id,
+        createdAt: "2026-03-13T14:00:00Z",
+        updatedAt: "2026-03-15T09:12:00.000Z",
+        classCode: "payroll-3",
+        isFreeTrial: false,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2026-03-16T00:00:00Z",
+        status: "completed",
+        subscriptionId: alice.subscription[0].id,
+        createdAt: "2026-03-16T00:00:00Z",
+        updatedAt: "2026-03-20T03:00:00.000Z",
+        classCode: "payroll-4",
+        isFreeTrial: false,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2026-03-19T23:00:00Z",
+        status: "canceledByInstructor",
+        canceledAt: "2026-03-19T15:30:00Z",
+        subscriptionId: alice.subscription[0].id,
+        createdAt: "2026-03-19T15:30:00Z",
+        updatedAt: "2026-03-28T03:00:00.000Z",
+        classCode: "payroll-5",
+        isFreeTrial: false,
       },
       // {
       //   instructorId: helen.id,
@@ -2712,6 +2810,32 @@ async function insertEvents() {
 }
 
 async function insertSchedules() {
+  const [noClassEvent, noClassRebookableEvent, themeClassWeekEvent] =
+    await Promise.all([
+      prisma.event.findFirst({
+        where: { name: "お休み / No Class" },
+        select: { id: true },
+      }),
+      prisma.event.findFirst({
+        where: { name: "お休み振替対象日 / No Class (Rebookable)" },
+        select: { id: true },
+      }),
+      prisma.event.findFirst({
+        where: { name: "テーマクラスウィーク / Theme Class Week" },
+        select: { id: true },
+      }),
+    ]);
+
+  if (!noClassEvent || !noClassRebookableEvent || !themeClassWeekEvent) {
+    throw new Error("Required events for business schedules were not found");
+  }
+
+  const legacyEventIdMap: Record<number, number> = {
+    2: noClassEvent.id,
+    3: noClassRebookableEvent.id,
+    4: themeClassWeekEvent.id,
+  };
+
   await prisma.schedule.createMany({
     data: [
       {
@@ -3338,7 +3462,10 @@ async function insertSchedules() {
         date: new Date("2025-12-31T00:00:00Z"),
         eventId: 2,
       },
-    ],
+    ].map((schedule) => ({
+      ...schedule,
+      eventId: legacyEventIdMap[schedule.eventId],
+    })),
   });
 }
 
@@ -3390,11 +3517,61 @@ async function getPlan(
 }
 
 async function deleteAll(table: Uncapitalize<Prisma.ModelName>) {
-  // Use raw SQL TRUNCATE to reset auto-increment sequences
-  const tableName = table.charAt(0).toUpperCase() + table.slice(1);
-  await prisma.$executeRawUnsafe(
-    `TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE`,
-  );
+  switch (table) {
+    case "admin":
+      await prisma.admin.deleteMany();
+      return;
+    case "child":
+      await prisma.child.deleteMany();
+      return;
+    case "class":
+      await prisma.class.deleteMany();
+      return;
+    case "classAttendance":
+      await prisma.classAttendance.deleteMany();
+      return;
+    case "customer":
+      await prisma.customer.deleteMany();
+      return;
+    case "event":
+      await prisma.event.deleteMany();
+      return;
+    case "instructor":
+      await prisma.instructor.deleteMany();
+      return;
+    case "instructorAbsence":
+      await prisma.instructorAbsence.deleteMany();
+      return;
+    case "instructorFee":
+      await prisma.instructorFee.deleteMany();
+      return;
+    case "instructorSchedule":
+      await prisma.instructorSchedule.deleteMany();
+      return;
+    case "instructorSlot":
+      await prisma.instructorSlot.deleteMany();
+      return;
+    case "plan":
+      await prisma.plan.deleteMany();
+      return;
+    case "recurringClass":
+      await prisma.recurringClass.deleteMany();
+      return;
+    case "recurringClassAttendance":
+      await prisma.recurringClassAttendance.deleteMany();
+      return;
+    case "schedule":
+      await prisma.schedule.deleteMany();
+      return;
+    case "subscription":
+      await prisma.subscription.deleteMany();
+      return;
+    case "systemStatus":
+      await prisma.systemStatus.deleteMany();
+      return;
+    default:
+      throw new Error(`Unsupported table for seed cleanup: ${table}`);
+  }
 }
 
 async function main() {
@@ -3412,6 +3589,7 @@ async function main() {
     await deleteAll("child");
     await deleteAll("subscription");
     await deleteAll("instructorSchedule");
+    await deleteAll("instructorFee");
     await deleteAll("schedule");
     await deleteAll("instructorAbsence");
 
@@ -3433,6 +3611,7 @@ async function main() {
     await insertSystemStatus();
 
     // Dependant on the above
+    await insertInstructorFees();
     await insertInstructorSchedules();
     await insertSubscriptions();
     await insertChildren();

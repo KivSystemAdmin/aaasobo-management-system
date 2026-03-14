@@ -8,6 +8,7 @@ import { useTabSelect } from "@/hooks/useTabSelect";
 import InstructorSchedule from "./instructor-schedule/InstructorSchedule";
 import AvailabilityCalendar from "./instructor-schedule/AvailabilityCalendar";
 import Loading from "@/components/elements/loading/Loading";
+import InstructorPayroll from "./InstructorPayroll";
 import type { InstructorSchedule as InstructorScheduleType } from "@shared/schemas/instructors";
 import type { InstructorScheduleWithSlots } from "@/lib/api/instructorsApi";
 
@@ -72,7 +73,7 @@ export default function InstructorTabs({
       content: classScheduleComponent,
     },
     {
-      label: "Instructor's Profile",
+      label: "Profile",
       content: (
         <InstructorProfile
           instructor={instructor}
@@ -82,11 +83,11 @@ export default function InstructorTabs({
       ),
     },
     {
-      label: "Instructor's Availability",
+      label: "Availability",
       content: <AvailabilityCalendar instructorId={instructorId} />,
     },
     {
-      label: "Instructor's Schedule",
+      label: "Schedule",
       content: (
         <InstructorSchedule
           instructorId={instructorId}
@@ -95,6 +96,10 @@ export default function InstructorTabs({
           initialSelectedSchedule={initialSelectedSchedule}
         />
       ),
+    },
+    {
+      label: "Payroll",
+      content: <InstructorPayroll instructorId={instructorId} />,
     },
   ];
 

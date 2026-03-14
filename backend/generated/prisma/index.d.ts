@@ -89,6 +89,11 @@ export type InstructorSlot = $Result.DefaultSelection<Prisma.$InstructorSlotPayl
  */
 export type InstructorAbsence = $Result.DefaultSelection<Prisma.$InstructorAbsencePayload>
 /**
+ * Model InstructorFee
+ * 
+ */
+export type InstructorFee = $Result.DefaultSelection<Prisma.$InstructorFeePayload>
+/**
  * Model SystemStatus
  * 
  */
@@ -392,6 +397,16 @@ export class PrismaClient<
     * ```
     */
   get instructorAbsence(): Prisma.InstructorAbsenceDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.instructorFee`: Exposes CRUD operations for the **InstructorFee** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more InstructorFees
+    * const instructorFees = await prisma.instructorFee.findMany()
+    * ```
+    */
+  get instructorFee(): Prisma.InstructorFeeDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.systemStatus`: Exposes CRUD operations for the **SystemStatus** model.
@@ -871,6 +886,7 @@ export namespace Prisma {
     InstructorSchedule: 'InstructorSchedule',
     InstructorSlot: 'InstructorSlot',
     InstructorAbsence: 'InstructorAbsence',
+    InstructorFee: 'InstructorFee',
     SystemStatus: 'SystemStatus',
     Admin: 'Admin',
     Child: 'Child'
@@ -889,7 +905,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "instructor" | "customer" | "class" | "classAttendance" | "plan" | "subscription" | "recurringClass" | "recurringClassAttendance" | "verificationToken" | "passwordResetToken" | "schedule" | "event" | "instructorSchedule" | "instructorSlot" | "instructorAbsence" | "systemStatus" | "admin" | "child"
+      modelProps: "instructor" | "customer" | "class" | "classAttendance" | "plan" | "subscription" | "recurringClass" | "recurringClassAttendance" | "verificationToken" | "passwordResetToken" | "schedule" | "event" | "instructorSchedule" | "instructorSlot" | "instructorAbsence" | "instructorFee" | "systemStatus" | "admin" | "child"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2003,6 +2019,80 @@ export namespace Prisma {
           }
         }
       }
+      InstructorFee: {
+        payload: Prisma.$InstructorFeePayload<ExtArgs>
+        fields: Prisma.InstructorFeeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.InstructorFeeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorFeePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.InstructorFeeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorFeePayload>
+          }
+          findFirst: {
+            args: Prisma.InstructorFeeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorFeePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.InstructorFeeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorFeePayload>
+          }
+          findMany: {
+            args: Prisma.InstructorFeeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorFeePayload>[]
+          }
+          create: {
+            args: Prisma.InstructorFeeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorFeePayload>
+          }
+          createMany: {
+            args: Prisma.InstructorFeeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.InstructorFeeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorFeePayload>[]
+          }
+          delete: {
+            args: Prisma.InstructorFeeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorFeePayload>
+          }
+          update: {
+            args: Prisma.InstructorFeeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorFeePayload>
+          }
+          deleteMany: {
+            args: Prisma.InstructorFeeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.InstructorFeeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.InstructorFeeUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorFeePayload>[]
+          }
+          upsert: {
+            args: Prisma.InstructorFeeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorFeePayload>
+          }
+          aggregate: {
+            args: Prisma.InstructorFeeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateInstructorFee>
+          }
+          groupBy: {
+            args: Prisma.InstructorFeeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<InstructorFeeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.InstructorFeeCountArgs<ExtArgs>
+            result: $Utils.Optional<InstructorFeeCountAggregateOutputType> | number
+          }
+        }
+      }
       SystemStatus: {
         payload: Prisma.$SystemStatusPayload<ExtArgs>
         fields: Prisma.SystemStatusFieldRefs
@@ -2348,6 +2438,7 @@ export namespace Prisma {
     instructorSchedule?: InstructorScheduleOmit
     instructorSlot?: InstructorSlotOmit
     instructorAbsence?: InstructorAbsenceOmit
+    instructorFee?: InstructorFeeOmit
     systemStatus?: SystemStatusOmit
     admin?: AdminOmit
     child?: ChildOmit
@@ -2433,6 +2524,7 @@ export namespace Prisma {
   export type InstructorCountOutputType = {
     classes: number
     instructorAbsences: number
+    instructorFees: number
     instructorSchedules: number
     recurringClasses: number
   }
@@ -2440,6 +2532,7 @@ export namespace Prisma {
   export type InstructorCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     classes?: boolean | InstructorCountOutputTypeCountClassesArgs
     instructorAbsences?: boolean | InstructorCountOutputTypeCountInstructorAbsencesArgs
+    instructorFees?: boolean | InstructorCountOutputTypeCountInstructorFeesArgs
     instructorSchedules?: boolean | InstructorCountOutputTypeCountInstructorSchedulesArgs
     recurringClasses?: boolean | InstructorCountOutputTypeCountRecurringClassesArgs
   }
@@ -2467,6 +2560,13 @@ export namespace Prisma {
    */
   export type InstructorCountOutputTypeCountInstructorAbsencesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InstructorAbsenceWhereInput
+  }
+
+  /**
+   * InstructorCountOutputType without action
+   */
+  export type InstructorCountOutputTypeCountInstructorFeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InstructorFeeWhereInput
   }
 
   /**
@@ -3101,6 +3201,7 @@ export namespace Prisma {
     isNative?: boolean
     classes?: boolean | Instructor$classesArgs<ExtArgs>
     instructorAbsences?: boolean | Instructor$instructorAbsencesArgs<ExtArgs>
+    instructorFees?: boolean | Instructor$instructorFeesArgs<ExtArgs>
     instructorSchedules?: boolean | Instructor$instructorSchedulesArgs<ExtArgs>
     recurringClasses?: boolean | Instructor$recurringClassesArgs<ExtArgs>
     _count?: boolean | InstructorCountOutputTypeDefaultArgs<ExtArgs>
@@ -3179,6 +3280,7 @@ export namespace Prisma {
   export type InstructorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     classes?: boolean | Instructor$classesArgs<ExtArgs>
     instructorAbsences?: boolean | Instructor$instructorAbsencesArgs<ExtArgs>
+    instructorFees?: boolean | Instructor$instructorFeesArgs<ExtArgs>
     instructorSchedules?: boolean | Instructor$instructorSchedulesArgs<ExtArgs>
     recurringClasses?: boolean | Instructor$recurringClassesArgs<ExtArgs>
     _count?: boolean | InstructorCountOutputTypeDefaultArgs<ExtArgs>
@@ -3191,6 +3293,7 @@ export namespace Prisma {
     objects: {
       classes: Prisma.$ClassPayload<ExtArgs>[]
       instructorAbsences: Prisma.$InstructorAbsencePayload<ExtArgs>[]
+      instructorFees: Prisma.$InstructorFeePayload<ExtArgs>[]
       instructorSchedules: Prisma.$InstructorSchedulePayload<ExtArgs>[]
       recurringClasses: Prisma.$RecurringClassPayload<ExtArgs>[]
     }
@@ -3611,6 +3714,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     classes<T extends Instructor$classesArgs<ExtArgs> = {}>(args?: Subset<T, Instructor$classesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClassPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     instructorAbsences<T extends Instructor$instructorAbsencesArgs<ExtArgs> = {}>(args?: Subset<T, Instructor$instructorAbsencesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorAbsencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    instructorFees<T extends Instructor$instructorFeesArgs<ExtArgs> = {}>(args?: Subset<T, Instructor$instructorFeesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     instructorSchedules<T extends Instructor$instructorSchedulesArgs<ExtArgs> = {}>(args?: Subset<T, Instructor$instructorSchedulesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorSchedulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     recurringClasses<T extends Instructor$recurringClassesArgs<ExtArgs> = {}>(args?: Subset<T, Instructor$recurringClassesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RecurringClassPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -4095,6 +4199,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InstructorAbsenceScalarFieldEnum | InstructorAbsenceScalarFieldEnum[]
+  }
+
+  /**
+   * Instructor.instructorFees
+   */
+  export type Instructor$instructorFeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeInclude<ExtArgs> | null
+    where?: InstructorFeeWhereInput
+    orderBy?: InstructorFeeOrderByWithRelationInput | InstructorFeeOrderByWithRelationInput[]
+    cursor?: InstructorFeeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InstructorFeeScalarFieldEnum | InstructorFeeScalarFieldEnum[]
   }
 
   /**
@@ -5424,6 +5552,7 @@ export namespace Prisma {
     recurringClassId: number | null
     dateTime: Date | null
     status: $Enums.Status | null
+    canceledAt: Date | null
     subscriptionId: number | null
     rebookableUntil: Date | null
     classCode: string | null
@@ -5439,6 +5568,7 @@ export namespace Prisma {
     recurringClassId: number | null
     dateTime: Date | null
     status: $Enums.Status | null
+    canceledAt: Date | null
     subscriptionId: number | null
     rebookableUntil: Date | null
     classCode: string | null
@@ -5454,6 +5584,7 @@ export namespace Prisma {
     recurringClassId: number
     dateTime: number
     status: number
+    canceledAt: number
     subscriptionId: number
     rebookableUntil: number
     classCode: number
@@ -5487,6 +5618,7 @@ export namespace Prisma {
     recurringClassId?: true
     dateTime?: true
     status?: true
+    canceledAt?: true
     subscriptionId?: true
     rebookableUntil?: true
     classCode?: true
@@ -5502,6 +5634,7 @@ export namespace Prisma {
     recurringClassId?: true
     dateTime?: true
     status?: true
+    canceledAt?: true
     subscriptionId?: true
     rebookableUntil?: true
     classCode?: true
@@ -5517,6 +5650,7 @@ export namespace Prisma {
     recurringClassId?: true
     dateTime?: true
     status?: true
+    canceledAt?: true
     subscriptionId?: true
     rebookableUntil?: true
     classCode?: true
@@ -5619,6 +5753,7 @@ export namespace Prisma {
     recurringClassId: number | null
     dateTime: Date | null
     status: $Enums.Status
+    canceledAt: Date | null
     subscriptionId: number | null
     rebookableUntil: Date | null
     classCode: string
@@ -5653,6 +5788,7 @@ export namespace Prisma {
     recurringClassId?: boolean
     dateTime?: boolean
     status?: boolean
+    canceledAt?: boolean
     subscriptionId?: boolean
     rebookableUntil?: boolean
     classCode?: boolean
@@ -5674,6 +5810,7 @@ export namespace Prisma {
     recurringClassId?: boolean
     dateTime?: boolean
     status?: boolean
+    canceledAt?: boolean
     subscriptionId?: boolean
     rebookableUntil?: boolean
     classCode?: boolean
@@ -5693,6 +5830,7 @@ export namespace Prisma {
     recurringClassId?: boolean
     dateTime?: boolean
     status?: boolean
+    canceledAt?: boolean
     subscriptionId?: boolean
     rebookableUntil?: boolean
     classCode?: boolean
@@ -5712,6 +5850,7 @@ export namespace Prisma {
     recurringClassId?: boolean
     dateTime?: boolean
     status?: boolean
+    canceledAt?: boolean
     subscriptionId?: boolean
     rebookableUntil?: boolean
     classCode?: boolean
@@ -5720,7 +5859,7 @@ export namespace Prisma {
     isFreeTrial?: boolean
   }
 
-  export type ClassOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "instructorId" | "customerId" | "recurringClassId" | "dateTime" | "status" | "subscriptionId" | "rebookableUntil" | "classCode" | "createdAt" | "updatedAt" | "isFreeTrial", ExtArgs["result"]["class"]>
+  export type ClassOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "instructorId" | "customerId" | "recurringClassId" | "dateTime" | "status" | "canceledAt" | "subscriptionId" | "rebookableUntil" | "classCode" | "createdAt" | "updatedAt" | "isFreeTrial", ExtArgs["result"]["class"]>
   export type ClassInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
     instructor?: boolean | Class$instructorArgs<ExtArgs>
@@ -5758,6 +5897,7 @@ export namespace Prisma {
       recurringClassId: number | null
       dateTime: Date | null
       status: $Enums.Status
+      canceledAt: Date | null
       subscriptionId: number | null
       rebookableUntil: Date | null
       classCode: string
@@ -6198,6 +6338,7 @@ export namespace Prisma {
     readonly recurringClassId: FieldRef<"Class", 'Int'>
     readonly dateTime: FieldRef<"Class", 'DateTime'>
     readonly status: FieldRef<"Class", 'Status'>
+    readonly canceledAt: FieldRef<"Class", 'DateTime'>
     readonly subscriptionId: FieldRef<"Class", 'Int'>
     readonly rebookableUntil: FieldRef<"Class", 'DateTime'>
     readonly classCode: FieldRef<"Class", 'String'>
@@ -19721,6 +19862,1170 @@ export namespace Prisma {
 
 
   /**
+   * Model InstructorFee
+   */
+
+  export type AggregateInstructorFee = {
+    _count: InstructorFeeCountAggregateOutputType | null
+    _avg: InstructorFeeAvgAggregateOutputType | null
+    _sum: InstructorFeeSumAggregateOutputType | null
+    _min: InstructorFeeMinAggregateOutputType | null
+    _max: InstructorFeeMaxAggregateOutputType | null
+  }
+
+  export type InstructorFeeAvgAggregateOutputType = {
+    id: number | null
+    instructorId: number | null
+    trialFee: number | null
+    regularFee: number | null
+    cancelFee: number | null
+    cancelWithoutNoticeFee: number | null
+  }
+
+  export type InstructorFeeSumAggregateOutputType = {
+    id: number | null
+    instructorId: number | null
+    trialFee: number | null
+    regularFee: number | null
+    cancelFee: number | null
+    cancelWithoutNoticeFee: number | null
+  }
+
+  export type InstructorFeeMinAggregateOutputType = {
+    id: number | null
+    instructorId: number | null
+    currency: string | null
+    effectiveFrom: Date | null
+    effectiveTo: Date | null
+    trialFee: number | null
+    regularFee: number | null
+    cancelFee: number | null
+    cancelWithoutNoticeFee: number | null
+  }
+
+  export type InstructorFeeMaxAggregateOutputType = {
+    id: number | null
+    instructorId: number | null
+    currency: string | null
+    effectiveFrom: Date | null
+    effectiveTo: Date | null
+    trialFee: number | null
+    regularFee: number | null
+    cancelFee: number | null
+    cancelWithoutNoticeFee: number | null
+  }
+
+  export type InstructorFeeCountAggregateOutputType = {
+    id: number
+    instructorId: number
+    currency: number
+    effectiveFrom: number
+    effectiveTo: number
+    trialFee: number
+    regularFee: number
+    cancelFee: number
+    cancelWithoutNoticeFee: number
+    _all: number
+  }
+
+
+  export type InstructorFeeAvgAggregateInputType = {
+    id?: true
+    instructorId?: true
+    trialFee?: true
+    regularFee?: true
+    cancelFee?: true
+    cancelWithoutNoticeFee?: true
+  }
+
+  export type InstructorFeeSumAggregateInputType = {
+    id?: true
+    instructorId?: true
+    trialFee?: true
+    regularFee?: true
+    cancelFee?: true
+    cancelWithoutNoticeFee?: true
+  }
+
+  export type InstructorFeeMinAggregateInputType = {
+    id?: true
+    instructorId?: true
+    currency?: true
+    effectiveFrom?: true
+    effectiveTo?: true
+    trialFee?: true
+    regularFee?: true
+    cancelFee?: true
+    cancelWithoutNoticeFee?: true
+  }
+
+  export type InstructorFeeMaxAggregateInputType = {
+    id?: true
+    instructorId?: true
+    currency?: true
+    effectiveFrom?: true
+    effectiveTo?: true
+    trialFee?: true
+    regularFee?: true
+    cancelFee?: true
+    cancelWithoutNoticeFee?: true
+  }
+
+  export type InstructorFeeCountAggregateInputType = {
+    id?: true
+    instructorId?: true
+    currency?: true
+    effectiveFrom?: true
+    effectiveTo?: true
+    trialFee?: true
+    regularFee?: true
+    cancelFee?: true
+    cancelWithoutNoticeFee?: true
+    _all?: true
+  }
+
+  export type InstructorFeeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InstructorFee to aggregate.
+     */
+    where?: InstructorFeeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InstructorFees to fetch.
+     */
+    orderBy?: InstructorFeeOrderByWithRelationInput | InstructorFeeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: InstructorFeeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InstructorFees from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InstructorFees.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned InstructorFees
+    **/
+    _count?: true | InstructorFeeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: InstructorFeeAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: InstructorFeeSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: InstructorFeeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: InstructorFeeMaxAggregateInputType
+  }
+
+  export type GetInstructorFeeAggregateType<T extends InstructorFeeAggregateArgs> = {
+        [P in keyof T & keyof AggregateInstructorFee]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateInstructorFee[P]>
+      : GetScalarType<T[P], AggregateInstructorFee[P]>
+  }
+
+
+
+
+  export type InstructorFeeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InstructorFeeWhereInput
+    orderBy?: InstructorFeeOrderByWithAggregationInput | InstructorFeeOrderByWithAggregationInput[]
+    by: InstructorFeeScalarFieldEnum[] | InstructorFeeScalarFieldEnum
+    having?: InstructorFeeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: InstructorFeeCountAggregateInputType | true
+    _avg?: InstructorFeeAvgAggregateInputType
+    _sum?: InstructorFeeSumAggregateInputType
+    _min?: InstructorFeeMinAggregateInputType
+    _max?: InstructorFeeMaxAggregateInputType
+  }
+
+  export type InstructorFeeGroupByOutputType = {
+    id: number
+    instructorId: number
+    currency: string
+    effectiveFrom: Date
+    effectiveTo: Date | null
+    trialFee: number
+    regularFee: number
+    cancelFee: number
+    cancelWithoutNoticeFee: number
+    _count: InstructorFeeCountAggregateOutputType | null
+    _avg: InstructorFeeAvgAggregateOutputType | null
+    _sum: InstructorFeeSumAggregateOutputType | null
+    _min: InstructorFeeMinAggregateOutputType | null
+    _max: InstructorFeeMaxAggregateOutputType | null
+  }
+
+  type GetInstructorFeeGroupByPayload<T extends InstructorFeeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<InstructorFeeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof InstructorFeeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], InstructorFeeGroupByOutputType[P]>
+            : GetScalarType<T[P], InstructorFeeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type InstructorFeeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    instructorId?: boolean
+    currency?: boolean
+    effectiveFrom?: boolean
+    effectiveTo?: boolean
+    trialFee?: boolean
+    regularFee?: boolean
+    cancelFee?: boolean
+    cancelWithoutNoticeFee?: boolean
+    instructor?: boolean | InstructorDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["instructorFee"]>
+
+  export type InstructorFeeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    instructorId?: boolean
+    currency?: boolean
+    effectiveFrom?: boolean
+    effectiveTo?: boolean
+    trialFee?: boolean
+    regularFee?: boolean
+    cancelFee?: boolean
+    cancelWithoutNoticeFee?: boolean
+    instructor?: boolean | InstructorDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["instructorFee"]>
+
+  export type InstructorFeeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    instructorId?: boolean
+    currency?: boolean
+    effectiveFrom?: boolean
+    effectiveTo?: boolean
+    trialFee?: boolean
+    regularFee?: boolean
+    cancelFee?: boolean
+    cancelWithoutNoticeFee?: boolean
+    instructor?: boolean | InstructorDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["instructorFee"]>
+
+  export type InstructorFeeSelectScalar = {
+    id?: boolean
+    instructorId?: boolean
+    currency?: boolean
+    effectiveFrom?: boolean
+    effectiveTo?: boolean
+    trialFee?: boolean
+    regularFee?: boolean
+    cancelFee?: boolean
+    cancelWithoutNoticeFee?: boolean
+  }
+
+  export type InstructorFeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "instructorId" | "currency" | "effectiveFrom" | "effectiveTo" | "trialFee" | "regularFee" | "cancelFee" | "cancelWithoutNoticeFee", ExtArgs["result"]["instructorFee"]>
+  export type InstructorFeeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    instructor?: boolean | InstructorDefaultArgs<ExtArgs>
+  }
+  export type InstructorFeeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    instructor?: boolean | InstructorDefaultArgs<ExtArgs>
+  }
+  export type InstructorFeeIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    instructor?: boolean | InstructorDefaultArgs<ExtArgs>
+  }
+
+  export type $InstructorFeePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "InstructorFee"
+    objects: {
+      instructor: Prisma.$InstructorPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      instructorId: number
+      currency: string
+      effectiveFrom: Date
+      effectiveTo: Date | null
+      trialFee: number
+      regularFee: number
+      cancelFee: number
+      cancelWithoutNoticeFee: number
+    }, ExtArgs["result"]["instructorFee"]>
+    composites: {}
+  }
+
+  type InstructorFeeGetPayload<S extends boolean | null | undefined | InstructorFeeDefaultArgs> = $Result.GetResult<Prisma.$InstructorFeePayload, S>
+
+  type InstructorFeeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<InstructorFeeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: InstructorFeeCountAggregateInputType | true
+    }
+
+  export interface InstructorFeeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['InstructorFee'], meta: { name: 'InstructorFee' } }
+    /**
+     * Find zero or one InstructorFee that matches the filter.
+     * @param {InstructorFeeFindUniqueArgs} args - Arguments to find a InstructorFee
+     * @example
+     * // Get one InstructorFee
+     * const instructorFee = await prisma.instructorFee.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends InstructorFeeFindUniqueArgs>(args: SelectSubset<T, InstructorFeeFindUniqueArgs<ExtArgs>>): Prisma__InstructorFeeClient<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one InstructorFee that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {InstructorFeeFindUniqueOrThrowArgs} args - Arguments to find a InstructorFee
+     * @example
+     * // Get one InstructorFee
+     * const instructorFee = await prisma.instructorFee.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends InstructorFeeFindUniqueOrThrowArgs>(args: SelectSubset<T, InstructorFeeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__InstructorFeeClient<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InstructorFee that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorFeeFindFirstArgs} args - Arguments to find a InstructorFee
+     * @example
+     * // Get one InstructorFee
+     * const instructorFee = await prisma.instructorFee.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends InstructorFeeFindFirstArgs>(args?: SelectSubset<T, InstructorFeeFindFirstArgs<ExtArgs>>): Prisma__InstructorFeeClient<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InstructorFee that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorFeeFindFirstOrThrowArgs} args - Arguments to find a InstructorFee
+     * @example
+     * // Get one InstructorFee
+     * const instructorFee = await prisma.instructorFee.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends InstructorFeeFindFirstOrThrowArgs>(args?: SelectSubset<T, InstructorFeeFindFirstOrThrowArgs<ExtArgs>>): Prisma__InstructorFeeClient<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more InstructorFees that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorFeeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all InstructorFees
+     * const instructorFees = await prisma.instructorFee.findMany()
+     * 
+     * // Get first 10 InstructorFees
+     * const instructorFees = await prisma.instructorFee.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const instructorFeeWithIdOnly = await prisma.instructorFee.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends InstructorFeeFindManyArgs>(args?: SelectSubset<T, InstructorFeeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a InstructorFee.
+     * @param {InstructorFeeCreateArgs} args - Arguments to create a InstructorFee.
+     * @example
+     * // Create one InstructorFee
+     * const InstructorFee = await prisma.instructorFee.create({
+     *   data: {
+     *     // ... data to create a InstructorFee
+     *   }
+     * })
+     * 
+     */
+    create<T extends InstructorFeeCreateArgs>(args: SelectSubset<T, InstructorFeeCreateArgs<ExtArgs>>): Prisma__InstructorFeeClient<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many InstructorFees.
+     * @param {InstructorFeeCreateManyArgs} args - Arguments to create many InstructorFees.
+     * @example
+     * // Create many InstructorFees
+     * const instructorFee = await prisma.instructorFee.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends InstructorFeeCreateManyArgs>(args?: SelectSubset<T, InstructorFeeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many InstructorFees and returns the data saved in the database.
+     * @param {InstructorFeeCreateManyAndReturnArgs} args - Arguments to create many InstructorFees.
+     * @example
+     * // Create many InstructorFees
+     * const instructorFee = await prisma.instructorFee.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many InstructorFees and only return the `id`
+     * const instructorFeeWithIdOnly = await prisma.instructorFee.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends InstructorFeeCreateManyAndReturnArgs>(args?: SelectSubset<T, InstructorFeeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a InstructorFee.
+     * @param {InstructorFeeDeleteArgs} args - Arguments to delete one InstructorFee.
+     * @example
+     * // Delete one InstructorFee
+     * const InstructorFee = await prisma.instructorFee.delete({
+     *   where: {
+     *     // ... filter to delete one InstructorFee
+     *   }
+     * })
+     * 
+     */
+    delete<T extends InstructorFeeDeleteArgs>(args: SelectSubset<T, InstructorFeeDeleteArgs<ExtArgs>>): Prisma__InstructorFeeClient<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one InstructorFee.
+     * @param {InstructorFeeUpdateArgs} args - Arguments to update one InstructorFee.
+     * @example
+     * // Update one InstructorFee
+     * const instructorFee = await prisma.instructorFee.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends InstructorFeeUpdateArgs>(args: SelectSubset<T, InstructorFeeUpdateArgs<ExtArgs>>): Prisma__InstructorFeeClient<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more InstructorFees.
+     * @param {InstructorFeeDeleteManyArgs} args - Arguments to filter InstructorFees to delete.
+     * @example
+     * // Delete a few InstructorFees
+     * const { count } = await prisma.instructorFee.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends InstructorFeeDeleteManyArgs>(args?: SelectSubset<T, InstructorFeeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InstructorFees.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorFeeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many InstructorFees
+     * const instructorFee = await prisma.instructorFee.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends InstructorFeeUpdateManyArgs>(args: SelectSubset<T, InstructorFeeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InstructorFees and returns the data updated in the database.
+     * @param {InstructorFeeUpdateManyAndReturnArgs} args - Arguments to update many InstructorFees.
+     * @example
+     * // Update many InstructorFees
+     * const instructorFee = await prisma.instructorFee.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more InstructorFees and only return the `id`
+     * const instructorFeeWithIdOnly = await prisma.instructorFee.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends InstructorFeeUpdateManyAndReturnArgs>(args: SelectSubset<T, InstructorFeeUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one InstructorFee.
+     * @param {InstructorFeeUpsertArgs} args - Arguments to update or create a InstructorFee.
+     * @example
+     * // Update or create a InstructorFee
+     * const instructorFee = await prisma.instructorFee.upsert({
+     *   create: {
+     *     // ... data to create a InstructorFee
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the InstructorFee we want to update
+     *   }
+     * })
+     */
+    upsert<T extends InstructorFeeUpsertArgs>(args: SelectSubset<T, InstructorFeeUpsertArgs<ExtArgs>>): Prisma__InstructorFeeClient<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of InstructorFees.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorFeeCountArgs} args - Arguments to filter InstructorFees to count.
+     * @example
+     * // Count the number of InstructorFees
+     * const count = await prisma.instructorFee.count({
+     *   where: {
+     *     // ... the filter for the InstructorFees we want to count
+     *   }
+     * })
+    **/
+    count<T extends InstructorFeeCountArgs>(
+      args?: Subset<T, InstructorFeeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], InstructorFeeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a InstructorFee.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorFeeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends InstructorFeeAggregateArgs>(args: Subset<T, InstructorFeeAggregateArgs>): Prisma.PrismaPromise<GetInstructorFeeAggregateType<T>>
+
+    /**
+     * Group by InstructorFee.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorFeeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends InstructorFeeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: InstructorFeeGroupByArgs['orderBy'] }
+        : { orderBy?: InstructorFeeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, InstructorFeeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInstructorFeeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the InstructorFee model
+   */
+  readonly fields: InstructorFeeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for InstructorFee.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__InstructorFeeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    instructor<T extends InstructorDefaultArgs<ExtArgs> = {}>(args?: Subset<T, InstructorDefaultArgs<ExtArgs>>): Prisma__InstructorClient<$Result.GetResult<Prisma.$InstructorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the InstructorFee model
+   */
+  interface InstructorFeeFieldRefs {
+    readonly id: FieldRef<"InstructorFee", 'Int'>
+    readonly instructorId: FieldRef<"InstructorFee", 'Int'>
+    readonly currency: FieldRef<"InstructorFee", 'String'>
+    readonly effectiveFrom: FieldRef<"InstructorFee", 'DateTime'>
+    readonly effectiveTo: FieldRef<"InstructorFee", 'DateTime'>
+    readonly trialFee: FieldRef<"InstructorFee", 'Int'>
+    readonly regularFee: FieldRef<"InstructorFee", 'Int'>
+    readonly cancelFee: FieldRef<"InstructorFee", 'Int'>
+    readonly cancelWithoutNoticeFee: FieldRef<"InstructorFee", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * InstructorFee findUnique
+   */
+  export type InstructorFeeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorFee to fetch.
+     */
+    where: InstructorFeeWhereUniqueInput
+  }
+
+  /**
+   * InstructorFee findUniqueOrThrow
+   */
+  export type InstructorFeeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorFee to fetch.
+     */
+    where: InstructorFeeWhereUniqueInput
+  }
+
+  /**
+   * InstructorFee findFirst
+   */
+  export type InstructorFeeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorFee to fetch.
+     */
+    where?: InstructorFeeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InstructorFees to fetch.
+     */
+    orderBy?: InstructorFeeOrderByWithRelationInput | InstructorFeeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InstructorFees.
+     */
+    cursor?: InstructorFeeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InstructorFees from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InstructorFees.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InstructorFees.
+     */
+    distinct?: InstructorFeeScalarFieldEnum | InstructorFeeScalarFieldEnum[]
+  }
+
+  /**
+   * InstructorFee findFirstOrThrow
+   */
+  export type InstructorFeeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorFee to fetch.
+     */
+    where?: InstructorFeeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InstructorFees to fetch.
+     */
+    orderBy?: InstructorFeeOrderByWithRelationInput | InstructorFeeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InstructorFees.
+     */
+    cursor?: InstructorFeeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InstructorFees from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InstructorFees.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InstructorFees.
+     */
+    distinct?: InstructorFeeScalarFieldEnum | InstructorFeeScalarFieldEnum[]
+  }
+
+  /**
+   * InstructorFee findMany
+   */
+  export type InstructorFeeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorFees to fetch.
+     */
+    where?: InstructorFeeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InstructorFees to fetch.
+     */
+    orderBy?: InstructorFeeOrderByWithRelationInput | InstructorFeeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing InstructorFees.
+     */
+    cursor?: InstructorFeeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InstructorFees from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InstructorFees.
+     */
+    skip?: number
+    distinct?: InstructorFeeScalarFieldEnum | InstructorFeeScalarFieldEnum[]
+  }
+
+  /**
+   * InstructorFee create
+   */
+  export type InstructorFeeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a InstructorFee.
+     */
+    data: XOR<InstructorFeeCreateInput, InstructorFeeUncheckedCreateInput>
+  }
+
+  /**
+   * InstructorFee createMany
+   */
+  export type InstructorFeeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many InstructorFees.
+     */
+    data: InstructorFeeCreateManyInput | InstructorFeeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * InstructorFee createManyAndReturn
+   */
+  export type InstructorFeeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * The data used to create many InstructorFees.
+     */
+    data: InstructorFeeCreateManyInput | InstructorFeeCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * InstructorFee update
+   */
+  export type InstructorFeeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a InstructorFee.
+     */
+    data: XOR<InstructorFeeUpdateInput, InstructorFeeUncheckedUpdateInput>
+    /**
+     * Choose, which InstructorFee to update.
+     */
+    where: InstructorFeeWhereUniqueInput
+  }
+
+  /**
+   * InstructorFee updateMany
+   */
+  export type InstructorFeeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update InstructorFees.
+     */
+    data: XOR<InstructorFeeUpdateManyMutationInput, InstructorFeeUncheckedUpdateManyInput>
+    /**
+     * Filter which InstructorFees to update
+     */
+    where?: InstructorFeeWhereInput
+    /**
+     * Limit how many InstructorFees to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * InstructorFee updateManyAndReturn
+   */
+  export type InstructorFeeUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * The data used to update InstructorFees.
+     */
+    data: XOR<InstructorFeeUpdateManyMutationInput, InstructorFeeUncheckedUpdateManyInput>
+    /**
+     * Filter which InstructorFees to update
+     */
+    where?: InstructorFeeWhereInput
+    /**
+     * Limit how many InstructorFees to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * InstructorFee upsert
+   */
+  export type InstructorFeeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the InstructorFee to update in case it exists.
+     */
+    where: InstructorFeeWhereUniqueInput
+    /**
+     * In case the InstructorFee found by the `where` argument doesn't exist, create a new InstructorFee with this data.
+     */
+    create: XOR<InstructorFeeCreateInput, InstructorFeeUncheckedCreateInput>
+    /**
+     * In case the InstructorFee was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<InstructorFeeUpdateInput, InstructorFeeUncheckedUpdateInput>
+  }
+
+  /**
+   * InstructorFee delete
+   */
+  export type InstructorFeeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeInclude<ExtArgs> | null
+    /**
+     * Filter which InstructorFee to delete.
+     */
+    where: InstructorFeeWhereUniqueInput
+  }
+
+  /**
+   * InstructorFee deleteMany
+   */
+  export type InstructorFeeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InstructorFees to delete
+     */
+    where?: InstructorFeeWhereInput
+    /**
+     * Limit how many InstructorFees to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * InstructorFee without action
+   */
+  export type InstructorFeeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorFee
+     */
+    select?: InstructorFeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorFee
+     */
+    omit?: InstructorFeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorFeeInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model SystemStatus
    */
 
@@ -23021,6 +24326,7 @@ export namespace Prisma {
     recurringClassId: 'recurringClassId',
     dateTime: 'dateTime',
     status: 'status',
+    canceledAt: 'canceledAt',
     subscriptionId: 'subscriptionId',
     rebookableUntil: 'rebookableUntil',
     classCode: 'classCode',
@@ -23149,6 +24455,21 @@ export namespace Prisma {
   };
 
   export type InstructorAbsenceScalarFieldEnum = (typeof InstructorAbsenceScalarFieldEnum)[keyof typeof InstructorAbsenceScalarFieldEnum]
+
+
+  export const InstructorFeeScalarFieldEnum: {
+    id: 'id',
+    instructorId: 'instructorId',
+    currency: 'currency',
+    effectiveFrom: 'effectiveFrom',
+    effectiveTo: 'effectiveTo',
+    trialFee: 'trialFee',
+    regularFee: 'regularFee',
+    cancelFee: 'cancelFee',
+    cancelWithoutNoticeFee: 'cancelWithoutNoticeFee'
+  };
+
+  export type InstructorFeeScalarFieldEnum = (typeof InstructorFeeScalarFieldEnum)[keyof typeof InstructorFeeScalarFieldEnum]
 
 
   export const SystemStatusScalarFieldEnum: {
@@ -23321,6 +24642,7 @@ export namespace Prisma {
     isNative?: BoolFilter<"Instructor"> | boolean
     classes?: ClassListRelationFilter
     instructorAbsences?: InstructorAbsenceListRelationFilter
+    instructorFees?: InstructorFeeListRelationFilter
     instructorSchedules?: InstructorScheduleListRelationFilter
     recurringClasses?: RecurringClassListRelationFilter
   }
@@ -23348,6 +24670,7 @@ export namespace Prisma {
     isNative?: SortOrder
     classes?: ClassOrderByRelationAggregateInput
     instructorAbsences?: InstructorAbsenceOrderByRelationAggregateInput
+    instructorFees?: InstructorFeeOrderByRelationAggregateInput
     instructorSchedules?: InstructorScheduleOrderByRelationAggregateInput
     recurringClasses?: RecurringClassOrderByRelationAggregateInput
   }
@@ -23378,6 +24701,7 @@ export namespace Prisma {
     isNative?: BoolFilter<"Instructor"> | boolean
     classes?: ClassListRelationFilter
     instructorAbsences?: InstructorAbsenceListRelationFilter
+    instructorFees?: InstructorFeeListRelationFilter
     instructorSchedules?: InstructorScheduleListRelationFilter
     recurringClasses?: RecurringClassListRelationFilter
   }, "id" | "email" | "classURL" | "icon" | "nickname" | "meetingId" | "passcode">
@@ -23534,6 +24858,7 @@ export namespace Prisma {
     recurringClassId?: IntNullableFilter<"Class"> | number | null
     dateTime?: DateTimeNullableFilter<"Class"> | Date | string | null
     status?: EnumStatusFilter<"Class"> | $Enums.Status
+    canceledAt?: DateTimeNullableFilter<"Class"> | Date | string | null
     subscriptionId?: IntNullableFilter<"Class"> | number | null
     rebookableUntil?: DateTimeNullableFilter<"Class"> | Date | string | null
     classCode?: StringFilter<"Class"> | string
@@ -23554,6 +24879,7 @@ export namespace Prisma {
     recurringClassId?: SortOrderInput | SortOrder
     dateTime?: SortOrderInput | SortOrder
     status?: SortOrder
+    canceledAt?: SortOrderInput | SortOrder
     subscriptionId?: SortOrderInput | SortOrder
     rebookableUntil?: SortOrderInput | SortOrder
     classCode?: SortOrder
@@ -23577,6 +24903,7 @@ export namespace Prisma {
     recurringClassId?: IntNullableFilter<"Class"> | number | null
     dateTime?: DateTimeNullableFilter<"Class"> | Date | string | null
     status?: EnumStatusFilter<"Class"> | $Enums.Status
+    canceledAt?: DateTimeNullableFilter<"Class"> | Date | string | null
     subscriptionId?: IntNullableFilter<"Class"> | number | null
     rebookableUntil?: DateTimeNullableFilter<"Class"> | Date | string | null
     classCode?: StringFilter<"Class"> | string
@@ -23597,6 +24924,7 @@ export namespace Prisma {
     recurringClassId?: SortOrderInput | SortOrder
     dateTime?: SortOrderInput | SortOrder
     status?: SortOrder
+    canceledAt?: SortOrderInput | SortOrder
     subscriptionId?: SortOrderInput | SortOrder
     rebookableUntil?: SortOrderInput | SortOrder
     classCode?: SortOrder
@@ -23620,6 +24948,7 @@ export namespace Prisma {
     recurringClassId?: IntNullableWithAggregatesFilter<"Class"> | number | null
     dateTime?: DateTimeNullableWithAggregatesFilter<"Class"> | Date | string | null
     status?: EnumStatusWithAggregatesFilter<"Class"> | $Enums.Status
+    canceledAt?: DateTimeNullableWithAggregatesFilter<"Class"> | Date | string | null
     subscriptionId?: IntNullableWithAggregatesFilter<"Class"> | number | null
     rebookableUntil?: DateTimeNullableWithAggregatesFilter<"Class"> | Date | string | null
     classCode?: StringWithAggregatesFilter<"Class"> | string
@@ -24271,6 +25600,83 @@ export namespace Prisma {
     absentAt?: DateTimeWithAggregatesFilter<"InstructorAbsence"> | Date | string
   }
 
+  export type InstructorFeeWhereInput = {
+    AND?: InstructorFeeWhereInput | InstructorFeeWhereInput[]
+    OR?: InstructorFeeWhereInput[]
+    NOT?: InstructorFeeWhereInput | InstructorFeeWhereInput[]
+    id?: IntFilter<"InstructorFee"> | number
+    instructorId?: IntFilter<"InstructorFee"> | number
+    currency?: StringFilter<"InstructorFee"> | string
+    effectiveFrom?: DateTimeFilter<"InstructorFee"> | Date | string
+    effectiveTo?: DateTimeNullableFilter<"InstructorFee"> | Date | string | null
+    trialFee?: IntFilter<"InstructorFee"> | number
+    regularFee?: IntFilter<"InstructorFee"> | number
+    cancelFee?: IntFilter<"InstructorFee"> | number
+    cancelWithoutNoticeFee?: IntFilter<"InstructorFee"> | number
+    instructor?: XOR<InstructorScalarRelationFilter, InstructorWhereInput>
+  }
+
+  export type InstructorFeeOrderByWithRelationInput = {
+    id?: SortOrder
+    instructorId?: SortOrder
+    currency?: SortOrder
+    effectiveFrom?: SortOrder
+    effectiveTo?: SortOrderInput | SortOrder
+    trialFee?: SortOrder
+    regularFee?: SortOrder
+    cancelFee?: SortOrder
+    cancelWithoutNoticeFee?: SortOrder
+    instructor?: InstructorOrderByWithRelationInput
+  }
+
+  export type InstructorFeeWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: InstructorFeeWhereInput | InstructorFeeWhereInput[]
+    OR?: InstructorFeeWhereInput[]
+    NOT?: InstructorFeeWhereInput | InstructorFeeWhereInput[]
+    instructorId?: IntFilter<"InstructorFee"> | number
+    currency?: StringFilter<"InstructorFee"> | string
+    effectiveFrom?: DateTimeFilter<"InstructorFee"> | Date | string
+    effectiveTo?: DateTimeNullableFilter<"InstructorFee"> | Date | string | null
+    trialFee?: IntFilter<"InstructorFee"> | number
+    regularFee?: IntFilter<"InstructorFee"> | number
+    cancelFee?: IntFilter<"InstructorFee"> | number
+    cancelWithoutNoticeFee?: IntFilter<"InstructorFee"> | number
+    instructor?: XOR<InstructorScalarRelationFilter, InstructorWhereInput>
+  }, "id">
+
+  export type InstructorFeeOrderByWithAggregationInput = {
+    id?: SortOrder
+    instructorId?: SortOrder
+    currency?: SortOrder
+    effectiveFrom?: SortOrder
+    effectiveTo?: SortOrderInput | SortOrder
+    trialFee?: SortOrder
+    regularFee?: SortOrder
+    cancelFee?: SortOrder
+    cancelWithoutNoticeFee?: SortOrder
+    _count?: InstructorFeeCountOrderByAggregateInput
+    _avg?: InstructorFeeAvgOrderByAggregateInput
+    _max?: InstructorFeeMaxOrderByAggregateInput
+    _min?: InstructorFeeMinOrderByAggregateInput
+    _sum?: InstructorFeeSumOrderByAggregateInput
+  }
+
+  export type InstructorFeeScalarWhereWithAggregatesInput = {
+    AND?: InstructorFeeScalarWhereWithAggregatesInput | InstructorFeeScalarWhereWithAggregatesInput[]
+    OR?: InstructorFeeScalarWhereWithAggregatesInput[]
+    NOT?: InstructorFeeScalarWhereWithAggregatesInput | InstructorFeeScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"InstructorFee"> | number
+    instructorId?: IntWithAggregatesFilter<"InstructorFee"> | number
+    currency?: StringWithAggregatesFilter<"InstructorFee"> | string
+    effectiveFrom?: DateTimeWithAggregatesFilter<"InstructorFee"> | Date | string
+    effectiveTo?: DateTimeNullableWithAggregatesFilter<"InstructorFee"> | Date | string | null
+    trialFee?: IntWithAggregatesFilter<"InstructorFee"> | number
+    regularFee?: IntWithAggregatesFilter<"InstructorFee"> | number
+    cancelFee?: IntWithAggregatesFilter<"InstructorFee"> | number
+    cancelWithoutNoticeFee?: IntWithAggregatesFilter<"InstructorFee"> | number
+  }
+
   export type SystemStatusWhereInput = {
     AND?: SystemStatusWhereInput | SystemStatusWhereInput[]
     OR?: SystemStatusWhereInput[]
@@ -24474,6 +25880,7 @@ export namespace Prisma {
     isNative: boolean
     classes?: ClassCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
+    instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassCreateNestedManyWithoutInstructorInput
   }
@@ -24501,6 +25908,7 @@ export namespace Prisma {
     isNative: boolean
     classes?: ClassUncheckedCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
+    instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassUncheckedCreateNestedManyWithoutInstructorInput
   }
@@ -24527,6 +25935,7 @@ export namespace Prisma {
     isNative?: BoolFieldUpdateOperationsInput | boolean
     classes?: ClassUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
+    instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUpdateManyWithoutInstructorNestedInput
   }
@@ -24554,6 +25963,7 @@ export namespace Prisma {
     isNative?: BoolFieldUpdateOperationsInput | boolean
     classes?: ClassUncheckedUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
+    instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUncheckedUpdateManyWithoutInstructorNestedInput
   }
@@ -24729,6 +26139,7 @@ export namespace Prisma {
   export type ClassCreateInput = {
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     rebookableUntil?: Date | string | null
     classCode: string
     createdAt?: Date | string
@@ -24748,6 +26159,7 @@ export namespace Prisma {
     recurringClassId?: number | null
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     subscriptionId?: number | null
     rebookableUntil?: Date | string | null
     classCode: string
@@ -24760,6 +26172,7 @@ export namespace Prisma {
   export type ClassUpdateInput = {
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24779,6 +26192,7 @@ export namespace Prisma {
     recurringClassId?: NullableIntFieldUpdateOperationsInput | number | null
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscriptionId?: NullableIntFieldUpdateOperationsInput | number | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
@@ -24795,6 +26209,7 @@ export namespace Prisma {
     recurringClassId?: number | null
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     subscriptionId?: number | null
     rebookableUntil?: Date | string | null
     classCode: string
@@ -24806,6 +26221,7 @@ export namespace Prisma {
   export type ClassUpdateManyMutationInput = {
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24820,6 +26236,7 @@ export namespace Prisma {
     recurringClassId?: NullableIntFieldUpdateOperationsInput | number | null
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscriptionId?: NullableIntFieldUpdateOperationsInput | number | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
@@ -25409,6 +26826,86 @@ export namespace Prisma {
     absentAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type InstructorFeeCreateInput = {
+    currency: string
+    effectiveFrom: Date | string
+    effectiveTo?: Date | string | null
+    trialFee: number
+    regularFee: number
+    cancelFee: number
+    cancelWithoutNoticeFee: number
+    instructor: InstructorCreateNestedOneWithoutInstructorFeesInput
+  }
+
+  export type InstructorFeeUncheckedCreateInput = {
+    id?: number
+    instructorId: number
+    currency: string
+    effectiveFrom: Date | string
+    effectiveTo?: Date | string | null
+    trialFee: number
+    regularFee: number
+    cancelFee: number
+    cancelWithoutNoticeFee: number
+  }
+
+  export type InstructorFeeUpdateInput = {
+    currency?: StringFieldUpdateOperationsInput | string
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialFee?: IntFieldUpdateOperationsInput | number
+    regularFee?: IntFieldUpdateOperationsInput | number
+    cancelFee?: IntFieldUpdateOperationsInput | number
+    cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+    instructor?: InstructorUpdateOneRequiredWithoutInstructorFeesNestedInput
+  }
+
+  export type InstructorFeeUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    instructorId?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialFee?: IntFieldUpdateOperationsInput | number
+    regularFee?: IntFieldUpdateOperationsInput | number
+    cancelFee?: IntFieldUpdateOperationsInput | number
+    cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type InstructorFeeCreateManyInput = {
+    id?: number
+    instructorId: number
+    currency: string
+    effectiveFrom: Date | string
+    effectiveTo?: Date | string | null
+    trialFee: number
+    regularFee: number
+    cancelFee: number
+    cancelWithoutNoticeFee: number
+  }
+
+  export type InstructorFeeUpdateManyMutationInput = {
+    currency?: StringFieldUpdateOperationsInput | string
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialFee?: IntFieldUpdateOperationsInput | number
+    regularFee?: IntFieldUpdateOperationsInput | number
+    cancelFee?: IntFieldUpdateOperationsInput | number
+    cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type InstructorFeeUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    instructorId?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialFee?: IntFieldUpdateOperationsInput | number
+    regularFee?: IntFieldUpdateOperationsInput | number
+    cancelFee?: IntFieldUpdateOperationsInput | number
+    cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+  }
+
   export type SystemStatusCreateInput = {
     status?: string
     createdAt?: Date | string
@@ -25654,6 +27151,12 @@ export namespace Prisma {
     none?: InstructorAbsenceWhereInput
   }
 
+  export type InstructorFeeListRelationFilter = {
+    every?: InstructorFeeWhereInput
+    some?: InstructorFeeWhereInput
+    none?: InstructorFeeWhereInput
+  }
+
   export type InstructorScheduleListRelationFilter = {
     every?: InstructorScheduleWhereInput
     some?: InstructorScheduleWhereInput
@@ -25676,6 +27179,10 @@ export namespace Prisma {
   }
 
   export type InstructorAbsenceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type InstructorFeeOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -25956,6 +27463,7 @@ export namespace Prisma {
     recurringClassId?: SortOrder
     dateTime?: SortOrder
     status?: SortOrder
+    canceledAt?: SortOrder
     subscriptionId?: SortOrder
     rebookableUntil?: SortOrder
     classCode?: SortOrder
@@ -25979,6 +27487,7 @@ export namespace Prisma {
     recurringClassId?: SortOrder
     dateTime?: SortOrder
     status?: SortOrder
+    canceledAt?: SortOrder
     subscriptionId?: SortOrder
     rebookableUntil?: SortOrder
     classCode?: SortOrder
@@ -25994,6 +27503,7 @@ export namespace Prisma {
     recurringClassId?: SortOrder
     dateTime?: SortOrder
     status?: SortOrder
+    canceledAt?: SortOrder
     subscriptionId?: SortOrder
     rebookableUntil?: SortOrder
     classCode?: SortOrder
@@ -26486,6 +27996,60 @@ export namespace Prisma {
     instructorId?: SortOrder
   }
 
+  export type InstructorFeeCountOrderByAggregateInput = {
+    id?: SortOrder
+    instructorId?: SortOrder
+    currency?: SortOrder
+    effectiveFrom?: SortOrder
+    effectiveTo?: SortOrder
+    trialFee?: SortOrder
+    regularFee?: SortOrder
+    cancelFee?: SortOrder
+    cancelWithoutNoticeFee?: SortOrder
+  }
+
+  export type InstructorFeeAvgOrderByAggregateInput = {
+    id?: SortOrder
+    instructorId?: SortOrder
+    trialFee?: SortOrder
+    regularFee?: SortOrder
+    cancelFee?: SortOrder
+    cancelWithoutNoticeFee?: SortOrder
+  }
+
+  export type InstructorFeeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    instructorId?: SortOrder
+    currency?: SortOrder
+    effectiveFrom?: SortOrder
+    effectiveTo?: SortOrder
+    trialFee?: SortOrder
+    regularFee?: SortOrder
+    cancelFee?: SortOrder
+    cancelWithoutNoticeFee?: SortOrder
+  }
+
+  export type InstructorFeeMinOrderByAggregateInput = {
+    id?: SortOrder
+    instructorId?: SortOrder
+    currency?: SortOrder
+    effectiveFrom?: SortOrder
+    effectiveTo?: SortOrder
+    trialFee?: SortOrder
+    regularFee?: SortOrder
+    cancelFee?: SortOrder
+    cancelWithoutNoticeFee?: SortOrder
+  }
+
+  export type InstructorFeeSumOrderByAggregateInput = {
+    id?: SortOrder
+    instructorId?: SortOrder
+    trialFee?: SortOrder
+    regularFee?: SortOrder
+    cancelFee?: SortOrder
+    cancelWithoutNoticeFee?: SortOrder
+  }
+
   export type SystemStatusCountOrderByAggregateInput = {
     id?: SortOrder
     status?: SortOrder
@@ -26637,6 +28201,13 @@ export namespace Prisma {
     connect?: InstructorAbsenceWhereUniqueInput | InstructorAbsenceWhereUniqueInput[]
   }
 
+  export type InstructorFeeCreateNestedManyWithoutInstructorInput = {
+    create?: XOR<InstructorFeeCreateWithoutInstructorInput, InstructorFeeUncheckedCreateWithoutInstructorInput> | InstructorFeeCreateWithoutInstructorInput[] | InstructorFeeUncheckedCreateWithoutInstructorInput[]
+    connectOrCreate?: InstructorFeeCreateOrConnectWithoutInstructorInput | InstructorFeeCreateOrConnectWithoutInstructorInput[]
+    createMany?: InstructorFeeCreateManyInstructorInputEnvelope
+    connect?: InstructorFeeWhereUniqueInput | InstructorFeeWhereUniqueInput[]
+  }
+
   export type InstructorScheduleCreateNestedManyWithoutInstructorInput = {
     create?: XOR<InstructorScheduleCreateWithoutInstructorInput, InstructorScheduleUncheckedCreateWithoutInstructorInput> | InstructorScheduleCreateWithoutInstructorInput[] | InstructorScheduleUncheckedCreateWithoutInstructorInput[]
     connectOrCreate?: InstructorScheduleCreateOrConnectWithoutInstructorInput | InstructorScheduleCreateOrConnectWithoutInstructorInput[]
@@ -26663,6 +28234,13 @@ export namespace Prisma {
     connectOrCreate?: InstructorAbsenceCreateOrConnectWithoutInstructorInput | InstructorAbsenceCreateOrConnectWithoutInstructorInput[]
     createMany?: InstructorAbsenceCreateManyInstructorInputEnvelope
     connect?: InstructorAbsenceWhereUniqueInput | InstructorAbsenceWhereUniqueInput[]
+  }
+
+  export type InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput = {
+    create?: XOR<InstructorFeeCreateWithoutInstructorInput, InstructorFeeUncheckedCreateWithoutInstructorInput> | InstructorFeeCreateWithoutInstructorInput[] | InstructorFeeUncheckedCreateWithoutInstructorInput[]
+    connectOrCreate?: InstructorFeeCreateOrConnectWithoutInstructorInput | InstructorFeeCreateOrConnectWithoutInstructorInput[]
+    createMany?: InstructorFeeCreateManyInstructorInputEnvelope
+    connect?: InstructorFeeWhereUniqueInput | InstructorFeeWhereUniqueInput[]
   }
 
   export type InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput = {
@@ -26721,6 +28299,20 @@ export namespace Prisma {
     update?: InstructorAbsenceUpdateWithWhereUniqueWithoutInstructorInput | InstructorAbsenceUpdateWithWhereUniqueWithoutInstructorInput[]
     updateMany?: InstructorAbsenceUpdateManyWithWhereWithoutInstructorInput | InstructorAbsenceUpdateManyWithWhereWithoutInstructorInput[]
     deleteMany?: InstructorAbsenceScalarWhereInput | InstructorAbsenceScalarWhereInput[]
+  }
+
+  export type InstructorFeeUpdateManyWithoutInstructorNestedInput = {
+    create?: XOR<InstructorFeeCreateWithoutInstructorInput, InstructorFeeUncheckedCreateWithoutInstructorInput> | InstructorFeeCreateWithoutInstructorInput[] | InstructorFeeUncheckedCreateWithoutInstructorInput[]
+    connectOrCreate?: InstructorFeeCreateOrConnectWithoutInstructorInput | InstructorFeeCreateOrConnectWithoutInstructorInput[]
+    upsert?: InstructorFeeUpsertWithWhereUniqueWithoutInstructorInput | InstructorFeeUpsertWithWhereUniqueWithoutInstructorInput[]
+    createMany?: InstructorFeeCreateManyInstructorInputEnvelope
+    set?: InstructorFeeWhereUniqueInput | InstructorFeeWhereUniqueInput[]
+    disconnect?: InstructorFeeWhereUniqueInput | InstructorFeeWhereUniqueInput[]
+    delete?: InstructorFeeWhereUniqueInput | InstructorFeeWhereUniqueInput[]
+    connect?: InstructorFeeWhereUniqueInput | InstructorFeeWhereUniqueInput[]
+    update?: InstructorFeeUpdateWithWhereUniqueWithoutInstructorInput | InstructorFeeUpdateWithWhereUniqueWithoutInstructorInput[]
+    updateMany?: InstructorFeeUpdateManyWithWhereWithoutInstructorInput | InstructorFeeUpdateManyWithWhereWithoutInstructorInput[]
+    deleteMany?: InstructorFeeScalarWhereInput | InstructorFeeScalarWhereInput[]
   }
 
   export type InstructorScheduleUpdateManyWithoutInstructorNestedInput = {
@@ -26785,6 +28377,20 @@ export namespace Prisma {
     update?: InstructorAbsenceUpdateWithWhereUniqueWithoutInstructorInput | InstructorAbsenceUpdateWithWhereUniqueWithoutInstructorInput[]
     updateMany?: InstructorAbsenceUpdateManyWithWhereWithoutInstructorInput | InstructorAbsenceUpdateManyWithWhereWithoutInstructorInput[]
     deleteMany?: InstructorAbsenceScalarWhereInput | InstructorAbsenceScalarWhereInput[]
+  }
+
+  export type InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput = {
+    create?: XOR<InstructorFeeCreateWithoutInstructorInput, InstructorFeeUncheckedCreateWithoutInstructorInput> | InstructorFeeCreateWithoutInstructorInput[] | InstructorFeeUncheckedCreateWithoutInstructorInput[]
+    connectOrCreate?: InstructorFeeCreateOrConnectWithoutInstructorInput | InstructorFeeCreateOrConnectWithoutInstructorInput[]
+    upsert?: InstructorFeeUpsertWithWhereUniqueWithoutInstructorInput | InstructorFeeUpsertWithWhereUniqueWithoutInstructorInput[]
+    createMany?: InstructorFeeCreateManyInstructorInputEnvelope
+    set?: InstructorFeeWhereUniqueInput | InstructorFeeWhereUniqueInput[]
+    disconnect?: InstructorFeeWhereUniqueInput | InstructorFeeWhereUniqueInput[]
+    delete?: InstructorFeeWhereUniqueInput | InstructorFeeWhereUniqueInput[]
+    connect?: InstructorFeeWhereUniqueInput | InstructorFeeWhereUniqueInput[]
+    update?: InstructorFeeUpdateWithWhereUniqueWithoutInstructorInput | InstructorFeeUpdateWithWhereUniqueWithoutInstructorInput[]
+    updateMany?: InstructorFeeUpdateManyWithWhereWithoutInstructorInput | InstructorFeeUpdateManyWithWhereWithoutInstructorInput[]
+    deleteMany?: InstructorFeeScalarWhereInput | InstructorFeeScalarWhereInput[]
   }
 
   export type InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput = {
@@ -27523,6 +29129,20 @@ export namespace Prisma {
     update?: XOR<XOR<InstructorUpdateToOneWithWhereWithoutInstructorAbsencesInput, InstructorUpdateWithoutInstructorAbsencesInput>, InstructorUncheckedUpdateWithoutInstructorAbsencesInput>
   }
 
+  export type InstructorCreateNestedOneWithoutInstructorFeesInput = {
+    create?: XOR<InstructorCreateWithoutInstructorFeesInput, InstructorUncheckedCreateWithoutInstructorFeesInput>
+    connectOrCreate?: InstructorCreateOrConnectWithoutInstructorFeesInput
+    connect?: InstructorWhereUniqueInput
+  }
+
+  export type InstructorUpdateOneRequiredWithoutInstructorFeesNestedInput = {
+    create?: XOR<InstructorCreateWithoutInstructorFeesInput, InstructorUncheckedCreateWithoutInstructorFeesInput>
+    connectOrCreate?: InstructorCreateOrConnectWithoutInstructorFeesInput
+    upsert?: InstructorUpsertWithoutInstructorFeesInput
+    connect?: InstructorWhereUniqueInput
+    update?: XOR<XOR<InstructorUpdateToOneWithWhereWithoutInstructorFeesInput, InstructorUpdateWithoutInstructorFeesInput>, InstructorUncheckedUpdateWithoutInstructorFeesInput>
+  }
+
   export type CustomerCreateNestedOneWithoutChildrenInput = {
     create?: XOR<CustomerCreateWithoutChildrenInput, CustomerUncheckedCreateWithoutChildrenInput>
     connectOrCreate?: CustomerCreateOrConnectWithoutChildrenInput
@@ -27846,6 +29466,7 @@ export namespace Prisma {
   export type ClassCreateWithoutInstructorInput = {
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     rebookableUntil?: Date | string | null
     classCode: string
     createdAt?: Date | string
@@ -27863,6 +29484,7 @@ export namespace Prisma {
     recurringClassId?: number | null
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     subscriptionId?: number | null
     rebookableUntil?: Date | string | null
     classCode: string
@@ -27897,6 +29519,37 @@ export namespace Prisma {
 
   export type InstructorAbsenceCreateManyInstructorInputEnvelope = {
     data: InstructorAbsenceCreateManyInstructorInput | InstructorAbsenceCreateManyInstructorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type InstructorFeeCreateWithoutInstructorInput = {
+    currency: string
+    effectiveFrom: Date | string
+    effectiveTo?: Date | string | null
+    trialFee: number
+    regularFee: number
+    cancelFee: number
+    cancelWithoutNoticeFee: number
+  }
+
+  export type InstructorFeeUncheckedCreateWithoutInstructorInput = {
+    id?: number
+    currency: string
+    effectiveFrom: Date | string
+    effectiveTo?: Date | string | null
+    trialFee: number
+    regularFee: number
+    cancelFee: number
+    cancelWithoutNoticeFee: number
+  }
+
+  export type InstructorFeeCreateOrConnectWithoutInstructorInput = {
+    where: InstructorFeeWhereUniqueInput
+    create: XOR<InstructorFeeCreateWithoutInstructorInput, InstructorFeeUncheckedCreateWithoutInstructorInput>
+  }
+
+  export type InstructorFeeCreateManyInstructorInputEnvelope = {
+    data: InstructorFeeCreateManyInstructorInput | InstructorFeeCreateManyInstructorInput[]
     skipDuplicates?: boolean
   }
 
@@ -27978,6 +29631,7 @@ export namespace Prisma {
     recurringClassId?: IntNullableFilter<"Class"> | number | null
     dateTime?: DateTimeNullableFilter<"Class"> | Date | string | null
     status?: EnumStatusFilter<"Class"> | $Enums.Status
+    canceledAt?: DateTimeNullableFilter<"Class"> | Date | string | null
     subscriptionId?: IntNullableFilter<"Class"> | number | null
     rebookableUntil?: DateTimeNullableFilter<"Class"> | Date | string | null
     classCode?: StringFilter<"Class"> | string
@@ -28008,6 +29662,37 @@ export namespace Prisma {
     NOT?: InstructorAbsenceScalarWhereInput | InstructorAbsenceScalarWhereInput[]
     instructorId?: IntFilter<"InstructorAbsence"> | number
     absentAt?: DateTimeFilter<"InstructorAbsence"> | Date | string
+  }
+
+  export type InstructorFeeUpsertWithWhereUniqueWithoutInstructorInput = {
+    where: InstructorFeeWhereUniqueInput
+    update: XOR<InstructorFeeUpdateWithoutInstructorInput, InstructorFeeUncheckedUpdateWithoutInstructorInput>
+    create: XOR<InstructorFeeCreateWithoutInstructorInput, InstructorFeeUncheckedCreateWithoutInstructorInput>
+  }
+
+  export type InstructorFeeUpdateWithWhereUniqueWithoutInstructorInput = {
+    where: InstructorFeeWhereUniqueInput
+    data: XOR<InstructorFeeUpdateWithoutInstructorInput, InstructorFeeUncheckedUpdateWithoutInstructorInput>
+  }
+
+  export type InstructorFeeUpdateManyWithWhereWithoutInstructorInput = {
+    where: InstructorFeeScalarWhereInput
+    data: XOR<InstructorFeeUpdateManyMutationInput, InstructorFeeUncheckedUpdateManyWithoutInstructorInput>
+  }
+
+  export type InstructorFeeScalarWhereInput = {
+    AND?: InstructorFeeScalarWhereInput | InstructorFeeScalarWhereInput[]
+    OR?: InstructorFeeScalarWhereInput[]
+    NOT?: InstructorFeeScalarWhereInput | InstructorFeeScalarWhereInput[]
+    id?: IntFilter<"InstructorFee"> | number
+    instructorId?: IntFilter<"InstructorFee"> | number
+    currency?: StringFilter<"InstructorFee"> | string
+    effectiveFrom?: DateTimeFilter<"InstructorFee"> | Date | string
+    effectiveTo?: DateTimeNullableFilter<"InstructorFee"> | Date | string | null
+    trialFee?: IntFilter<"InstructorFee"> | number
+    regularFee?: IntFilter<"InstructorFee"> | number
+    cancelFee?: IntFilter<"InstructorFee"> | number
+    cancelWithoutNoticeFee?: IntFilter<"InstructorFee"> | number
   }
 
   export type InstructorScheduleUpsertWithWhereUniqueWithoutInstructorInput = {
@@ -28098,6 +29783,7 @@ export namespace Prisma {
   export type ClassCreateWithoutCustomerInput = {
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     rebookableUntil?: Date | string | null
     classCode: string
     createdAt?: Date | string
@@ -28115,6 +29801,7 @@ export namespace Prisma {
     recurringClassId?: number | null
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     subscriptionId?: number | null
     rebookableUntil?: Date | string | null
     classCode: string
@@ -28291,6 +29978,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     isNative: boolean
     instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
+    instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassCreateNestedManyWithoutInstructorInput
   }
@@ -28317,6 +30005,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     isNative: boolean
     instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
+    instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassUncheckedCreateNestedManyWithoutInstructorInput
   }
@@ -28462,6 +30151,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isNative?: BoolFieldUpdateOperationsInput | boolean
     instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
+    instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUpdateManyWithoutInstructorNestedInput
   }
@@ -28488,6 +30178,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isNative?: BoolFieldUpdateOperationsInput | boolean
     instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
+    instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUncheckedUpdateManyWithoutInstructorNestedInput
   }
@@ -28603,6 +30294,7 @@ export namespace Prisma {
   export type ClassCreateWithoutClassAttendanceInput = {
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     rebookableUntil?: Date | string | null
     classCode: string
     createdAt?: Date | string
@@ -28621,6 +30313,7 @@ export namespace Prisma {
     recurringClassId?: number | null
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     subscriptionId?: number | null
     rebookableUntil?: Date | string | null
     classCode: string
@@ -28680,6 +30373,7 @@ export namespace Prisma {
   export type ClassUpdateWithoutClassAttendanceInput = {
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28698,6 +30392,7 @@ export namespace Prisma {
     recurringClassId?: NullableIntFieldUpdateOperationsInput | number | null
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscriptionId?: NullableIntFieldUpdateOperationsInput | number | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
@@ -28754,6 +30449,7 @@ export namespace Prisma {
   export type ClassCreateWithoutSubscriptionInput = {
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     rebookableUntil?: Date | string | null
     classCode: string
     createdAt?: Date | string
@@ -28772,6 +30468,7 @@ export namespace Prisma {
     recurringClassId?: number | null
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     rebookableUntil?: Date | string | null
     classCode: string
     createdAt?: Date | string
@@ -28984,6 +30681,7 @@ export namespace Prisma {
   export type ClassCreateWithoutRecurringClassInput = {
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     rebookableUntil?: Date | string | null
     classCode: string
     createdAt?: Date | string
@@ -29001,6 +30699,7 @@ export namespace Prisma {
     customerId: number
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     subscriptionId?: number | null
     rebookableUntil?: Date | string | null
     classCode: string
@@ -29042,6 +30741,7 @@ export namespace Prisma {
     isNative: boolean
     classes?: ClassCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
+    instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
   }
 
@@ -29068,6 +30768,7 @@ export namespace Prisma {
     isNative: boolean
     classes?: ClassUncheckedCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
+    instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
   }
 
@@ -29167,6 +30868,7 @@ export namespace Prisma {
     isNative?: BoolFieldUpdateOperationsInput | boolean
     classes?: ClassUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
+    instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
   }
 
@@ -29193,6 +30895,7 @@ export namespace Prisma {
     isNative?: BoolFieldUpdateOperationsInput | boolean
     classes?: ClassUncheckedUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
+    instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
   }
 
@@ -29462,6 +31165,7 @@ export namespace Prisma {
     isNative: boolean
     classes?: ClassCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
+    instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassCreateNestedManyWithoutInstructorInput
   }
 
@@ -29488,6 +31192,7 @@ export namespace Prisma {
     isNative: boolean
     classes?: ClassUncheckedCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
+    instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassUncheckedCreateNestedManyWithoutInstructorInput
   }
 
@@ -29549,6 +31254,7 @@ export namespace Prisma {
     isNative?: BoolFieldUpdateOperationsInput | boolean
     classes?: ClassUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
+    instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUpdateManyWithoutInstructorNestedInput
   }
 
@@ -29575,6 +31281,7 @@ export namespace Prisma {
     isNative?: BoolFieldUpdateOperationsInput | boolean
     classes?: ClassUncheckedUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
+    instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUncheckedUpdateManyWithoutInstructorNestedInput
   }
 
@@ -29670,6 +31377,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     isNative: boolean
     classes?: ClassCreateNestedManyWithoutInstructorInput
+    instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassCreateNestedManyWithoutInstructorInput
   }
@@ -29696,6 +31404,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     isNative: boolean
     classes?: ClassUncheckedCreateNestedManyWithoutInstructorInput
+    instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassUncheckedCreateNestedManyWithoutInstructorInput
   }
@@ -29737,6 +31446,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isNative?: BoolFieldUpdateOperationsInput | boolean
     classes?: ClassUpdateManyWithoutInstructorNestedInput
+    instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUpdateManyWithoutInstructorNestedInput
   }
@@ -29763,6 +31473,129 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isNative?: BoolFieldUpdateOperationsInput | boolean
     classes?: ClassUncheckedUpdateManyWithoutInstructorNestedInput
+    instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
+    instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
+    recurringClasses?: RecurringClassUncheckedUpdateManyWithoutInstructorNestedInput
+  }
+
+  export type InstructorCreateWithoutInstructorFeesInput = {
+    name: string
+    email: string
+    password: string
+    classURL: string
+    icon: string
+    nickname: string
+    meetingId: string
+    passcode: string
+    createdAt?: Date | string
+    birthdate: Date | string
+    favoriteFood: string
+    hobby: string
+    lifeHistory: string
+    messageForChildren: string
+    skill: string
+    workingTime: string
+    terminationAt?: Date | string | null
+    updatedAt?: Date | string
+    isNative: boolean
+    classes?: ClassCreateNestedManyWithoutInstructorInput
+    instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
+    instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
+    recurringClasses?: RecurringClassCreateNestedManyWithoutInstructorInput
+  }
+
+  export type InstructorUncheckedCreateWithoutInstructorFeesInput = {
+    id?: number
+    name: string
+    email: string
+    password: string
+    classURL: string
+    icon: string
+    nickname: string
+    meetingId: string
+    passcode: string
+    createdAt?: Date | string
+    birthdate: Date | string
+    favoriteFood: string
+    hobby: string
+    lifeHistory: string
+    messageForChildren: string
+    skill: string
+    workingTime: string
+    terminationAt?: Date | string | null
+    updatedAt?: Date | string
+    isNative: boolean
+    classes?: ClassUncheckedCreateNestedManyWithoutInstructorInput
+    instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
+    instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
+    recurringClasses?: RecurringClassUncheckedCreateNestedManyWithoutInstructorInput
+  }
+
+  export type InstructorCreateOrConnectWithoutInstructorFeesInput = {
+    where: InstructorWhereUniqueInput
+    create: XOR<InstructorCreateWithoutInstructorFeesInput, InstructorUncheckedCreateWithoutInstructorFeesInput>
+  }
+
+  export type InstructorUpsertWithoutInstructorFeesInput = {
+    update: XOR<InstructorUpdateWithoutInstructorFeesInput, InstructorUncheckedUpdateWithoutInstructorFeesInput>
+    create: XOR<InstructorCreateWithoutInstructorFeesInput, InstructorUncheckedCreateWithoutInstructorFeesInput>
+    where?: InstructorWhereInput
+  }
+
+  export type InstructorUpdateToOneWithWhereWithoutInstructorFeesInput = {
+    where?: InstructorWhereInput
+    data: XOR<InstructorUpdateWithoutInstructorFeesInput, InstructorUncheckedUpdateWithoutInstructorFeesInput>
+  }
+
+  export type InstructorUpdateWithoutInstructorFeesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    classURL?: StringFieldUpdateOperationsInput | string
+    icon?: StringFieldUpdateOperationsInput | string
+    nickname?: StringFieldUpdateOperationsInput | string
+    meetingId?: StringFieldUpdateOperationsInput | string
+    passcode?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    birthdate?: DateTimeFieldUpdateOperationsInput | Date | string
+    favoriteFood?: StringFieldUpdateOperationsInput | string
+    hobby?: StringFieldUpdateOperationsInput | string
+    lifeHistory?: StringFieldUpdateOperationsInput | string
+    messageForChildren?: StringFieldUpdateOperationsInput | string
+    skill?: StringFieldUpdateOperationsInput | string
+    workingTime?: StringFieldUpdateOperationsInput | string
+    terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isNative?: BoolFieldUpdateOperationsInput | boolean
+    classes?: ClassUpdateManyWithoutInstructorNestedInput
+    instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
+    instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
+    recurringClasses?: RecurringClassUpdateManyWithoutInstructorNestedInput
+  }
+
+  export type InstructorUncheckedUpdateWithoutInstructorFeesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    classURL?: StringFieldUpdateOperationsInput | string
+    icon?: StringFieldUpdateOperationsInput | string
+    nickname?: StringFieldUpdateOperationsInput | string
+    meetingId?: StringFieldUpdateOperationsInput | string
+    passcode?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    birthdate?: DateTimeFieldUpdateOperationsInput | Date | string
+    favoriteFood?: StringFieldUpdateOperationsInput | string
+    hobby?: StringFieldUpdateOperationsInput | string
+    lifeHistory?: StringFieldUpdateOperationsInput | string
+    messageForChildren?: StringFieldUpdateOperationsInput | string
+    skill?: StringFieldUpdateOperationsInput | string
+    workingTime?: StringFieldUpdateOperationsInput | string
+    terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isNative?: BoolFieldUpdateOperationsInput | boolean
+    classes?: ClassUncheckedUpdateManyWithoutInstructorNestedInput
+    instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUncheckedUpdateManyWithoutInstructorNestedInput
   }
@@ -29915,6 +31748,7 @@ export namespace Prisma {
     recurringClassId?: number | null
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     subscriptionId?: number | null
     rebookableUntil?: Date | string | null
     classCode: string
@@ -29925,6 +31759,17 @@ export namespace Prisma {
 
   export type InstructorAbsenceCreateManyInstructorInput = {
     absentAt: Date | string
+  }
+
+  export type InstructorFeeCreateManyInstructorInput = {
+    id?: number
+    currency: string
+    effectiveFrom: Date | string
+    effectiveTo?: Date | string | null
+    trialFee: number
+    regularFee: number
+    cancelFee: number
+    cancelWithoutNoticeFee: number
   }
 
   export type InstructorScheduleCreateManyInstructorInput = {
@@ -29944,6 +31789,7 @@ export namespace Prisma {
   export type ClassUpdateWithoutInstructorInput = {
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29961,6 +31807,7 @@ export namespace Prisma {
     recurringClassId?: NullableIntFieldUpdateOperationsInput | number | null
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscriptionId?: NullableIntFieldUpdateOperationsInput | number | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
@@ -29976,6 +31823,7 @@ export namespace Prisma {
     recurringClassId?: NullableIntFieldUpdateOperationsInput | number | null
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscriptionId?: NullableIntFieldUpdateOperationsInput | number | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
@@ -29994,6 +31842,38 @@ export namespace Prisma {
 
   export type InstructorAbsenceUncheckedUpdateManyWithoutInstructorInput = {
     absentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InstructorFeeUpdateWithoutInstructorInput = {
+    currency?: StringFieldUpdateOperationsInput | string
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialFee?: IntFieldUpdateOperationsInput | number
+    regularFee?: IntFieldUpdateOperationsInput | number
+    cancelFee?: IntFieldUpdateOperationsInput | number
+    cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type InstructorFeeUncheckedUpdateWithoutInstructorInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialFee?: IntFieldUpdateOperationsInput | number
+    regularFee?: IntFieldUpdateOperationsInput | number
+    cancelFee?: IntFieldUpdateOperationsInput | number
+    cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type InstructorFeeUncheckedUpdateManyWithoutInstructorInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialFee?: IntFieldUpdateOperationsInput | number
+    regularFee?: IntFieldUpdateOperationsInput | number
+    cancelFee?: IntFieldUpdateOperationsInput | number
+    cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
   }
 
   export type InstructorScheduleUpdateWithoutInstructorInput = {
@@ -30057,6 +31937,7 @@ export namespace Prisma {
     recurringClassId?: number | null
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     subscriptionId?: number | null
     rebookableUntil?: Date | string | null
     classCode: string
@@ -30106,6 +31987,7 @@ export namespace Prisma {
   export type ClassUpdateWithoutCustomerInput = {
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30123,6 +32005,7 @@ export namespace Prisma {
     recurringClassId?: NullableIntFieldUpdateOperationsInput | number | null
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscriptionId?: NullableIntFieldUpdateOperationsInput | number | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
@@ -30138,6 +32021,7 @@ export namespace Prisma {
     recurringClassId?: NullableIntFieldUpdateOperationsInput | number | null
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscriptionId?: NullableIntFieldUpdateOperationsInput | number | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
@@ -30231,6 +32115,7 @@ export namespace Prisma {
     recurringClassId?: number | null
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     rebookableUntil?: Date | string | null
     classCode: string
     createdAt?: Date | string
@@ -30248,6 +32133,7 @@ export namespace Prisma {
   export type ClassUpdateWithoutSubscriptionInput = {
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30266,6 +32152,7 @@ export namespace Prisma {
     recurringClassId?: NullableIntFieldUpdateOperationsInput | number | null
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30281,6 +32168,7 @@ export namespace Prisma {
     recurringClassId?: NullableIntFieldUpdateOperationsInput | number | null
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30318,6 +32206,7 @@ export namespace Prisma {
     customerId: number
     dateTime?: Date | string | null
     status: $Enums.Status
+    canceledAt?: Date | string | null
     subscriptionId?: number | null
     rebookableUntil?: Date | string | null
     classCode: string
@@ -30333,6 +32222,7 @@ export namespace Prisma {
   export type ClassUpdateWithoutRecurringClassInput = {
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30350,6 +32240,7 @@ export namespace Prisma {
     customerId?: IntFieldUpdateOperationsInput | number
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscriptionId?: NullableIntFieldUpdateOperationsInput | number | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string
@@ -30365,6 +32256,7 @@ export namespace Prisma {
     customerId?: IntFieldUpdateOperationsInput | number
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscriptionId?: NullableIntFieldUpdateOperationsInput | number | null
     rebookableUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     classCode?: StringFieldUpdateOperationsInput | string

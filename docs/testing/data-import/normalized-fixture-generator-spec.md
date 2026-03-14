@@ -88,6 +88,20 @@ Assignment:
 
 Sunday has no slots.
 
+## Instructor Fee Rules
+
+Emit one active `instructor_fees.csv` row per instructor.
+
+Field values:
+
+- `currency = PHP`
+- `effective_from = --from`
+- `effective_to = empty`
+- `trial_fee = 75`
+- `regular_fee = 100`
+- `cancel_fee = 50`
+- `cancel_without_notice_fee = 100`
+
 ## Instructor Assignment for Recurring Classes
 
 Recurring classes must be evenly distributed across instructors.
