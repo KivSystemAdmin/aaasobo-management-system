@@ -41,6 +41,7 @@ export const createNewSubscription = async (subscriptionData: {
   planId: number;
   customerId: number;
   startAt: Date;
+  selectType: string;
 }) => {
   try {
     const newSubscription = await prisma.subscription.create({
@@ -93,11 +94,31 @@ export const updatePlanIdOfSubscription = async (
   tx: Prisma.TransactionClient,
   subscriptionId: number,
   planId: number,
+  selectType: string,
 ) => {
   try {
     const subscription = await tx.subscription.update({
       where: { id: subscriptionId },
-      data: { planId: planId },
+      data: { planId: planId, selectType: selectType },
+    });
+
+    return subscription;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to update the subscription.");
+  }
+};
+
+// Update the SelectType URL
+export const updateSelectTypeUrl = async (
+  tx: Prisma.TransactionClient,
+  subscriptionId: number,
+  selectType: string,
+) => {
+  try {
+    const subscription = await tx.subscription.update({
+      where: { id: subscriptionId },
+      data: { selectType: selectType },
     });
 
     return subscription;

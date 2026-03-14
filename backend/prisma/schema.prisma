@@ -117,6 +117,7 @@ model Subscription {
   id             Int              @id @default(autoincrement())
   planId         Int
   customerId     Int
+  selectType     String           @unique
   startAt        DateTime
   endAt          DateTime?
   class          Class[]

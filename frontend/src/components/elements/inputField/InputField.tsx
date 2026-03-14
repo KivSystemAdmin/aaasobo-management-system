@@ -13,6 +13,7 @@ function InputField({
   min,
   display = "block",
   readOnly,
+  maxLength,
   onChange,
   onKeyDown,
 }: {
@@ -26,6 +27,7 @@ function InputField({
   min?: string; // Only applies when the input type is "date"
   display?: "block" | "inline-block" | "flex";
   readOnly?: boolean;
+  maxLength?: number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }) {
@@ -43,6 +45,7 @@ function InputField({
         placeholder={placeholder}
         min={min}
         readOnly={readOnly}
+        maxLength={maxLength}
       />
       {error && (
         <FormValidationMessage
