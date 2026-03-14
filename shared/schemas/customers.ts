@@ -60,6 +60,7 @@ export const SubscriptionsResponse = z.object({
         customerId: z.number().describe("Customer ID"),
         startAt: z.iso.datetime().describe("Subscription start date"),
         endAt: z.iso.datetime().nullable().describe("Subscription end date"),
+        selectType: z.string().describe("SelectType URL"),
         plan: z
           .object({
             id: z.number().describe("Plan ID"),
