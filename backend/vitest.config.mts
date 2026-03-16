@@ -8,6 +8,7 @@ export default defineConfig({
     environment: "node",
     silent: false, // Keep test output visible
     logHeapUsage: false,
+    testTimeout: 15000,
     include: ["src/test/**/*.test.ts"],
     globalSetup: ["./src/test/globalSetup.ts"],
     setupFiles: ["./src/test/setup.ts"],

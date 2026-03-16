@@ -26,7 +26,7 @@ function buildMinimalNormalizedFiles() {
     "children.csv":
       "child_ref,customer_ref,name,birthdate,personal_info\nCH0001,CU0001,Child One,2016-01-02,\n",
     "subscriptions.csv":
-      "subscription_ref,customer_ref,plan_ref,start_at,end_at\nSU0001,CU0001,PL0001,2025-01-01T00:00:00+09:00,2025-12-31T00:00:00+09:00\n",
+      "subscription_ref,customer_ref,plan_ref,select_type,start_at,end_at\nSU0001,CU0001,PL0001,https://example.com/subscriptions/cu0001-pl0001,2025-01-01T00:00:00+09:00,2025-12-31T00:00:00+09:00\n",
     "instructors.csv":
       "instructor_ref,name,email,temp_password,class_url,icon,nickname,meeting_id,passcode,birthdate,favorite_food,hobby,life_history,message_for_children,skill,working_time,is_native,termination_at\nIN0001,Instructor One,instructor.one@example.com,TempPass456!,https://import.local/class/in0001,https://import.local/icon/in0001.png,instructor_in0001,11111111111,PASS0001,1990-01-01,Sushi,Reading,Life history,Message,Skill,Weekdays,false,\n",
     "instructor_fees.csv":
@@ -193,6 +193,11 @@ describe("POST /admins/import/normalize", () => {
     expect(plansCsv).toContain("plan_ref,name,description,weekly_class_times");
     expect(plansCsv).toContain("1980円（週1回25分）");
     expect(plansCsv).toContain("1480円（月2回25分）");
+
+    const subscriptionsCsv = response.body.files["subscriptions.csv"] as string;
+    expect(subscriptionsCsv).toContain(
+      "subscription_ref,customer_ref,plan_ref,select_type,start_at,end_at",
+    );
 
     const instructorFeesCsv = response.body.files[
       "instructor_fees.csv"
