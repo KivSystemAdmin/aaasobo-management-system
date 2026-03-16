@@ -9,7 +9,8 @@
     "dev": "nodemon --exec ts-node ./api/app.ts",
     "prisma:init": "npx prisma migrate reset && npx ts-node ./src/seed/dummy.ts",
     "fixture:generate:normalized-import": "ts-node ./src/seed/generateNormalizedImportFixture.ts",
-    "test": "vitest run",
+    "test": "vitest run src/test/api",
+    "test:api": "vitest run src/test/api",
     "test:performance": "vitest run src/test/performance",
     "build": "cd ../shared && npm install && cd ../backend && prisma generate && prisma migrate reset --force && echo 'Start executing dummy.ts' && ts-node ./src/seed/dummy.ts && echo 'Finish executing dummy.ts'",
     "lint:unused": "knip"

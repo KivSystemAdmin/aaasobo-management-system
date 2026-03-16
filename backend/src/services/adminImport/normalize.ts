@@ -85,6 +85,7 @@ interface SubscriptionRow {
   subscription_ref: string;
   customer_ref: string;
   plan_ref: string;
+  select_type: string;
   start_at: string;
   end_at: string;
 }
@@ -172,6 +173,7 @@ export const NORMALIZED_HEADERS = {
     "subscription_ref",
     "customer_ref",
     "plan_ref",
+    "select_type",
     "start_at",
     "end_at",
   ],
@@ -531,6 +533,7 @@ function toRecordSet(rows: RawClassRow[]): {
         subscription_ref: subscriptionSeq.next(),
         customer_ref: customer.customer_ref,
         plan_ref: plan.plan_ref,
+        select_type: `https://example.com/subscriptions/${customer.customer_ref.toLowerCase()}-${plan.plan_ref.toLowerCase()}`,
         start_at: "2020-01-01T00:00:00+09:00",
         end_at: "",
       };

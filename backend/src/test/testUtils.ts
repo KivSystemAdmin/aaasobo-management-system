@@ -176,6 +176,7 @@ function generateTestSubscription(planId: number, customerId: number) {
   return {
     planId,
     customerId,
+    selectType: faker.internet.url(),
     startAt,
     endAt: faker.date.future({ refDate: startAt }),
   };

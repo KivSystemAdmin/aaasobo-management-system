@@ -28,6 +28,7 @@ describe("GET /subscriptions/:id", () => {
         id: subscription.id,
         planId: plan.id,
         customerId: customer.id,
+        selectType: subscription.selectType,
         startAt: "2024-01-01T00:00:00.000Z",
         endAt: null,
         plan: expect.objectContaining({

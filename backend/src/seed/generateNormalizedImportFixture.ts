@@ -65,6 +65,7 @@ type SubscriptionDef = {
   subscription_ref: string;
   customer_ref: string;
   plan_ref: string;
+  select_type: string;
   start_at: string;
   end_at: string;
 };
@@ -550,6 +551,7 @@ function subscriptionRows(from: string): SubscriptionDef[] {
       customer_ref: customerRef,
       // Keep 1-child customers on weekly-1, 2-child customers on weekly-2.
       plan_ref: hasTwoChildren ? ref("PL", 2) : ref("PL", 1),
+      select_type: `https://example.com/subscriptions/${customerRef.toLowerCase()}`,
       start_at: formatDateTime(from, "00:00"),
       end_at: "",
     });
