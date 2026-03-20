@@ -114,7 +114,7 @@ function InstructorProfile({
     "Native A",
     "Native B",
   ] as const;
-  const englishBackgroundClassNames = ["nativeA", "nativeB"] as const;
+  const englishBackgroundClassNames = ["", "nativeA", "nativeB"] as const;
 
   const handleEditClick = () => {
     setIsEditing(true);
