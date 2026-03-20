@@ -159,12 +159,13 @@ export const getAvailableSlotsByTypeController = async (
 ) => {
   try {
     const { start, end, timezone, englishBackground } = req.query;
+    const englishBackgroundNum = parseInt(englishBackground);
 
     const availableSlots = await getAvailableSlotsByType(
       start,
       end,
       timezone,
-      englishBackground,
+      englishBackgroundNum,
     );
 
     res.status(200).json({
