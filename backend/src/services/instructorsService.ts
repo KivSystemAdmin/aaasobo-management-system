@@ -12,6 +12,7 @@ import {
 import { convertToUTCDate } from "../utils/dateUtils";
 import { put, del } from "@vercel/blob";
 import { randomUUID } from "crypto";
+import { EnglishBackground } from "../types";
 
 // Register a new instructor account in the DB
 export const registerInstructor = async (data: {
@@ -30,7 +31,7 @@ export const registerInstructor = async (data: {
   classURL: string;
   meetingId: string;
   passcode: string;
-  isNative: boolean;
+  englishBackground: EnglishBackground;
 }) => {
   const hashedPassword = await hashPassword(data.password);
   const icon = data.icon;
@@ -63,7 +64,7 @@ export const registerInstructor = async (data: {
       classURL: data.classURL,
       meetingId: data.meetingId,
       passcode: data.passcode,
-      isNative: data.isNative,
+      englishBackground: data.englishBackground,
     },
   });
 
@@ -135,7 +136,7 @@ export const updateInstructor = async (
   classURL: string,
   meetingId: string,
   passcode: string,
-  isNative: boolean,
+  englishBackground: EnglishBackground,
 ) => {
   try {
     // Fetch the previous instructor data.
@@ -187,7 +188,7 @@ export const updateInstructor = async (
         terminationAt: leavingDate
           ? convertToUTCDate(leavingDate, "Asia/Tokyo")
           : null,
-        isNative,
+        englishBackground,
       },
     });
     return instructor;
@@ -284,7 +285,7 @@ export const getInstructorProfiles = async () => {
     name: instructor.name,
     nickname: instructor.nickname,
     icon: instructor.icon,
-    isNative: instructor.isNative,
+    englishBackground: instructor.englishBackground,
   }));
 
   return instructorProfiles;
@@ -298,7 +299,9 @@ export const getNativeInstructorProfiles = async () => {
         { terminationAt: null }, // Active
         { terminationAt: { gt: now } }, // Active (Future termination)
       ],
-      isNative: true,
+      englishBackground: {
+        in: [EnglishBackground.NativeA, EnglishBackground.NativeB],
+      }, // Native (NativeA or NativeB)
     },
   });
 
@@ -307,7 +310,7 @@ export const getNativeInstructorProfiles = async () => {
     name: instructor.name,
     nickname: instructor.nickname,
     icon: instructor.icon,
-    isNative: instructor.isNative,
+    englishBackground: instructor.englishBackground,
   }));
 
   return instructorProfiles;
@@ -321,7 +324,7 @@ export const getNonNativeInstructorProfiles = async () => {
         { terminationAt: null }, // Active
         { terminationAt: { gt: now } }, // Active (Future termination)
       ],
-      isNative: false,
+      englishBackground: EnglishBackground.NonNative, // Non-native
     },
   });
 
@@ -330,7 +333,7 @@ export const getNonNativeInstructorProfiles = async () => {
     name: instructor.name,
     nickname: instructor.nickname,
     icon: instructor.icon,
-    isNative: instructor.isNative,
+    englishBackground: instructor.englishBackground,
   }));
 
   return instructorProfiles;
@@ -391,7 +394,7 @@ export const maskInstructors = async (instructors: Instructor[]) => {
             classURL: `${maskedHeadLetters}_${suffix}${instructor.id}`,
             meetingId: `${maskedHeadLetters}_${suffix}${instructor.id}`,
             passcode: `${maskedHeadLetters}_${suffix}${instructor.id}`,
-            isNative: false,
+            englishBackground: EnglishBackground.NonNative, // Non-native
           },
         }),
       ),

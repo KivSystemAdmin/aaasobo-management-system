@@ -16,6 +16,7 @@ import {
   CustomerClassesResponse,
   RebookableClassesResponse,
 } from "../../../../shared/schemas/customers";
+import { EnglishBackground } from "../../types";
 
 vi.mock("../../lib/email/resendClient", () => ({
   resend: {
@@ -384,7 +385,7 @@ async function handleCustomerDailyOperation(args: {
       start: rebookStart,
       end: rebookEnd,
       timezone: "Asia/Tokyo",
-      isNative: "false",
+      englishBackground: EnglishBackground.NonNative,
     });
 
   if (availableSlotsResponse.status !== 200) {

@@ -7,6 +7,7 @@ import {
   getNativeInstructorProfiles,
   getNonNativeInstructorProfiles,
 } from "@/lib/api/instructorsApi";
+import { EnglishBackground } from "@/types";
 
 interface InstructorSelectionProps {
   onInstructorSelect: (instructor: InstructorRebookingProfile) => void;
@@ -42,7 +43,7 @@ export default function InstructorSelection({
         setLoading(true);
         setError(null);
 
-        if (plan?.isNative) {
+        if (plan?.englishBackground !== EnglishBackground.NonNative) {
           const instructorProfiles = await getNativeInstructorProfiles();
           setInstructors(instructorProfiles);
         } else {
@@ -62,7 +63,7 @@ export default function InstructorSelection({
     };
 
     fetchInstructors();
-  }, [language, availableInstructors, plan?.isNative]);
+  }, [language, availableInstructors, plan?.englishBackground]);
 
   const filteredInstructors = instructors.filter((instructor) =>
     instructor.nickname.toLowerCase().includes(searchTerm.toLowerCase()),

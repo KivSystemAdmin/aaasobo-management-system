@@ -3,6 +3,7 @@ import request from "supertest";
 import { server } from "../../../server";
 import { createAdmin, createPlan, generateAuthCookie } from "../../testUtils";
 import { prisma } from "../../setup";
+import { EnglishBackground } from "../../../types";
 
 describe("GET /admins/plan-list", () => {
   it("succeed with multiple plans", async () => {
@@ -48,7 +49,7 @@ describe("POST /admins/plan-list/register", () => {
       planNameJpn: "ベーシック",
       weeklyClassTimes: 2,
       description: "Test plan description",
-      isNative: "false",
+      englishBackground: EnglishBackground.NonNative,
     };
 
     await request(server)
@@ -69,7 +70,7 @@ describe("POST /admins/plan-list/register", () => {
       planNameJpn: "ベーシック",
       weeklyClassTimes: 2,
       description: "Test plan description",
-      isNative: "false",
+      englishBackground: EnglishBackground.NonNative,
     };
 
     await request(server)
@@ -94,7 +95,7 @@ describe("PATCH /admins/plan-list/update/:id", () => {
         planNameEng,
         planNameJpn,
         description: updatedDescription,
-        isNative: "false",
+        englishBackground: EnglishBackground.NonNative,
       })
       .expect(200);
 

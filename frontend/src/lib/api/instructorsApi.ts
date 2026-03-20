@@ -11,7 +11,6 @@ import {
   FAILED_TO_FETCH_INSTRUCTOR_CLASSES,
   FAILED_TO_FETCH_INSTRUCTOR_PROFILE,
 } from "../messages/instructorDashboard";
-
 import type {
   InstructorProfile,
   CompleteInstructor,
@@ -28,6 +27,7 @@ import type {
   CreateAbsenceResponse,
   DeleteAbsenceResponse,
 } from "@shared/schemas/instructors";
+import { EnglishBackground } from "@/types";
 
 const BACKEND_ORIGIN =
   process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
@@ -826,7 +826,7 @@ export const getInstructorAvailableSlots = async (
 export const getAllInstructorAvailableSlots = async (
   startDate: string,
   endDate: string,
-  isNative: boolean,
+  englishBackground: EnglishBackground,
   cookie?: string,
 ) => {
   try {
@@ -834,7 +834,7 @@ export const getAllInstructorAvailableSlots = async (
       start: startDate,
       end: endDate,
       timezone: "Asia/Tokyo",
-      isNative: String(isNative),
+      englishBackground: String(englishBackground),
     });
 
     let apiURL;
@@ -881,7 +881,7 @@ export const getAllInstructorAvailableSlots = async (
 export const getInstructorAvailableSlotsByType = async (
   startDate: string,
   endDate: string,
-  isNative: boolean,
+  englishBackground: EnglishBackground,
   cookie?: string,
 ) => {
   try {
@@ -898,7 +898,7 @@ export const getInstructorAvailableSlotsByType = async (
 
     if (cookie) {
       // From server component
-      apiURL = `${BASE_URL}/available-slots/by-type?${params}&isNative=${isNative}`;
+      apiURL = `${BASE_URL}/available-slots/by-type?${params}&englishBackground=${englishBackground}`;
       headers = { "Content-Type": "application/json", Cookie: cookie };
       response = await fetch(apiURL, {
         method,
@@ -908,7 +908,7 @@ export const getInstructorAvailableSlotsByType = async (
     } else {
       // From client component (via proxy)
       apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
-      const backendEndpoint = `/instructors/available-slots/by-type?${params}&isNative=${isNative}`;
+      const backendEndpoint = `/instructors/available-slots/by-type?${params}&englishBackground=${englishBackground}`;
       headers = {
         "Content-Type": "application/json",
         "backend-endpoint": backendEndpoint,

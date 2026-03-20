@@ -34,6 +34,7 @@ import {
   UpdateSubscriptionToAddClassRequest,
   UpdateSubscriptionToTerminateClassRequest,
 } from "@shared/schemas/admins";
+import { EnglishBackground } from "@/types";
 
 export async function updateEventAction(
   prevState: UpdateFormState | undefined,
@@ -90,18 +91,18 @@ export async function updatePlanAction(
     const description = formData.get("description");
     // Hidden input tag fields
     const planId = Number(formData.get("planId"));
-    const isNative = formData.get("isNative");
+    const englishBackground = Number(formData.get("englishBackground"));
 
     let requestNameEng: string | null = null;
     let requestNameJpn: string | null = null;
     let requestDescription: string | null = null;
-    let requestIsNative: string | null = null;
+    let requestEnglishBackground: EnglishBackground | null = null;
 
     const parsedForm = planUpdateSchema.safeParse({
       planNameEng,
       planNameJpn,
       description,
-      isNative,
+      englishBackground,
     });
 
     if (!parsedForm.success) {
@@ -112,7 +113,7 @@ export async function updatePlanAction(
     requestNameEng = parsedForm.data.planNameEng;
     requestNameJpn = parsedForm.data.planNameJpn;
     requestDescription = parsedForm.data.description;
-    requestIsNative = parsedForm.data.isNative ? "true" : "false";
+    requestEnglishBackground = parsedForm.data.englishBackground;
 
     // Get the cookies from the request headers
     const cookie = await getCookie();
@@ -122,7 +123,7 @@ export async function updatePlanAction(
       requestNameEng,
       requestNameJpn,
       requestDescription,
-      requestIsNative,
+      requestEnglishBackground,
       cookie,
     );
 

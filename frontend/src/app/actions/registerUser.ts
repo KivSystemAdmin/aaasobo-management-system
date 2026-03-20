@@ -32,13 +32,13 @@ export async function registerUser(
     const skill = String(formData.get("skill"));
     const classURL = formData.get("classURL");
     const meetingId = formData.get("meetingId");
+    const englishBackground = Number(formData.get("englishBackground"));
     const passcode = formData.get("passcode");
     const passwordStrength = parseInt(
       formData.get("passwordStrength") as string,
       10,
     );
     const userType = formData.get("userType");
-    const isNative = String(formData.get("nativeStatus")) === "Native";
 
     // Get the cookies from the request headers
     const cookie = await getCookie();
@@ -63,6 +63,7 @@ export async function registerUser(
           meetingId,
           passcode,
           userType,
+          englishBackground,
         });
         if (!parsedForm1.success) {
           const validationErrors = parsedForm1.error.issues;
@@ -84,7 +85,10 @@ export async function registerUser(
         userData.append("classURL", parsedForm1.data.classURL);
         userData.append("meetingId", parsedForm1.data.meetingId);
         userData.append("passcode", parsedForm1.data.passcode);
-        userData.append("isNative", isNative ? "true" : "false");
+        userData.append(
+          "englishBackground",
+          parsedForm1.data.englishBackground.toString(),
+        );
 
         // Append the icon file if it exists
         if (icon.name && icon.size > 0) {

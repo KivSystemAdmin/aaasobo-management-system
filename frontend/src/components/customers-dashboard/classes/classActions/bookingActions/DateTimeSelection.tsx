@@ -3,6 +3,7 @@
 import styles from "./DateTimeSelection.module.scss";
 import InstructorAvailabilityCalendar from "./InstructorAvailabilityCalendar";
 import AllInstructorAvailabilityCalendar from "./AllInstructorAvailabilityCalendar";
+import { EnglishBackground } from "@/types";
 
 interface DateTimeSelectionProps {
   onSlotSelect: (
@@ -11,14 +12,14 @@ interface DateTimeSelectionProps {
   ) => void;
   language: LanguageType;
   selectedInstructor?: InstructorRebookingProfile | null; // For instructor-first flow
-  isNative?: boolean;
+  englishBackground: EnglishBackground; // For filtering in date-first flow
 }
 
 export default function DateTimeSelection({
   onSlotSelect,
   language,
   selectedInstructor,
-  isNative,
+  englishBackground,
 }: DateTimeSelectionProps) {
   const handleSlotSelect = (
     dateTime: string,
@@ -48,7 +49,7 @@ export default function DateTimeSelection({
         /* For date-first flow, show full calendar with all instructor availability */
         <AllInstructorAvailabilityCalendar
           onSlotSelect={handleSlotSelect}
-          isNative={isNative}
+          englishBackground={englishBackground}
           language={language}
         />
       )}

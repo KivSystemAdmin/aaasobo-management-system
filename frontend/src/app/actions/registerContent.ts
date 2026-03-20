@@ -21,7 +21,7 @@ export async function registerContent(
     const color = formData.get("color");
     const description = formData.get("description");
     const categoryType = formData.get("categoryType");
-    const isNative = formData.get("isNative");
+    const englishBackground = Number(formData.get("englishBackground"));
 
     // Get the cookies from the request headers
     const cookie = await getCookie();
@@ -36,21 +36,19 @@ export async function registerContent(
           planNameJpn,
           weeklyClassTimes,
           description,
-          isNative,
+          englishBackground,
         });
         if (!parsedForm.success) {
           const validationErrors = parsedForm.error.issues;
           return extractRegisterValidationErrors(validationErrors);
         }
 
-        const isNativeStr = parsedForm.data.isNative ? "true" : "false";
-
         response = await registerPlan({
           planNameEng: parsedForm.data.planNameEng,
           planNameJpn: parsedForm.data.planNameJpn,
           weeklyClassTimes: parsedForm.data.weeklyClassTimes,
           description: parsedForm.data.description,
-          isNative: isNativeStr,
+          englishBackground: parsedForm.data.englishBackground,
           cookie,
         });
 

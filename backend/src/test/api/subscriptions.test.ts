@@ -7,6 +7,7 @@ import {
   createSubscription,
   generateAuthCookie,
 } from "../testUtils";
+import { EnglishBackground } from "../../types";
 
 describe("GET /subscriptions/:id", () => {
   it("succeed returning subscription by id (customer auth)", async () => {
@@ -33,7 +34,7 @@ describe("GET /subscriptions/:id", () => {
         plan: expect.objectContaining({
           id: plan.id,
           weeklyClassTimes: plan.weeklyClassTimes,
-          isNative: expect.any(Boolean),
+          EnglishBackground: plan.englishBackground,
         }),
         customer: expect.objectContaining({
           id: customer.id,

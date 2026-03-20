@@ -28,10 +28,10 @@ import { registerUser } from "@/app/actions/registerUser";
 import { registerContent } from "@/app/actions/registerContent";
 import { useFormMessages } from "@/hooks/useFormMessages";
 import { usePasswordStrength } from "@/hooks/usePasswordStrength";
-import StatusSwitcher from "@/components/elements/StatusSwitcher/StatusSwitcher";
 import { defaultColor } from "@/lib/data/data";
 import FormValidationMessage from "../../elements/formValidationMessage/FormValidationMessage";
 import Uploader from "./uploadImages/Uploader";
+import { EnglishBackground } from "@/types";
 
 const RegisterForm = ({
   categoryType,
@@ -58,6 +58,14 @@ const RegisterForm = ({
   const { passwordStrength } = usePasswordStrength(password);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [nativeStatus, setNativeStatus] = useState<string>("Non-native");
+  const [englishBackground, setEnglishBackground] = useState<EnglishBackground>(
+    EnglishBackground.NonNative,
+  );
+
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEnglishBackground = Number(e.target.value);
+    setEnglishBackground(newEnglishBackground);
+  };
 
   return (
     <form
@@ -307,18 +315,28 @@ const RegisterForm = ({
                 />
               </div>
 
-              {/* Native Type Switcher */}
-              <StatusSwitcher
-                isEditing={true}
-                statusOptions={["Non-native", "Native"]}
-                currentStatus={"Non-native"}
-                width="220px"
-                title="Non-native / Native"
-                onStatusChange={(nativeStatus) => {
-                  setNativeStatus(nativeStatus);
-                }}
+              {/* English Background Selection (radio button) */}
+              <input
+                type="radio"
+                name="englishBackground"
+                value={EnglishBackground.NonNative}
+                checked={englishBackground === EnglishBackground.NonNative}
+                onChange={handleRadioChange}
               />
-              <input type="hidden" name="nativeStatus" value={nativeStatus} />
+              <input
+                type="radio"
+                name="englishBackground"
+                value={EnglishBackground.NativeA}
+                checked={englishBackground === EnglishBackground.NativeA}
+                onChange={handleRadioChange}
+              />
+              <input
+                type="radio"
+                name="englishBackground"
+                value={EnglishBackground.NativeB}
+                checked={englishBackground === EnglishBackground.NativeB}
+                onChange={handleRadioChange}
+              />
 
               {/* Image File */}
               <input
@@ -395,6 +413,28 @@ const RegisterForm = ({
             error={localMessages.description}
             onChange={() => clearErrorMessage("description")}
           />{" "}
+          {/* Plan Type (Radio button) */}
+          <input
+            name="englishBackground"
+            type="radio"
+            value={EnglishBackground.NonNative}
+            checked={englishBackground === EnglishBackground.NonNative}
+            onChange={handleRadioChange}
+          />
+          <input
+            name="englishBackground"
+            type="radio"
+            value={EnglishBackground.NativeA}
+            checked={englishBackground === EnglishBackground.NativeA}
+            onChange={handleRadioChange}
+          />
+          <input
+            name="englishBackground"
+            type="radio"
+            value={EnglishBackground.NativeB}
+            checked={englishBackground === EnglishBackground.NativeB}
+            onChange={handleRadioChange}
+          />
         </>
       )}
 

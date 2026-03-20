@@ -1,12 +1,13 @@
 import { prisma } from "../../prisma/prismaClient";
 import { MONTHS_TO_DELETE_PLANS } from "../utils/commonUtils";
+import { EnglishBackground } from "../types";
 
 // Register a new plan in the DB
 export const registerPlan = async (data: {
   name: string;
   weeklyClassTimes: number;
   description: string;
-  isNative: boolean;
+  englishBackground: EnglishBackground;
 }) => {
   await prisma.plan.create({ data });
 
@@ -63,7 +64,7 @@ export const updatePlan = async (
   id: number,
   name: string,
   description: string,
-  isNative: boolean,
+  englishBackground: EnglishBackground,
 ) => {
   try {
     // Update the plan data.
@@ -74,7 +75,7 @@ export const updatePlan = async (
       data: {
         name,
         description,
-        isNative,
+        englishBackground,
       },
     });
     return plan;

@@ -8,6 +8,7 @@ import {
   generateAuthCookie,
 } from "../../testUtils";
 import { prisma } from "../../setup";
+import { EnglishBackground } from "../../../types";
 
 describe("GET /admins/instructor-list", () => {
   it("succeed with multiple instructors", async () => {
@@ -26,7 +27,12 @@ describe("GET /admins/instructor-list", () => {
         No: 1,
         ID: instructor1.id,
         Instructor: instructor1.nickname,
-        English: instructor1.isNative ? "Native" : "Non-native",
+        English:
+          instructor1.englishBackground === EnglishBackground.NonNative
+            ? "Non native"
+            : EnglishBackground.NativeA
+              ? "Native A"
+              : "Native B",
         "Full Name": instructor1.name,
         Email: instructor1.email,
       },
@@ -34,7 +40,12 @@ describe("GET /admins/instructor-list", () => {
         No: 2,
         ID: instructor2.id,
         Instructor: instructor2.nickname,
-        English: instructor2.isNative ? "Native" : "Non-native",
+        English:
+          instructor2.englishBackground === EnglishBackground.NonNative
+            ? "Non native"
+            : EnglishBackground.NativeA
+              ? "Native A"
+              : "Native B",
         "Full Name": instructor2.name,
         Email: instructor2.email,
       },
@@ -51,7 +62,10 @@ describe("POST /admins/instructor-list/register", () => {
     await request(server)
       .post("/admins/instructor-list/register")
       .set("Cookie", authCookie)
-      .send({ ...instructorData, isNative: "false" })
+      .send({
+        ...instructorData,
+        englishBackground: EnglishBackground.NonNative,
+      })
       .expect(201);
 
     const createdInstructor = await prisma.instructor.findUnique({
@@ -65,7 +79,10 @@ describe("POST /admins/instructor-list/register", () => {
 
     await request(server)
       .post("/admins/instructor-list/register")
-      .send({ ...instructorData, isNative: "false" })
+      .send({
+        ...instructorData,
+        englishBackground: EnglishBackground.NonNative,
+      })
       .expect(401);
   });
 });
@@ -95,7 +112,7 @@ describe("PATCH /admins/instructor-list/update/:id", () => {
         classURL: instructor.classURL,
         meetingId: instructor.meetingId,
         passcode: instructor.passcode,
-        isNative: instructor.isNative ? "true" : "false",
+        englishBackground: instructor.englishBackground,
       })
       .expect(200);
 

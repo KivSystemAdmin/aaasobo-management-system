@@ -3,6 +3,7 @@ import request from "supertest";
 import { server } from "../../server";
 import { prisma } from "../setup";
 import { createAdmin, createPlan, generateAuthCookie } from "../testUtils";
+import { EnglishBackground } from "../../types";
 
 async function createAdminAuthCookie() {
   const admin = await createAdmin();
@@ -19,7 +20,7 @@ describe("GET /plans", () => {
         name: "Terminated Plan",
         weeklyClassTimes: 1,
         description: "Should not appear in /plans",
-        isNative: false,
+        englishBackground: EnglishBackground.NonNative,
         terminationAt: new Date(),
       },
     });
@@ -43,7 +44,7 @@ describe("GET /plans/:id", () => {
       name: "Basic Plan",
       weeklyClassTimes: 2,
       description: "A basic plan with 2 weekly classes",
-      isNative: false,
+      englishBackground: EnglishBackground.NonNative,
     });
 
     const response = await request(server)
@@ -56,7 +57,7 @@ describe("GET /plans/:id", () => {
       name: "Basic Plan",
       weeklyClassTimes: 2,
       description: "A basic plan with 2 weekly classes",
-      isNative: false,
+      englishBackground: EnglishBackground.NonNative,
     });
   });
 });

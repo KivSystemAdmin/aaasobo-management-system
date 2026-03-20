@@ -90,7 +90,7 @@ export const getInstructor = async (
         meetingId: instructor.meetingId,
         passcode: instructor.passcode,
         terminationAt: terminationAt,
-        isNative: instructor.isNative,
+        englishBackground: instructor.englishBackground,
       },
     });
   } catch (error) {
@@ -135,7 +135,7 @@ export const getAllInstructorProfilesController = async (
           skill: instructor.skill,
           createdAt: instructor.createdAt,
           terminationAt: terminationAt,
-          isNative: instructor.isNative,
+          englishBackground: instructor.englishBackground,
         };
       }),
     );

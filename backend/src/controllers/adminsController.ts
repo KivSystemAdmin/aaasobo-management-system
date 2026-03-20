@@ -76,6 +76,7 @@ import type {
   RegisterEventRequest,
   UpdateEventRequest,
 } from "../../../shared/schemas/admins";
+import { EnglishBackground } from "../types";
 
 // Register Admin
 export const registerAdminController = async (
@@ -342,12 +343,20 @@ export const getAllInstructorsController = async (
     // Transform the data structure.
     const data = instructors.map((instructor, number) => {
       const { id, name, nickname, email } = instructor;
+      const englishBackgroundLabel: Record<EnglishBackground, string> = {
+        [EnglishBackground.NonNative]: "Non-Native",
+        [EnglishBackground.NativeA]: "Native A",
+        [EnglishBackground.NativeB]: "Native B",
+      };
 
       return {
         No: number + 1,
         ID: id,
         Instructor: nickname,
-        English: instructor.isNative ? "Native" : "Non-native",
+        English:
+          englishBackgroundLabel[
+            instructor.englishBackground as EnglishBackground
+          ],
         "Full Name": name,
         Email: email,
       };
@@ -522,13 +531,15 @@ export const registerInstructorController = async (
     classURL,
     meetingId,
     passcode,
-    isNative,
+    englishBackground,
   } = req.body;
 
   // Normalize email
   const normalizedEmail = email.trim().toLowerCase();
   // Normalize birthdate
   const normalizedBirthdate = new Date(convertToISOString(birthdate));
+  // Convert englishBackground to number
+  const englishBackgroundNum = Number(englishBackground);
 
   // Set unique checks list
   const uniqueChecks = [
@@ -539,9 +550,6 @@ export const registerInstructorController = async (
     { fn: getInstructorByPasscode, value: passcode },
   ];
   let errorItems = "";
-
-  // Parse string isNative value into boolean
-  const isNativeBool = isNative === "true";
 
   try {
     const results = await Promise.all(
@@ -589,7 +597,7 @@ export const registerInstructorController = async (
       classURL,
       meetingId,
       passcode,
-      isNative: isNativeBool,
+      englishBackground: englishBackgroundNum,
     });
 
     res.sendStatus(201);
@@ -621,7 +629,7 @@ export const updateInstructorProfileController = async (
     classURL,
     meetingId,
     passcode,
-    isNative,
+    englishBackground,
   } = req.body;
 
   // Normalize email
@@ -632,6 +640,8 @@ export const updateInstructorProfileController = async (
       ? new Date(convertToISOString(leavingDate))
       : null;
   const normalizedBirthdate = new Date(convertToISOString(birthdate));
+  // Convert englishBackground to number
+  const englishBackgroundNum = Number(englishBackground);
 
   // Set unique checks list
   const uniqueChecks = [
@@ -692,7 +702,7 @@ export const updateInstructorProfileController = async (
       classURL,
       meetingId,
       passcode,
-      isNative === "true",
+      englishBackgroundNum,
     );
 
     // Create a new instructor object with the updated termination date (JST).
@@ -826,21 +836,25 @@ export const registerPlanController = async (
   req: RequestWithBody<RegisterPlanRequest>,
   res: Response,
 ) => {
-  const { planNameEng, planNameJpn, weeklyClassTimes, description, isNative } =
-    req.body;
+  const {
+    planNameEng,
+    planNameJpn,
+    weeklyClassTimes,
+    description,
+    englishBackground,
+  } = req.body;
 
   // Combine Japanese and English names into the required format
   const name = `${planNameJpn} / ${planNameEng}`;
-
-  // Parse string isNative value into boolean
-  const isNativeBool = isNative === "true";
+  // Convert englishBackground to number
+  const englishBackgroundNum = Number(englishBackground);
 
   try {
     await registerPlan({
       name,
       weeklyClassTimes,
       description,
-      isNative: isNativeBool,
+      englishBackground: englishBackgroundNum,
     });
 
     res.sendStatus(201);
@@ -883,25 +897,24 @@ export const updatePlanController = async (
       !body.planNameEng ||
       !body.planNameJpn ||
       !body.description ||
-      !body.isNative
+      !body.englishBackground
     ) {
       return res
         .status(400)
         .json({ message: "Name and description are required for update" });
     }
-    const { planNameEng, planNameJpn, description, isNative } = body;
+    const { planNameEng, planNameJpn, description, englishBackground } = body;
 
     // Combine Japanese and English names into the required format
     const name = `${planNameJpn} / ${planNameEng}`;
-
-    // Parse string isNative value into boolean
-    const isNativeBool = isNative === "true";
+    // Convert englishBackground to number
+    const englishBackgroundNum = Number(englishBackground);
 
     const updatedPlan = await updatePlan(
       planId,
       name,
       description,
-      isNativeBool,
+      englishBackgroundNum,
     );
     return res.status(200).json({
       message: "Plan is updated successfully",

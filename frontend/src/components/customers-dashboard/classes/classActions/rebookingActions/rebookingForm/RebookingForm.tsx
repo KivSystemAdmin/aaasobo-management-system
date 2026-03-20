@@ -12,6 +12,7 @@ import Loading from "@/components/elements/loading/Loading";
 import RebookingCompleteMessage from "./rebookingCompleteMessage/RebookingCompleteMessage";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { nHoursLater } from "@/lib/utils/dateUtils";
+import { EnglishBackground } from "@/types";
 
 export default function RebookingForm({
   customerId,
@@ -42,7 +43,9 @@ export default function RebookingForm({
     const selectedClass = rebookableClasses.find(
       (classItem) => classItem.id === classId,
     );
-    const isNative = selectedClass?.subscription?.plan?.isNative ?? false;
+    const englishBackground =
+      selectedClass?.subscription?.plan?.englishBackground ||
+      EnglishBackground.NonNative;
     setClassToRebook(classId);
     setRebookingStep("selectOption");
     setIsLoading(true);
@@ -57,7 +60,7 @@ export default function RebookingForm({
       const result = await getAllInstructorAvailableSlots(
         startDate.toISOString().split("T")[0],
         endDate.toISOString().split("T")[0],
-        isNative,
+        englishBackground,
       );
 
       if ("data" in result) {

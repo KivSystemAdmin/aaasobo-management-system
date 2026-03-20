@@ -10,6 +10,7 @@ import Calendar from "@/components/features/calendar/Calendar";
 import { EventSourceFuncArg, EventClickArg } from "@fullcalendar/core";
 import styles from "./AllInstructorAvailabilityCalendar.module.scss";
 import { greenSuccess } from "@/styles/colors";
+import { EnglishBackground } from "@/types";
 
 interface CalendarEvent {
   id: string;
@@ -31,7 +32,7 @@ interface AllInstructorAvailabilityCalendarProps {
     availableInstructors: InstructorRebookingProfile[],
   ) => void;
   language: "ja" | "en";
-  isNative?: boolean;
+  englishBackground: EnglishBackground;
 }
 
 // Helper function to format date for API calls
@@ -78,14 +79,13 @@ const getErrorMessage = (language: "ja" | "en"): string => {
 export default function AllInstructorAvailabilityCalendar({
   onSlotSelect,
   language,
-  isNative,
+  englishBackground,
 }: AllInstructorAvailabilityCalendarProps) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fetchCalendarEvents = useCallback(
     async (info: EventSourceFuncArg) => {
-      if (isNative === undefined) return [];
       const startStr = formatJSTDate(info.start);
       const exclusiveEnd = new Date(info.end);
       exclusiveEnd.setDate(exclusiveEnd.getDate() + 1);
@@ -96,7 +96,7 @@ export default function AllInstructorAvailabilityCalendar({
         const response = await getInstructorAvailableSlotsByType(
           startStr,
           endStr,
-          isNative,
+          englishBackground,
         );
 
         if ("data" in response) {
@@ -112,7 +112,7 @@ export default function AllInstructorAvailabilityCalendar({
         return [];
       }
     },
-    [language, isNative],
+    [language, englishBackground],
   );
 
   const handleSlotClick = useCallback(

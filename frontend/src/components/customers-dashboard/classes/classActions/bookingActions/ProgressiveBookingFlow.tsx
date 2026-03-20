@@ -11,6 +11,7 @@ import { rebookClass } from "@/lib/api/classesApi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { errorAlert, warningAlert } from "@/lib/utils/alertUtils";
+import { EnglishBackground } from "@/types";
 
 interface ProgressiveBookingFlowProps {
   classId: number;
@@ -381,7 +382,9 @@ export default function ProgressiveBookingFlow({
                   onSlotSelect={handleSlotSelect}
                   language={language}
                   selectedInstructor={null}
-                  isNative={plan?.isNative}
+                  englishBackground={
+                    plan?.englishBackground || EnglishBackground.NonNative
+                  }
                 />
               </div>
             )}
@@ -415,6 +418,9 @@ export default function ProgressiveBookingFlow({
                   onSlotSelect={handleSlotSelect}
                   language={language}
                   selectedInstructor={selectedInstructor}
+                  englishBackground={
+                    plan?.englishBackground || EnglishBackground.NonNative
+                  }
                 />
               </div>
             )}

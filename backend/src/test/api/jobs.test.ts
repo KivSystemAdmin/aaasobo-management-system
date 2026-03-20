@@ -13,6 +13,7 @@ import {
   getFirstDesignatedDayOfYear,
 } from "../../utils/dateUtils";
 import { maskedHeadLetters } from "../../utils/commonUtils";
+import { EnglishBackground } from "../../types";
 
 function cronAuthHeader() {
   process.env.CRON_SECRET = "test-cron-secret";
@@ -140,7 +141,7 @@ describe("/jobs", () => {
         data: {
           terminationAt: new Date("2000-01-01T00:00:00.000Z"),
           classURL: "https://example.com/class",
-          isNative: true,
+          englishBackground: EnglishBackground.NativeA,
         },
       });
 
@@ -150,6 +151,7 @@ describe("/jobs", () => {
         data: {
           terminationAt: null,
           classURL: "https://example.com/active",
+          englishBackground: EnglishBackground.NonNative,
         },
       });
 
@@ -170,17 +172,18 @@ describe("/jobs", () => {
 
       const maskedDb = await prisma.instructor.findUnique({
         where: { id: toMask.id },
-        select: { name: true, classURL: true, isNative: true },
+        select: { name: true, classURL: true, englishBackground: true },
       });
       expect(maskedDb?.name).toBe(maskedHeadLetters);
       expect(maskedDb?.classURL).toContain(maskedHeadLetters);
-      expect(maskedDb?.isNative).toBe(false);
+      expect(maskedDb?.englishBackground).toBe(EnglishBackground.NonNative);
 
       const activeDb = await prisma.instructor.findUnique({
         where: { id: active.id },
-        select: { classURL: true },
+        select: { classURL: true, englishBackground: true },
       });
       expect(activeDb?.classURL).toBe("https://example.com/active");
+      expect(activeDb?.englishBackground).toBe(EnglishBackground.NonNative);
     });
 
     it("return empty list when no instructors need masking", async () => {

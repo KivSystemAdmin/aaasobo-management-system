@@ -158,20 +158,13 @@ export const getAvailableSlotsByTypeController = async (
   res: Response,
 ) => {
   try {
-    const { start, end, timezone, isNative: isNativeStr } = req.query;
-    const isNative = isNativeStr === "true";
-
-    if (isNativeStr === "undefined") {
-      return res.status(404).json({
-        message: "No Native flag found",
-      });
-    }
+    const { start, end, timezone, englishBackground } = req.query;
 
     const availableSlots = await getAvailableSlotsByType(
       start,
       end,
       timezone,
-      isNative,
+      englishBackground,
     );
 
     res.status(200).json({

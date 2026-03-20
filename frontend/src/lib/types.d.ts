@@ -101,7 +101,7 @@ type Plan = {
   description: string;
   weeklyClassTimes?: number;
   terminationAt?: string | null;
-  isNative: boolean;
+  englishBackground: EnglishBackground;
 };
 
 type BusinessEventType = {
@@ -227,7 +227,7 @@ type ForgotPasswordFormState = {
 type RegisterFormState = {
   password?: string;
   name?: string;
-  isNative?: string;
+  englishBackground?: EnglishBackground;
   email?: string;
   passConfirmation?: string;
   prefecture?: string;
@@ -246,7 +246,7 @@ type RegisterFormState = {
 
 type UpdateFormState = {
   name?: string;
-  isNative?: string;
+  englishBackground?: EnglishBackground;
   nickname?: string;
   email?: string;
   classURL?: string;

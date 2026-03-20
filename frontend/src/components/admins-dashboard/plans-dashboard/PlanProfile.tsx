@@ -21,6 +21,7 @@ import {
 } from "@/lib/messages/formValidation";
 import { confirmAlert } from "@/lib/utils/alertUtils";
 import { getLocalizedText } from "@/lib/utils/stringUtils";
+import { EnglishBackground } from "@/types";
 
 function PlanProfile({
   plan,
@@ -61,6 +62,12 @@ function PlanProfile({
     {},
   );
 
+  const englishBackgroundLabels = [
+    "Non Native",
+    "Native A",
+    "Native B",
+  ] as const;
+
   const handleEditClick = () => {
     setIsEditing(true);
   };
@@ -96,9 +103,12 @@ function PlanProfile({
     }
   };
 
-  // handle the isNative toggle
-  const handleToggleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLatestPlan({ ...latestPlan, isNative: e.target.checked } as Plan);
+  // Handle radio button change for englishBackground
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLatestPlan({
+      ...latestPlan,
+      englishBackground: Number(e.target.value),
+    } as Plan);
   };
 
   const clearErrorMessage = useCallback((field: string) => {
@@ -258,31 +268,47 @@ function PlanProfile({
                 </div>
               </div>
 
-              {/* Plan Type */}
+              {/* Plan Type (Radio button) */}
               <div className={styles.insideContainer}>
                 <AcademicCapIcon className={styles.icon} />
                 <div>
                   <p className={styles.planName__text}>Plan Type</p>
                   {isEditing ? (
                     <>
-                      <label className={styles.toggleSwitch}>
-                        <input
-                          name="isNative"
-                          type="checkbox"
-                          checked={latestPlan.isNative}
-                          onChange={handleToggleChange}
-                        />
-                        <span className={styles.toggleSlider} />
-                        <span className={styles.toggleLabel}>
-                          {latestPlan.isNative
-                            ? "Native Plan"
-                            : "Non Native Plan"}
-                        </span>
-                      </label>
+                      <input
+                        name="englishBackground"
+                        type="radio"
+                        value={EnglishBackground.NonNative}
+                        checked={
+                          latestPlan.englishBackground ===
+                          EnglishBackground.NonNative
+                        }
+                        onChange={handleRadioChange}
+                      />
+                      <input
+                        name="englishBackground"
+                        type="radio"
+                        value={EnglishBackground.NativeA}
+                        checked={
+                          latestPlan.englishBackground ===
+                          EnglishBackground.NativeA
+                        }
+                        onChange={handleRadioChange}
+                      />
+                      <input
+                        name="englishBackground"
+                        type="radio"
+                        value={EnglishBackground.NativeB}
+                        checked={
+                          latestPlan.englishBackground ===
+                          EnglishBackground.NativeB
+                        }
+                        onChange={handleRadioChange}
+                      />
                     </>
                   ) : (
                     <h4 className={styles.planDescription__text}>
-                      {latestPlan.isNative ? "Native Plan" : "Non Native Plan"}
+                      {englishBackgroundLabels[latestPlan.englishBackground]}
                     </h4>
                   )}
                 </div>

@@ -20,7 +20,7 @@ export const InstructorProfile = z.object({
   name: z.string().min(1).describe("Instructor full name"),
   nickname: z.string().min(1).describe("Instructor nickname"),
   icon: z.string().describe("Instructor profile icon URL from database"),
-  isNative: z.boolean().describe("If it's native or not"),
+  englishBackground: z.number().describe("English background requirement"),
 });
 
 export const InstructorProfilesResponse = z
@@ -49,7 +49,7 @@ export const DetailedInstructorProfile = z.object({
     .datetime()
     .nullable()
     .describe("Termination timestamp (ISO string)"),
-  isNative: z.boolean().describe("If it's native or not"),
+  englishBackground: z.number().describe("English background requirement"),
 });
 
 export const AllInstructorProfilesResponse = z
@@ -80,7 +80,7 @@ export const CompleteInstructor = z.object({
   meetingId: z.string().nullable().describe("Meeting ID"),
   passcode: z.string().nullable().describe("Meeting passcode"),
   terminationAt: z.string().nullable().describe("Termination timestamp (JST)"),
-  isNative: z.boolean().describe("If it's native or not"),
+  englishBackground: z.number().describe("English background requirement"),
 });
 
 export const InstructorResponse = z
@@ -182,7 +182,9 @@ export const AvailableSlotsQuery = z
     timezone: z
       .literal("Asia/Tokyo")
       .describe("Timezone (currently only Asia/Tokyo is supported)"),
-    isNative: z.string("true") || z.string("false"),
+    englishBackground: z
+      .string()
+      .describe("English background requirement for filtering instructors"),
   })
   .refine(
     (data) => new Date(data.start) < new Date(data.end),

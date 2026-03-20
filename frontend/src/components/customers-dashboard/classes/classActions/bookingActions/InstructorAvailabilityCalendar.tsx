@@ -6,6 +6,7 @@ import Calendar from "@/components/features/calendar/Calendar";
 import { EventSourceFuncArg, EventClickArg } from "@fullcalendar/core";
 import styles from "./InstructorAvailabilityCalendar.module.scss";
 import { greenSuccess } from "@/styles/colors";
+import { EnglishBackground } from "@/types";
 
 interface CalendarEvent {
   id: string;
@@ -73,7 +74,7 @@ const createInstructorProfile = (
   name: instructorName,
   nickname: instructorName,
   icon: "",
-  isNative: false,
+  englishBackground: EnglishBackground.NonNative,
 });
 
 export default function InstructorAvailabilityCalendar({
