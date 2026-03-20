@@ -374,6 +374,7 @@ describe("POST /customers/:id/subscription", () => {
     const subscriptionData = {
       planId: plan.id,
       startAt: faker.date.future().toISOString(),
+      selectType: faker.internet.url(),
     };
 
     await request(server)
@@ -395,6 +396,7 @@ describe("POST /customers/:id/subscription", () => {
     const subscriptionData = {
       planId: "invalid",
       startAt: faker.date.future().toISOString(),
+      selectType: faker.internet.url(),
     };
 
     await request(server)

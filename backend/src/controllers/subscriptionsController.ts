@@ -5,6 +5,7 @@ import {
   getSubscriptionById,
   terminateSubscription,
   updatePlanIdOfSubscription,
+  updateSelectTypeUrl,
 } from "../services/subscriptionsService";
 import { prisma } from "../../prisma/prismaClient";
 import {
@@ -92,11 +93,16 @@ export const updateSubscriptionToAddClassController = async (
 
     const planId = updateSubscriptionData.planId;
     const times = updateSubscriptionData.times;
+    const selectType = updateSubscriptionData.selectType;
 
     // validate
     const plan = await getPlanById(planId);
     if (!plan) {
       return res.status(404).json({ error: "Plan not found." });
+    }
+
+    if (!selectType) {
+      return res.status(404).json({ error: "SelectType URL not found." });
     }
 
     if (times !== plan.weeklyClassTimes - subscription.plan.weeklyClassTimes) {
@@ -107,11 +113,11 @@ export const updateSubscriptionToAddClassController = async (
 
     await prisma.$transaction(async (tx) => {
       // Updata the plan id of the subscription.
-      await updatePlanIdOfSubscription(tx, subscription.id, planId);
+      await updatePlanIdOfSubscription(tx, subscription.id, planId, selectType);
 
       // Add new recurring classes
       for (let i = 0; i < times; i++) {
-        await createNewRecurringClass(subscription.id);
+        await createNewRecurringClass(tx, subscription.id);
       }
 
       res.status(200).json({
@@ -139,6 +145,7 @@ export const updateSubscriptionToTerminateClassController = async (
 
     const planId = updateSubscriptionData.planId;
     const recurringClassIds = updateSubscriptionData.recurringClassIds;
+    const selectType = updateSubscriptionData.selectType;
 
     // validate
     if (!Array.isArray(recurringClassIds)) {
@@ -153,6 +160,10 @@ export const updateSubscriptionToTerminateClassController = async (
     const plan = await getPlanById(planId);
     if (!plan) {
       return res.status(404).json({ error: "Plan not found." });
+    }
+
+    if (!selectType) {
+      return res.status(404).json({ error: "SelectType URL not found." });
     }
 
     if (
@@ -174,12 +185,50 @@ export const updateSubscriptionToTerminateClassController = async (
 
     await prisma.$transaction(async (tx) => {
       // Updata the plan id of the subscription.
-      await updatePlanIdOfSubscription(tx, subscription.id, planId);
+      await updatePlanIdOfSubscription(tx, subscription.id, planId, selectType);
 
       // Terminate recurring classes
       for (const recurringClassId of recurringClassIds) {
         await terminateRecurringClass(tx, recurringClassId, today);
       }
+    });
+
+    res.status(200).json({
+      message: "Subscription updated successfully",
+      id: subscription.id,
+    });
+  } catch (error) {
+    console.error("Error updating subscription:", error);
+    res.status(500).json({
+      error:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred.",
+    });
+  }
+};
+
+export const updateSelectTypeUrlController = async (
+  req: RequestWithParams<SubscriptionIdParams>,
+  res: Response,
+) => {
+  try {
+    const { updateSubscriptionData } = req.body;
+    const selectType = updateSubscriptionData.selectType;
+
+    // validate
+    const subscription = await getSubscriptionById(req.params.id);
+    if (!subscription) {
+      return res.status(404).json({ error: "Subscription not found." });
+    }
+
+    if (!selectType) {
+      return res.status(404).json({ error: "SelectType URL not found." });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // Updata the SelectType url.
+      await updateSelectTypeUrl(tx, subscription.id, selectType);
     });
 
     res.status(200).json({

@@ -13,8 +13,14 @@ $font_size: 0.9rem;
 
 .filterContainer {
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
   gap: 1rem;
+
+  .planDate {
+    display: flex;
+    gap: 1rem;
+  }
 
   select,
   input {
@@ -33,8 +39,17 @@ $font_size: 0.9rem;
     width: 160px;
   }
 
+  .selectTypeInput {
+    width: 100%;
+  }
+
   input:not(:placeholder-shown) {
     color: #000000;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 1rem;
   }
 }
 

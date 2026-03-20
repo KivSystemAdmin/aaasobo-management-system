@@ -35,7 +35,12 @@ type RowByFile = {
     string
   >;
   "subscriptions.csv": Record<
-    "subscription_ref" | "customer_ref" | "plan_ref" | "start_at" | "end_at",
+    | "subscription_ref"
+    | "customer_ref"
+    | "plan_ref"
+    | "select_type"
+    | "start_at"
+    | "end_at",
     string
   >;
   "instructors.csv": Record<
@@ -1780,6 +1785,7 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
     data: parsed["subscriptions.csv"].map((row) => ({
       customerId: customerIdByRef.get(row.data.customer_ref)!,
       planId: planIdByRef.get(row.data.plan_ref)!,
+      selectType: row.data.select_type,
       startAt: new Date(row.data.start_at),
       endAt: parseOptionalDateTime(row.data.end_at),
     })),

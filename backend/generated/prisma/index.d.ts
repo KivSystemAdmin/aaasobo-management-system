@@ -9088,6 +9088,7 @@ export namespace Prisma {
     id: number | null
     planId: number | null
     customerId: number | null
+    selectType: string | null
     startAt: Date | null
     endAt: Date | null
   }
@@ -9096,6 +9097,7 @@ export namespace Prisma {
     id: number | null
     planId: number | null
     customerId: number | null
+    selectType: string | null
     startAt: Date | null
     endAt: Date | null
   }
@@ -9104,6 +9106,7 @@ export namespace Prisma {
     id: number
     planId: number
     customerId: number
+    selectType: number
     startAt: number
     endAt: number
     _all: number
@@ -9126,6 +9129,7 @@ export namespace Prisma {
     id?: true
     planId?: true
     customerId?: true
+    selectType?: true
     startAt?: true
     endAt?: true
   }
@@ -9134,6 +9138,7 @@ export namespace Prisma {
     id?: true
     planId?: true
     customerId?: true
+    selectType?: true
     startAt?: true
     endAt?: true
   }
@@ -9142,6 +9147,7 @@ export namespace Prisma {
     id?: true
     planId?: true
     customerId?: true
+    selectType?: true
     startAt?: true
     endAt?: true
     _all?: true
@@ -9237,6 +9243,7 @@ export namespace Prisma {
     id: number
     planId: number
     customerId: number
+    selectType: string
     startAt: Date
     endAt: Date | null
     _count: SubscriptionCountAggregateOutputType | null
@@ -9264,6 +9271,7 @@ export namespace Prisma {
     id?: boolean
     planId?: boolean
     customerId?: boolean
+    selectType?: boolean
     startAt?: boolean
     endAt?: boolean
     class?: boolean | Subscription$classArgs<ExtArgs>
@@ -9277,6 +9285,7 @@ export namespace Prisma {
     id?: boolean
     planId?: boolean
     customerId?: boolean
+    selectType?: boolean
     startAt?: boolean
     endAt?: boolean
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
@@ -9287,6 +9296,7 @@ export namespace Prisma {
     id?: boolean
     planId?: boolean
     customerId?: boolean
+    selectType?: boolean
     startAt?: boolean
     endAt?: boolean
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
@@ -9297,11 +9307,12 @@ export namespace Prisma {
     id?: boolean
     planId?: boolean
     customerId?: boolean
+    selectType?: boolean
     startAt?: boolean
     endAt?: boolean
   }
 
-  export type SubscriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "planId" | "customerId" | "startAt" | "endAt", ExtArgs["result"]["subscription"]>
+  export type SubscriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "planId" | "customerId" | "selectType" | "startAt" | "endAt", ExtArgs["result"]["subscription"]>
   export type SubscriptionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     class?: boolean | Subscription$classArgs<ExtArgs>
     recurringClass?: boolean | Subscription$recurringClassArgs<ExtArgs>
@@ -9330,6 +9341,7 @@ export namespace Prisma {
       id: number
       planId: number
       customerId: number
+      selectType: string
       startAt: Date
       endAt: Date | null
     }, ExtArgs["result"]["subscription"]>
@@ -9762,6 +9774,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Subscription", 'Int'>
     readonly planId: FieldRef<"Subscription", 'Int'>
     readonly customerId: FieldRef<"Subscription", 'Int'>
+    readonly selectType: FieldRef<"Subscription", 'String'>
     readonly startAt: FieldRef<"Subscription", 'DateTime'>
     readonly endAt: FieldRef<"Subscription", 'DateTime'>
   }
@@ -24359,6 +24372,7 @@ export namespace Prisma {
     id: 'id',
     planId: 'planId',
     customerId: 'customerId',
+    selectType: 'selectType',
     startAt: 'startAt',
     endAt: 'endAt'
   };
@@ -25076,6 +25090,7 @@ export namespace Prisma {
     id?: IntFilter<"Subscription"> | number
     planId?: IntFilter<"Subscription"> | number
     customerId?: IntFilter<"Subscription"> | number
+    selectType?: StringFilter<"Subscription"> | string
     startAt?: DateTimeFilter<"Subscription"> | Date | string
     endAt?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     class?: ClassListRelationFilter
@@ -25088,6 +25103,7 @@ export namespace Prisma {
     id?: SortOrder
     planId?: SortOrder
     customerId?: SortOrder
+    selectType?: SortOrder
     startAt?: SortOrder
     endAt?: SortOrderInput | SortOrder
     class?: ClassOrderByRelationAggregateInput
@@ -25098,6 +25114,7 @@ export namespace Prisma {
 
   export type SubscriptionWhereUniqueInput = Prisma.AtLeast<{
     id?: number
+    selectType?: string
     AND?: SubscriptionWhereInput | SubscriptionWhereInput[]
     OR?: SubscriptionWhereInput[]
     NOT?: SubscriptionWhereInput | SubscriptionWhereInput[]
@@ -25109,12 +25126,13 @@ export namespace Prisma {
     recurringClass?: RecurringClassListRelationFilter
     customer?: XOR<CustomerScalarRelationFilter, CustomerWhereInput>
     plan?: XOR<PlanScalarRelationFilter, PlanWhereInput>
-  }, "id">
+  }, "id" | "selectType">
 
   export type SubscriptionOrderByWithAggregationInput = {
     id?: SortOrder
     planId?: SortOrder
     customerId?: SortOrder
+    selectType?: SortOrder
     startAt?: SortOrder
     endAt?: SortOrderInput | SortOrder
     _count?: SubscriptionCountOrderByAggregateInput
@@ -25131,6 +25149,7 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"Subscription"> | number
     planId?: IntWithAggregatesFilter<"Subscription"> | number
     customerId?: IntWithAggregatesFilter<"Subscription"> | number
+    selectType?: StringWithAggregatesFilter<"Subscription"> | string
     startAt?: DateTimeWithAggregatesFilter<"Subscription"> | Date | string
     endAt?: DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
   }
@@ -26347,6 +26366,7 @@ export namespace Prisma {
   }
 
   export type SubscriptionCreateInput = {
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
     class?: ClassCreateNestedManyWithoutSubscriptionInput
@@ -26359,6 +26379,7 @@ export namespace Prisma {
     id?: number
     planId: number
     customerId: number
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
     class?: ClassUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -26366,6 +26387,7 @@ export namespace Prisma {
   }
 
   export type SubscriptionUpdateInput = {
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     class?: ClassUpdateManyWithoutSubscriptionNestedInput
@@ -26378,6 +26400,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     planId?: IntFieldUpdateOperationsInput | number
     customerId?: IntFieldUpdateOperationsInput | number
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     class?: ClassUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -26388,11 +26411,13 @@ export namespace Prisma {
     id?: number
     planId: number
     customerId: number
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
   }
 
   export type SubscriptionUpdateManyMutationInput = {
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -26401,6 +26426,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     planId?: IntFieldUpdateOperationsInput | number
     customerId?: IntFieldUpdateOperationsInput | number
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -27624,6 +27650,7 @@ export namespace Prisma {
     id?: SortOrder
     planId?: SortOrder
     customerId?: SortOrder
+    selectType?: SortOrder
     startAt?: SortOrder
     endAt?: SortOrder
   }
@@ -27638,6 +27665,7 @@ export namespace Prisma {
     id?: SortOrder
     planId?: SortOrder
     customerId?: SortOrder
+    selectType?: SortOrder
     startAt?: SortOrder
     endAt?: SortOrder
   }
@@ -27646,6 +27674,7 @@ export namespace Prisma {
     id?: SortOrder
     planId?: SortOrder
     customerId?: SortOrder
+    selectType?: SortOrder
     startAt?: SortOrder
     endAt?: SortOrder
   }
@@ -29805,6 +29834,7 @@ export namespace Prisma {
   }
 
   export type SubscriptionCreateWithoutCustomerInput = {
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
     class?: ClassCreateNestedManyWithoutSubscriptionInput
@@ -29815,6 +29845,7 @@ export namespace Prisma {
   export type SubscriptionUncheckedCreateWithoutCustomerInput = {
     id?: number
     planId: number
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
     class?: ClassUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -29899,6 +29930,7 @@ export namespace Prisma {
     id?: IntFilter<"Subscription"> | number
     planId?: IntFilter<"Subscription"> | number
     customerId?: IntFilter<"Subscription"> | number
+    selectType?: StringFilter<"Subscription"> | string
     startAt?: DateTimeFilter<"Subscription"> | Date | string
     endAt?: DateTimeNullableFilter<"Subscription"> | Date | string | null
   }
@@ -30018,6 +30050,7 @@ export namespace Prisma {
   }
 
   export type SubscriptionCreateWithoutClassInput = {
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
     recurringClass?: RecurringClassCreateNestedManyWithoutSubscriptionInput
@@ -30029,6 +30062,7 @@ export namespace Prisma {
     id?: number
     planId: number
     customerId: number
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
     recurringClass?: RecurringClassUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -30201,6 +30235,7 @@ export namespace Prisma {
   }
 
   export type SubscriptionUpdateWithoutClassInput = {
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     recurringClass?: RecurringClassUpdateManyWithoutSubscriptionNestedInput
@@ -30212,6 +30247,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     planId?: IntFieldUpdateOperationsInput | number
     customerId?: IntFieldUpdateOperationsInput | number
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     recurringClass?: RecurringClassUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -30378,6 +30414,7 @@ export namespace Prisma {
   }
 
   export type SubscriptionCreateWithoutPlanInput = {
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
     class?: ClassCreateNestedManyWithoutSubscriptionInput
@@ -30388,6 +30425,7 @@ export namespace Prisma {
   export type SubscriptionUncheckedCreateWithoutPlanInput = {
     id?: number
     customerId: number
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
     class?: ClassUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -30752,6 +30790,7 @@ export namespace Prisma {
   }
 
   export type SubscriptionCreateWithoutRecurringClassInput = {
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
     class?: ClassCreateNestedManyWithoutSubscriptionInput
@@ -30763,6 +30802,7 @@ export namespace Prisma {
     id?: number
     planId: number
     customerId: number
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
     class?: ClassUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -30883,6 +30923,7 @@ export namespace Prisma {
   }
 
   export type SubscriptionUpdateWithoutRecurringClassInput = {
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     class?: ClassUpdateManyWithoutSubscriptionNestedInput
@@ -30894,6 +30935,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     planId?: IntFieldUpdateOperationsInput | number
     customerId?: IntFieldUpdateOperationsInput | number
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     class?: ClassUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -31919,6 +31961,7 @@ export namespace Prisma {
   export type SubscriptionCreateManyCustomerInput = {
     id?: number
     planId: number
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
   }
@@ -32000,6 +32043,7 @@ export namespace Prisma {
   }
 
   export type SubscriptionUpdateWithoutCustomerInput = {
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     class?: ClassUpdateManyWithoutSubscriptionNestedInput
@@ -32010,6 +32054,7 @@ export namespace Prisma {
   export type SubscriptionUncheckedUpdateWithoutCustomerInput = {
     id?: IntFieldUpdateOperationsInput | number
     planId?: IntFieldUpdateOperationsInput | number
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     class?: ClassUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -32019,6 +32064,7 @@ export namespace Prisma {
   export type SubscriptionUncheckedUpdateManyWithoutCustomerInput = {
     id?: IntFieldUpdateOperationsInput | number
     planId?: IntFieldUpdateOperationsInput | number
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -32042,11 +32088,13 @@ export namespace Prisma {
   export type SubscriptionCreateManyPlanInput = {
     id?: number
     customerId: number
+    selectType: string
     startAt: Date | string
     endAt?: Date | string | null
   }
 
   export type SubscriptionUpdateWithoutPlanInput = {
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     class?: ClassUpdateManyWithoutSubscriptionNestedInput
@@ -32057,6 +32105,7 @@ export namespace Prisma {
   export type SubscriptionUncheckedUpdateWithoutPlanInput = {
     id?: IntFieldUpdateOperationsInput | number
     customerId?: IntFieldUpdateOperationsInput | number
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     class?: ClassUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -32066,6 +32115,7 @@ export namespace Prisma {
   export type SubscriptionUncheckedUpdateManyWithoutPlanInput = {
     id?: IntFieldUpdateOperationsInput | number
     customerId?: IntFieldUpdateOperationsInput | number
+    selectType?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }

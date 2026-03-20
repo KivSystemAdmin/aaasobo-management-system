@@ -239,7 +239,7 @@ export const registerSubscriptionController = async (
   res: Response,
 ) => {
   const customerId = req.params.id;
-  const { planId, startAt } = req.body;
+  const { planId, startAt, selectType } = req.body;
 
   try {
     // Get weekly class times based on plan id.
@@ -255,6 +255,7 @@ export const registerSubscriptionController = async (
       planId,
       customerId,
       startAt: new Date(startAt),
+      selectType,
     };
     const newSubscription = await createNewSubscription(subscriptionData);
     if (!newSubscription) {
@@ -263,14 +264,19 @@ export const registerSubscriptionController = async (
     }
     const subscriptionId = newSubscription.id;
 
-    // Create the same number of recurring class records as weekly class times
-    for (let i = 0; i < weeklyClassTimes; i++) {
-      const newRecurringClass = await createNewRecurringClass(subscriptionId);
-      if (!newRecurringClass) {
-        res.status(500).json({ error: "Failed to create recurring class" });
-        return;
+    await prisma.$transaction(async (tx) => {
+      // Create the same number of recurring class records as weekly class times
+      for (let i = 0; i < weeklyClassTimes; i++) {
+        const newRecurringClass = await createNewRecurringClass(
+          tx,
+          subscriptionId,
+        );
+        if (!newRecurringClass) {
+          res.status(500).json({ error: "Failed to create recurring class" });
+          return;
+        }
       }
-    }
+    });
 
     res.status(200).json({ newSubscription });
   } catch (error) {

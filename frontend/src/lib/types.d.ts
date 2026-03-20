@@ -124,6 +124,7 @@ type Subscription = {
   startAt: string;
   endAt: string | null;
   plan: Plan;
+  selectType: string;
 };
 
 type RegisterSubscription = {

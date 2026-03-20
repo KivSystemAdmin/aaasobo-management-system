@@ -94,7 +94,8 @@ function CurrentSubscription({
     <div className={styles.outsideContainer}>
       {subscriptionsData && subscriptionsData.subscriptions.length > 0 ? (
         subscriptionsData.subscriptions.map((subscription, index) => {
-          const { id, plan, startAt, customerTerminationAt } = subscription;
+          const { id, plan, startAt, customerTerminationAt, selectType } =
+            subscription;
           const startDate = new Date(startAt);
 
           return (
@@ -121,6 +122,21 @@ function CurrentSubscription({
                         - {PRESENT_LABEL[language]}
                       </span>
                     </div>
+
+                    {userSessionType === "admin" ? (
+                      <div>
+                        <a
+                          href={subscription.selectType}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.dateText}
+                        >
+                          {subscription.selectType}
+                        </a>
+                      </div>
+                    ) : (
+                      <></>
+                    )}
                   </div>
 
                   {userSessionType === "admin" &&
@@ -133,7 +149,7 @@ function CurrentSubscription({
                       />
                       <ActionButton
                         onClick={() => handleDeleteSubscription(id)}
-                        btnText={deletingId === id ? "DELETING..." : "DELETE"}
+                        btnText={deletingId === id ? "DELETING..." : "Delete"}
                         className="deleteBtn"
                         disabled={deletingId === id}
                       />
@@ -177,6 +193,7 @@ function CurrentSubscription({
         adminId={adminId}
         customerId={customerId}
         customerTerminationAt={selectedSubscription?.customerTerminationAt}
+        plan={selectedSubscription?.plan}
         language={language}
       />
     </div>
