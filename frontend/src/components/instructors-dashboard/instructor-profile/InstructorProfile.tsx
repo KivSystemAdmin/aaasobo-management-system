@@ -114,6 +114,7 @@ function InstructorProfile({
     "Native A",
     "Native B",
   ] as const;
+  const englishBackgroundClassNames = ["nativeA", "nativeB"] as const;
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -276,7 +277,16 @@ function InstructorProfile({
                 {!isEditing &&
                 latestInstructor.englishBackground !==
                   EnglishBackground.NonNative ? (
-                  <div className={styles.instructorName__isNativeFlag}>
+                  <div
+                    className={`${styles.instructorName__nativeFlag} 
+                      ${
+                        styles[
+                          englishBackgroundClassNames[
+                            latestInstructor.englishBackground
+                          ]
+                        ]
+                      }`}
+                  >
                     {
                       englishBackgroundLabels[
                         latestInstructor.englishBackground
