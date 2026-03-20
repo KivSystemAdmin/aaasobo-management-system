@@ -812,14 +812,21 @@ export const getAllPlansController = async (_: Request, res: Response) => {
 
     // Transform the data structure.
     const data = plans.map((plan, number) => {
-      const { id, name, weeklyClassTimes, description } = plan;
+      const { id, name, weeklyClassTimes, description, englishBackground } =
+        plan;
       const [planNameJpn, planNameEng] = name.split(" / ");
+      const englishBackgroundLabel: Record<EnglishBackground, string> = {
+        [EnglishBackground.NonNative]: "Non-Native",
+        [EnglishBackground.NativeA]: "Native A",
+        [EnglishBackground.NativeB]: "Native B",
+      };
 
       return {
         No: number + 1,
         ID: id,
         "Plan (Japanese)": planNameJpn,
         "Plan (English)": planNameEng,
+        English: englishBackgroundLabel[englishBackground as EnglishBackground],
         "Weekly Class Times": weeklyClassTimes,
         Description: description,
       };
