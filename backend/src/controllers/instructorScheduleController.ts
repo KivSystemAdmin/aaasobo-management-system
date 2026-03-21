@@ -23,6 +23,7 @@ import {
   InstructorScheduleParams,
   ActiveScheduleQuery,
 } from "../../../shared/schemas/instructors";
+import { EnglishBackground } from "../types";
 
 export const getInstructorSchedulesController = async (
   req: RequestWithParams<InstructorIdParams>,
@@ -159,13 +160,22 @@ export const getAvailableSlotsByTypeController = async (
 ) => {
   try {
     const { start, end, timezone, englishBackground } = req.query;
-    const englishBackgroundNum = parseInt(englishBackground);
 
+    // Organize the English backgrounds array depending on the index provided in the request
+    // Ex1: if the index is 2 (NativeB), the array will be [0, 1, 2] (NativeB, NonNative, NativeA)
+    // Ex2: if the index is 1 (NativeA), the array will be [0, 1] (NativeA, NonNative)
+    // Ex3: if the index is 0 (NonNative), the array will be [0] (NonNative)
+    const ordered = [
+      EnglishBackground.NonNative,
+      EnglishBackground.NativeA,
+      EnglishBackground.NativeB,
+    ];
+    const englishBackgroundArray = ordered.slice(0, englishBackground + 1);
     const availableSlots = await getAvailableSlotsByType(
       start,
       end,
       timezone,
-      englishBackgroundNum,
+      englishBackgroundArray,
     );
 
     res.status(200).json({

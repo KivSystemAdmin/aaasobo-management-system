@@ -35,6 +35,9 @@ export default function RebookingForm({
   const [dateTimeToRebook, setDateTimeToRebook] = useState<string | null>(null);
   const [rebookableClassesNumber, setRebookableClassesNumber] =
     useState<number>(0);
+  const [englishBackgroundArray, setEnglishBackgroundArray] = useState<
+    EnglishBackground[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const { language } = useLanguage();
@@ -44,8 +47,15 @@ export default function RebookingForm({
       (classItem) => classItem.id === classId,
     );
     const englishBackground =
-      selectedClass?.subscription?.plan?.englishBackground ||
-      EnglishBackground.NonNative;
+      selectedClass?.subscription?.plan?.englishBackground;
+    const englishBackgroundOrdered = [
+      EnglishBackground.NonNative,
+      EnglishBackground.NativeA,
+      EnglishBackground.NativeB,
+    ];
+    setEnglishBackgroundArray(
+      englishBackgroundOrdered.slice(0, englishBackground + 1),
+    );
     setClassToRebook(classId);
     setRebookingStep("selectOption");
     setIsLoading(true);
@@ -108,6 +118,7 @@ export default function RebookingForm({
           instructorProfiles={instructorProfiles}
           instructorAvailabilities={instructorAvailabilities}
           setInstructorToRebook={setInstructorToRebook}
+          englishBackgroundArray={englishBackgroundArray}
           rebookingOption={rebookingOption!}
           setRebookingStep={setRebookingStep}
           dateTimeToRebook={dateTimeToRebook}

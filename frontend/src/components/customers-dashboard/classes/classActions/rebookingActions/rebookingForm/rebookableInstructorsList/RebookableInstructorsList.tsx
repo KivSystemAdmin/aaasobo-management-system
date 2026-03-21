@@ -15,6 +15,7 @@ export default function RebookableInstructorsList({
   instructorProfiles,
   instructorAvailabilities,
   setInstructorToRebook,
+  englishBackgroundArray,
   rebookingOption,
   setRebookingStep,
   dateTimeToRebook,
@@ -64,18 +65,25 @@ export default function RebookableInstructorsList({
         </div>
       )}
       <div className={styles.rebookableInstructors__list}>
-        {instructorProfiles.map((instructor) => {
-          const isRebookable = rebookableInstructorIds.includes(instructor.id);
-          return (
-            <RebookableInstructorItem
-              key={instructor.id}
-              instructor={instructor}
-              isRebookable={isRebookable}
-              language={language}
-              onSelect={selectInstructor}
-            />
-          );
-        })}
+        {instructorProfiles
+          // Filter instructors based on the English background array
+          .filter((instructor) =>
+            englishBackgroundArray.includes(instructor.englishBackground),
+          )
+          .map((instructor) => {
+            const isRebookable = rebookableInstructorIds.includes(
+              instructor.id,
+            );
+            return (
+              <RebookableInstructorItem
+                key={instructor.id}
+                instructor={instructor}
+                isRebookable={isRebookable}
+                language={language}
+                onSelect={selectInstructor}
+              />
+            );
+          })}
       </div>
 
       <ActionButton

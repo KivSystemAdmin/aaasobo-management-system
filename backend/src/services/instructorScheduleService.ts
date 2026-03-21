@@ -322,7 +322,7 @@ export const getAvailableSlotsByType = async (
   startDate: string, // YYYY-MM-DD format
   endDate: string, // YYYY-MM-DD format
   timezone: string,
-  englishBackground: EnglishBackground,
+  englishBackground: EnglishBackground[],
 ): Promise<AvailableSlotWithInstructors[]> => {
   try {
     if (timezone !== "Asia/Tokyo") {
@@ -541,7 +541,7 @@ const getAllInstructorsConstraints = async (
 const getInstructorsConstraintsByType = async (
   startDate: string,
   endDate: string,
-  englishBackground: EnglishBackground,
+  englishBackground: EnglishBackground[],
 ): Promise<AllInstructorsConstraints> => {
   const [schedules, absences, bookings] = await Promise.all([
     prisma.instructorSchedule.findMany({
@@ -553,7 +553,7 @@ const getInstructorsConstraintsByType = async (
           { effectiveTo: null },
           { effectiveTo: { gt: new Date(startDate) } },
         ],
-        instructor: { englishBackground: englishBackground },
+        instructor: { englishBackground: { in: englishBackground } },
       },
       include: {
         slots: { orderBy: [{ weekday: "asc" }, { startTime: "asc" }] },

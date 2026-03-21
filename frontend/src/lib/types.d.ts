@@ -518,6 +518,7 @@ type RebookableInstructorsListProps = {
   instructorProfiles: InstructorRebookingProfile[];
   instructorAvailabilities: InstructorAvailability[] | [];
   setInstructorToRebook: (instructor: InstructorRebookingProfile) => void;
+  englishBackgroundArray: EnglishBackground[];
   rebookingOption: "instructor" | "dateTime";
   setRebookingStep: (step: RebookingSteps) => void;
   dateTimeToRebook: string | null;
