@@ -292,7 +292,7 @@ export const getInstructorProfiles = async () => {
 };
 
 export const getInstructorProfilesByEnglishBackground = async (
-  englishBackground: EnglishBackground,
+  englishBackground: EnglishBackground[],
 ) => {
   const now = new Date();
   const instructors = await prisma.instructor.findMany({
@@ -302,7 +302,7 @@ export const getInstructorProfilesByEnglishBackground = async (
         { terminationAt: { gt: now } }, // Active (Future termination)
       ],
       englishBackground: {
-        in: [englishBackground],
+        in: englishBackground,
       }, // Specific English background
     },
   });
