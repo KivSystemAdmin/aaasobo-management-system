@@ -71,7 +71,7 @@ function ListTable({
   const [filterValue, setFilterValue] = useState<string>("");
   const [pagination, setPagination] = useState({
     pageIndex: 0, // Initial page index
-    pageSize: 10, // Default page size
+    pageSize: PAGE_SIZE_OPTIONS[0], // Default page size
   });
   const [selectedCellId, setSelectedCellId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<[boolean, string]>([
