@@ -4,6 +4,13 @@ const nextConfig = {
       "@": "./src",
     },
   },
+  images: {
+    localPatterns: [
+      {
+        pathname: "/instructors/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

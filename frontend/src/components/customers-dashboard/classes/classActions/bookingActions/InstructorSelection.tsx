@@ -3,10 +3,7 @@
 import { useState, useEffect } from "react";
 import styles from "./InstructorSelection.module.scss";
 import InstructorItem from "./InstructorItem";
-import {
-  getNativeInstructorProfiles,
-  getNonNativeInstructorProfiles,
-} from "@/lib/api/instructorsApi";
+import { getInstructorProfilesByEnglishBackground } from "@/lib/api/instructorsApi";
 import { EnglishBackground } from "@/types";
 
 interface InstructorSelectionProps {
@@ -43,12 +40,28 @@ export default function InstructorSelection({
         setLoading(true);
         setError(null);
 
-        if (plan?.englishBackground !== EnglishBackground.NonNative) {
-          const instructorProfiles = await getNativeInstructorProfiles();
-          setInstructors(instructorProfiles);
-        } else {
-          const instructorProfiles = await getNonNativeInstructorProfiles();
-          setInstructors(instructorProfiles);
+        switch (plan?.englishBackground) {
+          case EnglishBackground.NonNative:
+            const nonNativeInstructorProfiles =
+              await getInstructorProfilesByEnglishBackground(
+                EnglishBackground.NonNative,
+              );
+            setInstructors(nonNativeInstructorProfiles);
+            break;
+          case EnglishBackground.NativeA:
+            const nativeAInstructorProfiles =
+              await getInstructorProfilesByEnglishBackground(
+                EnglishBackground.NativeA,
+              );
+            setInstructors(nativeAInstructorProfiles);
+            break;
+          case EnglishBackground.NativeB:
+            const nativeBInstructorProfiles =
+              await getInstructorProfilesByEnglishBackground(
+                EnglishBackground.NativeB,
+              );
+            setInstructors(nativeBInstructorProfiles);
+            break;
         }
       } catch (err) {
         console.error("Failed to fetch instructors:", err);

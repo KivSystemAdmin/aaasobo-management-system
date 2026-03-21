@@ -4,6 +4,7 @@ import { RequestWithParams } from "../middlewares/validationMiddleware";
 import {
   InstructorIdParams,
   ClassIdParams,
+  EnglishBackgroundParams,
   InstructorClassParams,
 } from "../../../shared/schemas/instructors";
 import { validateUserImageUrl } from "../utils/commonUtils";
@@ -14,8 +15,7 @@ import {
   getInstructorProfiles,
   getInstructorsToMask,
   maskInstructors,
-  getNonNativeInstructorProfiles,
-  getNativeInstructorProfiles,
+  getInstructorProfilesByEnglishBackground,
   deletePastInstructors,
 } from "../services/instructorsService";
 import { type RequestWithId } from "../middlewares/parseId.middleware";
@@ -25,6 +25,7 @@ import {
   getClassByClassId,
 } from "../services/classesService";
 import { convertToTimezoneDate } from "../utils/dateUtils";
+import { EnglishBackground } from "../types";
 
 function setErrorResponse(res: Response, error: unknown) {
   return res
@@ -213,41 +214,23 @@ export const getInstructorProfilesController = async (
   }
 };
 
-export const getNativeInstructorProfilesController = async (
-  _: Request,
+export const getInstructorProfilesByEnglishBackgroundController = async (
+  req: RequestWithParams<EnglishBackgroundParams>,
   res: Response,
 ) => {
+  const englishBackgroundType = req.params
+    .englishBackground as EnglishBackground;
   try {
-    const instructorProfiles = await getNativeInstructorProfiles();
+    const instructorProfiles = await getInstructorProfilesByEnglishBackground(
+      englishBackgroundType,
+    );
     if (!instructorProfiles) {
       res.sendStatus(404);
     }
 
     res.status(200).json(instructorProfiles);
   } catch (error) {
-    console.error("Error fetching native instructor profiles", {
-      error,
-      context: {
-        time: new Date().toISOString(),
-      },
-    });
-    return setErrorResponse(res, error);
-  }
-};
-
-export const getNonNativeInstructorProfilesController = async (
-  _: Request,
-  res: Response,
-) => {
-  try {
-    const instructorProfiles = await getNonNativeInstructorProfiles();
-    if (!instructorProfiles) {
-      res.sendStatus(404);
-    }
-
-    res.status(200).json(instructorProfiles);
-  } catch (error) {
-    console.error("Error fetching non native instructor profiles", {
+    console.error("Error fetching instructor profiles by English background", {
       error,
       context: {
         time: new Date().toISOString(),

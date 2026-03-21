@@ -291,7 +291,9 @@ export const getInstructorProfiles = async () => {
   return instructorProfiles;
 };
 
-export const getNativeInstructorProfiles = async () => {
+export const getInstructorProfilesByEnglishBackground = async (
+  englishBackground: EnglishBackground,
+) => {
   const now = new Date();
   const instructors = await prisma.instructor.findMany({
     where: {
@@ -300,31 +302,8 @@ export const getNativeInstructorProfiles = async () => {
         { terminationAt: { gt: now } }, // Active (Future termination)
       ],
       englishBackground: {
-        in: [EnglishBackground.NativeA, EnglishBackground.NativeB],
-      }, // Native (NativeA or NativeB)
-    },
-  });
-
-  const instructorProfiles = instructors.map((instructor) => ({
-    id: instructor.id,
-    name: instructor.name,
-    nickname: instructor.nickname,
-    icon: instructor.icon,
-    englishBackground: instructor.englishBackground,
-  }));
-
-  return instructorProfiles;
-};
-
-export const getNonNativeInstructorProfiles = async () => {
-  const now = new Date();
-  const instructors = await prisma.instructor.findMany({
-    where: {
-      OR: [
-        { terminationAt: null }, // Active
-        { terminationAt: { gt: now } }, // Active (Future termination)
-      ],
-      englishBackground: EnglishBackground.NonNative, // Non-native
+        in: [englishBackground],
+      }, // Specific English background
     },
   });
 

@@ -8,8 +8,7 @@ import {
   getCalendarClassesController,
   getInstructorProfilesController,
   getSameDateClassesController,
-  getNativeInstructorProfilesController,
-  getNonNativeInstructorProfilesController,
+  getInstructorProfilesByEnglishBackgroundController,
 } from "../../src/controllers/instructorsController";
 import { registerRoutes } from "../middlewares/validationMiddleware";
 import {
@@ -25,6 +24,7 @@ import {
   InstructorSchedulesResponse,
   ClassIdParams,
   ClassInstructorResponse,
+  EnglishBackgroundParams,
   AvailableSlotsQuery,
   InstructorAvailableSlotsQuery,
   AvailableSlotsResponse,
@@ -83,36 +83,19 @@ const profilesConfig = {
   },
 } as const;
 
-const nativeProfilesConfig = {
+const englishBackgroundProfilesConfig = {
   method: "get" as const,
+  paramsSchema: EnglishBackgroundParams,
   middleware: [verifyAuthentication(AUTH_ROLES.ACI)] as RequestHandler[],
-  handler: getNativeInstructorProfilesController,
+  handler: getInstructorProfilesByEnglishBackgroundController,
   openapi: {
-    summary: "Get Native instructor profiles",
-    description: "Get public instructor profiles for customer dashboard",
+    summary: "Get instructor profiles by English background",
+    description:
+      "Get public instructor profiles for customer dashboard filtered by English background",
     responses: {
       200: {
-        description: "Successfully retrieved native instructor profiles",
-        schema: InstructorProfilesResponse,
-      },
-      500: {
-        description: "Internal server error",
-        schema: MessageErrorResponse,
-      },
-    },
-  },
-} as const;
-
-const nonNativeProfilesConfig = {
-  method: "get" as const,
-  middleware: [verifyAuthentication(AUTH_ROLES.ACI)] as RequestHandler[],
-  handler: getNonNativeInstructorProfilesController,
-  openapi: {
-    summary: "Get Non Native instructor profiles",
-    description: "Get public instructor profiles for customer dashboard",
-    responses: {
-      200: {
-        description: "Successfully retrieved non native instructor profiles",
+        description:
+          "Successfully retrieved instructor profiles filtered by English background",
         schema: InstructorProfilesResponse,
       },
       500: {
@@ -589,8 +572,9 @@ const validatedRouteConfigs = {
   "/available-slots/by-type": [availableSlotsByTypeConfig],
   "/class/:id": [classInstructorConfig],
   "/profiles": [profilesConfig],
-  "/profiles/native": [nativeProfilesConfig],
-  "/profiles/non-native": [nonNativeProfilesConfig],
+  "/profiles/english-background/:englishBackground": [
+    englishBackgroundProfilesConfig,
+  ],
   "/:id": [instructorByIdConfig],
   "/:id/absences": [instructorAbsencesConfig, createAbsenceConfig],
   "/:id/absences/:absentAt": [deleteAbsenceConfig],

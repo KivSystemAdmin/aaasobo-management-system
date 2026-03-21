@@ -14,6 +14,13 @@ export const ClassIdParams = z.object({
     .transform((val) => parseInt(val, 10)),
 });
 
+export const EnglishBackgroundParams = z.object({
+  englishBackground: z
+    .string()
+    .regex(/^\d+$/, "English background must be a valid number")
+    .transform((val) => parseInt(val, 10)),
+});
+
 // Instructor profile schema for public profiles endpoint
 export const InstructorProfile = z.object({
   id: z.number().int().positive().describe("Instructor ID"),
@@ -356,6 +363,7 @@ export const PostTerminationScheduleResponse = z.object({
 // Type exports
 export type InstructorIdParams = z.infer<typeof InstructorIdParams>;
 export type ClassIdParams = z.infer<typeof ClassIdParams>;
+export type EnglishBackgroundParams = z.infer<typeof EnglishBackgroundParams>;
 export type InstructorProfile = z.infer<typeof InstructorProfile>;
 export type InstructorProfilesResponse = z.infer<
   typeof InstructorProfilesResponse
