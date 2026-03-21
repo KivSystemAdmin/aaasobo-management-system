@@ -910,7 +910,7 @@ async function insertInstructors() {
       {
         email: "george.adams@example.com",
         name: "George Adams",
-        nickname: "George (Native)",
+        nickname: "George",
         birthdate: new Date("1986-08-08"),
         lifeHistory:
           "Instructor specializing in data visualization and storytelling.",
@@ -932,7 +932,7 @@ async function insertInstructors() {
       {
         email: "emi.nakagawa@example.com",
         name: "Emi Nakagawa",
-        nickname: "Emi (Native)",
+        nickname: "Emi",
         birthdate: new Date("1990-12-12"),
         lifeHistory:
           "Web instructor focused on building inclusive and responsive UI.",
@@ -952,7 +952,7 @@ async function insertInstructors() {
       {
         email: "niki.alvarez@example.com",
         name: "Niki Alvarez",
-        nickname: "Niki (Native)",
+        nickname: "Niki",
         birthdate: new Date("1990-10-20"),
         lifeHistory: "Enjoys language exchange sessions with students.",
         favoriteFood: "Grilled fish",
@@ -2411,8 +2411,8 @@ async function insertRecurringClasses() {
 async function insertInstructorSchedules() {
   const helen = await getInstructor("Helen");
   const elian = await getInstructor("Elian");
-  const niki = await getInstructor("Niki (Native)");
-  const emi = await getInstructor("Emi (Native)");
+  const niki = await getInstructor("Niki");
+  const emi = await getInstructor("Emi");
 
   // Helen's first schedule (historical - 2024-06-01 to 2024-07-31)
   const helenSchedule1 = await prisma.instructorSchedule.create({
@@ -3492,9 +3492,7 @@ async function getCustomer(name: "Alice" | "Bob" | "山田 花") {
   return customer;
 }
 
-async function getInstructor(
-  nickname: "Helen" | "Elian" | "Niki (Native)" | "Emi (Native)",
-) {
+async function getInstructor(nickname: "Helen" | "Elian" | "Niki" | "Emi") {
   const instructor = await prisma.instructor.findFirst({ where: { nickname } });
   if (!instructor) {
     throw new Error(`Instructor ${nickname} not found`);
