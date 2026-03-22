@@ -27,8 +27,10 @@ export default async function Page(props: {
   ]; // Set the link URL
   const userType = "admin"; // Set the user type for the registration form (It's not used in this page, but kept for consistency)
   const isAddButton = true; // Enable the add button
-  const isTodayFilterActive = searchParams.today === "true";
-  const data = await getAllClasses(isTodayFilterActive, cookie); // Fetch class list data
+  const isFilterActive = searchParams.today === "true"; // Determine if the filter is active based on the search parameter
+  const filterHref = `/admins/${adminId}/class-list?today=true`; // URL to apply the filter
+  const clearFilterHref = `/admins/${adminId}/class-list`; // URL to clear the filter
+  const data = await getAllClasses(isFilterActive, cookie); // Fetch class list data
 
   return (
     <div>
@@ -41,10 +43,9 @@ export default async function Page(props: {
         replaceItems={replaceItems}
         userType={userType}
         isAddButton={isAddButton}
-        showTodayFilterButton={true}
-        isTodayFilterActive={isTodayFilterActive}
-        todayFilterHref={`/admins/${adminId}/class-list?today=true`}
-        clearTodayFilterHref={`/admins/${adminId}/class-list`}
+        isFilterActive={isFilterActive}
+        filterHref={filterHref}
+        clearFilterHref={clearFilterHref}
       />
     </div>
   );

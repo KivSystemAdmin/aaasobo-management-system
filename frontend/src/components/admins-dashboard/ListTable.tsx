@@ -21,6 +21,7 @@ import ListPageRegistrationModal from "@/components/admins-dashboard/ListPageReg
 import ListPageViewPastModal from "@/components/admins-dashboard/ListPageViewPastModal";
 import ActionButton from "@/components/elements/buttons/actionButton/ActionButton";
 import GenerateClassesForm from "./GenerateClassesForm";
+import FilterButton from "./FilterButton";
 import { OMIT_CLASS_STATUSES, PAGE_SIZE_OPTIONS } from "@/lib/data/data";
 
 function useTable<TData extends RowData>(options: TableOptions<TData>) {
@@ -64,10 +65,9 @@ function ListTable({
   isViewPastButton,
   pastListTableProps,
   linkTarget,
-  showTodayFilterButton,
-  isTodayFilterActive,
-  todayFilterHref,
-  clearTodayFilterHref,
+  isFilterActive,
+  filterHref,
+  clearFilterHref,
 }: ListTableProps) {
   const [currentData, setCurrentData] = useState<any[]>(fetchedData);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -333,20 +333,6 @@ function ListTable({
             />
           </div>
           <div className={`${styles.buttonsContainer}`}>
-            {showTodayFilterButton &&
-              todayFilterHref &&
-              clearTodayFilterHref && (
-                <Link
-                  href={
-                    isTodayFilterActive ? clearTodayFilterHref : todayFilterHref
-                  }
-                  className={`${styles.todayFilterButton} ${
-                    isTodayFilterActive ? styles.todayFilterButtonActive : ""
-                  }`}
-                >
-                  {isTodayFilterActive ? "Show All" : "Today"}
-                </Link>
-              )}
             {isViewPastButton && (
               <ActionButton
                 btnText={`View past ${categoryType ? categoryType : userType}s`}
@@ -357,7 +343,18 @@ function ListTable({
             )}
             {isAddButton &&
               (listType === "Class List" ? (
-                <GenerateClassesForm />
+                <>
+                  <FilterButton
+                    filterHref={filterHref}
+                    clearFilterHref={clearFilterHref}
+                    isFilterActive={isFilterActive}
+                    displayNames={[
+                      "Filter Today's Classes",
+                      "Show All Classes",
+                    ]}
+                  />
+                  <GenerateClassesForm />
+                </>
               ) : (
                 <ActionButton
                   btnText={`Add ${categoryType ? categoryType : userType}`}
