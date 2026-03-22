@@ -7,6 +7,7 @@ import { updatePlanAction } from "@/app/actions/updateContent";
 import { deletePlanAction } from "@/app/actions/deleteContent";
 import InputField from "../../elements/inputField/InputField";
 import ActionButton from "../../elements/buttons/actionButton/ActionButton";
+import RadioButton from "../../elements/radioButton/RadioButton";
 import {
   CalendarIcon,
   PencilIcon,
@@ -275,35 +276,44 @@ function PlanProfile({
                   <p className={styles.planName__text}>Plan Type</p>
                   {isEditing ? (
                     <>
-                      <input
+                      <RadioButton
                         name="englishBackground"
-                        type="radio"
                         value={EnglishBackground.NonNative}
                         checked={
                           latestPlan.englishBackground ===
                           EnglishBackground.NonNative
                         }
                         onChange={handleRadioChange}
+                        label={
+                          englishBackgroundLabels[EnglishBackground.NonNative]
+                        }
+                        className={styles.planTypeRadio}
                       />
-                      <input
+                      <RadioButton
                         name="englishBackground"
-                        type="radio"
                         value={EnglishBackground.NativeA}
                         checked={
                           latestPlan.englishBackground ===
                           EnglishBackground.NativeA
                         }
                         onChange={handleRadioChange}
+                        label={
+                          englishBackgroundLabels[EnglishBackground.NativeA]
+                        }
+                        className={styles.planTypeRadio}
                       />
-                      <input
+                      <RadioButton
                         name="englishBackground"
-                        type="radio"
                         value={EnglishBackground.NativeB}
                         checked={
                           latestPlan.englishBackground ===
                           EnglishBackground.NativeB
                         }
                         onChange={handleRadioChange}
+                        label={
+                          englishBackgroundLabels[EnglishBackground.NativeB]
+                        }
+                        className={styles.planTypeRadio}
                       />
                     </>
                   ) : (

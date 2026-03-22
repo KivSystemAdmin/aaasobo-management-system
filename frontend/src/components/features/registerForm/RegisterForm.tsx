@@ -32,6 +32,7 @@ import { defaultColor } from "@/lib/data/data";
 import FormValidationMessage from "../../elements/formValidationMessage/FormValidationMessage";
 import Uploader from "./uploadImages/Uploader";
 import { EnglishBackground } from "@/types";
+import RadioButton from "../../elements/radioButton/RadioButton";
 
 const RegisterForm = ({
   categoryType,
@@ -57,10 +58,14 @@ const RegisterForm = ({
     useFormMessages(registerResultState);
   const { passwordStrength } = usePasswordStrength(password);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [nativeStatus, setNativeStatus] = useState<string>("Non-native");
   const [englishBackground, setEnglishBackground] = useState<EnglishBackground>(
     EnglishBackground.NonNative,
   );
+  const englishBackgroundLabels = [
+    "Non Native",
+    "Native A",
+    "Native B",
+  ] as const;
 
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEnglishBackground = Number(e.target.value);
@@ -316,27 +321,33 @@ const RegisterForm = ({
               </div>
 
               {/* English Background Selection (radio button) */}
-              <input
-                type="radio"
-                name="englishBackground"
-                value={EnglishBackground.NonNative}
-                checked={englishBackground === EnglishBackground.NonNative}
-                onChange={handleRadioChange}
-              />
-              <input
-                type="radio"
-                name="englishBackground"
-                value={EnglishBackground.NativeA}
-                checked={englishBackground === EnglishBackground.NativeA}
-                onChange={handleRadioChange}
-              />
-              <input
-                type="radio"
-                name="englishBackground"
-                value={EnglishBackground.NativeB}
-                checked={englishBackground === EnglishBackground.NativeB}
-                onChange={handleRadioChange}
-              />
+              <label className={styles.label}>English Background</label>
+              <div className={styles.radioButtonContainer}>
+                <RadioButton
+                  name="englishBackground"
+                  value={EnglishBackground.NonNative}
+                  checked={englishBackground === EnglishBackground.NonNative}
+                  onChange={handleRadioChange}
+                  label={englishBackgroundLabels[EnglishBackground.NonNative]}
+                  className={styles.englishBackgroundRadio}
+                />
+                <RadioButton
+                  name="englishBackground"
+                  value={EnglishBackground.NativeA}
+                  checked={englishBackground === EnglishBackground.NativeA}
+                  onChange={handleRadioChange}
+                  label={englishBackgroundLabels[EnglishBackground.NativeA]}
+                  className={styles.englishBackgroundRadio}
+                />
+                <RadioButton
+                  name="englishBackground"
+                  value={EnglishBackground.NativeB}
+                  checked={englishBackground === EnglishBackground.NativeB}
+                  onChange={handleRadioChange}
+                  label={englishBackgroundLabels[EnglishBackground.NativeB]}
+                  className={styles.englishBackgroundRadio}
+                />
+              </div>
 
               {/* Image File */}
               <input
@@ -414,27 +425,33 @@ const RegisterForm = ({
             onChange={() => clearErrorMessage("description")}
           />{" "}
           {/* Plan Type (Radio button) */}
-          <input
-            name="englishBackground"
-            type="radio"
-            value={EnglishBackground.NonNative}
-            checked={englishBackground === EnglishBackground.NonNative}
-            onChange={handleRadioChange}
-          />
-          <input
-            name="englishBackground"
-            type="radio"
-            value={EnglishBackground.NativeA}
-            checked={englishBackground === EnglishBackground.NativeA}
-            onChange={handleRadioChange}
-          />
-          <input
-            name="englishBackground"
-            type="radio"
-            value={EnglishBackground.NativeB}
-            checked={englishBackground === EnglishBackground.NativeB}
-            onChange={handleRadioChange}
-          />
+          <label className={styles.label}>English Background</label>
+          <div className={styles.radioButtonContainer}>
+            <RadioButton
+              name="englishBackground"
+              value={EnglishBackground.NonNative}
+              checked={englishBackground === EnglishBackground.NonNative}
+              onChange={handleRadioChange}
+              label={englishBackgroundLabels[EnglishBackground.NonNative]}
+              className={styles.englishBackgroundRadio}
+            />
+            <RadioButton
+              name="englishBackground"
+              value={EnglishBackground.NativeA}
+              checked={englishBackground === EnglishBackground.NativeA}
+              onChange={handleRadioChange}
+              label={englishBackgroundLabels[EnglishBackground.NativeA]}
+              className={styles.englishBackgroundRadio}
+            />
+            <RadioButton
+              name="englishBackground"
+              value={EnglishBackground.NativeB}
+              checked={englishBackground === EnglishBackground.NativeB}
+              onChange={handleRadioChange}
+              label={englishBackgroundLabels[EnglishBackground.NativeB]}
+              className={styles.englishBackgroundRadio}
+            />
+          </div>
         </>
       )}
 

@@ -246,8 +246,24 @@
   border: 1px solid $purple-accent-hover;
 }
 
-// Profile Image
-.profileImage {
+.englishBackgroundRadio {
+  margin: 0.5rem 0.75rem 1rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f2937;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 0.3rem 0.65rem;
+
+  input {
+    accent-color: $blue_primary;
+  }
+}
+
+// Profile Image, English Background (Radio button)
+.profileImage,
+.englishBackground {
   &__text {
     font-size: 16px;
     font-weight: 400;
