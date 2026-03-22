@@ -57,10 +57,12 @@ import {
   days,
   convertToISOString,
   convertToTimezoneDate,
+  getJstDayRange,
 } from "../utils/dateUtils";
 import { EVENT_CONFLICT_ITEMS } from "../utils/commonUtils";
 import type {
   AdminIdParams,
+  ClassListQuery,
   CustomerIdParams,
   InstructorIdParams,
   InstructorPayrollQuery,
@@ -1097,21 +1099,31 @@ export const deleteEventController = async (
 
 // Get class information within designated period
 export const getClassesWithinPeriodController = async (
-  _: Request,
+  req: RequestWith<never, never, ClassListQuery>,
   res: Response,
 ) => {
   try {
-    // Fetch class data within designated period (31days).
-    const designatedPeriod = 31;
-    const designatedPeriodBefore = new Date(
-      Date.now() - designatedPeriod * (24 * 60 * 60 * 1000),
-    );
-    const designatedPeriodAfter = new Date(
-      Date.now() + (designatedPeriod + 1) * (24 * 60 * 60 * 1000),
-    );
-    // Set the designated period to 31 days converted to "T00:00:00.000Z".
-    designatedPeriodBefore.setUTCHours(0, 0, 0, 0);
-    designatedPeriodAfter.setUTCHours(0, 0, 0, 0);
+    const shouldFetchTodayOnly = req.query.today;
+    let designatedPeriodBefore: Date;
+    let designatedPeriodAfter: Date;
+
+    if (shouldFetchTodayOnly) {
+      const { startOfDay, endOfDay } = getJstDayRange(new Date());
+      designatedPeriodBefore = startOfDay;
+      designatedPeriodAfter = endOfDay;
+    } else {
+      // Fetch class data within designated period (31days).
+      const designatedPeriod = 31;
+      designatedPeriodBefore = new Date(
+        Date.now() - designatedPeriod * (24 * 60 * 60 * 1000),
+      );
+      designatedPeriodAfter = new Date(
+        Date.now() + (designatedPeriod + 1) * (24 * 60 * 60 * 1000),
+      );
+      // Set the designated period to 31 days converted to "T00:00:00.000Z".
+      designatedPeriodBefore.setUTCHours(0, 0, 0, 0);
+      designatedPeriodAfter.setUTCHours(0, 0, 0, 0);
+    }
 
     const classes = await getClassesWithinPeriod(
       designatedPeriodBefore,
