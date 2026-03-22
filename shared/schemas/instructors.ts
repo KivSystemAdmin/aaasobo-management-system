@@ -191,7 +191,6 @@ export const AvailableSlotsQuery = z
       .describe("Timezone (currently only Asia/Tokyo is supported)"),
     englishBackground: z
       .string()
-      .transform((val) => parseInt(val, 10))
       .describe("English background requirement for filtering instructors"),
   })
   .refine(

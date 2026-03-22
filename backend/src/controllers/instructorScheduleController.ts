@@ -160,6 +160,7 @@ export const getAvailableSlotsByTypeController = async (
 ) => {
   try {
     const { start, end, timezone, englishBackground } = req.query;
+    const englishBackgroundInt = parseInt(englishBackground, 10);
 
     // Organize the English backgrounds array depending on the index provided in the request
     // Ex1: if the index is 2 (NativeB), the array will be [0, 1, 2] (NativeB, NonNative, NativeA)
@@ -170,7 +171,7 @@ export const getAvailableSlotsByTypeController = async (
       EnglishBackground.NativeA,
       EnglishBackground.NativeB,
     ];
-    const englishBackgroundArray = ordered.slice(0, englishBackground + 1);
+    const englishBackgroundArray = ordered.slice(0, englishBackgroundInt + 1);
     const availableSlots = await getAvailableSlotsByType(
       start,
       end,
