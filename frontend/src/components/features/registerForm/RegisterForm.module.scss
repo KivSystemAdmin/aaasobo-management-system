@@ -57,6 +57,12 @@
   white-space: pre-line;
 }
 
+.radioButtonContainer {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0.4rem 0 0 0;
+}
+
 .required {
   color: $red-alert;
   font-size: 0.8rem;
@@ -93,5 +99,19 @@
 
   input {
     cursor: pointer;
+  }
+}
+
+.englishBackgroundRadio {
+  margin: 0 0.9rem 1rem 0;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.45rem;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  input {
+    accent-color: $blue_primary;
   }
 }

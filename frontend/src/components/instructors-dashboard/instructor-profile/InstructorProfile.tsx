@@ -33,6 +33,7 @@ import Image from "next/image";
 import { confirmAlert } from "@/lib/utils/alertUtils";
 import InstructorFeeRates from "./InstructorFeeRates";
 import { EnglishBackground } from "@/types";
+import RadioButton from "../../elements/radioButton/RadioButton";
 
 // Define the specific string fields that are editable in this component
 type EditableInstructorFields =
@@ -314,8 +315,8 @@ function InstructorProfile({
             {/* English Background Selection (Radio button) */}
             {isEditing ? (
               <>
-                <input
-                  type="radio"
+                <p className={styles.englishBackground}>English Background</p>
+                <RadioButton
                   name="englishBackground"
                   value={EnglishBackground.NonNative}
                   checked={
@@ -323,9 +324,10 @@ function InstructorProfile({
                     EnglishBackground.NonNative
                   }
                   onChange={handleRadioChange}
+                  label={englishBackgroundLabels[EnglishBackground.NonNative]}
+                  className={styles.englishBackgroundRadio}
                 />
-                <input
-                  type="radio"
+                <RadioButton
                   name="englishBackground"
                   value={EnglishBackground.NativeA}
                   checked={
@@ -333,9 +335,10 @@ function InstructorProfile({
                     EnglishBackground.NativeA
                   }
                   onChange={handleRadioChange}
+                  label={englishBackgroundLabels[EnglishBackground.NativeA]}
+                  className={styles.englishBackgroundRadio}
                 />
-                <input
-                  type="radio"
+                <RadioButton
                   name="englishBackground"
                   value={EnglishBackground.NativeB}
                   checked={
@@ -343,6 +346,8 @@ function InstructorProfile({
                     EnglishBackground.NativeB
                   }
                   onChange={handleRadioChange}
+                  label={englishBackgroundLabels[EnglishBackground.NativeB]}
+                  className={styles.englishBackgroundRadio}
                 />
               </>
             ) : null}
