@@ -62,11 +62,7 @@ export function generateTestInstructor() {
     skill: faker.lorem.sentence(),
     meetingId: uniqueDigits,
     passcode: uniquePasscode,
-    englishBackground: faker.helpers.arrayElement([
-      "NonNative",
-      "NativeA",
-      "NativeB",
-    ]),
+    englishBackground: faker.helpers.arrayElement([0, 1, 2]),
   };
 }
 
@@ -117,7 +113,7 @@ function generateTestPlan() {
     name: `${planNameJpn} / ${planNameEng}`,
     weeklyClassTimes: faker.number.int({ min: 1, max: 5 }),
     description: faker.lorem.sentence(),
-    englishBackground: faker.helpers.arrayElement(["NonNative"]),
+    englishBackground: faker.helpers.arrayElement([0, 1, 2]),
   };
 }
 
