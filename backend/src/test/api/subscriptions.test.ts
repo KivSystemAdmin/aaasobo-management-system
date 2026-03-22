@@ -7,7 +7,6 @@ import {
   createSubscription,
   generateAuthCookie,
 } from "../testUtils";
-import { EnglishBackground } from "../../types";
 
 describe("GET /subscriptions/:id", () => {
   it("succeed returning subscription by id (customer auth)", async () => {
@@ -24,26 +23,25 @@ describe("GET /subscriptions/:id", () => {
       .set("Cookie", authCookie)
       .expect(200);
 
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        id: subscription.id,
-        planId: plan.id,
-        customerId: customer.id,
-        selectType: subscription.selectType,
-        startAt: "2024-01-01T00:00:00.000Z",
-        endAt: null,
-        plan: expect.objectContaining({
-          id: plan.id,
-          weeklyClassTimes: plan.weeklyClassTimes,
-          EnglishBackground: plan.englishBackground,
-        }),
-        customer: expect.objectContaining({
-          id: customer.id,
-          email: customer.email,
-          hasSeenWelcome: customer.hasSeenWelcome,
-        }),
-      }),
-    );
+    expect(response.body).toMatchObject({
+      id: subscription.id,
+      planId: plan.id,
+      customerId: customer.id,
+      selectType: subscription.selectType,
+      startAt: "2024-01-01T00:00:00.000Z",
+      endAt: null,
+      plan: {
+        id: plan.id,
+        weeklyClassTimes: plan.weeklyClassTimes,
+      },
+      customer: {
+        id: customer.id,
+        email: customer.email,
+        hasSeenWelcome: customer.hasSeenWelcome,
+      },
+    });
+
+    expect(response.body.plan.englishBackground).toBe(plan.englishBackground);
   });
 
   it("return 400 for invalid subscription id (with auth)", async () => {
