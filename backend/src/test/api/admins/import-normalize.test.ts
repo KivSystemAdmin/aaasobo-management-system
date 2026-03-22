@@ -20,7 +20,7 @@ function rawRow(columns: string[]) {
 function buildMinimalNormalizedFiles() {
   return {
     "plans.csv":
-      "plan_ref,name,description,weekly_class_times,is_native,termination_at\nPL0001,Starter,Starter plan,1,false,\n",
+      "plan_ref,name,description,weekly_class_times,english_background,termination_at\nPL0001,Starter,Starter plan,1,0,\n",
     "customers.csv":
       "customer_ref,name,email,temp_password,prefecture,termination_at,has_seen_welcome\nCU0001,Customer One,customer.one@example.com,TempPass123!,Tokyo,,false\n",
     "children.csv":
@@ -28,7 +28,7 @@ function buildMinimalNormalizedFiles() {
     "subscriptions.csv":
       "subscription_ref,customer_ref,plan_ref,select_type,start_at,end_at\nSU0001,CU0001,PL0001,https://example.com/subscriptions/cu0001-pl0001,2025-01-01T00:00:00+09:00,2025-12-31T00:00:00+09:00\n",
     "instructors.csv":
-      "instructor_ref,name,email,temp_password,class_url,icon,nickname,meeting_id,passcode,birthdate,favorite_food,hobby,life_history,message_for_children,skill,working_time,is_native,termination_at\nIN0001,Instructor One,instructor.one@example.com,TempPass456!,https://import.local/class/in0001,https://import.local/icon/in0001.png,instructor_in0001,11111111111,PASS0001,1990-01-01,Sushi,Reading,Life history,Message,Skill,Weekdays,false,\n",
+      "instructor_ref,name,email,temp_password,class_url,icon,nickname,meeting_id,passcode,birthdate,favorite_food,hobby,life_history,message_for_children,skill,working_time,english_background,termination_at\nIN0001,Instructor One,instructor.one@example.com,TempPass456!,https://import.local/class/in0001,https://import.local/icon/in0001.png,instructor_in0001,11111111111,PASS0001,1990-01-01,Sushi,Reading,Life history,Message,Skill,Weekdays,0,\n",
     "instructor_fees.csv":
       "instructor_ref,currency,effective_from,effective_to,trial_fee,regular_fee,cancel_fee,cancel_without_notice_fee\nIN0001,PHP,2025-01-01,,75,100,50,100\n",
     "instructor_schedules.csv":
@@ -263,7 +263,7 @@ describe("POST /admins/import/normalize", () => {
 
     const plansCsv = await zip.file("plans.csv")!.async("string");
     expect(plansCsv).toBe(
-      "plan_ref,name,description,weekly_class_times,is_native,termination_at",
+      "plan_ref,name,description,weekly_class_times,english_background,termination_at",
     );
   });
 
@@ -357,7 +357,7 @@ describe("POST /admins/import/execute", () => {
     const zip = new JSZip();
     zip.file(
       "plans.csv",
-      "plan_ref,name,description,weekly_class_times,is_native,termination_at\n",
+      "plan_ref,name,description,weekly_class_times,english_background,termination_at\n",
     );
     const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
 

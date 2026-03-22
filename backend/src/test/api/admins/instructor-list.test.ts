@@ -29,8 +29,8 @@ describe("GET /admins/instructor-list", () => {
         Instructor: instructor1.nickname,
         English:
           instructor1.englishBackground === EnglishBackground.NonNative
-            ? "Non native"
-            : EnglishBackground.NativeA
+            ? "Non-Native"
+            : instructor1.englishBackground === EnglishBackground.NativeA
               ? "Native A"
               : "Native B",
         "Full Name": instructor1.name,
@@ -42,8 +42,8 @@ describe("GET /admins/instructor-list", () => {
         Instructor: instructor2.nickname,
         English:
           instructor2.englishBackground === EnglishBackground.NonNative
-            ? "Non native"
-            : EnglishBackground.NativeA
+            ? "Non-Native"
+            : instructor2.englishBackground === EnglishBackground.NativeA
               ? "Native A"
               : "Native B",
         "Full Name": instructor2.name,
@@ -64,7 +64,7 @@ describe("POST /admins/instructor-list/register", () => {
       .set("Cookie", authCookie)
       .send({
         ...instructorData,
-        englishBackground: EnglishBackground.NonNative,
+        englishBackground: String(EnglishBackground.NonNative),
       })
       .expect(201);
 
@@ -81,7 +81,7 @@ describe("POST /admins/instructor-list/register", () => {
       .post("/admins/instructor-list/register")
       .send({
         ...instructorData,
-        englishBackground: EnglishBackground.NonNative,
+        englishBackground: String(EnglishBackground.NonNative),
       })
       .expect(401);
   });
@@ -112,7 +112,7 @@ describe("PATCH /admins/instructor-list/update/:id", () => {
         classURL: instructor.classURL,
         meetingId: instructor.meetingId,
         passcode: instructor.passcode,
-        englishBackground: instructor.englishBackground,
+        englishBackground: String(instructor.englishBackground),
       })
       .expect(200);
 
