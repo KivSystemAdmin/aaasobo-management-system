@@ -24,7 +24,6 @@ function AddSubscription({
   const [plansData, setPlansData] = useState<Plans>([]);
   const [filterColumn, setFilterColumn] = useState<string>("0");
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
-  useState<string>("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectTypeValue, setSelectTypeValue] = useState<string>("");
 
@@ -104,10 +103,20 @@ function AddSubscription({
         <>
           <div className={styles.container}>
             <div className={styles.filterContainer}>
+              <div className={styles.formHeader}>
+                <h3>Register New Subscription</h3>
+                <p>
+                  Enter the plan details and payment link to complete setup.
+                </p>
+              </div>
               <div className={styles.planDate}>
-                <div>
-                  <h4>Plan</h4>
-                  <select value={filterColumn} onChange={handleChange}>
+                <div className={styles.fieldGroup}>
+                  <h4 className={styles.fieldLabel}>Plan</h4>
+                  <select
+                    value={filterColumn}
+                    onChange={handleChange}
+                    className={styles.selectField}
+                  >
                     <option disabled value="0">
                       Select a plan
                     </option>
@@ -121,22 +130,23 @@ function AddSubscription({
                     })}
                   </select>
                 </div>
-                <div className={styles.inputContainer}>
-                  <h4>Subscription Date</h4>
+                <div className={styles.fieldGroup}>
+                  <h4 className={styles.fieldLabel}>Subscription Date</h4>
                   <input
                     type="date"
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
                     style={inputStyle}
+                    className={styles.dateField}
                   />
                 </div>
               </div>
-              <div className={styles.inputContainer}>
-                <h4>SelectType URL</h4>
+              <div className={styles.fieldGroup}>
+                <h4 className={styles.fieldLabel}>SelectType URL</h4>
                 <InputField
                   type="text"
                   name="SelectType url"
-                  placeholder="https://..."
+                  placeholder="https://dashboard.stripe.com/subscriptions/sub_1234567890abcdef"
                   value={selectTypeValue}
                   maxLength={50}
                   onChange={(e) => setSelectTypeValue(e.target.value)}
@@ -144,22 +154,16 @@ function AddSubscription({
                 />
               </div>
               <div className={styles.buttons}>
-                <div>
-                  <h4>&nbsp;</h4>
-                  <ActionButton
-                    onClick={handleRegisterSubscription}
-                    btnText="Subscribe"
-                    className="addBtn"
-                  />
-                </div>
-                <div>
-                  <h4>&nbsp;</h4>
-                  <ActionButton
-                    onClick={handleCancellation}
-                    btnText="Cancel"
-                    className="cancelBtn"
-                  />
-                </div>
+                <ActionButton
+                  onClick={handleRegisterSubscription}
+                  btnText="Subscribe"
+                  className="addBtn"
+                />
+                <ActionButton
+                  onClick={handleCancellation}
+                  btnText="Cancel"
+                  className="cancelBtn"
+                />
               </div>
             </div>
           </div>
