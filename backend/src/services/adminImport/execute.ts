@@ -16,7 +16,7 @@ type RowByFile = {
     | "name"
     | "description"
     | "weekly_class_times"
-    | "is_native"
+    | "english_background"
     | "termination_at",
     string
   >;
@@ -60,7 +60,7 @@ type RowByFile = {
     | "message_for_children"
     | "skill"
     | "working_time"
-    | "is_native"
+    | "english_background"
     | "termination_at",
     string
   >;
@@ -412,6 +412,26 @@ function assertExists(
   }
 }
 
+function assertEnglishBackground(
+  issues: ImportValidationIssue[],
+  file: NormalizedFileName,
+  row: number,
+  column: string,
+  value: string,
+) {
+  if (!value) return;
+
+  if (!["0", "1", "2"].includes(value)) {
+    addIssue(
+      issues,
+      file,
+      row,
+      column,
+      'english_background must be one of "0", "1", or "2"',
+    );
+  }
+}
+
 function parseFileRows<K extends NormalizedFileName>(
   file: K,
   content: string,
@@ -639,12 +659,12 @@ export function validateNormalizedImportFiles(
         "weekly_class_times must be an integer",
       );
     }
-    assertBoolean(
+    assertRequired(
       issues,
       "plans.csv",
       row.rowNumber,
-      "is_native",
-      row.data.is_native,
+      "english_background",
+      row.data.english_background,
     );
     assertDateTime(
       issues,
@@ -805,12 +825,12 @@ export function validateNormalizedImportFiles(
       "instructor_ref",
       row.data.instructor_ref,
     );
-    assertBoolean(
+    assertEnglishBackground(
       issues,
       "instructors.csv",
       row.rowNumber,
-      "is_native",
-      row.data.is_native,
+      "english_background",
+      row.data.english_background,
     );
     assertDate(
       issues,
@@ -1732,7 +1752,7 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       name: row.data.name,
       description: row.data.description,
       weeklyClassTimes: Number(row.data.weekly_class_times),
-      isNative: row.data.is_native === "true",
+      englishBackground: Number(row.data.english_background),
       terminationAt: parseOptionalDateTime(row.data.termination_at),
     })),
     select: {
@@ -1823,7 +1843,7 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       messageForChildren: row.data.message_for_children,
       skill: row.data.skill,
       workingTime: row.data.working_time,
-      isNative: row.data.is_native === "true",
+      englishBackground: Number(row.data.english_background),
       terminationAt: parseOptionalDateTime(row.data.termination_at),
     })),
     select: {

@@ -4,6 +4,7 @@ import { RequestWithParams } from "../middlewares/validationMiddleware";
 import {
   InstructorIdParams,
   ClassIdParams,
+  EnglishBackgroundParams,
   InstructorClassParams,
 } from "../../../shared/schemas/instructors";
 import { validateUserImageUrl } from "../utils/commonUtils";
@@ -14,8 +15,7 @@ import {
   getInstructorProfiles,
   getInstructorsToMask,
   maskInstructors,
-  getNonNativeInstructorProfiles,
-  getNativeInstructorProfiles,
+  getInstructorProfilesByEnglishBackground,
   deletePastInstructors,
 } from "../services/instructorsService";
 import { type RequestWithId } from "../middlewares/parseId.middleware";
@@ -25,6 +25,7 @@ import {
   getClassByClassId,
 } from "../services/classesService";
 import { convertToTimezoneDate } from "../utils/dateUtils";
+import { EnglishBackground } from "../types";
 
 function setErrorResponse(res: Response, error: unknown) {
   return res
@@ -90,7 +91,7 @@ export const getInstructor = async (
         meetingId: instructor.meetingId,
         passcode: instructor.passcode,
         terminationAt: terminationAt,
-        isNative: instructor.isNative,
+        englishBackground: instructor.englishBackground,
       },
     });
   } catch (error) {
@@ -135,7 +136,7 @@ export const getAllInstructorProfilesController = async (
           skill: instructor.skill,
           createdAt: instructor.createdAt,
           terminationAt: terminationAt,
-          isNative: instructor.isNative,
+          englishBackground: instructor.englishBackground,
         };
       }),
     );
@@ -213,41 +214,35 @@ export const getInstructorProfilesController = async (
   }
 };
 
-export const getNativeInstructorProfilesController = async (
-  _: Request,
+export const getInstructorProfilesByEnglishBackgroundController = async (
+  req: RequestWithParams<EnglishBackgroundParams>,
   res: Response,
 ) => {
+  const englishBackgroundIndex = req.params
+    .englishBackground as EnglishBackground;
+
+  // Organize the English backgrounds array depending on the index provided in the request
+  // Ex1: if the index is 2 (NativeB), the array will be [0, 1, 2] (NativeB, NonNative, NativeA)
+  // Ex2: if the index is 1 (NativeA), the array will be [0, 1] (NativeA, NonNative)
+  // Ex3: if the index is 0 (NonNative), the array will be [0] (NonNative)
+  const ordered = [
+    EnglishBackground.NonNative,
+    EnglishBackground.NativeA,
+    EnglishBackground.NativeB,
+  ];
+  const englishBackgroundArray = ordered.slice(0, englishBackgroundIndex + 1);
+
   try {
-    const instructorProfiles = await getNativeInstructorProfiles();
+    const instructorProfiles = await getInstructorProfilesByEnglishBackground(
+      englishBackgroundArray,
+    );
     if (!instructorProfiles) {
       res.sendStatus(404);
     }
 
     res.status(200).json(instructorProfiles);
   } catch (error) {
-    console.error("Error fetching native instructor profiles", {
-      error,
-      context: {
-        time: new Date().toISOString(),
-      },
-    });
-    return setErrorResponse(res, error);
-  }
-};
-
-export const getNonNativeInstructorProfilesController = async (
-  _: Request,
-  res: Response,
-) => {
-  try {
-    const instructorProfiles = await getNonNativeInstructorProfiles();
-    if (!instructorProfiles) {
-      res.sendStatus(404);
-    }
-
-    res.status(200).json(instructorProfiles);
-  } catch (error) {
-    console.error("Error fetching non native instructor profiles", {
+    console.error("Error fetching instructor profiles by English background", {
       error,
       context: {
         time: new Date().toISOString(),

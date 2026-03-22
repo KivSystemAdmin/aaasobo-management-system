@@ -10,6 +10,7 @@ import {
   setTestDataSeed,
 } from "../testUtils";
 import type { PerformanceTestConfig } from "./config";
+import { EnglishBackground } from "../../types";
 
 type Slot = { weekday: number; startTime: string };
 
@@ -180,7 +181,7 @@ export async function initializePerformanceData(
     name: "パフォーマンステスト / Performance Test",
     weeklyClassTimes: 1,
     description: "Seeded plan for performance test inspection",
-    isNative: false,
+    englishBackground: EnglishBackground.NonNative,
   });
 
   const instructors = await Promise.all(

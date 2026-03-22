@@ -140,7 +140,7 @@ exports.Prisma.InstructorScalarFieldEnum = {
   workingTime: 'workingTime',
   terminationAt: 'terminationAt',
   updatedAt: 'updatedAt',
-  isNative: 'isNative'
+  englishBackground: 'englishBackground'
 };
 
 exports.Prisma.CustomerScalarFieldEnum = {
@@ -185,7 +185,7 @@ exports.Prisma.PlanScalarFieldEnum = {
   createdAt: 'createdAt',
   terminationAt: 'terminationAt',
   updatedAt: 'updatedAt',
-  isNative: 'isNative'
+  englishBackground: 'englishBackground'
 };
 
 exports.Prisma.SubscriptionScalarFieldEnum = {

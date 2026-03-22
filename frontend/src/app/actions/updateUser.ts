@@ -88,7 +88,7 @@ export async function updateInstructorAction(
     const meetingId = formData.get("meetingId");
     const passcode = formData.get("passcode");
     const icon = formData.get("icon") as File;
-    const isNative = String(formData.get("nativeStatus")) === "Native";
+    const englishBackground = Number(formData.get("englishBackground"));
     // Hidden input tag fields
     const id = Number(formData.get("id"));
     const confirmResult = formData.get("confirmResult");
@@ -108,6 +108,7 @@ export async function updateInstructorAction(
       classURL,
       meetingId,
       passcode,
+      englishBackground,
     });
 
     if (!parsedForm1.success) {
@@ -133,7 +134,10 @@ export async function updateInstructorAction(
     userData.append("classURL", parsedForm1.data.classURL);
     userData.append("meetingId", parsedForm1.data.meetingId);
     userData.append("passcode", parsedForm1.data.passcode);
-    userData.append("isNative", isNative ? "true" : "false");
+    userData.append(
+      "englishBackground",
+      parsedForm1.data.englishBackground.toString(),
+    );
 
     // Append the icon file if it exists
     if (icon.name && icon.size > 0) {

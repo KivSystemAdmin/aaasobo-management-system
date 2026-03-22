@@ -14,13 +14,20 @@ export const ClassIdParams = z.object({
     .transform((val) => parseInt(val, 10)),
 });
 
+export const EnglishBackgroundParams = z.object({
+  englishBackground: z
+    .string()
+    .regex(/^\d+$/, "English background must be a valid number")
+    .transform((val) => parseInt(val, 10)),
+});
+
 // Instructor profile schema for public profiles endpoint
 export const InstructorProfile = z.object({
   id: z.number().int().positive().describe("Instructor ID"),
   name: z.string().min(1).describe("Instructor full name"),
   nickname: z.string().min(1).describe("Instructor nickname"),
   icon: z.string().describe("Instructor profile icon URL from database"),
-  isNative: z.boolean().describe("If it's native or not"),
+  englishBackground: z.number().describe("English background requirement"),
 });
 
 export const InstructorProfilesResponse = z
@@ -49,7 +56,7 @@ export const DetailedInstructorProfile = z.object({
     .datetime()
     .nullable()
     .describe("Termination timestamp (ISO string)"),
-  isNative: z.boolean().describe("If it's native or not"),
+  englishBackground: z.number().describe("English background requirement"),
 });
 
 export const AllInstructorProfilesResponse = z
@@ -80,7 +87,7 @@ export const CompleteInstructor = z.object({
   meetingId: z.string().nullable().describe("Meeting ID"),
   passcode: z.string().nullable().describe("Meeting passcode"),
   terminationAt: z.string().nullable().describe("Termination timestamp (JST)"),
-  isNative: z.boolean().describe("If it's native or not"),
+  englishBackground: z.number().describe("English background requirement"),
 });
 
 export const InstructorResponse = z
@@ -182,7 +189,9 @@ export const AvailableSlotsQuery = z
     timezone: z
       .literal("Asia/Tokyo")
       .describe("Timezone (currently only Asia/Tokyo is supported)"),
-    isNative: z.string("true") || z.string("false"),
+    englishBackground: z
+      .string()
+      .describe("English background requirement for filtering instructors"),
   })
   .refine(
     (data) => new Date(data.start) < new Date(data.end),
@@ -354,6 +363,7 @@ export const PostTerminationScheduleResponse = z.object({
 // Type exports
 export type InstructorIdParams = z.infer<typeof InstructorIdParams>;
 export type ClassIdParams = z.infer<typeof ClassIdParams>;
+export type EnglishBackgroundParams = z.infer<typeof EnglishBackgroundParams>;
 export type InstructorProfile = z.infer<typeof InstructorProfile>;
 export type InstructorProfilesResponse = z.infer<
   typeof InstructorProfilesResponse

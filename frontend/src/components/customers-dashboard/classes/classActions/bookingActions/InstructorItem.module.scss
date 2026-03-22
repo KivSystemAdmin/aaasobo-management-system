@@ -132,11 +132,20 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  border: 3px solid $green-success-hover;
   background-color: $background-light;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.non-native {
+  border: 3px solid $green-success;
+}
+.native-a {
+  border: 4px solid $blue_primary;
+}
+.native-b {
+  border: 4px solid $purple-accent-hover;
 }
 
 .instructorName {

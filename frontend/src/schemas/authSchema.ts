@@ -11,6 +11,7 @@ import {
   PRIVACY_POLICY_AGREEMENT_MESSAGE,
   REQUIRED_MESSAGE,
 } from "../lib/messages/authSchemas";
+import { en } from "zod/v4/locales";
 
 const currentYear = new Date().getFullYear();
 const currentMonthIndex = new Date().getMonth();
@@ -73,6 +74,7 @@ export const instructorRegisterSchema = z
       ),
     meetingId: z.string().min(1, "Meeting ID is required."),
     passcode: z.string().min(1, "Passcode is required."),
+    englishBackground: z.number().describe("English background requirement"),
     userType: z.enum(["admin", "customer", "instructor"], {
       message: "Invalid user type.",
     }),
@@ -140,7 +142,7 @@ export const planRegisterSchema = z.object({
     }),
   weeklyClassTimes: z.number(),
   description: z.string().min(1, "Description is required."),
-  isNative: z.string("on").nullable(),
+  englishBackground: z.number().describe("English background requirement"),
 });
 
 export const eventRegisterSchema = z.object({
@@ -189,7 +191,7 @@ export const planUpdateSchema = z.object({
       message: "Plan Name (Japanese) must contain Japanese characters.",
     }),
   description: z.string().min(1, "Description is required."),
-  isNative: z.string("on").nullable(),
+  englishBackground: z.number().describe("English background requirement"),
 });
 
 export const scheduleUpdateSchema = z.object({
@@ -216,6 +218,7 @@ export const instructorUpdateSchema = z.object({
     }),
   meetingId: z.string().min(1, "Meeting ID is required."),
   passcode: z.string().min(1, "Passcode is required."),
+  englishBackground: z.number().describe("English background requirement"),
 });
 
 export const instructorIconUpdateSchema = z.object({

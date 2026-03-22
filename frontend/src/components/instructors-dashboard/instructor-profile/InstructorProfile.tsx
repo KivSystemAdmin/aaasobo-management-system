@@ -32,11 +32,12 @@ import { defaultUserImageUrl } from "@/lib/data/data";
 import Image from "next/image";
 import { confirmAlert } from "@/lib/utils/alertUtils";
 import InstructorFeeRates from "./InstructorFeeRates";
+import { EnglishBackground } from "@/types";
 
 // Define the specific string fields that are editable in this component
 type EditableInstructorFields =
   | "name"
-  | "isNative"
+  | "englishBackground"
   | "nickname"
   | "birthdate"
   | "workingTime"
@@ -73,7 +74,6 @@ function InstructorProfile({
     }
     const newMessages: Record<string, string> = {};
     if (result.name) newMessages.name = result.name;
-    if (result.isNative) newMessages.isNative = result.isNative;
     if (result.nickname) newMessages.nickname = result.nickname;
     if (result.email) newMessages.email = result.email;
     if (result.classURL) newMessages.classURL = result.classURL;
@@ -105,11 +105,16 @@ function InstructorProfile({
   >(typeof instructor !== "string" ? instructor : null);
   const [isEditing, setIsEditing] = useState(false);
   const [userStatus, setUserStatus] = useState<string>("Active");
-  const [nativeStatus, setNativeStatus] = useState<string>("Non-native");
   const [leavingDate, setLeavingDate] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { language } = useLanguage();
   const formRef = useRef<HTMLFormElement>(null);
+  const englishBackgroundLabels = [
+    "Non Native",
+    "Native A",
+    "Native B",
+  ] as const;
+  const englishBackgroundClassNames = ["", "nativeA", "nativeB"] as const;
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -132,6 +137,16 @@ function InstructorProfile({
       setLatestInstructor(previousInstructor);
       setIsEditing(false);
       clearErrorMessage("all");
+    }
+  };
+
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (latestInstructor) {
+      const newEnglishBackground = Number(e.target.value);
+      setLatestInstructor({
+        ...latestInstructor,
+        englishBackground: newEnglishBackground,
+      });
     }
   };
 
@@ -259,9 +274,24 @@ function InstructorProfile({
                 <p className={styles.instructorName__text}>
                   {language === "en" ? "Name" : "名前"}
                 </p>
-                {!isEditing && latestInstructor.isNative ? (
-                  <div className={styles.instructorName__isNativeFlag}>
-                    Native
+                {!isEditing &&
+                latestInstructor.englishBackground !==
+                  EnglishBackground.NonNative ? (
+                  <div
+                    className={`${styles.instructorName__nativeFlag} 
+                      ${
+                        styles[
+                          englishBackgroundClassNames[
+                            latestInstructor.englishBackground
+                          ]
+                        ]
+                      }`}
+                  >
+                    {
+                      englishBackgroundLabels[
+                        latestInstructor.englishBackground
+                      ]
+                    }
                   </div>
                 ) : null}
               </div>
@@ -281,19 +311,41 @@ function InstructorProfile({
               )}
             </div>
 
-            {/* Native Type Switcher */}
-            <StatusSwitcher
-              isEditing={isEditing}
-              statusOptions={["Non-native", "Native"]}
-              currentStatus={
-                latestInstructor.isNative ? "Native" : "Non-native"
-              }
-              width="220px"
-              title="Non-native / Native"
-              onStatusChange={(newStatus) => {
-                setNativeStatus(newStatus);
-              }}
-            />
+            {/* English Background Selection (Radio button) */}
+            {isEditing ? (
+              <>
+                <input
+                  type="radio"
+                  name="englishBackground"
+                  value={EnglishBackground.NonNative}
+                  checked={
+                    latestInstructor.englishBackground ===
+                    EnglishBackground.NonNative
+                  }
+                  onChange={handleRadioChange}
+                />
+                <input
+                  type="radio"
+                  name="englishBackground"
+                  value={EnglishBackground.NativeA}
+                  checked={
+                    latestInstructor.englishBackground ===
+                    EnglishBackground.NativeA
+                  }
+                  onChange={handleRadioChange}
+                />
+                <input
+                  type="radio"
+                  name="englishBackground"
+                  value={EnglishBackground.NativeB}
+                  checked={
+                    latestInstructor.englishBackground ===
+                    EnglishBackground.NativeB
+                  }
+                  onChange={handleRadioChange}
+                />
+              </>
+            ) : null}
 
             {/* Nickname Hobby, Message For Children, Skill */}
             <div className={styles.insideContainer}>
@@ -637,7 +689,6 @@ function InstructorProfile({
               name="icon"
               value={latestInstructor.icon.url}
             />
-            <input type="hidden" name="nativeStatus" value={nativeStatus} />
 
             {/* Action buttons for only admin */}
             {userSessionType === "admin" &&

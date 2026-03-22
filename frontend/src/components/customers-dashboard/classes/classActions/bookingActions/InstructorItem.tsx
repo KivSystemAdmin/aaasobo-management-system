@@ -19,6 +19,9 @@ export default function InstructorItem({
   isAvailable,
 }: InstructorItemProps) {
   const [imageError, setImageError] = useState(false);
+  const englishBackgroundClass = ["non-native", "native-a", "native-b"][
+    instructor.englishBackground
+  ];
 
   const handleCardClick = () => {
     if (isAvailable) {
@@ -47,7 +50,11 @@ export default function InstructorItem({
         <div className={styles.instructorItem__instructor}>
           <div className={styles.instructorPhoto}>
             {imageError ? (
-              <div className={styles.placeholderImage}>
+              <div
+                className={
+                  styles.placeholderImage + " " + styles[englishBackgroundClass]
+                }
+              >
                 <svg
                   width="50"
                   height="50"

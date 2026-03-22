@@ -16,6 +16,10 @@ export default function RebookableInstructorItem({
   language,
   onSelect,
 }: RebookableInstructorItemProps) {
+  const englishBackgroundClass = ["non-native", "native-a", "native-b"][
+    instructor.englishBackground
+  ];
+
   return (
     <div
       className={`${styles.instructorItem} ${
@@ -23,7 +27,7 @@ export default function RebookableInstructorItem({
       }`}
     >
       <ClassInstructor
-        classStatus={"freeTrial"}
+        classStatus={englishBackgroundClass}
         instructorIcon={instructor.icon}
         instructorNickname={instructor.nickname}
         width={90}

@@ -5,6 +5,7 @@ import Modal from "../../elements/modal/Modal";
 import { editRecurringClass } from "@/lib/api/recurringClassesApi";
 import InstructorSelection from "../classes/classActions/bookingActions/InstructorSelection";
 import InstructorSchedule from "./InstructorSchedule";
+import { EnglishBackground } from "@/types";
 import {
   CalendarIcon,
   UserGroupIcon,
@@ -80,7 +81,9 @@ export default function EditRegularClassModal({
         classURL: recurringClass.instructor.classURL || "",
         meetingId: recurringClass.instructor.meetingId || "",
         passcode: recurringClass.instructor.passcode || "",
-        isNative: recurringClass.instructor.isNative || false,
+        englishBackground:
+          recurringClass.instructor.englishBackground ||
+          EnglishBackground.NonNative,
       };
       setSelectedInstructor(currentInstructor);
     }
@@ -157,7 +160,9 @@ export default function EditRegularClassModal({
       classURL: recurringClass.instructor!.classURL || "",
       meetingId: recurringClass.instructor!.meetingId || "",
       passcode: recurringClass.instructor!.passcode || "",
-      isNative: recurringClass.instructor!.isNative || false,
+      englishBackground:
+        recurringClass.instructor!.englishBackground ||
+        EnglishBackground.NonNative,
     };
 
     let finalWeekday = selectedWeekday;

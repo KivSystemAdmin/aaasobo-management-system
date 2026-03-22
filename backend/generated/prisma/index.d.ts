@@ -2895,10 +2895,12 @@ export namespace Prisma {
 
   export type InstructorAvgAggregateOutputType = {
     id: number | null
+    englishBackground: number | null
   }
 
   export type InstructorSumAggregateOutputType = {
     id: number | null
+    englishBackground: number | null
   }
 
   export type InstructorMinAggregateOutputType = {
@@ -2921,7 +2923,7 @@ export namespace Prisma {
     workingTime: string | null
     terminationAt: Date | null
     updatedAt: Date | null
-    isNative: boolean | null
+    englishBackground: number | null
   }
 
   export type InstructorMaxAggregateOutputType = {
@@ -2944,7 +2946,7 @@ export namespace Prisma {
     workingTime: string | null
     terminationAt: Date | null
     updatedAt: Date | null
-    isNative: boolean | null
+    englishBackground: number | null
   }
 
   export type InstructorCountAggregateOutputType = {
@@ -2967,17 +2969,19 @@ export namespace Prisma {
     workingTime: number
     terminationAt: number
     updatedAt: number
-    isNative: number
+    englishBackground: number
     _all: number
   }
 
 
   export type InstructorAvgAggregateInputType = {
     id?: true
+    englishBackground?: true
   }
 
   export type InstructorSumAggregateInputType = {
     id?: true
+    englishBackground?: true
   }
 
   export type InstructorMinAggregateInputType = {
@@ -3000,7 +3004,7 @@ export namespace Prisma {
     workingTime?: true
     terminationAt?: true
     updatedAt?: true
-    isNative?: true
+    englishBackground?: true
   }
 
   export type InstructorMaxAggregateInputType = {
@@ -3023,7 +3027,7 @@ export namespace Prisma {
     workingTime?: true
     terminationAt?: true
     updatedAt?: true
-    isNative?: true
+    englishBackground?: true
   }
 
   export type InstructorCountAggregateInputType = {
@@ -3046,7 +3050,7 @@ export namespace Prisma {
     workingTime?: true
     terminationAt?: true
     updatedAt?: true
-    isNative?: true
+    englishBackground?: true
     _all?: true
   }
 
@@ -3156,7 +3160,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt: Date | null
     updatedAt: Date
-    isNative: boolean
+    englishBackground: number
     _count: InstructorCountAggregateOutputType | null
     _avg: InstructorAvgAggregateOutputType | null
     _sum: InstructorSumAggregateOutputType | null
@@ -3198,7 +3202,7 @@ export namespace Prisma {
     workingTime?: boolean
     terminationAt?: boolean
     updatedAt?: boolean
-    isNative?: boolean
+    englishBackground?: boolean
     classes?: boolean | Instructor$classesArgs<ExtArgs>
     instructorAbsences?: boolean | Instructor$instructorAbsencesArgs<ExtArgs>
     instructorFees?: boolean | Instructor$instructorFeesArgs<ExtArgs>
@@ -3227,7 +3231,7 @@ export namespace Prisma {
     workingTime?: boolean
     terminationAt?: boolean
     updatedAt?: boolean
-    isNative?: boolean
+    englishBackground?: boolean
   }, ExtArgs["result"]["instructor"]>
 
   export type InstructorSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -3250,7 +3254,7 @@ export namespace Prisma {
     workingTime?: boolean
     terminationAt?: boolean
     updatedAt?: boolean
-    isNative?: boolean
+    englishBackground?: boolean
   }, ExtArgs["result"]["instructor"]>
 
   export type InstructorSelectScalar = {
@@ -3273,10 +3277,10 @@ export namespace Prisma {
     workingTime?: boolean
     terminationAt?: boolean
     updatedAt?: boolean
-    isNative?: boolean
+    englishBackground?: boolean
   }
 
-  export type InstructorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "classURL" | "icon" | "nickname" | "meetingId" | "passcode" | "createdAt" | "birthdate" | "favoriteFood" | "hobby" | "lifeHistory" | "messageForChildren" | "skill" | "workingTime" | "terminationAt" | "updatedAt" | "isNative", ExtArgs["result"]["instructor"]>
+  export type InstructorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "classURL" | "icon" | "nickname" | "meetingId" | "passcode" | "createdAt" | "birthdate" | "favoriteFood" | "hobby" | "lifeHistory" | "messageForChildren" | "skill" | "workingTime" | "terminationAt" | "updatedAt" | "englishBackground", ExtArgs["result"]["instructor"]>
   export type InstructorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     classes?: boolean | Instructor$classesArgs<ExtArgs>
     instructorAbsences?: boolean | Instructor$instructorAbsencesArgs<ExtArgs>
@@ -3317,7 +3321,7 @@ export namespace Prisma {
       workingTime: string
       terminationAt: Date | null
       updatedAt: Date
-      isNative: boolean
+      englishBackground: number
     }, ExtArgs["result"]["instructor"]>
     composites: {}
   }
@@ -3765,7 +3769,7 @@ export namespace Prisma {
     readonly workingTime: FieldRef<"Instructor", 'String'>
     readonly terminationAt: FieldRef<"Instructor", 'DateTime'>
     readonly updatedAt: FieldRef<"Instructor", 'DateTime'>
-    readonly isNative: FieldRef<"Instructor", 'Boolean'>
+    readonly englishBackground: FieldRef<"Instructor", 'Int'>
   }
     
 
@@ -7920,11 +7924,13 @@ export namespace Prisma {
   export type PlanAvgAggregateOutputType = {
     id: number | null
     weeklyClassTimes: number | null
+    englishBackground: number | null
   }
 
   export type PlanSumAggregateOutputType = {
     id: number | null
     weeklyClassTimes: number | null
+    englishBackground: number | null
   }
 
   export type PlanMinAggregateOutputType = {
@@ -7935,7 +7941,7 @@ export namespace Prisma {
     createdAt: Date | null
     terminationAt: Date | null
     updatedAt: Date | null
-    isNative: boolean | null
+    englishBackground: number | null
   }
 
   export type PlanMaxAggregateOutputType = {
@@ -7946,7 +7952,7 @@ export namespace Prisma {
     createdAt: Date | null
     terminationAt: Date | null
     updatedAt: Date | null
-    isNative: boolean | null
+    englishBackground: number | null
   }
 
   export type PlanCountAggregateOutputType = {
@@ -7957,7 +7963,7 @@ export namespace Prisma {
     createdAt: number
     terminationAt: number
     updatedAt: number
-    isNative: number
+    englishBackground: number
     _all: number
   }
 
@@ -7965,11 +7971,13 @@ export namespace Prisma {
   export type PlanAvgAggregateInputType = {
     id?: true
     weeklyClassTimes?: true
+    englishBackground?: true
   }
 
   export type PlanSumAggregateInputType = {
     id?: true
     weeklyClassTimes?: true
+    englishBackground?: true
   }
 
   export type PlanMinAggregateInputType = {
@@ -7980,7 +7988,7 @@ export namespace Prisma {
     createdAt?: true
     terminationAt?: true
     updatedAt?: true
-    isNative?: true
+    englishBackground?: true
   }
 
   export type PlanMaxAggregateInputType = {
@@ -7991,7 +7999,7 @@ export namespace Prisma {
     createdAt?: true
     terminationAt?: true
     updatedAt?: true
-    isNative?: true
+    englishBackground?: true
   }
 
   export type PlanCountAggregateInputType = {
@@ -8002,7 +8010,7 @@ export namespace Prisma {
     createdAt?: true
     terminationAt?: true
     updatedAt?: true
-    isNative?: true
+    englishBackground?: true
     _all?: true
   }
 
@@ -8100,7 +8108,7 @@ export namespace Prisma {
     createdAt: Date
     terminationAt: Date | null
     updatedAt: Date
-    isNative: boolean
+    englishBackground: number
     _count: PlanCountAggregateOutputType | null
     _avg: PlanAvgAggregateOutputType | null
     _sum: PlanSumAggregateOutputType | null
@@ -8130,7 +8138,7 @@ export namespace Prisma {
     createdAt?: boolean
     terminationAt?: boolean
     updatedAt?: boolean
-    isNative?: boolean
+    englishBackground?: boolean
     subscription?: boolean | Plan$subscriptionArgs<ExtArgs>
     _count?: boolean | PlanCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["plan"]>
@@ -8143,7 +8151,7 @@ export namespace Prisma {
     createdAt?: boolean
     terminationAt?: boolean
     updatedAt?: boolean
-    isNative?: boolean
+    englishBackground?: boolean
   }, ExtArgs["result"]["plan"]>
 
   export type PlanSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -8154,7 +8162,7 @@ export namespace Prisma {
     createdAt?: boolean
     terminationAt?: boolean
     updatedAt?: boolean
-    isNative?: boolean
+    englishBackground?: boolean
   }, ExtArgs["result"]["plan"]>
 
   export type PlanSelectScalar = {
@@ -8165,10 +8173,10 @@ export namespace Prisma {
     createdAt?: boolean
     terminationAt?: boolean
     updatedAt?: boolean
-    isNative?: boolean
+    englishBackground?: boolean
   }
 
-  export type PlanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "weeklyClassTimes" | "createdAt" | "terminationAt" | "updatedAt" | "isNative", ExtArgs["result"]["plan"]>
+  export type PlanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "weeklyClassTimes" | "createdAt" | "terminationAt" | "updatedAt" | "englishBackground", ExtArgs["result"]["plan"]>
   export type PlanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     subscription?: boolean | Plan$subscriptionArgs<ExtArgs>
     _count?: boolean | PlanCountOutputTypeDefaultArgs<ExtArgs>
@@ -8189,7 +8197,7 @@ export namespace Prisma {
       createdAt: Date
       terminationAt: Date | null
       updatedAt: Date
-      isNative: boolean
+      englishBackground: number
     }, ExtArgs["result"]["plan"]>
     composites: {}
   }
@@ -8621,7 +8629,7 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"Plan", 'DateTime'>
     readonly terminationAt: FieldRef<"Plan", 'DateTime'>
     readonly updatedAt: FieldRef<"Plan", 'DateTime'>
-    readonly isNative: FieldRef<"Plan", 'Boolean'>
+    readonly englishBackground: FieldRef<"Plan", 'Int'>
   }
     
 
@@ -24297,7 +24305,7 @@ export namespace Prisma {
     workingTime: 'workingTime',
     terminationAt: 'terminationAt',
     updatedAt: 'updatedAt',
-    isNative: 'isNative'
+    englishBackground: 'englishBackground'
   };
 
   export type InstructorScalarFieldEnum = (typeof InstructorScalarFieldEnum)[keyof typeof InstructorScalarFieldEnum]
@@ -24354,7 +24362,7 @@ export namespace Prisma {
     createdAt: 'createdAt',
     terminationAt: 'terminationAt',
     updatedAt: 'updatedAt',
-    isNative: 'isNative'
+    englishBackground: 'englishBackground'
   };
 
   export type PlanScalarFieldEnum = (typeof PlanScalarFieldEnum)[keyof typeof PlanScalarFieldEnum]
@@ -24639,7 +24647,7 @@ export namespace Prisma {
     workingTime?: StringFilter<"Instructor"> | string
     terminationAt?: DateTimeNullableFilter<"Instructor"> | Date | string | null
     updatedAt?: DateTimeFilter<"Instructor"> | Date | string
-    isNative?: BoolFilter<"Instructor"> | boolean
+    englishBackground?: IntFilter<"Instructor"> | number
     classes?: ClassListRelationFilter
     instructorAbsences?: InstructorAbsenceListRelationFilter
     instructorFees?: InstructorFeeListRelationFilter
@@ -24667,7 +24675,7 @@ export namespace Prisma {
     workingTime?: SortOrder
     terminationAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
-    isNative?: SortOrder
+    englishBackground?: SortOrder
     classes?: ClassOrderByRelationAggregateInput
     instructorAbsences?: InstructorAbsenceOrderByRelationAggregateInput
     instructorFees?: InstructorFeeOrderByRelationAggregateInput
@@ -24698,7 +24706,7 @@ export namespace Prisma {
     workingTime?: StringFilter<"Instructor"> | string
     terminationAt?: DateTimeNullableFilter<"Instructor"> | Date | string | null
     updatedAt?: DateTimeFilter<"Instructor"> | Date | string
-    isNative?: BoolFilter<"Instructor"> | boolean
+    englishBackground?: IntFilter<"Instructor"> | number
     classes?: ClassListRelationFilter
     instructorAbsences?: InstructorAbsenceListRelationFilter
     instructorFees?: InstructorFeeListRelationFilter
@@ -24726,7 +24734,7 @@ export namespace Prisma {
     workingTime?: SortOrder
     terminationAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
-    isNative?: SortOrder
+    englishBackground?: SortOrder
     _count?: InstructorCountOrderByAggregateInput
     _avg?: InstructorAvgOrderByAggregateInput
     _max?: InstructorMaxOrderByAggregateInput
@@ -24757,7 +24765,7 @@ export namespace Prisma {
     workingTime?: StringWithAggregatesFilter<"Instructor"> | string
     terminationAt?: DateTimeNullableWithAggregatesFilter<"Instructor"> | Date | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"Instructor"> | Date | string
-    isNative?: BoolWithAggregatesFilter<"Instructor"> | boolean
+    englishBackground?: IntWithAggregatesFilter<"Instructor"> | number
   }
 
   export type CustomerWhereInput = {
@@ -25014,7 +25022,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Plan"> | Date | string
     terminationAt?: DateTimeNullableFilter<"Plan"> | Date | string | null
     updatedAt?: DateTimeFilter<"Plan"> | Date | string
-    isNative?: BoolFilter<"Plan"> | boolean
+    englishBackground?: IntFilter<"Plan"> | number
     subscription?: SubscriptionListRelationFilter
   }
 
@@ -25026,7 +25034,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     terminationAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
-    isNative?: SortOrder
+    englishBackground?: SortOrder
     subscription?: SubscriptionOrderByRelationAggregateInput
   }
 
@@ -25041,7 +25049,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Plan"> | Date | string
     terminationAt?: DateTimeNullableFilter<"Plan"> | Date | string | null
     updatedAt?: DateTimeFilter<"Plan"> | Date | string
-    isNative?: BoolFilter<"Plan"> | boolean
+    englishBackground?: IntFilter<"Plan"> | number
     subscription?: SubscriptionListRelationFilter
   }, "id">
 
@@ -25053,7 +25061,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     terminationAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
-    isNative?: SortOrder
+    englishBackground?: SortOrder
     _count?: PlanCountOrderByAggregateInput
     _avg?: PlanAvgOrderByAggregateInput
     _max?: PlanMaxOrderByAggregateInput
@@ -25072,7 +25080,7 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Plan"> | Date | string
     terminationAt?: DateTimeNullableWithAggregatesFilter<"Plan"> | Date | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"Plan"> | Date | string
-    isNative?: BoolWithAggregatesFilter<"Plan"> | boolean
+    englishBackground?: IntWithAggregatesFilter<"Plan"> | number
   }
 
   export type SubscriptionWhereInput = {
@@ -25877,7 +25885,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     classes?: ClassCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
@@ -25905,7 +25913,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     classes?: ClassUncheckedCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
@@ -25932,7 +25940,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     classes?: ClassUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
@@ -25960,7 +25968,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     classes?: ClassUncheckedUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
@@ -25988,7 +25996,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
   }
 
   export type InstructorUpdateManyMutationInput = {
@@ -26010,7 +26018,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
   }
 
   export type InstructorUncheckedUpdateManyInput = {
@@ -26033,7 +26041,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
   }
 
   export type CustomerCreateInput = {
@@ -26286,7 +26294,7 @@ export namespace Prisma {
     createdAt?: Date | string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     subscription?: SubscriptionCreateNestedManyWithoutPlanInput
   }
 
@@ -26298,7 +26306,7 @@ export namespace Prisma {
     createdAt?: Date | string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     subscription?: SubscriptionUncheckedCreateNestedManyWithoutPlanInput
   }
 
@@ -26309,7 +26317,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     subscription?: SubscriptionUpdateManyWithoutPlanNestedInput
   }
 
@@ -26321,7 +26329,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     subscription?: SubscriptionUncheckedUpdateManyWithoutPlanNestedInput
   }
 
@@ -26333,7 +26341,7 @@ export namespace Prisma {
     createdAt?: Date | string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
   }
 
   export type PlanUpdateManyMutationInput = {
@@ -26343,7 +26351,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
   }
 
   export type PlanUncheckedUpdateManyInput = {
@@ -26354,7 +26362,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
   }
 
   export type SubscriptionCreateInput = {
@@ -27134,11 +27142,6 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type ClassListRelationFilter = {
     every?: ClassWhereInput
     some?: ClassWhereInput
@@ -27214,11 +27217,12 @@ export namespace Prisma {
     workingTime?: SortOrder
     terminationAt?: SortOrder
     updatedAt?: SortOrder
-    isNative?: SortOrder
+    englishBackground?: SortOrder
   }
 
   export type InstructorAvgOrderByAggregateInput = {
     id?: SortOrder
+    englishBackground?: SortOrder
   }
 
   export type InstructorMaxOrderByAggregateInput = {
@@ -27241,7 +27245,7 @@ export namespace Prisma {
     workingTime?: SortOrder
     terminationAt?: SortOrder
     updatedAt?: SortOrder
-    isNative?: SortOrder
+    englishBackground?: SortOrder
   }
 
   export type InstructorMinOrderByAggregateInput = {
@@ -27264,11 +27268,12 @@ export namespace Prisma {
     workingTime?: SortOrder
     terminationAt?: SortOrder
     updatedAt?: SortOrder
-    isNative?: SortOrder
+    englishBackground?: SortOrder
   }
 
   export type InstructorSumOrderByAggregateInput = {
     id?: SortOrder
+    englishBackground?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -27333,12 +27338,9 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+  export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type ChildListRelationFilter = {
@@ -27406,6 +27408,14 @@ export namespace Prisma {
 
   export type CustomerSumOrderByAggregateInput = {
     id?: SortOrder
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type IntNullableFilter<$PrismaModel = never> = {
@@ -27594,12 +27604,13 @@ export namespace Prisma {
     createdAt?: SortOrder
     terminationAt?: SortOrder
     updatedAt?: SortOrder
-    isNative?: SortOrder
+    englishBackground?: SortOrder
   }
 
   export type PlanAvgOrderByAggregateInput = {
     id?: SortOrder
     weeklyClassTimes?: SortOrder
+    englishBackground?: SortOrder
   }
 
   export type PlanMaxOrderByAggregateInput = {
@@ -27610,7 +27621,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     terminationAt?: SortOrder
     updatedAt?: SortOrder
-    isNative?: SortOrder
+    englishBackground?: SortOrder
   }
 
   export type PlanMinOrderByAggregateInput = {
@@ -27621,12 +27632,13 @@ export namespace Prisma {
     createdAt?: SortOrder
     terminationAt?: SortOrder
     updatedAt?: SortOrder
-    isNative?: SortOrder
+    englishBackground?: SortOrder
   }
 
   export type PlanSumOrderByAggregateInput = {
     id?: SortOrder
     weeklyClassTimes?: SortOrder
+    englishBackground?: SortOrder
   }
 
   export type PlanScalarRelationFilter = {
@@ -28269,8 +28281,12 @@ export namespace Prisma {
     set?: Date | string | null
   }
 
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type ClassUpdateManyWithoutInstructorNestedInput = {
@@ -28341,14 +28357,6 @@ export namespace Prisma {
     update?: RecurringClassUpdateWithWhereUniqueWithoutInstructorInput | RecurringClassUpdateWithWhereUniqueWithoutInstructorInput[]
     updateMany?: RecurringClassUpdateManyWithWhereWithoutInstructorInput | RecurringClassUpdateManyWithWhereWithoutInstructorInput[]
     deleteMany?: RecurringClassScalarWhereInput | RecurringClassScalarWhereInput[]
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type ClassUncheckedUpdateManyWithoutInstructorNestedInput = {
@@ -28461,6 +28469,10 @@ export namespace Prisma {
     connectOrCreate?: SubscriptionCreateOrConnectWithoutCustomerInput | SubscriptionCreateOrConnectWithoutCustomerInput[]
     createMany?: SubscriptionCreateManyCustomerInputEnvelope
     connect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type ChildUpdateManyWithoutCustomerNestedInput = {
@@ -29292,11 +29304,6 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -29378,6 +29385,11 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -29976,7 +29988,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
@@ -30003,7 +30015,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
@@ -30149,7 +30161,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
@@ -30176,7 +30188,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
@@ -30555,7 +30567,7 @@ export namespace Prisma {
     createdAt?: Date | string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
   }
 
   export type PlanUncheckedCreateWithoutSubscriptionInput = {
@@ -30566,7 +30578,7 @@ export namespace Prisma {
     createdAt?: Date | string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
   }
 
   export type PlanCreateOrConnectWithoutSubscriptionInput = {
@@ -30664,7 +30676,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
   }
 
   export type PlanUncheckedUpdateWithoutSubscriptionInput = {
@@ -30675,7 +30687,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
   }
 
   export type ClassCreateWithoutRecurringClassInput = {
@@ -30738,7 +30750,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     classes?: ClassCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
@@ -30765,7 +30777,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     classes?: ClassUncheckedCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
@@ -30865,7 +30877,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     classes?: ClassUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
@@ -30892,7 +30904,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     classes?: ClassUncheckedUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
@@ -31162,7 +31174,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     classes?: ClassCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
@@ -31189,7 +31201,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     classes?: ClassUncheckedCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
@@ -31251,7 +31263,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     classes?: ClassUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
@@ -31278,7 +31290,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     classes?: ClassUncheckedUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
@@ -31375,7 +31387,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     classes?: ClassCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
@@ -31402,7 +31414,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     classes?: ClassUncheckedCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
@@ -31444,7 +31456,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     classes?: ClassUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
@@ -31471,7 +31483,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     classes?: ClassUncheckedUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
@@ -31497,7 +31509,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     classes?: ClassCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
@@ -31524,7 +31536,7 @@ export namespace Prisma {
     workingTime: string
     terminationAt?: Date | string | null
     updatedAt?: Date | string
-    isNative: boolean
+    englishBackground: number
     classes?: ClassUncheckedCreateNestedManyWithoutInstructorInput
     instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
@@ -31566,7 +31578,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     classes?: ClassUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
@@ -31593,7 +31605,7 @@ export namespace Prisma {
     workingTime?: StringFieldUpdateOperationsInput | string
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isNative?: BoolFieldUpdateOperationsInput | boolean
+    englishBackground?: IntFieldUpdateOperationsInput | number
     classes?: ClassUncheckedUpdateManyWithoutInstructorNestedInput
     instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput

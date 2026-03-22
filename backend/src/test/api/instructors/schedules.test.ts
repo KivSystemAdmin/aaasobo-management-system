@@ -14,6 +14,7 @@ import {
   generateAuthCookie,
   generateTestInstructor,
 } from "../../testUtils";
+import { EnglishBackground } from "../../../types";
 
 /**
  * Creates a time-only ISO string
@@ -871,7 +872,7 @@ describe("GET /instructors/available-slots - All Available Slots", () => {
         start: "2025-08-04",
         end: "2025-08-05",
         timezone: "Asia/Tokyo",
-        isNative: "false",
+        englishBackground: EnglishBackground.NonNative,
       })
       .expect(200);
 
@@ -895,7 +896,7 @@ describe("GET /instructors/available-slots - All Available Slots", () => {
         start: "2025-08-04",
         end: "2025-08-05",
         timezone: "Asia/Tokyo",
-        isNative: "false",
+        englishBackground: EnglishBackground.NonNative,
       })
       .expect(200);
 
@@ -989,6 +990,7 @@ describe("POST /instructors/:id/schedules", () => {
       ...testData,
       birthdate: new Date(testData.birthdate),
       terminationAt: futureDate,
+      englishBackground: EnglishBackground.NonNative,
     });
     await createInstructorSchedule(instructor.id, {
       effectiveFrom: new Date("2024-01-01"),
