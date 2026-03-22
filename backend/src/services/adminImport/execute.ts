@@ -412,6 +412,26 @@ function assertExists(
   }
 }
 
+function assertEnglishBackground(
+  issues: ImportValidationIssue[],
+  file: NormalizedFileName,
+  row: number,
+  column: string,
+  value: string,
+) {
+  if (!value) return;
+
+  if (!["0", "1", "2"].includes(value)) {
+    addIssue(
+      issues,
+      file,
+      row,
+      column,
+      'english_background must be one of "0", "1", or "2"',
+    );
+  }
+}
+
 function parseFileRows<K extends NormalizedFileName>(
   file: K,
   content: string,
@@ -805,7 +825,7 @@ export function validateNormalizedImportFiles(
       "instructor_ref",
       row.data.instructor_ref,
     );
-    assertBoolean(
+    assertEnglishBackground(
       issues,
       "instructors.csv",
       row.rowNumber,

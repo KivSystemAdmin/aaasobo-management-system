@@ -904,7 +904,7 @@ export const updatePlanController = async (
       !body.planNameEng ||
       !body.planNameJpn ||
       !body.description ||
-      !body.englishBackground
+      typeof body.englishBackground !== "number"
     ) {
       return res
         .status(400)

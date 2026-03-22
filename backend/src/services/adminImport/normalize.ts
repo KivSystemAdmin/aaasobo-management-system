@@ -60,7 +60,7 @@ interface PlanRow {
   name: string;
   description: string;
   weekly_class_times: string;
-  english_background: EnglishBackground;
+  english_background: string;
   termination_at: string;
 }
 
@@ -108,7 +108,7 @@ interface InstructorRow {
   message_for_children: string;
   skill: string;
   working_time: string;
-  english_background: EnglishBackground;
+  english_background: string;
   termination_at: string;
 }
 
@@ -477,7 +477,7 @@ function toRecordSet(rows: RawClassRow[]): {
         name: planName,
         description: `Imported from raw plan label: ${planName}`,
         weekly_class_times: String(parseWeeklyClassTimes(planName)),
-        english_background: EnglishBackground.NonNative,
+        english_background: "0",
         termination_at: "",
       };
       plansByName.set(planName, plan);
@@ -564,7 +564,7 @@ function toRecordSet(rows: RawClassRow[]): {
           message_for_children: "",
           skill: "",
           working_time: "",
-          english_background: EnglishBackground.NonNative,
+          english_background: "0",
           termination_at: "",
         };
         instructorsByName.set(row.instructorName, instructor);
