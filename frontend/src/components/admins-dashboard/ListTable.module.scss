@@ -63,6 +63,32 @@ $font_size: 0.9rem;
   }
 }
 
+.todayFilterButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  color: #ffffff;
+  text-decoration: none;
+  background-color: $blue_primary;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: $blue_primary_hover;
+  }
+}
+
+.todayFilterButtonActive {
+  background-color: $green-success;
+
+  &:hover {
+    background-color: $green-success-hover;
+  }
+}
+
 .tableWrapper {
   width: 100%;
   overflow-x: auto;

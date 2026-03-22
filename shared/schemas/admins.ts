@@ -27,6 +27,13 @@ export const InstructorPayrollQuery = z.object({
     .regex(/^\d{4}-(0[1-9]|1[0-2])$/, "month must be in YYYY-MM format"),
 });
 
+export const ClassListQuery = z.object({
+  today: z
+    .enum(["true", "false"])
+    .optional()
+    .transform((value) => value === "true"),
+});
+
 export const CreateInstructorFeeRequest = z.object({
   currency: z.string().regex(/^[A-Z]{3}$/, "currency must be a 3-letter code"),
   effectiveFrom: z
@@ -552,6 +559,7 @@ export type AdminIdParams = z.infer<typeof AdminIdParams>;
 export type CustomerIdParams = z.infer<typeof CustomerIdParams>;
 export type InstructorIdParams = z.infer<typeof InstructorIdParams>;
 export type InstructorPayrollQuery = z.infer<typeof InstructorPayrollQuery>;
+export type ClassListQuery = z.infer<typeof ClassListQuery>;
 export type CreateInstructorFeeRequest = z.infer<
   typeof CreateInstructorFeeRequest
 >;

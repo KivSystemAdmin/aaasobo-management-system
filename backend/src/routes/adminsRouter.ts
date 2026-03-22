@@ -44,6 +44,7 @@ import {
 } from "../../../shared/schemas/common";
 import {
   AdminIdParams,
+  ClassListQuery,
   CustomerIdParams,
   InstructorIdParams,
   InstructorPayrollQuery,
@@ -890,6 +891,7 @@ const getAllEventsConfig = {
 
 const getClassesWithinPeriodConfig = {
   method: "get" as const,
+  querySchema: ClassListQuery,
   middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
   handler: getClassesWithinPeriodController,
   openapi: {

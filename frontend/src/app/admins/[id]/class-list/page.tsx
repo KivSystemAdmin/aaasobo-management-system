@@ -2,9 +2,12 @@ import ListTable from "@/components/admins-dashboard/ListTable";
 import { getAllClasses } from "@/lib/api/adminsApi";
 import { authenticateUserSession } from "@/lib/auth/sessionUtils";
 import { getCookie } from "../../../../proxy";
-``;
-export default async function Page(props: { params: Promise<{ id: string }> }) {
+export default async function Page(props: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ today?: string }>;
+}) {
   const params = await props.params;
+  const searchParams = props.searchParams ? await props.searchParams : {};
   // Authenticate user session
   const adminId = params.id;
   await authenticateUserSession("admin", adminId);
@@ -24,7 +27,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   ]; // Set the link URL
   const userType = "admin"; // Set the user type for the registration form (It's not used in this page, but kept for consistency)
   const isAddButton = true; // Enable the add button
-  const data = await getAllClasses(cookie); // Fetch all classes data
+  const isTodayFilterActive = searchParams.today === "true";
+  const data = await getAllClasses(isTodayFilterActive, cookie); // Fetch class list data
 
   return (
     <div>
@@ -37,6 +41,10 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         replaceItems={replaceItems}
         userType={userType}
         isAddButton={isAddButton}
+        showTodayFilterButton={true}
+        isTodayFilterActive={isTodayFilterActive}
+        todayFilterHref={`/admins/${adminId}/class-list?today=true`}
+        clearTodayFilterHref={`/admins/${adminId}/class-list`}
       />
     </div>
   );

@@ -64,6 +64,10 @@ function ListTable({
   isViewPastButton,
   pastListTableProps,
   linkTarget,
+  showTodayFilterButton,
+  isTodayFilterActive,
+  todayFilterHref,
+  clearTodayFilterHref,
 }: ListTableProps) {
   const [currentData, setCurrentData] = useState<any[]>(fetchedData);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -329,6 +333,20 @@ function ListTable({
             />
           </div>
           <div className={`${styles.buttonsContainer}`}>
+            {showTodayFilterButton &&
+              todayFilterHref &&
+              clearTodayFilterHref && (
+                <Link
+                  href={
+                    isTodayFilterActive ? clearTodayFilterHref : todayFilterHref
+                  }
+                  className={`${styles.todayFilterButton} ${
+                    isTodayFilterActive ? styles.todayFilterButtonActive : ""
+                  }`}
+                >
+                  {isTodayFilterActive ? "Show All" : "Today"}
+                </Link>
+              )}
             {isViewPastButton && (
               <ActionButton
                 btnText={`View past ${categoryType ? categoryType : userType}s`}

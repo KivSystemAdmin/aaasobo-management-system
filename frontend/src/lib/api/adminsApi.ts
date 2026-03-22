@@ -502,6 +502,7 @@ export const getAllEvents = async (
 
 // GET all class data
 export const getAllClasses = async (
+  todayOnly: boolean = false,
   cookie?: string,
 ): Promise<ClassesListResponse["data"]> => {
   try {
@@ -512,7 +513,7 @@ export const getAllClasses = async (
 
     if (cookie) {
       // From server component
-      apiURL = `${BASE_URL}/class-list`;
+      apiURL = `${BASE_URL}/class-list${todayOnly ? "?today=true" : ""}`;
       headers = { "Content-Type": "application/json", Cookie: cookie };
       response = await fetch(apiURL, {
         method,
@@ -521,7 +522,7 @@ export const getAllClasses = async (
       });
     } else {
       // From client component (via proxy)
-      const backendEndpoint = `/admins/class-list`;
+      const backendEndpoint = `/admins/class-list${todayOnly ? "?today=true" : ""}`;
       apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
       headers = {
         "Content-Type": "application/json",

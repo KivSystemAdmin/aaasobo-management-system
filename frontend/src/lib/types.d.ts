@@ -658,6 +658,10 @@ type CurrentListTableProps = {
   categoryType?: CategoryType;
   isAddButton?: boolean;
   isViewPastButton?: boolean;
+  showTodayFilterButton?: boolean;
+  isTodayFilterActive?: boolean;
+  todayFilterHref?: string;
+  clearTodayFilterHref?: string;
   linkTarget?: string;
 };
 
