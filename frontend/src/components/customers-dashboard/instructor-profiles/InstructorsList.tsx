@@ -16,6 +16,7 @@ export default function InstructorsList({
   instructorProfiles: InstructorProfile[];
   userSessionType: UserType;
 }) {
+  const englishBackgroundClass = ["non-native", "native-a", "native-b"];
   const [filteredInstructors, setFilteredInstructors] = useState<
     InstructorProfile[] | null
   >(instructorProfiles);
@@ -51,7 +52,7 @@ export default function InstructorsList({
         {filteredInstructors?.map((instructor) => (
           <ClassInstructor
             key={instructor.id}
-            classStatus="none"
+            classStatus={englishBackgroundClass[instructor.englishBackground]}
             instructorIcon={instructor.icon.url}
             instructorNickname={instructor.nickname}
             width={140}
