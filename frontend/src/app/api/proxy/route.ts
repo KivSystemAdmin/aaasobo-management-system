@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { getCookie } from "../../../proxy";
 
 const BACKEND_ORIGIN = process.env.BACKEND_ORIGIN;
+const RESPONSE_HEADERS_TO_REMOVE = ["content-encoding", "content-length"];
 
 const createBackendUrl = (backendEndpoint: string | null) => {
   if (!BACKEND_ORIGIN || !backendEndpoint) {
@@ -53,7 +54,7 @@ const proxyRequest = async (req: NextRequest, method: string) => {
     body = isJson ? JSON.stringify(await req.json()) : await req.formData();
   }
 
-  return fetch(backendApiURL, {
+  const backendResponse = await fetch(backendApiURL, {
     method,
     headers: createHeaders(
       req,
@@ -64,6 +65,17 @@ const proxyRequest = async (req: NextRequest, method: string) => {
     cache: method === "GET" ? (noCache ? "no-store" : "default") : undefined,
     next:
       method === "GET" && revalidateTag ? { tags: [revalidateTag] } : undefined,
+  });
+
+  const responseHeaders = new Headers(backendResponse.headers);
+  RESPONSE_HEADERS_TO_REMOVE.forEach((header) =>
+    responseHeaders.delete(header),
+  );
+
+  return new Response(backendResponse.body, {
+    status: backendResponse.status,
+    statusText: backendResponse.statusText,
+    headers: responseHeaders,
   });
 };
 
