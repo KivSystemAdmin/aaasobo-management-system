@@ -68,6 +68,11 @@ export const deleteAdmin = async (adminId: number) => {
 export const getAllAdmins = async () => {
   try {
     return await prisma.admin.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
       orderBy: {
         id: "asc",
       },

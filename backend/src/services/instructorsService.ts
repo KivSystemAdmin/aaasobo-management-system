@@ -91,6 +91,48 @@ export const getAllInstructors = async () => {
 };
 
 // Fetch all instructors information
+
+export const getAllInstructorsForAdminList = async () => {
+  try {
+    const now = new Date();
+    return await prisma.instructor.findMany({
+      where: {
+        OR: [{ terminationAt: null }, { terminationAt: { gt: now } }],
+      },
+      select: {
+        id: true,
+        name: true,
+        nickname: true,
+        email: true,
+        englishBackground: true,
+      },
+      orderBy: { id: "asc" },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch instructors.");
+  }
+};
+
+export const getAllPastInstructorsForAdminList = async () => {
+  try {
+    const now = new Date();
+    return await prisma.instructor.findMany({
+      where: {
+        OR: [{ terminationAt: { lte: now } }],
+      },
+      select: {
+        id: true,
+        nickname: true,
+        terminationAt: true,
+      },
+      orderBy: { terminationAt: "asc" },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch past instructors.");
+  }
+};
 export const getAllPastInstructors = async () => {
   try {
     const now = new Date();
