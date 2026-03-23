@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useRef, useState } from "react";
-import { useInput } from "@/hooks/useInput";
 import styles from "./RegisterForm.module.scss";
 import {
   EnvelopeIcon,
@@ -51,9 +50,12 @@ const RegisterForm = ({
     undefined,
   );
 
-  const [password, onPasswordChange] = useInput();
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [colorValue, setColorValue] = useState(defaultColor);
+  const [submittedValues, setSubmittedValues] = useState<
+    Record<string, string>
+  >({});
   const { localMessages, clearErrorMessage, resetMessages } =
     useFormMessages(registerResultState);
   const { passwordStrength } = usePasswordStrength(password);
@@ -72,12 +74,26 @@ const RegisterForm = ({
     setEnglishBackground(newEnglishBackground);
   };
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    resetMessages();
+    const formData = new FormData(event.currentTarget);
+    const values: Record<string, string> = {};
+
+    formData.forEach((value, key) => {
+      if (typeof value === "string") {
+        values[key] = value;
+      }
+    });
+
+    setSubmittedValues(values);
+  };
+
+  const persistedValues = registerResultState?.successMessage
+    ? {}
+    : submittedValues;
+
   return (
-    <form
-      action={formAction}
-      className={styles.form}
-      onSubmit={() => resetMessages()}
-    >
+    <form action={formAction} className={styles.form} onSubmit={handleSubmit}>
       {/* Hidden fields to include in form submission */}
       <input type="hidden" name="userType" value={userType ?? ""} />
       <input type="hidden" name="categoryType" value={categoryType ?? ""} />
@@ -98,6 +114,7 @@ const RegisterForm = ({
             label="Name"
             type="text"
             name="name"
+            defaultValue={persistedValues.name}
             placeholder="e.g., John Doe"
             icon={<UserCircleIcon className={styles.icon} />}
             inputRequired
@@ -113,6 +130,7 @@ const RegisterForm = ({
                 label="Nickname"
                 type="text"
                 name="nickname"
+                defaultValue={persistedValues.nickname}
                 placeholder="e.g., John"
                 icon={<UserCircleIcon className={styles.icon} />}
                 inputRequired
@@ -126,6 +144,7 @@ const RegisterForm = ({
                 label="Birthday"
                 type="date"
                 name="birthdate"
+                defaultValue={persistedValues.birthdate}
                 placeholder="e.g., 2000-01-01"
                 icon={<CakeIcon className={styles.icon} />}
                 inputRequired
@@ -140,6 +159,7 @@ const RegisterForm = ({
             label="Email"
             type="email"
             name="email"
+            defaultValue={persistedValues.email}
             placeholder="e.g., example@aaasobo.com"
             icon={<EnvelopeIcon className={styles.icon} />}
             inputRequired
@@ -156,7 +176,7 @@ const RegisterForm = ({
             value={password}
             placeholder="At least 8 characters"
             onChange={(event) => {
-              onPasswordChange(event);
+              setPassword(event.target.value);
               clearErrorMessage("password");
             }}
             icon={<LockClosedIcon className={styles.icon} />}
@@ -179,6 +199,7 @@ const RegisterForm = ({
             label="Password Confirmation"
             type="password"
             name="passConfirmation"
+            defaultValue={persistedValues.passConfirmation}
             placeholder="Re-enter your password"
             icon={<LockClosedIcon className={styles.icon} />}
             inputRequired
@@ -196,6 +217,7 @@ const RegisterForm = ({
                 label="Class URL"
                 type="text"
                 name="classURL"
+                defaultValue={persistedValues.classURL}
                 placeholder="e.g., https://zoom.us/j/..."
                 icon={<LinkIcon className={styles.icon} />}
                 inputRequired
@@ -208,6 +230,7 @@ const RegisterForm = ({
                 label="Meeting ID"
                 type="text"
                 name="meetingId"
+                defaultValue={persistedValues.meetingId}
                 placeholder="e.g., 123 456 7890"
                 icon={<IdentificationIcon className={styles.icon} />}
                 inputRequired
@@ -220,6 +243,7 @@ const RegisterForm = ({
                 label="Pass Code"
                 type="text"
                 name="passcode"
+                defaultValue={persistedValues.passcode}
                 placeholder="e.g., 123456"
                 icon={<KeyIcon className={styles.icon} />}
                 inputRequired
@@ -237,6 +261,7 @@ const RegisterForm = ({
                 <textarea
                   id="workingTime"
                   name="workingTime"
+                  defaultValue={persistedValues.workingTime}
                   placeholder="e.g., 9 AM - 5 PM (Philippines) on weekdays"
                   className={styles.textarea}
                   maxLength={500}
@@ -252,6 +277,7 @@ const RegisterForm = ({
                 <textarea
                   id="lifeHistory"
                   name="lifeHistory"
+                  defaultValue={persistedValues.lifeHistory}
                   placeholder="e.g., I am a dedicated instructor with a passion for teaching."
                   className={styles.textarea}
                   maxLength={500}
@@ -267,6 +293,7 @@ const RegisterForm = ({
                 <textarea
                   id="favoriteFood"
                   name="favoriteFood"
+                  defaultValue={persistedValues.favoriteFood}
                   placeholder="e.g., Sushi"
                   className={styles.textarea}
                   maxLength={500}
@@ -282,6 +309,7 @@ const RegisterForm = ({
                 <textarea
                   id="hobby"
                   name="hobby"
+                  defaultValue={persistedValues.hobby}
                   placeholder="e.g., Reading"
                   className={styles.textarea}
                   maxLength={500}
@@ -299,6 +327,7 @@ const RegisterForm = ({
                 <textarea
                   id="messageForChildren"
                   name="messageForChildren"
+                  defaultValue={persistedValues.messageForChildren}
                   placeholder="e.g., Always do your best!"
                   className={styles.textarea}
                   maxLength={500}
@@ -314,6 +343,7 @@ const RegisterForm = ({
                 <textarea
                   id="skill"
                   name="skill"
+                  defaultValue={persistedValues.skill}
                   placeholder="e.g., Japanese Language"
                   className={styles.textarea}
                   maxLength={500}
@@ -385,6 +415,7 @@ const RegisterForm = ({
             label="Plan Name (Japanese)"
             type="text"
             name="planNameJpn"
+            defaultValue={persistedValues.planNameJpn}
             placeholder="e.g., 月3,180円プラン"
             icon={<AcademicCapIcon className={styles.icon} />}
             inputRequired
@@ -396,6 +427,7 @@ const RegisterForm = ({
             label="Plan Name (English)"
             type="text"
             name="planNameEng"
+            defaultValue={persistedValues.planNameEng}
             placeholder="e.g., 3,180 yen/month Plan"
             icon={<AcademicCapIcon className={styles.icon} />}
             inputRequired
@@ -407,6 +439,7 @@ const RegisterForm = ({
             label="Weekly Class Times"
             type="number"
             name="weeklyClassTimes"
+            defaultValue={persistedValues.weeklyClassTimes}
             placeholder="e.g., 2"
             icon={<CalendarIcon className={styles.icon} />}
             inputRequired
@@ -418,6 +451,7 @@ const RegisterForm = ({
             label="Description"
             type="text"
             name="description"
+            defaultValue={persistedValues.description}
             placeholder="e.g., 2 classes per week"
             icon={<DocumentTextIcon className={styles.icon} />}
             inputRequired
@@ -464,6 +498,7 @@ const RegisterForm = ({
             label="Event Name (Japanese)"
             type="text"
             name="eventNameJpn"
+            defaultValue={persistedValues.eventNameJpn}
             placeholder="e.g., アーソボイベント"
             icon={<AcademicCapIcon className={styles.icon} />}
             inputRequired
@@ -475,6 +510,7 @@ const RegisterForm = ({
             label="Event Name (English)"
             type="text"
             name="eventNameEng"
+            defaultValue={persistedValues.eventNameEng}
             placeholder="e.g., AaasoBo! Event"
             icon={<AcademicCapIcon className={styles.icon} />}
             inputRequired
