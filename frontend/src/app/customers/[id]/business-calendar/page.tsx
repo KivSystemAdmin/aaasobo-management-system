@@ -13,10 +13,11 @@ const Page = async (props: { params: Promise<{ id: string }> }) => {
   // Get the cookies from the request headers
   const cookie = await getCookie();
 
-  // Fetch all schedule data
-  const schedule = await getAllBusinessSchedules(cookie);
-  // Fetch all events data
-  const data = await getAllEvents(cookie);
+  // Fetch all schedule and events data in parallel
+  const [schedule, data] = await Promise.all([
+    getAllBusinessSchedules(cookie),
+    getAllEvents(cookie),
+  ]);
   // Organize the event data by id and event name
   const events: BusinessEventType[] = [
     ...data.map((item: EventColor) => ({

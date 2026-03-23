@@ -18,8 +18,10 @@ async function ChildrenProfilesPage(props: {
   // Get the cookies from the request headers
   const cookie = await getCookie();
 
-  const customerProfile = await getCustomerById(customerId, cookie);
-  const childProfiles = await getChildProfiles(customerId, cookie);
+  const [customerProfile, childProfiles] = await Promise.all([
+    getCustomerById(customerId, cookie),
+    getChildProfiles(customerId, cookie),
+  ]);
 
   return (
     <main>

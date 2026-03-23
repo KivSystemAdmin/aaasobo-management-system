@@ -13,8 +13,8 @@ import {
   deleteAdmin,
 } from "../services/adminsService";
 import {
-  getAllInstructors,
-  getAllPastInstructors,
+  getAllInstructorsForAdminList,
+  getAllPastInstructorsForAdminList,
   registerInstructor,
   updateInstructor,
   getInstructorByEmail,
@@ -340,7 +340,7 @@ export const getAllInstructorsController = async (
 ) => {
   try {
     // Fetch the instructors data using the email.
-    const instructors = await getAllInstructors();
+    const instructors = await getAllInstructorsForAdminList();
 
     // Transform the data structure.
     const data = instructors.map((instructor, number) => {
@@ -481,7 +481,7 @@ export const getAllPastInstructorsController = async (
 ) => {
   try {
     // Fetch the instructors data using the email.
-    const instructors = await getAllPastInstructors();
+    const instructors = await getAllPastInstructorsForAdminList();
 
     // Transform the data structure.
     const data = instructors.map((instructor, number) => {

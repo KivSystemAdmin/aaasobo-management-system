@@ -21,8 +21,10 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const userType = "instructor"; // Set the user type for the registration form
   const isAddButton = true; // Enable the add button
   const isViewPastButton = true; // Enable the view past information button
-  const currentInstructors = await getAllInstructors(cookie); // Fetch all instructors data
-  const pastInstructors = await getAllPastInstructors(cookie); // Fetch all past instructors data
+  const [currentInstructors, pastInstructors] = await Promise.all([
+    getAllInstructors(cookie), // Fetch all instructors data
+    getAllPastInstructors(cookie), // Fetch all past instructors data
+  ]);
   // Define past list table configuration
   const pastListTableProps = {
     listType: "Past Instructor List",
