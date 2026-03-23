@@ -25,7 +25,10 @@ const createHeaders = (
   }
 
   const contentType = req.headers.get("content-type");
-  if (contentType) {
+  if (
+    contentType &&
+    !contentType.toLowerCase().startsWith("multipart/form-data")
+  ) {
     headers["Content-Type"] = contentType;
   }
 
