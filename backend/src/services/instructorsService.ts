@@ -133,22 +133,6 @@ export const getAllPastInstructorsForAdminList = async () => {
     throw new Error("Failed to fetch past instructors.");
   }
 };
-export const getAllPastInstructors = async () => {
-  try {
-    const now = new Date();
-    return await prisma.instructor.findMany({
-      where: {
-        OR: [
-          { terminationAt: { lte: now } }, // Past termination
-        ],
-      },
-      orderBy: { terminationAt: "asc" },
-    });
-  } catch (error) {
-    console.error("Database Error:", error);
-    throw new Error("Failed to fetch past instructors.");
-  }
-};
 
 export async function getInstructorById(id: number) {
   try {
