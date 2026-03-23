@@ -6,10 +6,12 @@ export default async function ClassActions({
   userSessionType,
   customerId,
   terminationAt,
+  adminId,
 }: {
   userSessionType: UserType;
   customerId: number;
   terminationAt: string | null;
+  adminId?: number;
 }) {
   return (
     <div className={styles.calendarHeaderContainer}>
@@ -25,6 +27,7 @@ export default async function ClassActions({
             customerId={customerId}
             userSessionType={userSessionType}
             terminationAt={terminationAt}
+            adminId={adminId}
           />
         </div>
       </div>

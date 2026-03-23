@@ -302,6 +302,8 @@ export default function EditRegularClassModal({
                     onInstructorSelect={handleInstructorSelect}
                     plan={plan}
                     language="en"
+                    adminId={adminId}
+                    customerId={customerId}
                   />
                 )}
                 {modalStep === "schedule" &&

@@ -1,22 +1,21 @@
 import InstructorsList from "@/components/customers-dashboard/instructor-profiles/InstructorsList";
-import Breadcrumb from "@/components/elements/breadcrumb/Breadcrumb";
 import { getAllInstructorProfiles } from "@/lib/api/instructorsApi";
 import { authenticateUserSession } from "@/lib/auth/sessionUtils";
-import { getCookie } from "../../../../proxy";
+import { getCookie } from "../../../../../proxy";
 
 async function InstructorProfilesPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ instructorId?: string }>;
+  searchParams: Promise<{ instructorId?: string; customerId?: string }>;
 }) {
-  const { id: customerId } = await params;
-  const { instructorId } = await searchParams;
+  const { id: adminId } = await params;
+  const { instructorId, customerId } = await searchParams;
   // Authenticate user session
   const userSessionType: UserType = await authenticateUserSession(
-    "customer",
-    customerId,
+    "admin",
+    adminId,
   );
 
   // Get the cookies from the request headers
@@ -30,25 +29,18 @@ async function InstructorProfilesPage({
     return <p>Error: No instructor profiles found.</p>;
   }
 
+  // Define the breadcrumb links
+  const breadcrumbLink = `/admins/${adminId}/customer-list/${customerId}`;
+
   return (
     <>
-      <Breadcrumb
-        links={[
-          {
-            label: {
-              ja: "インストラクタープロフィール",
-              en: "Instructor Profiles",
-            },
-          },
-        ]}
-        className="profile"
-      />
       <InstructorsList
         instructorProfiles={instructorProfiles}
         userSessionType={userSessionType}
         designatedInstructorId={
           instructorId ? parseInt(instructorId) : undefined
         }
+        breadcrumbLink={breadcrumbLink}
       />
     </>
   );

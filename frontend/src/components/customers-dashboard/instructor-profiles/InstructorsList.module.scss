@@ -1,3 +1,36 @@
+@use "@/styles/variables.module.scss" as *;
+
+.breadcrumb {
+  margin: -1rem 1rem 1rem 0;
+  font-size: 20px;
+  font-weight: 500;
+
+  &__list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__item {
+    margin-right: 0.5rem;
+
+    a {
+      text-decoration: none;
+      color: $blue-primary;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__separator {
+    margin-right: 0.5rem;
+    color: #555;
+  }
+}
+
 .instructors {
   &__list {
     display: flex;

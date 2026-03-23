@@ -226,7 +226,7 @@ function EditSubscriptionModal({
               <InputField
                 name="SelectType url"
                 type="text"
-                placeholder="https://..."
+                placeholder="https://dashboard.stripe.com/subscriptions/sub_1234567890abcdef"
                 value={selectTypeValue}
                 maxLength={50}
                 onChange={(e) => setSelectTypeValue(e.target.value)}

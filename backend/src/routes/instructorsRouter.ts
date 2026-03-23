@@ -108,7 +108,7 @@ const englishBackgroundProfilesConfig = {
 
 const allProfilesConfig = {
   method: "get" as const,
-  middleware: [verifyAuthentication(AUTH_ROLES.C)] as RequestHandler[],
+  middleware: [verifyAuthentication(AUTH_ROLES.AC)] as RequestHandler[],
   handler: getAllInstructorProfilesController,
   openapi: {
     summary: "Get all instructor profiles",

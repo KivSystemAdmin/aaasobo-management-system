@@ -10,9 +10,11 @@ import { getCookie } from "../../../proxy";
 export default async function ClassCalendar({
   customerId,
   userSessionType,
+  adminId,
 }: {
   customerId: number;
   userSessionType: UserType;
+  adminId?: number;
 }) {
   // Get the cookies from the request headers
   const cookie = await getCookie();
@@ -41,6 +43,7 @@ export default async function ClassCalendar({
         userSessionType={userSessionType}
         customerId={customerId}
         terminationAt={terminationAt}
+        adminId={adminId}
       />
 
       <CustomerCalendar

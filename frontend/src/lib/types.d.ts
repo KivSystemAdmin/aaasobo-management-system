@@ -491,6 +491,7 @@ type RebookingSteps =
 
 type RebookingFormProps = {
   customerId: number;
+  adminId?: number;
   classId?: number;
   rebookableClasses: RebookableClass[] | [];
   instructorAvailabilities?: InstructorAvailability[] | [];
@@ -523,6 +524,8 @@ type RebookableInstructorsListProps = {
   setRebookingStep: (step: RebookingSteps) => void;
   dateTimeToRebook: string | null;
   language: LanguageType;
+  adminId?: number;
+  customerId?: number;
 };
 
 type RebookableTimeSlotsProps = {

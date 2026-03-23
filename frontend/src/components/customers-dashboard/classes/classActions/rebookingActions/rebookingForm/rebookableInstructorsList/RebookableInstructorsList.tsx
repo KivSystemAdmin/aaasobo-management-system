@@ -20,6 +20,8 @@ export default function RebookableInstructorsList({
   setRebookingStep,
   dateTimeToRebook,
   language,
+  adminId,
+  customerId,
 }: RebookableInstructorsListProps) {
   const previousRebookingStep =
     rebookingOption === "instructor" ? "selectOption" : "selectDateTime";
@@ -80,6 +82,8 @@ export default function RebookableInstructorsList({
                 instructor={instructor}
                 isRebookable={isRebookable}
                 language={language}
+                adminId={adminId}
+                customerId={customerId}
                 onSelect={selectInstructor}
               />
             );
