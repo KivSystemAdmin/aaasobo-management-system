@@ -3,6 +3,7 @@
 import { getRecurringClassesBySubscriptionId } from "@/lib/api/recurringClassesApi";
 import { getChildrenByCustomerId } from "@/lib/api/childrenApi";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./RegularClassesTable.module.scss";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import RegularClassCard from "./RegularClassCard";
@@ -38,6 +39,7 @@ function RegularClassesTable({
   plan?: Plan;
   refreshKey?: number;
 }) {
+  const router = useRouter();
   const [activeRecurringClasses, setActiveRecurringClasses] = useState<
     RecurringClass[]
   >([]);
@@ -138,7 +140,8 @@ function RegularClassesTable({
   };
 
   const handleEditSuccess = () => {
-    setUpdateCount(updateCount + 1);
+    setUpdateCount((count) => count + 1);
+    router.refresh();
     handleCloseEditModal();
   };
 
