@@ -1,7 +1,8 @@
 "use client";
 
 import styles from "./InstructorsList.module.scss";
-import { useState } from "react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Modal from "@/components/elements/modal/Modal";
 import InputField from "@/components/elements/inputField/InputField";
@@ -13,24 +14,36 @@ export default function InstructorsList({
   instructorProfiles,
   userSessionType,
   designatedInstructorId,
+  breadcrumbLink,
 }: {
   instructorProfiles: InstructorProfile[];
   userSessionType: UserType;
   designatedInstructorId?: number;
+  breadcrumbLink?: string;
 }) {
   const englishBackgroundClass = ["non-native", "native-a", "native-b"];
   const { language } = useLanguage();
 
-  const [filteredInstructors, setFilteredInstructors] = useState<
-    InstructorProfile[] | null
-  >(instructorProfiles);
+  const [filteredInstructors, setFilteredInstructors] =
+    useState(instructorProfiles);
+  const [clickedInstructor, setClickedInstructor] =
+    useState<InstructorProfile | null>(null);
+  const [hasClosedDesignatedModal, setHasClosedDesignatedModal] =
+    useState(false);
 
-  const [selectedInstructor, setSelectedInstructor] =
-    useState<InstructorProfile | null>(
-      instructorProfiles.find(
-        (instructor) => instructor.id === designatedInstructorId,
-      ) || null,
-    );
+  const designatedInstructor = useMemo(
+    () =>
+      designatedInstructorId
+        ? instructorProfiles.find(
+            (instructor) => instructor.id === designatedInstructorId,
+          ) || null
+        : null,
+    [designatedInstructorId, instructorProfiles],
+  );
+
+  const selectedInstructor =
+    clickedInstructor ||
+    (!hasClosedDesignatedModal ? designatedInstructor : null);
 
   if (!instructorProfiles) {
     return <Loading />;
@@ -38,6 +51,18 @@ export default function InstructorsList({
 
   return (
     <>
+      {breadcrumbLink && (
+        <nav className={styles.breadcrumb}>
+          <ul className={styles.breadcrumb__list}>
+            <li className={styles.breadcrumb__item}>
+              <Link href={breadcrumbLink}>Customer Page</Link>
+            </li>
+            <li className={styles.breadcrumb__separator}>{" >> "}</li>
+            <li className={styles.breadcrumb__item}>Instructor Profiles</li>
+          </ul>
+        </nav>
+      )}
+
       <InputField
         type="text"
         placeholder={
@@ -65,7 +90,7 @@ export default function InstructorsList({
             instructorNickname={instructor.nickname}
             width={140}
             className="instructorCursorItem"
-            onClick={() => setSelectedInstructor(instructor)}
+            onClick={() => setClickedInstructor(instructor)}
           />
         ))}
       </div>
@@ -73,7 +98,13 @@ export default function InstructorsList({
       {selectedInstructor && (
         <Modal
           isOpen={!!selectedInstructor}
-          onClose={() => setSelectedInstructor(null)}
+          onClose={() => {
+            if (clickedInstructor) {
+              setClickedInstructor(null);
+            } else {
+              setHasClosedDesignatedModal(true);
+            }
+          }}
         >
           <InstructorProfileModal
             instructor={selectedInstructor}

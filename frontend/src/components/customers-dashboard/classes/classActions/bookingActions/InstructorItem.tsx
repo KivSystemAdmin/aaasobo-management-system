@@ -27,7 +27,7 @@ export default function InstructorItem({
     instructor.englishBackground
   ];
   const instructorProfileUrl = adminId
-    ? `/admins/${adminId}/customer-list/instructor-profiles?instructorId=${instructor.id}`
+    ? `/admins/${adminId}/customer-list/instructor-profiles?customerId=${customerId}&instructorId=${instructor.id}`
     : `/customers/${customerId}/instructor-profiles?instructorId=${instructor.id}`;
 
   const handleCardClick = () => {

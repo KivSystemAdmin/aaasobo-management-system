@@ -1,5 +1,4 @@
 import InstructorsList from "@/components/customers-dashboard/instructor-profiles/InstructorsList";
-import Breadcrumb from "@/components/elements/breadcrumb/Breadcrumb";
 import { getAllInstructorProfiles } from "@/lib/api/instructorsApi";
 import { authenticateUserSession } from "@/lib/auth/sessionUtils";
 import { getCookie } from "../../../../../proxy";
@@ -9,10 +8,10 @@ async function InstructorProfilesPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ instructorId?: string }>;
+  searchParams: Promise<{ instructorId?: string; customerId?: string }>;
 }) {
   const { id: adminId } = await params;
-  const { instructorId } = await searchParams;
+  const { instructorId, customerId } = await searchParams;
   // Authenticate user session
   const userSessionType: UserType = await authenticateUserSession(
     "admin",
@@ -30,25 +29,18 @@ async function InstructorProfilesPage({
     return <p>Error: No instructor profiles found.</p>;
   }
 
+  // Define the breadcrumb links
+  const breadcrumbLink = `/admins/${adminId}/customer-list/${customerId}`;
+
   return (
     <>
-      <Breadcrumb
-        links={[
-          {
-            label: {
-              ja: "インストラクタープロフィール",
-              en: "Instructor Profiles",
-            },
-          },
-        ]}
-        className="profile"
-      />
       <InstructorsList
         instructorProfiles={instructorProfiles}
         userSessionType={userSessionType}
         designatedInstructorId={
           instructorId ? parseInt(instructorId) : undefined
         }
+        breadcrumbLink={breadcrumbLink}
       />
     </>
   );
