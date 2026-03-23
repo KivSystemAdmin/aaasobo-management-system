@@ -11,6 +11,8 @@ interface InstructorSelectionProps {
   plan?: Plan;
   language: LanguageType;
   availableInstructors?: InstructorRebookingProfile[]; // Pre-filtered instructors for date-first flow
+  adminId?: number;
+  customerId?: number;
 }
 
 export default function InstructorSelection({
@@ -18,6 +20,8 @@ export default function InstructorSelection({
   plan,
   language,
   availableInstructors,
+  adminId,
+  customerId,
 }: InstructorSelectionProps) {
   const [instructors, setInstructors] = useState<InstructorRebookingProfile[]>(
     [],
@@ -132,6 +136,8 @@ export default function InstructorSelection({
               onSelect={onInstructorSelect}
               language={language}
               isAvailable={true}
+              adminId={adminId}
+              customerId={customerId}
             />
           ))
         ) : (

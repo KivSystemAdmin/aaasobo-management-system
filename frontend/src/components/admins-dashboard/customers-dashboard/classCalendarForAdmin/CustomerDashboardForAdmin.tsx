@@ -27,6 +27,7 @@ export default async function CustomerDashboardForAdmin({
         <ClassCalendar
           customerId={customerId}
           userSessionType={userSessionType}
+          adminId={adminId}
         />
       }
       customerProfile={customerProfile}

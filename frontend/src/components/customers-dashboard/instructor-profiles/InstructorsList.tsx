@@ -12,19 +12,26 @@ import Loading from "@/components/elements/loading/Loading";
 export default function InstructorsList({
   instructorProfiles,
   userSessionType,
+  designatedInstructorId,
 }: {
   instructorProfiles: InstructorProfile[];
   userSessionType: UserType;
+  designatedInstructorId?: number;
 }) {
   const englishBackgroundClass = ["non-native", "native-a", "native-b"];
+  const { language } = useLanguage();
+
   const [filteredInstructors, setFilteredInstructors] = useState<
     InstructorProfile[] | null
   >(instructorProfiles);
-  const [selectedInstructor, setSelectedInstructor] =
-    useState<InstructorProfile | null>(null);
-  const { language } = useLanguage();
 
-  // Show loading state while fetching instructor profiles
+  const [selectedInstructor, setSelectedInstructor] =
+    useState<InstructorProfile | null>(
+      instructorProfiles.find(
+        (instructor) => instructor.id === designatedInstructorId,
+      ) || null,
+    );
+
   if (!instructorProfiles) {
     return <Loading />;
   }
@@ -48,6 +55,7 @@ export default function InstructorsList({
         }}
         className={styles.instructorSearch}
       />
+
       <div className={styles.instructors__list}>
         {filteredInstructors?.map((instructor) => (
           <ClassInstructor
@@ -60,19 +68,19 @@ export default function InstructorsList({
             onClick={() => setSelectedInstructor(instructor)}
           />
         ))}
-
-        {selectedInstructor && (
-          <Modal
-            isOpen={!!selectedInstructor}
-            onClose={() => setSelectedInstructor(null)}
-          >
-            <InstructorProfileModal
-              instructor={selectedInstructor}
-              userSessionType={userSessionType}
-            />
-          </Modal>
-        )}
       </div>
+
+      {selectedInstructor && (
+        <Modal
+          isOpen={!!selectedInstructor}
+          onClose={() => setSelectedInstructor(null)}
+        >
+          <InstructorProfileModal
+            instructor={selectedInstructor}
+            userSessionType={userSessionType}
+          />
+        </Modal>
+      )}
     </>
   );
 }

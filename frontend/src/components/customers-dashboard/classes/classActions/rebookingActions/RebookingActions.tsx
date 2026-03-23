@@ -8,10 +8,12 @@ export default async function RebookingActions({
   userSessionType,
   customerId,
   terminationAt,
+  adminId,
 }: {
   userSessionType?: UserType;
   customerId: number;
   terminationAt: string | null;
+  adminId?: number;
 }) {
   // Get the cookies from the request headers
   const cookie = await getCookie();
@@ -38,6 +40,7 @@ export default async function RebookingActions({
           instructorProfiles={instructorProfiles}
           childProfiles={childProfiles}
           userSessionType={userSessionType}
+          adminId={adminId}
         />
       }
     />

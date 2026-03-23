@@ -20,6 +20,7 @@ export default function RebookingForm({
   instructorProfiles,
   childProfiles,
   userSessionType,
+  adminId,
 }: RebookingFormProps) {
   const [instructorAvailabilities, setInstructorAvailabilities] = useState<
     { dateTime: string; availableInstructors: number[] }[] | []
@@ -123,6 +124,8 @@ export default function RebookingForm({
           setRebookingStep={setRebookingStep}
           dateTimeToRebook={dateTimeToRebook}
           language={language}
+          adminId={adminId}
+          customerId={customerId}
         />
       )}
 

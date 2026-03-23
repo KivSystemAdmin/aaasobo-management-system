@@ -2,7 +2,7 @@ import InstructorsList from "@/components/customers-dashboard/instructor-profile
 import Breadcrumb from "@/components/elements/breadcrumb/Breadcrumb";
 import { getAllInstructorProfiles } from "@/lib/api/instructorsApi";
 import { authenticateUserSession } from "@/lib/auth/sessionUtils";
-import { getCookie } from "../../../../proxy";
+import { getCookie } from "../../../../../proxy";
 
 async function InstructorProfilesPage({
   params,
@@ -11,12 +11,12 @@ async function InstructorProfilesPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ instructorId?: string }>;
 }) {
-  const { id: customerId } = await params;
+  const { id: adminId } = await params;
   const { instructorId } = await searchParams;
   // Authenticate user session
   const userSessionType: UserType = await authenticateUserSession(
-    "customer",
-    customerId,
+    "admin",
+    adminId,
   );
 
   // Get the cookies from the request headers
