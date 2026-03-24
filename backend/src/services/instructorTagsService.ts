@@ -7,12 +7,15 @@ export type InstructorTag = {
 };
 
 export const getTagCatalog = async () => {
-  return prisma.$queryRaw<InstructorTag[]>`
-    SELECT id, label, "sortOrder"
-    FROM "InstructorTagCatalog"
-    WHERE "deletedAt" IS NULL
-    ORDER BY "sortOrder" ASC, id ASC
-  `;
+  return prisma.instructorTagCatalog.findMany({
+    where: { deletedAt: null },
+    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+    select: {
+      id: true,
+      label: true,
+      sortOrder: true,
+    },
+  });
 };
 
 export const addTagToCatalog = async (label: string, adminId: number) => {
@@ -21,57 +24,62 @@ export const addTagToCatalog = async (label: string, adminId: number) => {
     throw new Error("Tag label is required.");
   }
 
-  const duplicate = await prisma.$queryRaw<{ id: number }[]>`
-    SELECT id
-    FROM "InstructorTagCatalog"
-    WHERE lower(label) = lower(${trimmed})
-      AND "deletedAt" IS NULL
-    LIMIT 1
-  `;
+  const duplicate = await prisma.instructorTagCatalog.findFirst({
+    where: {
+      label: {
+        equals: trimmed,
+        mode: "insensitive",
+      },
+      deletedAt: null,
+    },
+    select: { id: true },
+  });
 
-  if (duplicate.length > 0) {
+  if (duplicate) {
     throw new Error("Tag label already exists.");
   }
 
-  const [maxSort] = await prisma.$queryRaw<{ maxSortOrder: number | null }[]>`
-    SELECT MAX("sortOrder") AS "maxSortOrder"
-    FROM "InstructorTagCatalog"
-  `;
+  const maxSort = await prisma.instructorTagCatalog.aggregate({
+    _max: { sortOrder: true },
+  });
+  const nextSortOrder = (maxSort._max.sortOrder ?? 0) + 1;
 
-  const nextSortOrder = (maxSort?.maxSortOrder ?? 0) + 1;
-
-  const created = await prisma.$queryRaw<InstructorTag[]>`
-    INSERT INTO "InstructorTagCatalog" (label, "sortOrder", "createdBy")
-    VALUES (${trimmed}, ${nextSortOrder}, ${adminId})
-    RETURNING id, label, "sortOrder"
-  `;
-
-  return created[0];
+  return prisma.instructorTagCatalog.create({
+    data: {
+      label: trimmed,
+      sortOrder: nextSortOrder,
+      createdBy: adminId,
+    },
+    select: {
+      id: true,
+      label: true,
+      sortOrder: true,
+    },
+  });
 };
 
 export const softDeleteTag = async (tagId: number, adminId: number) => {
-  await prisma.$executeRaw`
-    UPDATE "InstructorTagCatalog"
-    SET "deletedAt" = NOW(), "deletedBy" = ${adminId}
-    WHERE id = ${tagId}
-      AND "deletedAt" IS NULL
-  `;
-
-  await prisma.$executeRaw`
-    DELETE FROM "InstructorTagAssignment"
-    WHERE "tagId" = ${tagId}
-  `;
+  await prisma.$transaction([
+    prisma.instructorTagCatalog.updateMany({
+      where: { id: tagId, deletedAt: null },
+      data: { deletedAt: new Date(), deletedBy: adminId },
+    }),
+    prisma.instructorTagAssignment.deleteMany({
+      where: { tagId },
+    }),
+  ]);
 };
 
 export const getInstructorTagIds = async (instructorId: number) => {
-  const rows = await prisma.$queryRaw<{ tagId: number }[]>`
-    SELECT ita."tagId"
-    FROM "InstructorTagAssignment" ita
-    INNER JOIN "InstructorTagCatalog" itc
-      ON itc.id = ita."tagId"
-     AND itc."deletedAt" IS NULL
-    WHERE ita."instructorId" = ${instructorId}
-  `;
+  const rows = await prisma.instructorTagAssignment.findMany({
+    where: {
+      instructorId,
+      tag: {
+        deletedAt: null,
+      },
+    },
+    select: { tagId: true },
+  });
 
   return rows.map((row) => row.tagId);
 };
@@ -82,47 +90,59 @@ export const updateInstructorTags = async (
   updatedBy: number,
 ) => {
   await prisma.$transaction(async (tx) => {
-    await tx.$executeRaw`
-      DELETE FROM "InstructorTagAssignment"
-      WHERE "instructorId" = ${instructorId}
-    `;
+    await tx.instructorTagAssignment.deleteMany({
+      where: { instructorId },
+    });
 
     if (tagIds.length === 0) {
       return;
     }
 
-    await Promise.all(
-      tagIds.map(
-        (tagId) =>
-          tx.$executeRaw`
-          INSERT INTO "InstructorTagAssignment" ("instructorId", "tagId", "updatedBy")
-          SELECT ${instructorId}, id, ${updatedBy}
-          FROM "InstructorTagCatalog"
-          WHERE id = ${tagId}
-            AND "deletedAt" IS NULL
-          ON CONFLICT ("instructorId", "tagId") DO NOTHING
-        `,
-      ),
-    );
+    const validTags = await tx.instructorTagCatalog.findMany({
+      where: {
+        id: { in: tagIds },
+        deletedAt: null,
+      },
+      select: { id: true },
+    });
+
+    if (validTags.length === 0) {
+      return;
+    }
+
+    await tx.instructorTagAssignment.createMany({
+      data: validTags.map(({ id }) => ({
+        instructorId,
+        tagId: id,
+        updatedBy,
+      })),
+      skipDuplicates: true,
+    });
   });
 };
 
 export const getTagUsageCounts = async () => {
-  return prisma.$queryRaw<
-    { id: number; label: string; sortOrder: number; assignedCount: number }[]
-  >`
-    SELECT
-      itc.id,
-      itc.label,
-      itc."sortOrder",
-      COUNT(ita."instructorId")::int AS "assignedCount"
-    FROM "InstructorTagCatalog" itc
-    LEFT JOIN "InstructorTagAssignment" ita
-      ON ita."tagId" = itc.id
-    WHERE itc."deletedAt" IS NULL
-    GROUP BY itc.id, itc.label, itc."sortOrder"
-    ORDER BY itc."sortOrder" ASC, itc.id ASC
-  `;
+  const rows = await prisma.instructorTagCatalog.findMany({
+    where: { deletedAt: null },
+    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+    select: {
+      id: true,
+      label: true,
+      sortOrder: true,
+      _count: {
+        select: {
+          assignments: true,
+        },
+      },
+    },
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    label: row.label,
+    sortOrder: row.sortOrder,
+    assignedCount: row._count.assignments,
+  }));
 };
 
 export const getTagsByInstructorIds = async (instructorIds: number[]) => {
@@ -135,31 +155,32 @@ export const getTagsByInstructorIds = async (instructorIds: number[]) => {
     }[];
   }
 
-  const rows = await Promise.all(
-    instructorIds.map(
-      (instructorId) =>
-        prisma.$queryRaw<
-          {
-            instructorId: number;
-            id: number;
-            label: string;
-            sortOrder: number;
-          }[]
-        >`
-        SELECT
-          ita."instructorId",
-          itc.id,
-          itc.label,
-          itc."sortOrder"
-        FROM "InstructorTagAssignment" ita
-        INNER JOIN "InstructorTagCatalog" itc
-          ON itc.id = ita."tagId"
-         AND itc."deletedAt" IS NULL
-        WHERE ita."instructorId" = ${instructorId}
-        ORDER BY itc."sortOrder" ASC, itc.id ASC
-      `,
-    ),
-  );
+  const rows = await prisma.instructorTagAssignment.findMany({
+    where: {
+      instructorId: { in: instructorIds },
+      tag: { deletedAt: null },
+    },
+    orderBy: [
+      { instructorId: "asc" },
+      { tag: { sortOrder: "asc" } },
+      { tagId: "asc" },
+    ],
+    select: {
+      instructorId: true,
+      tag: {
+        select: {
+          id: true,
+          label: true,
+          sortOrder: true,
+        },
+      },
+    },
+  });
 
-  return rows.flat();
+  return rows.map((row) => ({
+    instructorId: row.instructorId,
+    id: row.tag.id,
+    label: row.tag.label,
+    sortOrder: row.tag.sortOrder,
+  }));
 };
