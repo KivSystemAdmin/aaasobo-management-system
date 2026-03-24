@@ -15,11 +15,13 @@ export default function InstructorsList({
   userSessionType,
   designatedInstructorId,
   breadcrumbLink,
+  isCustomerView,
 }: {
   instructorProfiles: InstructorProfile[];
   userSessionType: UserType;
   designatedInstructorId?: number;
   breadcrumbLink?: string;
+  isCustomerView?: boolean;
 }) {
   const englishBackgroundClass = ["non-native", "native-a", "native-b"];
   const { language } = useLanguage();
@@ -165,6 +167,7 @@ export default function InstructorsList({
           <InstructorProfileModal
             instructor={selectedInstructor}
             userSessionType={userSessionType}
+            isCustomerView={isCustomerView}
           />
         </Modal>
       )}

@@ -5,13 +5,10 @@ import { getCookie } from "../../../../proxy";
 
 async function InstructorProfilesPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ instructorId?: string; customerId?: string }>;
 }) {
   const { id: adminId } = await params;
-  const { instructorId, customerId } = await searchParams;
   // Authenticate user session
   const userSessionType: UserType = await authenticateUserSession(
     "admin",
@@ -29,11 +26,15 @@ async function InstructorProfilesPage({
     return <p>Error: No instructor profiles found.</p>;
   }
 
+  // From this page, admins can only view instructor profiles with limited information the same as customers.
+  const isCustomerView = true;
+
   return (
     <>
       <InstructorsList
         instructorProfiles={instructorProfiles}
         userSessionType={userSessionType}
+        isCustomerView={isCustomerView}
       />
     </>
   );

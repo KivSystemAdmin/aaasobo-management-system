@@ -57,10 +57,12 @@ function InstructorProfile({
   instructor,
   token,
   userSessionType,
+  isCustomerView = false,
 }: {
   instructor: Instructor | InstructorProfile | string;
   token?: string;
   userSessionType?: UserType;
+  isCustomerView?: boolean;
 }) {
   const [updateResultState, setUpdateResultState] = useState<
     UpdateFormState | undefined
@@ -542,7 +544,7 @@ function InstructorProfile({
             </div>
 
             {/* Email */}
-            {userSessionType !== "customer" && (
+            {userSessionType !== "customer" && !isCustomerView && (
               <div className={styles.insideContainer}>
                 <EnvelopeIcon className={styles.icon} />
                 <div className={styles.userInfo}>
@@ -574,7 +576,7 @@ function InstructorProfile({
             )}
 
             {/* Class URL, Meeting ID, and Passcode */}
-            {userSessionType !== "customer" && (
+            {userSessionType !== "customer" && !isCustomerView && (
               <div className={styles.insideContainer}>
                 <VideoCameraIcon className={styles.icon} />
                 <div className={styles.userInfo}>
@@ -673,9 +675,11 @@ function InstructorProfile({
               </div>
             )}
 
-            {userSessionType === "admin" && latestInstructor && (
-              <InstructorFeeRates instructorId={latestInstructor.id} />
-            )}
+            {userSessionType === "admin" &&
+              !isCustomerView &&
+              latestInstructor && (
+                <InstructorFeeRates instructorId={latestInstructor.id} />
+              )}
 
             {(latestInstructor.tags?.length || 0) > 0 && (
               <div className={styles.insideContainer}>
@@ -699,7 +703,7 @@ function InstructorProfile({
             )}
 
             {/* Informational message */}
-            {userSessionType !== "customer" && (
+            {userSessionType !== "customer" && !isCustomerView && (
               <div className={styles.insideContainer}>
                 <InformationCircleIcon className={styles.icon} />
                 <p className={styles.info}>
@@ -719,6 +723,7 @@ function InstructorProfile({
 
             {/* Action buttons for only admin */}
             {userSessionType === "admin" &&
+            !isCustomerView &&
             latestInstructor.name !== MASKED_HEAD_LETTERS ? (
               <>
                 {isEditing ? (
