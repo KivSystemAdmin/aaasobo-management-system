@@ -30,11 +30,8 @@ export interface RequestWithQuery<QueryT> extends Omit<Request, "query"> {
 }
 
 // Flexible RequestWith interface supporting any combination of params, body, and query
-export interface RequestWith<
-  ParamsT = any,
-  BodyT = any,
-  QueryT = any,
-> extends Omit<Request, "params" | "body" | "query"> {
+export interface RequestWith<ParamsT = any, BodyT = any, QueryT = any>
+  extends Omit<Request, "params" | "body" | "query"> {
   params: ParamsT;
   body: BodyT;
   query: QueryT;

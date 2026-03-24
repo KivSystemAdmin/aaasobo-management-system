@@ -9,16 +9,16 @@ datasource db {
 }
 
 model Instructor {
-  id                  Int                  @id @default(autoincrement())
+  id                  Int                       @id @default(autoincrement())
   name                String
-  email               String               @unique
+  email               String                    @unique
   password            String
-  classURL            String               @unique
-  icon                String               @unique
-  nickname            String               @unique
-  meetingId           String               @unique
-  passcode            String               @unique
-  createdAt           DateTime             @default(now())
+  classURL            String                    @unique
+  icon                String                    @unique
+  nickname            String                    @unique
+  meetingId           String                    @unique
+  passcode            String                    @unique
+  createdAt           DateTime                  @default(now())
   birthdate           DateTime
   favoriteFood        String
   hobby               String
@@ -27,7 +27,7 @@ model Instructor {
   skill               String
   workingTime         String
   terminationAt       DateTime?
-  updatedAt           DateTime             @default(now()) @updatedAt
+  updatedAt           DateTime                  @default(now()) @updatedAt
   englishBackground   Int // 0: non-native, 1: native-A, 2: native-B
   classes             Class[]
   instructorAbsences  InstructorAbsence[]
@@ -40,14 +40,14 @@ model Instructor {
 }
 
 model InstructorTagCatalog {
-  id           Int                       @id @default(autoincrement())
-  label        String                    @unique
-  sortOrder    Int                       @default(0)
-  createdBy    Int?
-  createdAt    DateTime                  @default(now())
-  deletedAt    DateTime?
-  deletedBy    Int?
-  assignments  InstructorTagAssignment[]
+  id          Int                       @id @default(autoincrement())
+  label       String                    @unique
+  sortOrder   Int                       @default(0)
+  createdBy   Int?
+  createdAt   DateTime                  @default(now())
+  deletedAt   DateTime?
+  deletedBy   Int?
+  assignments InstructorTagAssignment[]
 
   @@index([deletedAt])
   @@index([sortOrder])
