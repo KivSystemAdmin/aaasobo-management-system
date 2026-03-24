@@ -18,18 +18,20 @@ export const addTagToCatalog = async (label: string, adminId: number) => {
     throw new Error("Tag label is required.");
   }
 
-  const duplicate = await prisma.instructorTagCatalog.findFirst({
+  const existing = await prisma.instructorTagCatalog.findFirst({
     where: {
       label: {
         equals: trimmed,
         mode: "insensitive",
       },
-      deletedAt: null,
     },
-    select: { id: true },
+    select: {
+      id: true,
+      deletedAt: true,
+    },
   });
 
-  if (duplicate) {
+  if (existing && existing.deletedAt === null) {
     throw new Error("Tag label already exists.");
   }
 
@@ -37,6 +39,23 @@ export const addTagToCatalog = async (label: string, adminId: number) => {
     _max: { sortOrder: true },
   });
   const nextSortOrder = (maxSort._max.sortOrder ?? 0) + 1;
+
+  if (existing) {
+    return prisma.instructorTagCatalog.update({
+      where: { id: existing.id },
+      data: {
+        label: trimmed,
+        sortOrder: nextSortOrder,
+        deletedAt: null,
+        deletedBy: null,
+      },
+      select: {
+        id: true,
+        label: true,
+        sortOrder: true,
+      },
+    });
+  }
 
   return prisma.instructorTagCatalog.create({
     data: {
