@@ -26,6 +26,9 @@ import type {
   InstructorAbsencesResponse,
   CreateAbsenceResponse,
   DeleteAbsenceResponse,
+  InstructorTagsResponse,
+  TagCatalogResponse,
+  UpdateInstructorTagsRequest,
 } from "@shared/schemas/instructors";
 import { EnglishBackground } from "@/types";
 
@@ -461,6 +464,104 @@ export const getAllInstructorProfiles = async (cookie?: string) => {
   } catch (error) {
     console.error("Failed to fetch all instructor profiles:", error);
     throw error;
+  }
+};
+
+export const getInstructorTagCatalog = async (cookie?: string) => {
+  const method = "GET";
+  let apiURL;
+  let headers;
+  let response;
+
+  if (cookie) {
+    apiURL = `${BASE_URL}/tags`;
+    headers = { "Content-Type": "application/json", Cookie: cookie };
+    response = await fetch(apiURL, { method, headers, cache: "no-store" });
+  } else {
+    apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+    headers = {
+      "Content-Type": "application/json",
+      "backend-endpoint": "/instructors/tags",
+      "no-cache": "no-cache",
+    };
+    response = await fetch(apiURL, { method, headers });
+  }
+
+  if (response.status !== 200) {
+    throw new Error(`HTTP Status: ${response.status} ${response.statusText}`);
+  }
+
+  const data: TagCatalogResponse = await response.json();
+  return data.tags;
+};
+
+export const createInstructorTag = async (label: string, cookie: string) => {
+  const response = await fetch(`${BASE_URL}/tags`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Cookie: cookie },
+    body: JSON.stringify({ label }),
+  });
+
+  if (response.status !== 201) {
+    const data = await response.json();
+    throw new Error(data.message || "Failed to create tag");
+  }
+};
+
+export const deleteInstructorTag = async (tagId: number, cookie: string) => {
+  const response = await fetch(`${BASE_URL}/tags/${tagId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json", Cookie: cookie },
+  });
+
+  if (response.status !== 200) {
+    throw new Error("Failed to delete tag");
+  }
+};
+
+export const getInstructorTags = async (
+  instructorId: number,
+  cookie?: string,
+) => {
+  const method = "GET";
+  let apiURL;
+  let headers;
+  let response;
+
+  if (cookie) {
+    apiURL = `${BASE_URL}/${instructorId}/tags`;
+    headers = { "Content-Type": "application/json", Cookie: cookie };
+    response = await fetch(apiURL, { method, headers, cache: "no-store" });
+  } else {
+    apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+    headers = {
+      "Content-Type": "application/json",
+      "backend-endpoint": `/instructors/${instructorId}/tags`,
+      "no-cache": "no-cache",
+    };
+    response = await fetch(apiURL, { method, headers });
+  }
+
+  if (response.status !== 200) {
+    throw new Error("Failed to fetch instructor tags");
+  }
+
+  return (await response.json()) as InstructorTagsResponse;
+};
+
+export const saveInstructorTags = async (
+  instructorId: number,
+  payload: UpdateInstructorTagsRequest,
+  cookie: string,
+) => {
+  const response = await fetch(`${BASE_URL}/${instructorId}/tags`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Cookie: cookie },
+    body: JSON.stringify(payload),
+  });
+
+  if (response.status !== 200) {
+    throw new Error("Failed to save instructor tags");
   }
 };
 

@@ -34,8 +34,35 @@ model Instructor {
   instructorFees      InstructorFee[]
   instructorSchedules InstructorSchedule[]
   recurringClasses    RecurringClass[]
+  tagAssignments      InstructorTagAssignment[]
 
   @@index([terminationAt])
+}
+
+model InstructorTagCatalog {
+  id           Int                       @id @default(autoincrement())
+  label        String                    @unique
+  sortOrder    Int                       @default(0)
+  createdBy    Int?
+  createdAt    DateTime                  @default(now())
+  deletedAt    DateTime?
+  deletedBy    Int?
+  assignments  InstructorTagAssignment[]
+
+  @@index([deletedAt])
+  @@index([sortOrder])
+}
+
+model InstructorTagAssignment {
+  instructorId Int
+  tagId        Int
+  updatedBy    Int?
+  updatedAt    DateTime             @default(now()) @updatedAt
+  instructor   Instructor           @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  tag          InstructorTagCatalog @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([instructorId, tagId])
+  @@index([tagId])
 }
 
 model Customer {

@@ -676,6 +676,21 @@ function InstructorProfile({
               <InstructorFeeRates instructorId={latestInstructor.id} />
             )}
 
+            {(latestInstructor.tags?.length || 0) > 0 && (
+              <div className={styles.tagSection}>
+                <h4 className={styles.tagSectionTitle}>
+                  {language === "en" ? "Skills & preferences" : "スキル・希望"}
+                </h4>
+                <div className={styles.tagList}>
+                  {latestInstructor.tags.map((tag) => (
+                    <span key={tag.id} className={styles.tagChip}>
+                      {tag.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Instructor introduction URL */}
             {userSessionType !== "customer" && (
               <div className={styles.insideContainer}>

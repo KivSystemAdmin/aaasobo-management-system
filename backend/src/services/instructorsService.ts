@@ -13,6 +13,7 @@ import { convertToUTCDate } from "../utils/dateUtils";
 import { put, del } from "@vercel/blob";
 import { randomUUID } from "crypto";
 import { EnglishBackground } from "../types";
+import { getTagsByInstructorIds } from "./instructorTagsService";
 
 // Register a new instructor account in the DB
 export const registerInstructor = async (data: {
@@ -306,12 +307,25 @@ export const getInstructorProfiles = async () => {
     },
   });
 
+  const tags = await getTagsByInstructorIds(instructors.map((row) => row.id));
+  const tagsByInstructorId = new Map<number, typeof tags>();
+  for (const tag of tags) {
+    const current = tagsByInstructorId.get(tag.instructorId) || [];
+    current.push(tag);
+    tagsByInstructorId.set(tag.instructorId, current);
+  }
+
   const instructorProfiles = instructors.map((instructor: Instructor) => ({
     id: instructor.id,
     name: instructor.name,
     nickname: instructor.nickname,
     icon: instructor.icon,
     englishBackground: instructor.englishBackground,
+    tags: (tagsByInstructorId.get(instructor.id) || []).map((tag) => ({
+      id: tag.id,
+      label: tag.label,
+      sortOrder: tag.sortOrder,
+    })),
   }));
 
   return instructorProfiles;
@@ -333,12 +347,25 @@ export const getInstructorProfilesByEnglishBackground = async (
     },
   });
 
+  const tags = await getTagsByInstructorIds(instructors.map((row) => row.id));
+  const tagsByInstructorId = new Map<number, typeof tags>();
+  for (const tag of tags) {
+    const current = tagsByInstructorId.get(tag.instructorId) || [];
+    current.push(tag);
+    tagsByInstructorId.set(tag.instructorId, current);
+  }
+
   const instructorProfiles = instructors.map((instructor) => ({
     id: instructor.id,
     name: instructor.name,
     nickname: instructor.nickname,
     icon: instructor.icon,
     englishBackground: instructor.englishBackground,
+    tags: (tagsByInstructorId.get(instructor.id) || []).map((tag) => ({
+      id: tag.id,
+      label: tag.label,
+      sortOrder: tag.sortOrder,
+    })),
   }));
 
   return instructorProfiles;

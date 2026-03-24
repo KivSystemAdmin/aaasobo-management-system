@@ -1,0 +1,66 @@
+.container {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.panel {
+  border: 1px solid #d5d9e2;
+  border-radius: 12px;
+  padding: 20px;
+  background: #fff;
+}
+
+.search {
+  width: 100%;
+  border: 1px solid #c8cfdd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 8px 0 12px;
+}
+
+.checkList {
+  max-height: 360px;
+  overflow: auto;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #edf1f8;
+}
+
+.primary {
+  background: #4d4caf;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+.addRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.catalogRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #edf1f8;
+}
+
+.delete {
+  color: #dd3030;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
