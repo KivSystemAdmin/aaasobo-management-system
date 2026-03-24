@@ -1,11 +1,5 @@
 import { prisma } from "../../prisma/prismaClient";
 
-export type InstructorTag = {
-  id: number;
-  label: string;
-  sortOrder: number;
-};
-
 export const getTagCatalog = async () => {
   return prisma.instructorTagCatalog.findMany({
     where: { deletedAt: null },
