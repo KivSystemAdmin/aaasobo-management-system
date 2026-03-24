@@ -9,7 +9,7 @@ import InstructorSchedule from "./instructor-schedule/InstructorSchedule";
 import AvailabilityCalendar from "./instructor-schedule/AvailabilityCalendar";
 import Loading from "@/components/elements/loading/Loading";
 import InstructorPayroll from "./InstructorPayroll";
-import InstructorTagsTab from "./InstructorTagsTab";
+import InstructorTagsTab from "./InstructorTags";
 import type { InstructorSchedule as InstructorScheduleType } from "@shared/schemas/instructors";
 import type { InstructorScheduleWithSlots } from "@/lib/api/instructorsApi";
 

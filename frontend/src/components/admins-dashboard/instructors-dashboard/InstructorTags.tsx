@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import styles from "./InstructorTagsTab.module.scss";
+import styles from "./InstructorTags.module.scss";
 import {
   createInstructorTagAction,
   deleteInstructorTagAction,
@@ -18,7 +18,7 @@ import type {
   TagCatalogResponse,
 } from "@shared/schemas/instructors";
 
-export default function InstructorTagsTab({
+export default function InstructorTags({
   instructorId,
 }: {
   instructorId: number;
@@ -68,7 +68,7 @@ export default function InstructorTagsTab({
     setIsSaving(true);
     try {
       await saveInstructorTagsAction(instructorId, selectedTagIds);
-      toast.success("Tags saved.");
+      toast.success("Tags saved successfully.");
       await load();
     } catch {
       toast.error("Failed to save tags.");
@@ -85,7 +85,7 @@ export default function InstructorTagsTab({
       await createInstructorTagAction(newTagLabel.trim());
       setNewTagLabel("");
       await load();
-      toast.success("Tag created.");
+      toast.success("Tag created successfully.");
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to create tag.",
@@ -97,7 +97,7 @@ export default function InstructorTagsTab({
     try {
       await deleteInstructorTagAction(tagId);
       await load();
-      toast.success("Tag deleted.");
+      toast.success("Tag deleted successfully.");
     } catch {
       toast.error("Failed to delete tag.");
     }
@@ -125,7 +125,11 @@ export default function InstructorTagsTab({
             </label>
           ))}
         </div>
-        <button className={styles.primary} onClick={save} disabled={isSaving}>
+        <button
+          className={styles.primary + " " + styles.save}
+          onClick={save}
+          disabled={isSaving}
+        >
           {isSaving ? "Saving..." : "Save selections"}
         </button>
       </div>
@@ -139,14 +143,17 @@ export default function InstructorTagsTab({
             placeholder="New tag name..."
             className={styles.search}
           />
-          <button className={styles.primary} onClick={createTag}>
+          <button
+            className={styles.primary + " " + styles.add}
+            onClick={createTag}
+          >
             Add
           </button>
         </div>
         <div className={styles.checkList}>
           {catalog.map((tag) => (
             <div key={tag.id} className={styles.catalogRow}>
-              <strong>{tag.label}</strong>
+              <span>{tag.label}</span>
               <span>{tag.assignedCount ?? 0} instructors</span>
               <button
                 onClick={() => deleteTag(tag.id)}

@@ -22,6 +22,7 @@ import {
   LinkIcon,
   UserCircleIcon,
   VideoCameraIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -677,21 +678,27 @@ function InstructorProfile({
             )}
 
             {(latestInstructor.tags?.length || 0) > 0 && (
-              <div className={styles.tagSection}>
-                <h4 className={styles.tagSectionTitle}>
-                  {language === "en" ? "Skills & preferences" : "スキル・希望"}
-                </h4>
-                <div className={styles.tagList}>
-                  {latestInstructor.tags.map((tag) => (
-                    <span key={tag.id} className={styles.tagChip}>
-                      {tag.label}
-                    </span>
-                  ))}
+              <div className={styles.insideContainer}>
+                <SparklesIcon className={styles.icon} />
+                <div className={styles.userInfo}>
+                  <p className={styles.tagSectionTitle}>
+                    {language === "en" ? "Specialties" : "得意分野"}
+                  </p>
+
+                  <div className={styles.tagSection}>
+                    <div className={styles.tagList}>
+                      {latestInstructor.tags.map((tag) => (
+                        <span key={tag.id} className={styles.tagChip}>
+                          {tag.label}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Instructor introduction URL */}
+            {/* Informational message */}
             {userSessionType !== "customer" && (
               <div className={styles.insideContainer}>
                 <InformationCircleIcon className={styles.icon} />
