@@ -8,25 +8,37 @@ import {
 import { z } from "zod";
 import { RouteConfig } from "../openapi/routerRegistry";
 
+type AuthenticatedUser = {
+  id: string;
+  userType: string;
+};
+
 // Type-safe request interfaces for validated requests
 export interface RequestWithBody<BodyT> extends Omit<Request, "body"> {
   body: BodyT;
+  user?: AuthenticatedUser;
 }
 
 export interface RequestWithParams<ParamsT> extends Omit<Request, "params"> {
   params: ParamsT;
+  user?: AuthenticatedUser;
 }
 
 export interface RequestWithQuery<QueryT> extends Omit<Request, "query"> {
   query: QueryT;
+  user?: AuthenticatedUser;
 }
 
 // Flexible RequestWith interface supporting any combination of params, body, and query
-export interface RequestWith<ParamsT = any, BodyT = any, QueryT = any>
-  extends Omit<Request, "params" | "body" | "query"> {
+export interface RequestWith<
+  ParamsT = any,
+  BodyT = any,
+  QueryT = any,
+> extends Omit<Request, "params" | "body" | "query"> {
   params: ParamsT;
   body: BodyT;
   query: QueryT;
+  user?: AuthenticatedUser;
 }
 
 const validateBody = (schema: z.ZodTypeAny) => {

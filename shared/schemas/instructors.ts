@@ -65,6 +65,11 @@ export const InstructorProfilesResponse = z
   .array(InstructorProfile)
   .describe("Array of instructor profiles");
 
+const InstructorTag = z.object({
+  id: z.number().int().positive().describe("Instructor tag ID"),
+  label: z.string().min(1).describe("Instructor tag label"),
+});
+
 // Detailed instructor profile schema for admin/authenticated users
 export const DetailedInstructorProfile = z.object({
   id: z.number().int().positive().describe("Instructor ID"),
@@ -88,7 +93,10 @@ export const DetailedInstructorProfile = z.object({
     .nullable()
     .describe("Termination timestamp (ISO string)"),
   englishBackground: z.number().describe("English background requirement"),
-  tags: z.array(InstructorTag).optional(),
+  tags: z
+    .array(InstructorTag)
+    .default([])
+    .describe("Instructor tags for profile search/filtering"),
 });
 
 export const AllInstructorProfilesResponse = z
@@ -120,7 +128,10 @@ export const CompleteInstructor = z.object({
   passcode: z.string().nullable().describe("Meeting passcode"),
   terminationAt: z.string().nullable().describe("Termination timestamp (JST)"),
   englishBackground: z.number().describe("English background requirement"),
-  tags: z.array(InstructorTag).optional(),
+  tags: z
+    .array(InstructorTag)
+    .default([])
+    .describe("Instructor tags for profile search/filtering"),
 });
 
 export const InstructorResponse = z
