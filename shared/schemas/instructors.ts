@@ -21,6 +21,19 @@ export const EnglishBackgroundParams = z.object({
     .transform((val) => parseInt(val, 10)),
 });
 
+const InstructorTagSchema = z.object({
+  id: z.number().int().positive(),
+  label: z.string().min(1),
+  sortOrder: z.number().int().nonnegative(),
+});
+
+export const InstructorTag = InstructorTagSchema.describe("Instructor tag");
+
+export const InstructorTagsResponse = z.object({
+  tags: z.array(InstructorTag),
+  selectedTagIds: z.array(z.number().int().positive()),
+});
+
 export const TagIdParams = z.object({
   id: z
     .string()
@@ -32,23 +45,12 @@ export const UpdateInstructorTagsRequest = z.object({
   tagIds: z.array(z.number().int().positive()).default([]),
 });
 
-export const InstructorTag = z.object({
-  id: z.number().int().positive(),
-  label: z.string().min(1),
-  sortOrder: z.number().int().nonnegative(),
-});
-
 export const InstructorTagWithCount = InstructorTag.extend({
   assignedCount: z.number().int().nonnegative(),
 });
 
 export const TagCatalogResponse = z.object({
   tags: z.array(InstructorTagWithCount),
-});
-
-export const InstructorTagsResponse = z.object({
-  tags: z.array(InstructorTag),
-  selectedTagIds: z.array(z.number().int().positive()),
 });
 
 // Instructor profile schema for public profiles endpoint
@@ -64,11 +66,6 @@ export const InstructorProfile = z.object({
 export const InstructorProfilesResponse = z
   .array(InstructorProfile)
   .describe("Array of instructor profiles");
-
-const InstructorTag = z.object({
-  id: z.number().int().positive().describe("Instructor tag ID"),
-  label: z.string().min(1).describe("Instructor tag label"),
-});
 
 // Detailed instructor profile schema for admin/authenticated users
 export const DetailedInstructorProfile = z.object({
@@ -408,14 +405,12 @@ export const PostTerminationScheduleResponse = z.object({
 export type InstructorIdParams = z.infer<typeof InstructorIdParams>;
 export type ClassIdParams = z.infer<typeof ClassIdParams>;
 export type EnglishBackgroundParams = z.infer<typeof EnglishBackgroundParams>;
-export type TagIdParams = z.infer<typeof TagIdParams>;
+export type InstructorTag = z.infer<typeof InstructorTag>;
+export type InstructorTagsResponse = z.infer<typeof InstructorTagsResponse>;
+export type TagCatalogResponse = z.infer<typeof TagCatalogResponse>;
 export type UpdateInstructorTagsRequest = z.infer<
   typeof UpdateInstructorTagsRequest
 >;
-export type InstructorTag = z.infer<typeof InstructorTag>;
-export type InstructorTagWithCount = z.infer<typeof InstructorTagWithCount>;
-export type TagCatalogResponse = z.infer<typeof TagCatalogResponse>;
-export type InstructorTagsResponse = z.infer<typeof InstructorTagsResponse>;
 export type InstructorProfile = z.infer<typeof InstructorProfile>;
 export type InstructorProfilesResponse = z.infer<
   typeof InstructorProfilesResponse

@@ -467,7 +467,9 @@ export const getAllInstructorProfiles = async (cookie?: string) => {
   }
 };
 
-export const getInstructorTagCatalog = async (cookie?: string) => {
+export const getInstructorTagCatalog = async (
+  cookie?: string,
+): Promise<TagCatalogResponse["tags"]> => {
   const method = "GET";
   let apiURL;
   let headers;
@@ -495,34 +497,10 @@ export const getInstructorTagCatalog = async (cookie?: string) => {
   return data.tags;
 };
 
-export const createInstructorTag = async (label: string, cookie: string) => {
-  const response = await fetch(`${BASE_URL}/tags`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Cookie: cookie },
-    body: JSON.stringify({ label }),
-  });
-
-  if (response.status !== 201) {
-    const data = await response.json();
-    throw new Error(data.message || "Failed to create tag");
-  }
-};
-
-export const deleteInstructorTag = async (tagId: number, cookie: string) => {
-  const response = await fetch(`${BASE_URL}/tags/${tagId}`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json", Cookie: cookie },
-  });
-
-  if (response.status !== 200) {
-    throw new Error("Failed to delete tag");
-  }
-};
-
 export const getInstructorTags = async (
   instructorId: number,
   cookie?: string,
-) => {
+): Promise<InstructorTagsResponse> => {
   const method = "GET";
   let apiURL;
   let headers;
@@ -547,6 +525,30 @@ export const getInstructorTags = async (
   }
 
   return (await response.json()) as InstructorTagsResponse;
+};
+
+export const createInstructorTag = async (label: string, cookie: string) => {
+  const response = await fetch(`${BASE_URL}/tags`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Cookie: cookie },
+    body: JSON.stringify({ label }),
+  });
+
+  if (response.status !== 201) {
+    const data = await response.json();
+    throw new Error(data.message || "Failed to create tag");
+  }
+};
+
+export const deleteInstructorTag = async (tagId: number, cookie: string) => {
+  const response = await fetch(`${BASE_URL}/tags/${tagId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json", Cookie: cookie },
+  });
+
+  if (response.status !== 200) {
+    throw new Error("Failed to delete tag");
+  }
 };
 
 export const saveInstructorTags = async (

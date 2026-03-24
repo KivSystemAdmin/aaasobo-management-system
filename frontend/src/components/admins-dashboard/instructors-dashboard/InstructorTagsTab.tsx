@@ -13,6 +13,10 @@ import {
 } from "@/lib/api/instructorsApi";
 import { useCallback, useEffect } from "react";
 import { toast } from "react-toastify";
+import type {
+  InstructorTagsResponse,
+  TagCatalogResponse,
+} from "@shared/schemas/instructors";
 
 export default function InstructorTagsTab({
   instructorId,
@@ -28,10 +32,14 @@ export default function InstructorTagsTab({
   const [isSaving, setIsSaving] = useState(false);
 
   const load = useCallback(async () => {
-    const [instructorTags, fullCatalog] = await Promise.all([
+    const [instructorTags, fullCatalog]: [
+      InstructorTagsResponse,
+      TagCatalogResponse["tags"],
+    ] = await Promise.all([
       getInstructorTags(instructorId),
       getInstructorTagCatalog(),
     ]);
+
     setSelectedTagIds(instructorTags.selectedTagIds);
     setCatalog(fullCatalog);
   }, [instructorId]);

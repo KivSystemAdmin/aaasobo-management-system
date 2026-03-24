@@ -95,7 +95,7 @@ export const updateInstructorTagsController = async (
   }
 
   const tagIds = Array.isArray(req.body?.tagIds)
-    ? req.body.tagIds.filter((tagId) => Number.isInteger(tagId))
+    ? req.body.tagIds.filter((tagId: number) => Number.isInteger(tagId))
     : [];
 
   try {
