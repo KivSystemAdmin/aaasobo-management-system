@@ -26,6 +26,7 @@ import {
 } from "../services/classesService";
 import { convertToTimezoneDate } from "../utils/dateUtils";
 import { EnglishBackground } from "../types";
+import { getTagsByInstructorIds } from "../services/instructorTagsService";
 
 function setErrorResponse(res: Response, error: unknown) {
   return res
@@ -73,6 +74,8 @@ export const getInstructor = async (
       ? convertToTimezoneDate(instructor.terminationAt, "Asia/Tokyo")
       : null;
 
+    const tags = await getTagsByInstructorIds([instructorId]);
+
     return res.status(200).json({
       instructor: {
         id: instructorId,
@@ -92,6 +95,11 @@ export const getInstructor = async (
         passcode: instructor.passcode,
         terminationAt: terminationAt,
         englishBackground: instructor.englishBackground,
+        tags: tags.map((tag) => ({
+          id: tag.id,
+          label: tag.label,
+          sortOrder: tag.sortOrder,
+        })),
       },
     });
   } catch (error) {
@@ -111,6 +119,15 @@ export const getAllInstructorProfilesController = async (
     }
 
     // Map the instructors to include only the necessary fields for the profile.
+    const instructorIds = instructors.map((instructor) => instructor.id);
+    const tags = await getTagsByInstructorIds(instructorIds);
+    const tagsByInstructorId = new Map<number, typeof tags>();
+    for (const tag of tags) {
+      const current = tagsByInstructorId.get(tag.instructorId) || [];
+      current.push(tag);
+      tagsByInstructorId.set(tag.instructorId, current);
+    }
+
     const instructorProfiles = await Promise.all(
       instructors.map(async (instructor: Instructor) => {
         // Validate the instructor's icon URL
@@ -137,6 +154,11 @@ export const getAllInstructorProfilesController = async (
           createdAt: instructor.createdAt,
           terminationAt: terminationAt,
           englishBackground: instructor.englishBackground,
+          tags: (tagsByInstructorId.get(instructor.id) || []).map((tag) => ({
+            id: tag.id,
+            label: tag.label,
+            sortOrder: tag.sortOrder,
+          })),
         };
       }),
     );

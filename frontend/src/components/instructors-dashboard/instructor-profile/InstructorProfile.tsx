@@ -22,6 +22,7 @@ import {
   LinkIcon,
   UserCircleIcon,
   VideoCameraIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -56,10 +57,12 @@ function InstructorProfile({
   instructor,
   token,
   userSessionType,
+  isCustomerView = false,
 }: {
   instructor: Instructor | InstructorProfile | string;
   token?: string;
   userSessionType?: UserType;
+  isCustomerView?: boolean;
 }) {
   const [updateResultState, setUpdateResultState] = useState<
     UpdateFormState | undefined
@@ -541,7 +544,7 @@ function InstructorProfile({
             </div>
 
             {/* Email */}
-            {userSessionType !== "customer" && (
+            {userSessionType !== "customer" && !isCustomerView && (
               <div className={styles.insideContainer}>
                 <EnvelopeIcon className={styles.icon} />
                 <div className={styles.userInfo}>
@@ -573,7 +576,7 @@ function InstructorProfile({
             )}
 
             {/* Class URL, Meeting ID, and Passcode */}
-            {userSessionType !== "customer" && (
+            {userSessionType !== "customer" && !isCustomerView && (
               <div className={styles.insideContainer}>
                 <VideoCameraIcon className={styles.icon} />
                 <div className={styles.userInfo}>
@@ -672,12 +675,35 @@ function InstructorProfile({
               </div>
             )}
 
-            {userSessionType === "admin" && latestInstructor && (
-              <InstructorFeeRates instructorId={latestInstructor.id} />
+            {userSessionType === "admin" &&
+              !isCustomerView &&
+              latestInstructor && (
+                <InstructorFeeRates instructorId={latestInstructor.id} />
+              )}
+
+            {(latestInstructor.tags?.length || 0) > 0 && (
+              <div className={styles.insideContainer}>
+                <SparklesIcon className={styles.icon} />
+                <div className={styles.userInfo}>
+                  <p className={styles.tagSectionTitle}>
+                    {language === "en" ? "Specialties" : "得意分野"}
+                  </p>
+
+                  <div className={styles.tagSection}>
+                    <div className={styles.tagList}>
+                      {latestInstructor.tags.map((tag) => (
+                        <span key={tag.id} className={styles.tagChip}>
+                          {tag.label}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
 
-            {/* Instructor introduction URL */}
-            {userSessionType !== "customer" && (
+            {/* Informational message */}
+            {userSessionType !== "customer" && !isCustomerView && (
               <div className={styles.insideContainer}>
                 <InformationCircleIcon className={styles.icon} />
                 <p className={styles.info}>
@@ -697,6 +723,7 @@ function InstructorProfile({
 
             {/* Action buttons for only admin */}
             {userSessionType === "admin" &&
+            !isCustomerView &&
             latestInstructor.name !== MASKED_HEAD_LETTERS ? (
               <>
                 {isEditing ? (

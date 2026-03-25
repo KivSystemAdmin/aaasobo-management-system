@@ -41,6 +41,10 @@ import {
   InstructorAbsencesResponse,
   CreateAbsenceResponse,
   DeleteAbsenceResponse,
+  TagCatalogResponse,
+  InstructorTagsResponse,
+  TagIdParams,
+  UpdateInstructorTagsRequest,
 } from "../../../shared/schemas/instructors";
 import {
   type RequestWithId,
@@ -62,6 +66,13 @@ import {
   removeInstructorAbsenceController,
 } from "../../src/controllers/instructorAbsenceController";
 import { AUTH_ROLES } from "../utils/commonUtils";
+import {
+  createTagController,
+  deleteTagController,
+  getInstructorTagsController,
+  getTagCatalogController,
+  updateInstructorTagsController,
+} from "../controllers/instructorTagsController";
 
 const profilesConfig = {
   method: "get" as const,
@@ -566,6 +577,97 @@ const deleteAbsenceConfig = {
   },
 } as const;
 
+const tagCatalogConfig = {
+  method: "get" as const,
+  middleware: [verifyAuthentication(AUTH_ROLES.ACI)] as RequestHandler[],
+  handler: getTagCatalogController,
+  openapi: {
+    summary: "Get instructor tag catalog",
+    description: "Get active instructor tags and usage counts",
+    responses: {
+      200: { description: "Tag catalog", schema: TagCatalogResponse },
+      500: {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const createTagConfig = {
+  method: "post" as const,
+  bodySchema: z.object({ label: z.string().min(1).max(80) }),
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: createTagController,
+  openapi: {
+    summary: "Create instructor tag",
+    description: "Create a shared instructor tag (admin only)",
+    responses: {
+      201: { description: "Created" },
+      400: { description: "Bad request", schema: MessageErrorResponse },
+      500: {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const deleteTagConfig = {
+  method: "delete" as const,
+  paramsSchema: TagIdParams,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: deleteTagController,
+  openapi: {
+    summary: "Delete instructor tag",
+    description: "Soft-delete an instructor tag (admin only)",
+    responses: {
+      200: { description: "Deleted" },
+      500: {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const instructorTagsConfig = {
+  method: "get" as const,
+  paramsSchema: InstructorIdParams,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: getInstructorTagsController,
+  openapi: {
+    summary: "Get instructor tags",
+    description: "Get shared tag catalog and selected tags for an instructor",
+    responses: {
+      200: { description: "Instructor tags", schema: InstructorTagsResponse },
+      500: {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const updateInstructorTagsConfig = {
+  method: "put" as const,
+  paramsSchema: InstructorIdParams,
+  bodySchema: UpdateInstructorTagsRequest,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: updateInstructorTagsController,
+  openapi: {
+    summary: "Update instructor tags",
+    description: "Replace selected tags for an instructor",
+    responses: {
+      200: { description: "Updated" },
+      500: {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
+      },
+    },
+  },
+} as const;
+
 const validatedRouteConfigs = {
   "/all-profiles": [allProfilesConfig],
   "/available-slots": [availableSlotsConfig],
@@ -575,7 +677,10 @@ const validatedRouteConfigs = {
   "/profiles/english-background/:englishBackground": [
     englishBackgroundProfilesConfig,
   ],
+  "/tags": [tagCatalogConfig, createTagConfig],
+  "/tags/:id": [deleteTagConfig],
   "/:id": [instructorByIdConfig],
+  "/:id/tags": [instructorTagsConfig, updateInstructorTagsConfig],
   "/:id/absences": [instructorAbsencesConfig, createAbsenceConfig],
   "/:id/absences/:absentAt": [deleteAbsenceConfig],
   "/:id/available-slots": [instructorAvailableSlotsConfig],

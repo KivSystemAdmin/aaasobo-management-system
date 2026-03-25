@@ -91,6 +91,11 @@ export function getLinks(
       icon: UserIcon,
     },
     {
+      name: "Instructor Profiles",
+      href: `/admins/${userId}/instructor-profiles`,
+      icon: UsersIcon,
+    },
+    {
       name: "AaasoBo! Calendar",
       href: `/admins/${userId}/business-calendar`,
       icon: CalendarDaysIcon,

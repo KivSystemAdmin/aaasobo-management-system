@@ -143,6 +143,23 @@ exports.Prisma.InstructorScalarFieldEnum = {
   englishBackground: 'englishBackground'
 };
 
+exports.Prisma.InstructorTagCatalogScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  sortOrder: 'sortOrder',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  deletedAt: 'deletedAt',
+  deletedBy: 'deletedBy'
+};
+
+exports.Prisma.InstructorTagAssignmentScalarFieldEnum = {
+  instructorId: 'instructorId',
+  tagId: 'tagId',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.CustomerScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -319,6 +336,8 @@ exports.Status = exports.$Enums.Status = {
 
 exports.Prisma.ModelName = {
   Instructor: 'Instructor',
+  InstructorTagCatalog: 'InstructorTagCatalog',
+  InstructorTagAssignment: 'InstructorTagAssignment',
   Customer: 'Customer',
   Class: 'Class',
   ClassAttendance: 'ClassAttendance',

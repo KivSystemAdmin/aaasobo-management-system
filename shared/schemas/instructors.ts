@@ -21,6 +21,38 @@ export const EnglishBackgroundParams = z.object({
     .transform((val) => parseInt(val, 10)),
 });
 
+const InstructorTagSchema = z.object({
+  id: z.number().int().positive(),
+  label: z.string().min(1),
+  sortOrder: z.number().int().nonnegative(),
+});
+
+export const InstructorTag = InstructorTagSchema.describe("Instructor tag");
+
+export const InstructorTagsResponse = z.object({
+  tags: z.array(InstructorTag),
+  selectedTagIds: z.array(z.number().int().positive()),
+});
+
+export const TagIdParams = z.object({
+  id: z
+    .string()
+    .regex(/^\d+$/, "Tag ID must be a valid number")
+    .transform((val) => parseInt(val, 10)),
+});
+
+export const UpdateInstructorTagsRequest = z.object({
+  tagIds: z.array(z.number().int().positive()).default([]),
+});
+
+export const InstructorTagWithCount = InstructorTag.extend({
+  assignedCount: z.number().int().nonnegative(),
+});
+
+export const TagCatalogResponse = z.object({
+  tags: z.array(InstructorTagWithCount),
+});
+
 // Instructor profile schema for public profiles endpoint
 export const InstructorProfile = z.object({
   id: z.number().int().positive().describe("Instructor ID"),
@@ -28,6 +60,7 @@ export const InstructorProfile = z.object({
   nickname: z.string().min(1).describe("Instructor nickname"),
   icon: z.string().describe("Instructor profile icon URL from database"),
   englishBackground: z.number().describe("English background requirement"),
+  tags: z.array(InstructorTag).optional(),
 });
 
 export const InstructorProfilesResponse = z
@@ -57,6 +90,10 @@ export const DetailedInstructorProfile = z.object({
     .nullable()
     .describe("Termination timestamp (ISO string)"),
   englishBackground: z.number().describe("English background requirement"),
+  tags: z
+    .array(InstructorTag)
+    .default([])
+    .describe("Instructor tags for profile search/filtering"),
 });
 
 export const AllInstructorProfilesResponse = z
@@ -88,6 +125,10 @@ export const CompleteInstructor = z.object({
   passcode: z.string().nullable().describe("Meeting passcode"),
   terminationAt: z.string().nullable().describe("Termination timestamp (JST)"),
   englishBackground: z.number().describe("English background requirement"),
+  tags: z
+    .array(InstructorTag)
+    .default([])
+    .describe("Instructor tags for profile search/filtering"),
 });
 
 export const InstructorResponse = z
@@ -364,6 +405,12 @@ export const PostTerminationScheduleResponse = z.object({
 export type InstructorIdParams = z.infer<typeof InstructorIdParams>;
 export type ClassIdParams = z.infer<typeof ClassIdParams>;
 export type EnglishBackgroundParams = z.infer<typeof EnglishBackgroundParams>;
+export type InstructorTag = z.infer<typeof InstructorTag>;
+export type InstructorTagsResponse = z.infer<typeof InstructorTagsResponse>;
+export type TagCatalogResponse = z.infer<typeof TagCatalogResponse>;
+export type UpdateInstructorTagsRequest = z.infer<
+  typeof UpdateInstructorTagsRequest
+>;
 export type InstructorProfile = z.infer<typeof InstructorProfile>;
 export type InstructorProfilesResponse = z.infer<
   typeof InstructorProfilesResponse

@@ -19,6 +19,16 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type Instructor = $Result.DefaultSelection<Prisma.$InstructorPayload>
 /**
+ * Model InstructorTagCatalog
+ * 
+ */
+export type InstructorTagCatalog = $Result.DefaultSelection<Prisma.$InstructorTagCatalogPayload>
+/**
+ * Model InstructorTagAssignment
+ * 
+ */
+export type InstructorTagAssignment = $Result.DefaultSelection<Prisma.$InstructorTagAssignmentPayload>
+/**
  * Model Customer
  * 
  */
@@ -257,6 +267,26 @@ export class PrismaClient<
     * ```
     */
   get instructor(): Prisma.InstructorDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.instructorTagCatalog`: Exposes CRUD operations for the **InstructorTagCatalog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more InstructorTagCatalogs
+    * const instructorTagCatalogs = await prisma.instructorTagCatalog.findMany()
+    * ```
+    */
+  get instructorTagCatalog(): Prisma.InstructorTagCatalogDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.instructorTagAssignment`: Exposes CRUD operations for the **InstructorTagAssignment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more InstructorTagAssignments
+    * const instructorTagAssignments = await prisma.instructorTagAssignment.findMany()
+    * ```
+    */
+  get instructorTagAssignment(): Prisma.InstructorTagAssignmentDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.customer`: Exposes CRUD operations for the **Customer** model.
@@ -872,6 +902,8 @@ export namespace Prisma {
 
   export const ModelName: {
     Instructor: 'Instructor',
+    InstructorTagCatalog: 'InstructorTagCatalog',
+    InstructorTagAssignment: 'InstructorTagAssignment',
     Customer: 'Customer',
     Class: 'Class',
     ClassAttendance: 'ClassAttendance',
@@ -905,7 +937,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "instructor" | "customer" | "class" | "classAttendance" | "plan" | "subscription" | "recurringClass" | "recurringClassAttendance" | "verificationToken" | "passwordResetToken" | "schedule" | "event" | "instructorSchedule" | "instructorSlot" | "instructorAbsence" | "instructorFee" | "systemStatus" | "admin" | "child"
+      modelProps: "instructor" | "instructorTagCatalog" | "instructorTagAssignment" | "customer" | "class" | "classAttendance" | "plan" | "subscription" | "recurringClass" | "recurringClassAttendance" | "verificationToken" | "passwordResetToken" | "schedule" | "event" | "instructorSchedule" | "instructorSlot" | "instructorAbsence" | "instructorFee" | "systemStatus" | "admin" | "child"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -980,6 +1012,154 @@ export namespace Prisma {
           count: {
             args: Prisma.InstructorCountArgs<ExtArgs>
             result: $Utils.Optional<InstructorCountAggregateOutputType> | number
+          }
+        }
+      }
+      InstructorTagCatalog: {
+        payload: Prisma.$InstructorTagCatalogPayload<ExtArgs>
+        fields: Prisma.InstructorTagCatalogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.InstructorTagCatalogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagCatalogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.InstructorTagCatalogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagCatalogPayload>
+          }
+          findFirst: {
+            args: Prisma.InstructorTagCatalogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagCatalogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.InstructorTagCatalogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagCatalogPayload>
+          }
+          findMany: {
+            args: Prisma.InstructorTagCatalogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagCatalogPayload>[]
+          }
+          create: {
+            args: Prisma.InstructorTagCatalogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagCatalogPayload>
+          }
+          createMany: {
+            args: Prisma.InstructorTagCatalogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.InstructorTagCatalogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagCatalogPayload>[]
+          }
+          delete: {
+            args: Prisma.InstructorTagCatalogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagCatalogPayload>
+          }
+          update: {
+            args: Prisma.InstructorTagCatalogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagCatalogPayload>
+          }
+          deleteMany: {
+            args: Prisma.InstructorTagCatalogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.InstructorTagCatalogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.InstructorTagCatalogUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagCatalogPayload>[]
+          }
+          upsert: {
+            args: Prisma.InstructorTagCatalogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagCatalogPayload>
+          }
+          aggregate: {
+            args: Prisma.InstructorTagCatalogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateInstructorTagCatalog>
+          }
+          groupBy: {
+            args: Prisma.InstructorTagCatalogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<InstructorTagCatalogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.InstructorTagCatalogCountArgs<ExtArgs>
+            result: $Utils.Optional<InstructorTagCatalogCountAggregateOutputType> | number
+          }
+        }
+      }
+      InstructorTagAssignment: {
+        payload: Prisma.$InstructorTagAssignmentPayload<ExtArgs>
+        fields: Prisma.InstructorTagAssignmentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.InstructorTagAssignmentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagAssignmentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.InstructorTagAssignmentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagAssignmentPayload>
+          }
+          findFirst: {
+            args: Prisma.InstructorTagAssignmentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagAssignmentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.InstructorTagAssignmentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagAssignmentPayload>
+          }
+          findMany: {
+            args: Prisma.InstructorTagAssignmentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagAssignmentPayload>[]
+          }
+          create: {
+            args: Prisma.InstructorTagAssignmentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagAssignmentPayload>
+          }
+          createMany: {
+            args: Prisma.InstructorTagAssignmentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.InstructorTagAssignmentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagAssignmentPayload>[]
+          }
+          delete: {
+            args: Prisma.InstructorTagAssignmentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagAssignmentPayload>
+          }
+          update: {
+            args: Prisma.InstructorTagAssignmentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagAssignmentPayload>
+          }
+          deleteMany: {
+            args: Prisma.InstructorTagAssignmentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.InstructorTagAssignmentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.InstructorTagAssignmentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagAssignmentPayload>[]
+          }
+          upsert: {
+            args: Prisma.InstructorTagAssignmentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InstructorTagAssignmentPayload>
+          }
+          aggregate: {
+            args: Prisma.InstructorTagAssignmentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateInstructorTagAssignment>
+          }
+          groupBy: {
+            args: Prisma.InstructorTagAssignmentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<InstructorTagAssignmentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.InstructorTagAssignmentCountArgs<ExtArgs>
+            result: $Utils.Optional<InstructorTagAssignmentCountAggregateOutputType> | number
           }
         }
       }
@@ -2424,6 +2604,8 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     instructor?: InstructorOmit
+    instructorTagCatalog?: InstructorTagCatalogOmit
+    instructorTagAssignment?: InstructorTagAssignmentOmit
     customer?: CustomerOmit
     class?: ClassOmit
     classAttendance?: ClassAttendanceOmit
@@ -2527,6 +2709,7 @@ export namespace Prisma {
     instructorFees: number
     instructorSchedules: number
     recurringClasses: number
+    tagAssignments: number
   }
 
   export type InstructorCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2535,6 +2718,7 @@ export namespace Prisma {
     instructorFees?: boolean | InstructorCountOutputTypeCountInstructorFeesArgs
     instructorSchedules?: boolean | InstructorCountOutputTypeCountInstructorSchedulesArgs
     recurringClasses?: boolean | InstructorCountOutputTypeCountRecurringClassesArgs
+    tagAssignments?: boolean | InstructorCountOutputTypeCountTagAssignmentsArgs
   }
 
   // Custom InputTypes
@@ -2581,6 +2765,44 @@ export namespace Prisma {
    */
   export type InstructorCountOutputTypeCountRecurringClassesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RecurringClassWhereInput
+  }
+
+  /**
+   * InstructorCountOutputType without action
+   */
+  export type InstructorCountOutputTypeCountTagAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InstructorTagAssignmentWhereInput
+  }
+
+
+  /**
+   * Count Type InstructorTagCatalogCountOutputType
+   */
+
+  export type InstructorTagCatalogCountOutputType = {
+    assignments: number
+  }
+
+  export type InstructorTagCatalogCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assignments?: boolean | InstructorTagCatalogCountOutputTypeCountAssignmentsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * InstructorTagCatalogCountOutputType without action
+   */
+  export type InstructorTagCatalogCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalogCountOutputType
+     */
+    select?: InstructorTagCatalogCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * InstructorTagCatalogCountOutputType without action
+   */
+  export type InstructorTagCatalogCountOutputTypeCountAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InstructorTagAssignmentWhereInput
   }
 
 
@@ -3208,6 +3430,7 @@ export namespace Prisma {
     instructorFees?: boolean | Instructor$instructorFeesArgs<ExtArgs>
     instructorSchedules?: boolean | Instructor$instructorSchedulesArgs<ExtArgs>
     recurringClasses?: boolean | Instructor$recurringClassesArgs<ExtArgs>
+    tagAssignments?: boolean | Instructor$tagAssignmentsArgs<ExtArgs>
     _count?: boolean | InstructorCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["instructor"]>
 
@@ -3287,6 +3510,7 @@ export namespace Prisma {
     instructorFees?: boolean | Instructor$instructorFeesArgs<ExtArgs>
     instructorSchedules?: boolean | Instructor$instructorSchedulesArgs<ExtArgs>
     recurringClasses?: boolean | Instructor$recurringClassesArgs<ExtArgs>
+    tagAssignments?: boolean | Instructor$tagAssignmentsArgs<ExtArgs>
     _count?: boolean | InstructorCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type InstructorIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3300,6 +3524,7 @@ export namespace Prisma {
       instructorFees: Prisma.$InstructorFeePayload<ExtArgs>[]
       instructorSchedules: Prisma.$InstructorSchedulePayload<ExtArgs>[]
       recurringClasses: Prisma.$RecurringClassPayload<ExtArgs>[]
+      tagAssignments: Prisma.$InstructorTagAssignmentPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -3721,6 +3946,7 @@ export namespace Prisma {
     instructorFees<T extends Instructor$instructorFeesArgs<ExtArgs> = {}>(args?: Subset<T, Instructor$instructorFeesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorFeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     instructorSchedules<T extends Instructor$instructorSchedulesArgs<ExtArgs> = {}>(args?: Subset<T, Instructor$instructorSchedulesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorSchedulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     recurringClasses<T extends Instructor$recurringClassesArgs<ExtArgs> = {}>(args?: Subset<T, Instructor$recurringClassesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RecurringClassPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    tagAssignments<T extends Instructor$tagAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, Instructor$tagAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4278,6 +4504,30 @@ export namespace Prisma {
   }
 
   /**
+   * Instructor.tagAssignments
+   */
+  export type Instructor$tagAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentInclude<ExtArgs> | null
+    where?: InstructorTagAssignmentWhereInput
+    orderBy?: InstructorTagAssignmentOrderByWithRelationInput | InstructorTagAssignmentOrderByWithRelationInput[]
+    cursor?: InstructorTagAssignmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InstructorTagAssignmentScalarFieldEnum | InstructorTagAssignmentScalarFieldEnum[]
+  }
+
+  /**
    * Instructor without action
    */
   export type InstructorDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4293,6 +4543,2243 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: InstructorInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model InstructorTagCatalog
+   */
+
+  export type AggregateInstructorTagCatalog = {
+    _count: InstructorTagCatalogCountAggregateOutputType | null
+    _avg: InstructorTagCatalogAvgAggregateOutputType | null
+    _sum: InstructorTagCatalogSumAggregateOutputType | null
+    _min: InstructorTagCatalogMinAggregateOutputType | null
+    _max: InstructorTagCatalogMaxAggregateOutputType | null
+  }
+
+  export type InstructorTagCatalogAvgAggregateOutputType = {
+    id: number | null
+    sortOrder: number | null
+    createdBy: number | null
+    deletedBy: number | null
+  }
+
+  export type InstructorTagCatalogSumAggregateOutputType = {
+    id: number | null
+    sortOrder: number | null
+    createdBy: number | null
+    deletedBy: number | null
+  }
+
+  export type InstructorTagCatalogMinAggregateOutputType = {
+    id: number | null
+    label: string | null
+    sortOrder: number | null
+    createdBy: number | null
+    createdAt: Date | null
+    deletedAt: Date | null
+    deletedBy: number | null
+  }
+
+  export type InstructorTagCatalogMaxAggregateOutputType = {
+    id: number | null
+    label: string | null
+    sortOrder: number | null
+    createdBy: number | null
+    createdAt: Date | null
+    deletedAt: Date | null
+    deletedBy: number | null
+  }
+
+  export type InstructorTagCatalogCountAggregateOutputType = {
+    id: number
+    label: number
+    sortOrder: number
+    createdBy: number
+    createdAt: number
+    deletedAt: number
+    deletedBy: number
+    _all: number
+  }
+
+
+  export type InstructorTagCatalogAvgAggregateInputType = {
+    id?: true
+    sortOrder?: true
+    createdBy?: true
+    deletedBy?: true
+  }
+
+  export type InstructorTagCatalogSumAggregateInputType = {
+    id?: true
+    sortOrder?: true
+    createdBy?: true
+    deletedBy?: true
+  }
+
+  export type InstructorTagCatalogMinAggregateInputType = {
+    id?: true
+    label?: true
+    sortOrder?: true
+    createdBy?: true
+    createdAt?: true
+    deletedAt?: true
+    deletedBy?: true
+  }
+
+  export type InstructorTagCatalogMaxAggregateInputType = {
+    id?: true
+    label?: true
+    sortOrder?: true
+    createdBy?: true
+    createdAt?: true
+    deletedAt?: true
+    deletedBy?: true
+  }
+
+  export type InstructorTagCatalogCountAggregateInputType = {
+    id?: true
+    label?: true
+    sortOrder?: true
+    createdBy?: true
+    createdAt?: true
+    deletedAt?: true
+    deletedBy?: true
+    _all?: true
+  }
+
+  export type InstructorTagCatalogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InstructorTagCatalog to aggregate.
+     */
+    where?: InstructorTagCatalogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InstructorTagCatalogs to fetch.
+     */
+    orderBy?: InstructorTagCatalogOrderByWithRelationInput | InstructorTagCatalogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: InstructorTagCatalogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InstructorTagCatalogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InstructorTagCatalogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned InstructorTagCatalogs
+    **/
+    _count?: true | InstructorTagCatalogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: InstructorTagCatalogAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: InstructorTagCatalogSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: InstructorTagCatalogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: InstructorTagCatalogMaxAggregateInputType
+  }
+
+  export type GetInstructorTagCatalogAggregateType<T extends InstructorTagCatalogAggregateArgs> = {
+        [P in keyof T & keyof AggregateInstructorTagCatalog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateInstructorTagCatalog[P]>
+      : GetScalarType<T[P], AggregateInstructorTagCatalog[P]>
+  }
+
+
+
+
+  export type InstructorTagCatalogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InstructorTagCatalogWhereInput
+    orderBy?: InstructorTagCatalogOrderByWithAggregationInput | InstructorTagCatalogOrderByWithAggregationInput[]
+    by: InstructorTagCatalogScalarFieldEnum[] | InstructorTagCatalogScalarFieldEnum
+    having?: InstructorTagCatalogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: InstructorTagCatalogCountAggregateInputType | true
+    _avg?: InstructorTagCatalogAvgAggregateInputType
+    _sum?: InstructorTagCatalogSumAggregateInputType
+    _min?: InstructorTagCatalogMinAggregateInputType
+    _max?: InstructorTagCatalogMaxAggregateInputType
+  }
+
+  export type InstructorTagCatalogGroupByOutputType = {
+    id: number
+    label: string
+    sortOrder: number
+    createdBy: number | null
+    createdAt: Date
+    deletedAt: Date | null
+    deletedBy: number | null
+    _count: InstructorTagCatalogCountAggregateOutputType | null
+    _avg: InstructorTagCatalogAvgAggregateOutputType | null
+    _sum: InstructorTagCatalogSumAggregateOutputType | null
+    _min: InstructorTagCatalogMinAggregateOutputType | null
+    _max: InstructorTagCatalogMaxAggregateOutputType | null
+  }
+
+  type GetInstructorTagCatalogGroupByPayload<T extends InstructorTagCatalogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<InstructorTagCatalogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof InstructorTagCatalogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], InstructorTagCatalogGroupByOutputType[P]>
+            : GetScalarType<T[P], InstructorTagCatalogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type InstructorTagCatalogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    label?: boolean
+    sortOrder?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    deletedAt?: boolean
+    deletedBy?: boolean
+    assignments?: boolean | InstructorTagCatalog$assignmentsArgs<ExtArgs>
+    _count?: boolean | InstructorTagCatalogCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["instructorTagCatalog"]>
+
+  export type InstructorTagCatalogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    label?: boolean
+    sortOrder?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    deletedAt?: boolean
+    deletedBy?: boolean
+  }, ExtArgs["result"]["instructorTagCatalog"]>
+
+  export type InstructorTagCatalogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    label?: boolean
+    sortOrder?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    deletedAt?: boolean
+    deletedBy?: boolean
+  }, ExtArgs["result"]["instructorTagCatalog"]>
+
+  export type InstructorTagCatalogSelectScalar = {
+    id?: boolean
+    label?: boolean
+    sortOrder?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    deletedAt?: boolean
+    deletedBy?: boolean
+  }
+
+  export type InstructorTagCatalogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "label" | "sortOrder" | "createdBy" | "createdAt" | "deletedAt" | "deletedBy", ExtArgs["result"]["instructorTagCatalog"]>
+  export type InstructorTagCatalogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assignments?: boolean | InstructorTagCatalog$assignmentsArgs<ExtArgs>
+    _count?: boolean | InstructorTagCatalogCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type InstructorTagCatalogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type InstructorTagCatalogIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $InstructorTagCatalogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "InstructorTagCatalog"
+    objects: {
+      assignments: Prisma.$InstructorTagAssignmentPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      label: string
+      sortOrder: number
+      createdBy: number | null
+      createdAt: Date
+      deletedAt: Date | null
+      deletedBy: number | null
+    }, ExtArgs["result"]["instructorTagCatalog"]>
+    composites: {}
+  }
+
+  type InstructorTagCatalogGetPayload<S extends boolean | null | undefined | InstructorTagCatalogDefaultArgs> = $Result.GetResult<Prisma.$InstructorTagCatalogPayload, S>
+
+  type InstructorTagCatalogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<InstructorTagCatalogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: InstructorTagCatalogCountAggregateInputType | true
+    }
+
+  export interface InstructorTagCatalogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['InstructorTagCatalog'], meta: { name: 'InstructorTagCatalog' } }
+    /**
+     * Find zero or one InstructorTagCatalog that matches the filter.
+     * @param {InstructorTagCatalogFindUniqueArgs} args - Arguments to find a InstructorTagCatalog
+     * @example
+     * // Get one InstructorTagCatalog
+     * const instructorTagCatalog = await prisma.instructorTagCatalog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends InstructorTagCatalogFindUniqueArgs>(args: SelectSubset<T, InstructorTagCatalogFindUniqueArgs<ExtArgs>>): Prisma__InstructorTagCatalogClient<$Result.GetResult<Prisma.$InstructorTagCatalogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one InstructorTagCatalog that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {InstructorTagCatalogFindUniqueOrThrowArgs} args - Arguments to find a InstructorTagCatalog
+     * @example
+     * // Get one InstructorTagCatalog
+     * const instructorTagCatalog = await prisma.instructorTagCatalog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends InstructorTagCatalogFindUniqueOrThrowArgs>(args: SelectSubset<T, InstructorTagCatalogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__InstructorTagCatalogClient<$Result.GetResult<Prisma.$InstructorTagCatalogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InstructorTagCatalog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagCatalogFindFirstArgs} args - Arguments to find a InstructorTagCatalog
+     * @example
+     * // Get one InstructorTagCatalog
+     * const instructorTagCatalog = await prisma.instructorTagCatalog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends InstructorTagCatalogFindFirstArgs>(args?: SelectSubset<T, InstructorTagCatalogFindFirstArgs<ExtArgs>>): Prisma__InstructorTagCatalogClient<$Result.GetResult<Prisma.$InstructorTagCatalogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InstructorTagCatalog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagCatalogFindFirstOrThrowArgs} args - Arguments to find a InstructorTagCatalog
+     * @example
+     * // Get one InstructorTagCatalog
+     * const instructorTagCatalog = await prisma.instructorTagCatalog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends InstructorTagCatalogFindFirstOrThrowArgs>(args?: SelectSubset<T, InstructorTagCatalogFindFirstOrThrowArgs<ExtArgs>>): Prisma__InstructorTagCatalogClient<$Result.GetResult<Prisma.$InstructorTagCatalogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more InstructorTagCatalogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagCatalogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all InstructorTagCatalogs
+     * const instructorTagCatalogs = await prisma.instructorTagCatalog.findMany()
+     * 
+     * // Get first 10 InstructorTagCatalogs
+     * const instructorTagCatalogs = await prisma.instructorTagCatalog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const instructorTagCatalogWithIdOnly = await prisma.instructorTagCatalog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends InstructorTagCatalogFindManyArgs>(args?: SelectSubset<T, InstructorTagCatalogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorTagCatalogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a InstructorTagCatalog.
+     * @param {InstructorTagCatalogCreateArgs} args - Arguments to create a InstructorTagCatalog.
+     * @example
+     * // Create one InstructorTagCatalog
+     * const InstructorTagCatalog = await prisma.instructorTagCatalog.create({
+     *   data: {
+     *     // ... data to create a InstructorTagCatalog
+     *   }
+     * })
+     * 
+     */
+    create<T extends InstructorTagCatalogCreateArgs>(args: SelectSubset<T, InstructorTagCatalogCreateArgs<ExtArgs>>): Prisma__InstructorTagCatalogClient<$Result.GetResult<Prisma.$InstructorTagCatalogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many InstructorTagCatalogs.
+     * @param {InstructorTagCatalogCreateManyArgs} args - Arguments to create many InstructorTagCatalogs.
+     * @example
+     * // Create many InstructorTagCatalogs
+     * const instructorTagCatalog = await prisma.instructorTagCatalog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends InstructorTagCatalogCreateManyArgs>(args?: SelectSubset<T, InstructorTagCatalogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many InstructorTagCatalogs and returns the data saved in the database.
+     * @param {InstructorTagCatalogCreateManyAndReturnArgs} args - Arguments to create many InstructorTagCatalogs.
+     * @example
+     * // Create many InstructorTagCatalogs
+     * const instructorTagCatalog = await prisma.instructorTagCatalog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many InstructorTagCatalogs and only return the `id`
+     * const instructorTagCatalogWithIdOnly = await prisma.instructorTagCatalog.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends InstructorTagCatalogCreateManyAndReturnArgs>(args?: SelectSubset<T, InstructorTagCatalogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorTagCatalogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a InstructorTagCatalog.
+     * @param {InstructorTagCatalogDeleteArgs} args - Arguments to delete one InstructorTagCatalog.
+     * @example
+     * // Delete one InstructorTagCatalog
+     * const InstructorTagCatalog = await prisma.instructorTagCatalog.delete({
+     *   where: {
+     *     // ... filter to delete one InstructorTagCatalog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends InstructorTagCatalogDeleteArgs>(args: SelectSubset<T, InstructorTagCatalogDeleteArgs<ExtArgs>>): Prisma__InstructorTagCatalogClient<$Result.GetResult<Prisma.$InstructorTagCatalogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one InstructorTagCatalog.
+     * @param {InstructorTagCatalogUpdateArgs} args - Arguments to update one InstructorTagCatalog.
+     * @example
+     * // Update one InstructorTagCatalog
+     * const instructorTagCatalog = await prisma.instructorTagCatalog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends InstructorTagCatalogUpdateArgs>(args: SelectSubset<T, InstructorTagCatalogUpdateArgs<ExtArgs>>): Prisma__InstructorTagCatalogClient<$Result.GetResult<Prisma.$InstructorTagCatalogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more InstructorTagCatalogs.
+     * @param {InstructorTagCatalogDeleteManyArgs} args - Arguments to filter InstructorTagCatalogs to delete.
+     * @example
+     * // Delete a few InstructorTagCatalogs
+     * const { count } = await prisma.instructorTagCatalog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends InstructorTagCatalogDeleteManyArgs>(args?: SelectSubset<T, InstructorTagCatalogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InstructorTagCatalogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagCatalogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many InstructorTagCatalogs
+     * const instructorTagCatalog = await prisma.instructorTagCatalog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends InstructorTagCatalogUpdateManyArgs>(args: SelectSubset<T, InstructorTagCatalogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InstructorTagCatalogs and returns the data updated in the database.
+     * @param {InstructorTagCatalogUpdateManyAndReturnArgs} args - Arguments to update many InstructorTagCatalogs.
+     * @example
+     * // Update many InstructorTagCatalogs
+     * const instructorTagCatalog = await prisma.instructorTagCatalog.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more InstructorTagCatalogs and only return the `id`
+     * const instructorTagCatalogWithIdOnly = await prisma.instructorTagCatalog.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends InstructorTagCatalogUpdateManyAndReturnArgs>(args: SelectSubset<T, InstructorTagCatalogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorTagCatalogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one InstructorTagCatalog.
+     * @param {InstructorTagCatalogUpsertArgs} args - Arguments to update or create a InstructorTagCatalog.
+     * @example
+     * // Update or create a InstructorTagCatalog
+     * const instructorTagCatalog = await prisma.instructorTagCatalog.upsert({
+     *   create: {
+     *     // ... data to create a InstructorTagCatalog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the InstructorTagCatalog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends InstructorTagCatalogUpsertArgs>(args: SelectSubset<T, InstructorTagCatalogUpsertArgs<ExtArgs>>): Prisma__InstructorTagCatalogClient<$Result.GetResult<Prisma.$InstructorTagCatalogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of InstructorTagCatalogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagCatalogCountArgs} args - Arguments to filter InstructorTagCatalogs to count.
+     * @example
+     * // Count the number of InstructorTagCatalogs
+     * const count = await prisma.instructorTagCatalog.count({
+     *   where: {
+     *     // ... the filter for the InstructorTagCatalogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends InstructorTagCatalogCountArgs>(
+      args?: Subset<T, InstructorTagCatalogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], InstructorTagCatalogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a InstructorTagCatalog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagCatalogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends InstructorTagCatalogAggregateArgs>(args: Subset<T, InstructorTagCatalogAggregateArgs>): Prisma.PrismaPromise<GetInstructorTagCatalogAggregateType<T>>
+
+    /**
+     * Group by InstructorTagCatalog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagCatalogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends InstructorTagCatalogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: InstructorTagCatalogGroupByArgs['orderBy'] }
+        : { orderBy?: InstructorTagCatalogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, InstructorTagCatalogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInstructorTagCatalogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the InstructorTagCatalog model
+   */
+  readonly fields: InstructorTagCatalogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for InstructorTagCatalog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__InstructorTagCatalogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    assignments<T extends InstructorTagCatalog$assignmentsArgs<ExtArgs> = {}>(args?: Subset<T, InstructorTagCatalog$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the InstructorTagCatalog model
+   */
+  interface InstructorTagCatalogFieldRefs {
+    readonly id: FieldRef<"InstructorTagCatalog", 'Int'>
+    readonly label: FieldRef<"InstructorTagCatalog", 'String'>
+    readonly sortOrder: FieldRef<"InstructorTagCatalog", 'Int'>
+    readonly createdBy: FieldRef<"InstructorTagCatalog", 'Int'>
+    readonly createdAt: FieldRef<"InstructorTagCatalog", 'DateTime'>
+    readonly deletedAt: FieldRef<"InstructorTagCatalog", 'DateTime'>
+    readonly deletedBy: FieldRef<"InstructorTagCatalog", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * InstructorTagCatalog findUnique
+   */
+  export type InstructorTagCatalogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalog
+     */
+    select?: InstructorTagCatalogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagCatalog
+     */
+    omit?: InstructorTagCatalogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagCatalogInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorTagCatalog to fetch.
+     */
+    where: InstructorTagCatalogWhereUniqueInput
+  }
+
+  /**
+   * InstructorTagCatalog findUniqueOrThrow
+   */
+  export type InstructorTagCatalogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalog
+     */
+    select?: InstructorTagCatalogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagCatalog
+     */
+    omit?: InstructorTagCatalogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagCatalogInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorTagCatalog to fetch.
+     */
+    where: InstructorTagCatalogWhereUniqueInput
+  }
+
+  /**
+   * InstructorTagCatalog findFirst
+   */
+  export type InstructorTagCatalogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalog
+     */
+    select?: InstructorTagCatalogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagCatalog
+     */
+    omit?: InstructorTagCatalogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagCatalogInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorTagCatalog to fetch.
+     */
+    where?: InstructorTagCatalogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InstructorTagCatalogs to fetch.
+     */
+    orderBy?: InstructorTagCatalogOrderByWithRelationInput | InstructorTagCatalogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InstructorTagCatalogs.
+     */
+    cursor?: InstructorTagCatalogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InstructorTagCatalogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InstructorTagCatalogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InstructorTagCatalogs.
+     */
+    distinct?: InstructorTagCatalogScalarFieldEnum | InstructorTagCatalogScalarFieldEnum[]
+  }
+
+  /**
+   * InstructorTagCatalog findFirstOrThrow
+   */
+  export type InstructorTagCatalogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalog
+     */
+    select?: InstructorTagCatalogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagCatalog
+     */
+    omit?: InstructorTagCatalogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagCatalogInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorTagCatalog to fetch.
+     */
+    where?: InstructorTagCatalogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InstructorTagCatalogs to fetch.
+     */
+    orderBy?: InstructorTagCatalogOrderByWithRelationInput | InstructorTagCatalogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InstructorTagCatalogs.
+     */
+    cursor?: InstructorTagCatalogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InstructorTagCatalogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InstructorTagCatalogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InstructorTagCatalogs.
+     */
+    distinct?: InstructorTagCatalogScalarFieldEnum | InstructorTagCatalogScalarFieldEnum[]
+  }
+
+  /**
+   * InstructorTagCatalog findMany
+   */
+  export type InstructorTagCatalogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalog
+     */
+    select?: InstructorTagCatalogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagCatalog
+     */
+    omit?: InstructorTagCatalogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagCatalogInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorTagCatalogs to fetch.
+     */
+    where?: InstructorTagCatalogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InstructorTagCatalogs to fetch.
+     */
+    orderBy?: InstructorTagCatalogOrderByWithRelationInput | InstructorTagCatalogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing InstructorTagCatalogs.
+     */
+    cursor?: InstructorTagCatalogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InstructorTagCatalogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InstructorTagCatalogs.
+     */
+    skip?: number
+    distinct?: InstructorTagCatalogScalarFieldEnum | InstructorTagCatalogScalarFieldEnum[]
+  }
+
+  /**
+   * InstructorTagCatalog create
+   */
+  export type InstructorTagCatalogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalog
+     */
+    select?: InstructorTagCatalogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagCatalog
+     */
+    omit?: InstructorTagCatalogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagCatalogInclude<ExtArgs> | null
+    /**
+     * The data needed to create a InstructorTagCatalog.
+     */
+    data: XOR<InstructorTagCatalogCreateInput, InstructorTagCatalogUncheckedCreateInput>
+  }
+
+  /**
+   * InstructorTagCatalog createMany
+   */
+  export type InstructorTagCatalogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many InstructorTagCatalogs.
+     */
+    data: InstructorTagCatalogCreateManyInput | InstructorTagCatalogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * InstructorTagCatalog createManyAndReturn
+   */
+  export type InstructorTagCatalogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalog
+     */
+    select?: InstructorTagCatalogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagCatalog
+     */
+    omit?: InstructorTagCatalogOmit<ExtArgs> | null
+    /**
+     * The data used to create many InstructorTagCatalogs.
+     */
+    data: InstructorTagCatalogCreateManyInput | InstructorTagCatalogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * InstructorTagCatalog update
+   */
+  export type InstructorTagCatalogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalog
+     */
+    select?: InstructorTagCatalogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagCatalog
+     */
+    omit?: InstructorTagCatalogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagCatalogInclude<ExtArgs> | null
+    /**
+     * The data needed to update a InstructorTagCatalog.
+     */
+    data: XOR<InstructorTagCatalogUpdateInput, InstructorTagCatalogUncheckedUpdateInput>
+    /**
+     * Choose, which InstructorTagCatalog to update.
+     */
+    where: InstructorTagCatalogWhereUniqueInput
+  }
+
+  /**
+   * InstructorTagCatalog updateMany
+   */
+  export type InstructorTagCatalogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update InstructorTagCatalogs.
+     */
+    data: XOR<InstructorTagCatalogUpdateManyMutationInput, InstructorTagCatalogUncheckedUpdateManyInput>
+    /**
+     * Filter which InstructorTagCatalogs to update
+     */
+    where?: InstructorTagCatalogWhereInput
+    /**
+     * Limit how many InstructorTagCatalogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * InstructorTagCatalog updateManyAndReturn
+   */
+  export type InstructorTagCatalogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalog
+     */
+    select?: InstructorTagCatalogSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagCatalog
+     */
+    omit?: InstructorTagCatalogOmit<ExtArgs> | null
+    /**
+     * The data used to update InstructorTagCatalogs.
+     */
+    data: XOR<InstructorTagCatalogUpdateManyMutationInput, InstructorTagCatalogUncheckedUpdateManyInput>
+    /**
+     * Filter which InstructorTagCatalogs to update
+     */
+    where?: InstructorTagCatalogWhereInput
+    /**
+     * Limit how many InstructorTagCatalogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * InstructorTagCatalog upsert
+   */
+  export type InstructorTagCatalogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalog
+     */
+    select?: InstructorTagCatalogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagCatalog
+     */
+    omit?: InstructorTagCatalogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagCatalogInclude<ExtArgs> | null
+    /**
+     * The filter to search for the InstructorTagCatalog to update in case it exists.
+     */
+    where: InstructorTagCatalogWhereUniqueInput
+    /**
+     * In case the InstructorTagCatalog found by the `where` argument doesn't exist, create a new InstructorTagCatalog with this data.
+     */
+    create: XOR<InstructorTagCatalogCreateInput, InstructorTagCatalogUncheckedCreateInput>
+    /**
+     * In case the InstructorTagCatalog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<InstructorTagCatalogUpdateInput, InstructorTagCatalogUncheckedUpdateInput>
+  }
+
+  /**
+   * InstructorTagCatalog delete
+   */
+  export type InstructorTagCatalogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalog
+     */
+    select?: InstructorTagCatalogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagCatalog
+     */
+    omit?: InstructorTagCatalogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagCatalogInclude<ExtArgs> | null
+    /**
+     * Filter which InstructorTagCatalog to delete.
+     */
+    where: InstructorTagCatalogWhereUniqueInput
+  }
+
+  /**
+   * InstructorTagCatalog deleteMany
+   */
+  export type InstructorTagCatalogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InstructorTagCatalogs to delete
+     */
+    where?: InstructorTagCatalogWhereInput
+    /**
+     * Limit how many InstructorTagCatalogs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * InstructorTagCatalog.assignments
+   */
+  export type InstructorTagCatalog$assignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentInclude<ExtArgs> | null
+    where?: InstructorTagAssignmentWhereInput
+    orderBy?: InstructorTagAssignmentOrderByWithRelationInput | InstructorTagAssignmentOrderByWithRelationInput[]
+    cursor?: InstructorTagAssignmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InstructorTagAssignmentScalarFieldEnum | InstructorTagAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * InstructorTagCatalog without action
+   */
+  export type InstructorTagCatalogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagCatalog
+     */
+    select?: InstructorTagCatalogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagCatalog
+     */
+    omit?: InstructorTagCatalogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagCatalogInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model InstructorTagAssignment
+   */
+
+  export type AggregateInstructorTagAssignment = {
+    _count: InstructorTagAssignmentCountAggregateOutputType | null
+    _avg: InstructorTagAssignmentAvgAggregateOutputType | null
+    _sum: InstructorTagAssignmentSumAggregateOutputType | null
+    _min: InstructorTagAssignmentMinAggregateOutputType | null
+    _max: InstructorTagAssignmentMaxAggregateOutputType | null
+  }
+
+  export type InstructorTagAssignmentAvgAggregateOutputType = {
+    instructorId: number | null
+    tagId: number | null
+    updatedBy: number | null
+  }
+
+  export type InstructorTagAssignmentSumAggregateOutputType = {
+    instructorId: number | null
+    tagId: number | null
+    updatedBy: number | null
+  }
+
+  export type InstructorTagAssignmentMinAggregateOutputType = {
+    instructorId: number | null
+    tagId: number | null
+    updatedBy: number | null
+    updatedAt: Date | null
+  }
+
+  export type InstructorTagAssignmentMaxAggregateOutputType = {
+    instructorId: number | null
+    tagId: number | null
+    updatedBy: number | null
+    updatedAt: Date | null
+  }
+
+  export type InstructorTagAssignmentCountAggregateOutputType = {
+    instructorId: number
+    tagId: number
+    updatedBy: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type InstructorTagAssignmentAvgAggregateInputType = {
+    instructorId?: true
+    tagId?: true
+    updatedBy?: true
+  }
+
+  export type InstructorTagAssignmentSumAggregateInputType = {
+    instructorId?: true
+    tagId?: true
+    updatedBy?: true
+  }
+
+  export type InstructorTagAssignmentMinAggregateInputType = {
+    instructorId?: true
+    tagId?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type InstructorTagAssignmentMaxAggregateInputType = {
+    instructorId?: true
+    tagId?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type InstructorTagAssignmentCountAggregateInputType = {
+    instructorId?: true
+    tagId?: true
+    updatedBy?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type InstructorTagAssignmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InstructorTagAssignment to aggregate.
+     */
+    where?: InstructorTagAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InstructorTagAssignments to fetch.
+     */
+    orderBy?: InstructorTagAssignmentOrderByWithRelationInput | InstructorTagAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: InstructorTagAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InstructorTagAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InstructorTagAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned InstructorTagAssignments
+    **/
+    _count?: true | InstructorTagAssignmentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: InstructorTagAssignmentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: InstructorTagAssignmentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: InstructorTagAssignmentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: InstructorTagAssignmentMaxAggregateInputType
+  }
+
+  export type GetInstructorTagAssignmentAggregateType<T extends InstructorTagAssignmentAggregateArgs> = {
+        [P in keyof T & keyof AggregateInstructorTagAssignment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateInstructorTagAssignment[P]>
+      : GetScalarType<T[P], AggregateInstructorTagAssignment[P]>
+  }
+
+
+
+
+  export type InstructorTagAssignmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InstructorTagAssignmentWhereInput
+    orderBy?: InstructorTagAssignmentOrderByWithAggregationInput | InstructorTagAssignmentOrderByWithAggregationInput[]
+    by: InstructorTagAssignmentScalarFieldEnum[] | InstructorTagAssignmentScalarFieldEnum
+    having?: InstructorTagAssignmentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: InstructorTagAssignmentCountAggregateInputType | true
+    _avg?: InstructorTagAssignmentAvgAggregateInputType
+    _sum?: InstructorTagAssignmentSumAggregateInputType
+    _min?: InstructorTagAssignmentMinAggregateInputType
+    _max?: InstructorTagAssignmentMaxAggregateInputType
+  }
+
+  export type InstructorTagAssignmentGroupByOutputType = {
+    instructorId: number
+    tagId: number
+    updatedBy: number | null
+    updatedAt: Date
+    _count: InstructorTagAssignmentCountAggregateOutputType | null
+    _avg: InstructorTagAssignmentAvgAggregateOutputType | null
+    _sum: InstructorTagAssignmentSumAggregateOutputType | null
+    _min: InstructorTagAssignmentMinAggregateOutputType | null
+    _max: InstructorTagAssignmentMaxAggregateOutputType | null
+  }
+
+  type GetInstructorTagAssignmentGroupByPayload<T extends InstructorTagAssignmentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<InstructorTagAssignmentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof InstructorTagAssignmentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], InstructorTagAssignmentGroupByOutputType[P]>
+            : GetScalarType<T[P], InstructorTagAssignmentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type InstructorTagAssignmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    instructorId?: boolean
+    tagId?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    instructor?: boolean | InstructorDefaultArgs<ExtArgs>
+    tag?: boolean | InstructorTagCatalogDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["instructorTagAssignment"]>
+
+  export type InstructorTagAssignmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    instructorId?: boolean
+    tagId?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    instructor?: boolean | InstructorDefaultArgs<ExtArgs>
+    tag?: boolean | InstructorTagCatalogDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["instructorTagAssignment"]>
+
+  export type InstructorTagAssignmentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    instructorId?: boolean
+    tagId?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    instructor?: boolean | InstructorDefaultArgs<ExtArgs>
+    tag?: boolean | InstructorTagCatalogDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["instructorTagAssignment"]>
+
+  export type InstructorTagAssignmentSelectScalar = {
+    instructorId?: boolean
+    tagId?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+  }
+
+  export type InstructorTagAssignmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"instructorId" | "tagId" | "updatedBy" | "updatedAt", ExtArgs["result"]["instructorTagAssignment"]>
+  export type InstructorTagAssignmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    instructor?: boolean | InstructorDefaultArgs<ExtArgs>
+    tag?: boolean | InstructorTagCatalogDefaultArgs<ExtArgs>
+  }
+  export type InstructorTagAssignmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    instructor?: boolean | InstructorDefaultArgs<ExtArgs>
+    tag?: boolean | InstructorTagCatalogDefaultArgs<ExtArgs>
+  }
+  export type InstructorTagAssignmentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    instructor?: boolean | InstructorDefaultArgs<ExtArgs>
+    tag?: boolean | InstructorTagCatalogDefaultArgs<ExtArgs>
+  }
+
+  export type $InstructorTagAssignmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "InstructorTagAssignment"
+    objects: {
+      instructor: Prisma.$InstructorPayload<ExtArgs>
+      tag: Prisma.$InstructorTagCatalogPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      instructorId: number
+      tagId: number
+      updatedBy: number | null
+      updatedAt: Date
+    }, ExtArgs["result"]["instructorTagAssignment"]>
+    composites: {}
+  }
+
+  type InstructorTagAssignmentGetPayload<S extends boolean | null | undefined | InstructorTagAssignmentDefaultArgs> = $Result.GetResult<Prisma.$InstructorTagAssignmentPayload, S>
+
+  type InstructorTagAssignmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<InstructorTagAssignmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: InstructorTagAssignmentCountAggregateInputType | true
+    }
+
+  export interface InstructorTagAssignmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['InstructorTagAssignment'], meta: { name: 'InstructorTagAssignment' } }
+    /**
+     * Find zero or one InstructorTagAssignment that matches the filter.
+     * @param {InstructorTagAssignmentFindUniqueArgs} args - Arguments to find a InstructorTagAssignment
+     * @example
+     * // Get one InstructorTagAssignment
+     * const instructorTagAssignment = await prisma.instructorTagAssignment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends InstructorTagAssignmentFindUniqueArgs>(args: SelectSubset<T, InstructorTagAssignmentFindUniqueArgs<ExtArgs>>): Prisma__InstructorTagAssignmentClient<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one InstructorTagAssignment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {InstructorTagAssignmentFindUniqueOrThrowArgs} args - Arguments to find a InstructorTagAssignment
+     * @example
+     * // Get one InstructorTagAssignment
+     * const instructorTagAssignment = await prisma.instructorTagAssignment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends InstructorTagAssignmentFindUniqueOrThrowArgs>(args: SelectSubset<T, InstructorTagAssignmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__InstructorTagAssignmentClient<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InstructorTagAssignment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagAssignmentFindFirstArgs} args - Arguments to find a InstructorTagAssignment
+     * @example
+     * // Get one InstructorTagAssignment
+     * const instructorTagAssignment = await prisma.instructorTagAssignment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends InstructorTagAssignmentFindFirstArgs>(args?: SelectSubset<T, InstructorTagAssignmentFindFirstArgs<ExtArgs>>): Prisma__InstructorTagAssignmentClient<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InstructorTagAssignment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagAssignmentFindFirstOrThrowArgs} args - Arguments to find a InstructorTagAssignment
+     * @example
+     * // Get one InstructorTagAssignment
+     * const instructorTagAssignment = await prisma.instructorTagAssignment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends InstructorTagAssignmentFindFirstOrThrowArgs>(args?: SelectSubset<T, InstructorTagAssignmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__InstructorTagAssignmentClient<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more InstructorTagAssignments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagAssignmentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all InstructorTagAssignments
+     * const instructorTagAssignments = await prisma.instructorTagAssignment.findMany()
+     * 
+     * // Get first 10 InstructorTagAssignments
+     * const instructorTagAssignments = await prisma.instructorTagAssignment.findMany({ take: 10 })
+     * 
+     * // Only select the `instructorId`
+     * const instructorTagAssignmentWithInstructorIdOnly = await prisma.instructorTagAssignment.findMany({ select: { instructorId: true } })
+     * 
+     */
+    findMany<T extends InstructorTagAssignmentFindManyArgs>(args?: SelectSubset<T, InstructorTagAssignmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a InstructorTagAssignment.
+     * @param {InstructorTagAssignmentCreateArgs} args - Arguments to create a InstructorTagAssignment.
+     * @example
+     * // Create one InstructorTagAssignment
+     * const InstructorTagAssignment = await prisma.instructorTagAssignment.create({
+     *   data: {
+     *     // ... data to create a InstructorTagAssignment
+     *   }
+     * })
+     * 
+     */
+    create<T extends InstructorTagAssignmentCreateArgs>(args: SelectSubset<T, InstructorTagAssignmentCreateArgs<ExtArgs>>): Prisma__InstructorTagAssignmentClient<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many InstructorTagAssignments.
+     * @param {InstructorTagAssignmentCreateManyArgs} args - Arguments to create many InstructorTagAssignments.
+     * @example
+     * // Create many InstructorTagAssignments
+     * const instructorTagAssignment = await prisma.instructorTagAssignment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends InstructorTagAssignmentCreateManyArgs>(args?: SelectSubset<T, InstructorTagAssignmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many InstructorTagAssignments and returns the data saved in the database.
+     * @param {InstructorTagAssignmentCreateManyAndReturnArgs} args - Arguments to create many InstructorTagAssignments.
+     * @example
+     * // Create many InstructorTagAssignments
+     * const instructorTagAssignment = await prisma.instructorTagAssignment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many InstructorTagAssignments and only return the `instructorId`
+     * const instructorTagAssignmentWithInstructorIdOnly = await prisma.instructorTagAssignment.createManyAndReturn({
+     *   select: { instructorId: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends InstructorTagAssignmentCreateManyAndReturnArgs>(args?: SelectSubset<T, InstructorTagAssignmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a InstructorTagAssignment.
+     * @param {InstructorTagAssignmentDeleteArgs} args - Arguments to delete one InstructorTagAssignment.
+     * @example
+     * // Delete one InstructorTagAssignment
+     * const InstructorTagAssignment = await prisma.instructorTagAssignment.delete({
+     *   where: {
+     *     // ... filter to delete one InstructorTagAssignment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends InstructorTagAssignmentDeleteArgs>(args: SelectSubset<T, InstructorTagAssignmentDeleteArgs<ExtArgs>>): Prisma__InstructorTagAssignmentClient<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one InstructorTagAssignment.
+     * @param {InstructorTagAssignmentUpdateArgs} args - Arguments to update one InstructorTagAssignment.
+     * @example
+     * // Update one InstructorTagAssignment
+     * const instructorTagAssignment = await prisma.instructorTagAssignment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends InstructorTagAssignmentUpdateArgs>(args: SelectSubset<T, InstructorTagAssignmentUpdateArgs<ExtArgs>>): Prisma__InstructorTagAssignmentClient<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more InstructorTagAssignments.
+     * @param {InstructorTagAssignmentDeleteManyArgs} args - Arguments to filter InstructorTagAssignments to delete.
+     * @example
+     * // Delete a few InstructorTagAssignments
+     * const { count } = await prisma.instructorTagAssignment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends InstructorTagAssignmentDeleteManyArgs>(args?: SelectSubset<T, InstructorTagAssignmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InstructorTagAssignments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagAssignmentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many InstructorTagAssignments
+     * const instructorTagAssignment = await prisma.instructorTagAssignment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends InstructorTagAssignmentUpdateManyArgs>(args: SelectSubset<T, InstructorTagAssignmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InstructorTagAssignments and returns the data updated in the database.
+     * @param {InstructorTagAssignmentUpdateManyAndReturnArgs} args - Arguments to update many InstructorTagAssignments.
+     * @example
+     * // Update many InstructorTagAssignments
+     * const instructorTagAssignment = await prisma.instructorTagAssignment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more InstructorTagAssignments and only return the `instructorId`
+     * const instructorTagAssignmentWithInstructorIdOnly = await prisma.instructorTagAssignment.updateManyAndReturn({
+     *   select: { instructorId: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends InstructorTagAssignmentUpdateManyAndReturnArgs>(args: SelectSubset<T, InstructorTagAssignmentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one InstructorTagAssignment.
+     * @param {InstructorTagAssignmentUpsertArgs} args - Arguments to update or create a InstructorTagAssignment.
+     * @example
+     * // Update or create a InstructorTagAssignment
+     * const instructorTagAssignment = await prisma.instructorTagAssignment.upsert({
+     *   create: {
+     *     // ... data to create a InstructorTagAssignment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the InstructorTagAssignment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends InstructorTagAssignmentUpsertArgs>(args: SelectSubset<T, InstructorTagAssignmentUpsertArgs<ExtArgs>>): Prisma__InstructorTagAssignmentClient<$Result.GetResult<Prisma.$InstructorTagAssignmentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of InstructorTagAssignments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagAssignmentCountArgs} args - Arguments to filter InstructorTagAssignments to count.
+     * @example
+     * // Count the number of InstructorTagAssignments
+     * const count = await prisma.instructorTagAssignment.count({
+     *   where: {
+     *     // ... the filter for the InstructorTagAssignments we want to count
+     *   }
+     * })
+    **/
+    count<T extends InstructorTagAssignmentCountArgs>(
+      args?: Subset<T, InstructorTagAssignmentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], InstructorTagAssignmentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a InstructorTagAssignment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagAssignmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends InstructorTagAssignmentAggregateArgs>(args: Subset<T, InstructorTagAssignmentAggregateArgs>): Prisma.PrismaPromise<GetInstructorTagAssignmentAggregateType<T>>
+
+    /**
+     * Group by InstructorTagAssignment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InstructorTagAssignmentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends InstructorTagAssignmentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: InstructorTagAssignmentGroupByArgs['orderBy'] }
+        : { orderBy?: InstructorTagAssignmentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, InstructorTagAssignmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInstructorTagAssignmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the InstructorTagAssignment model
+   */
+  readonly fields: InstructorTagAssignmentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for InstructorTagAssignment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__InstructorTagAssignmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    instructor<T extends InstructorDefaultArgs<ExtArgs> = {}>(args?: Subset<T, InstructorDefaultArgs<ExtArgs>>): Prisma__InstructorClient<$Result.GetResult<Prisma.$InstructorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    tag<T extends InstructorTagCatalogDefaultArgs<ExtArgs> = {}>(args?: Subset<T, InstructorTagCatalogDefaultArgs<ExtArgs>>): Prisma__InstructorTagCatalogClient<$Result.GetResult<Prisma.$InstructorTagCatalogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the InstructorTagAssignment model
+   */
+  interface InstructorTagAssignmentFieldRefs {
+    readonly instructorId: FieldRef<"InstructorTagAssignment", 'Int'>
+    readonly tagId: FieldRef<"InstructorTagAssignment", 'Int'>
+    readonly updatedBy: FieldRef<"InstructorTagAssignment", 'Int'>
+    readonly updatedAt: FieldRef<"InstructorTagAssignment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * InstructorTagAssignment findUnique
+   */
+  export type InstructorTagAssignmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorTagAssignment to fetch.
+     */
+    where: InstructorTagAssignmentWhereUniqueInput
+  }
+
+  /**
+   * InstructorTagAssignment findUniqueOrThrow
+   */
+  export type InstructorTagAssignmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorTagAssignment to fetch.
+     */
+    where: InstructorTagAssignmentWhereUniqueInput
+  }
+
+  /**
+   * InstructorTagAssignment findFirst
+   */
+  export type InstructorTagAssignmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorTagAssignment to fetch.
+     */
+    where?: InstructorTagAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InstructorTagAssignments to fetch.
+     */
+    orderBy?: InstructorTagAssignmentOrderByWithRelationInput | InstructorTagAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InstructorTagAssignments.
+     */
+    cursor?: InstructorTagAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InstructorTagAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InstructorTagAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InstructorTagAssignments.
+     */
+    distinct?: InstructorTagAssignmentScalarFieldEnum | InstructorTagAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * InstructorTagAssignment findFirstOrThrow
+   */
+  export type InstructorTagAssignmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorTagAssignment to fetch.
+     */
+    where?: InstructorTagAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InstructorTagAssignments to fetch.
+     */
+    orderBy?: InstructorTagAssignmentOrderByWithRelationInput | InstructorTagAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InstructorTagAssignments.
+     */
+    cursor?: InstructorTagAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InstructorTagAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InstructorTagAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InstructorTagAssignments.
+     */
+    distinct?: InstructorTagAssignmentScalarFieldEnum | InstructorTagAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * InstructorTagAssignment findMany
+   */
+  export type InstructorTagAssignmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which InstructorTagAssignments to fetch.
+     */
+    where?: InstructorTagAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InstructorTagAssignments to fetch.
+     */
+    orderBy?: InstructorTagAssignmentOrderByWithRelationInput | InstructorTagAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing InstructorTagAssignments.
+     */
+    cursor?: InstructorTagAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InstructorTagAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InstructorTagAssignments.
+     */
+    skip?: number
+    distinct?: InstructorTagAssignmentScalarFieldEnum | InstructorTagAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * InstructorTagAssignment create
+   */
+  export type InstructorTagAssignmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a InstructorTagAssignment.
+     */
+    data: XOR<InstructorTagAssignmentCreateInput, InstructorTagAssignmentUncheckedCreateInput>
+  }
+
+  /**
+   * InstructorTagAssignment createMany
+   */
+  export type InstructorTagAssignmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many InstructorTagAssignments.
+     */
+    data: InstructorTagAssignmentCreateManyInput | InstructorTagAssignmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * InstructorTagAssignment createManyAndReturn
+   */
+  export type InstructorTagAssignmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * The data used to create many InstructorTagAssignments.
+     */
+    data: InstructorTagAssignmentCreateManyInput | InstructorTagAssignmentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * InstructorTagAssignment update
+   */
+  export type InstructorTagAssignmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a InstructorTagAssignment.
+     */
+    data: XOR<InstructorTagAssignmentUpdateInput, InstructorTagAssignmentUncheckedUpdateInput>
+    /**
+     * Choose, which InstructorTagAssignment to update.
+     */
+    where: InstructorTagAssignmentWhereUniqueInput
+  }
+
+  /**
+   * InstructorTagAssignment updateMany
+   */
+  export type InstructorTagAssignmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update InstructorTagAssignments.
+     */
+    data: XOR<InstructorTagAssignmentUpdateManyMutationInput, InstructorTagAssignmentUncheckedUpdateManyInput>
+    /**
+     * Filter which InstructorTagAssignments to update
+     */
+    where?: InstructorTagAssignmentWhereInput
+    /**
+     * Limit how many InstructorTagAssignments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * InstructorTagAssignment updateManyAndReturn
+   */
+  export type InstructorTagAssignmentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * The data used to update InstructorTagAssignments.
+     */
+    data: XOR<InstructorTagAssignmentUpdateManyMutationInput, InstructorTagAssignmentUncheckedUpdateManyInput>
+    /**
+     * Filter which InstructorTagAssignments to update
+     */
+    where?: InstructorTagAssignmentWhereInput
+    /**
+     * Limit how many InstructorTagAssignments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * InstructorTagAssignment upsert
+   */
+  export type InstructorTagAssignmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the InstructorTagAssignment to update in case it exists.
+     */
+    where: InstructorTagAssignmentWhereUniqueInput
+    /**
+     * In case the InstructorTagAssignment found by the `where` argument doesn't exist, create a new InstructorTagAssignment with this data.
+     */
+    create: XOR<InstructorTagAssignmentCreateInput, InstructorTagAssignmentUncheckedCreateInput>
+    /**
+     * In case the InstructorTagAssignment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<InstructorTagAssignmentUpdateInput, InstructorTagAssignmentUncheckedUpdateInput>
+  }
+
+  /**
+   * InstructorTagAssignment delete
+   */
+  export type InstructorTagAssignmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter which InstructorTagAssignment to delete.
+     */
+    where: InstructorTagAssignmentWhereUniqueInput
+  }
+
+  /**
+   * InstructorTagAssignment deleteMany
+   */
+  export type InstructorTagAssignmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InstructorTagAssignments to delete
+     */
+    where?: InstructorTagAssignmentWhereInput
+    /**
+     * Limit how many InstructorTagAssignments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * InstructorTagAssignment without action
+   */
+  export type InstructorTagAssignmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InstructorTagAssignment
+     */
+    select?: InstructorTagAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InstructorTagAssignment
+     */
+    omit?: InstructorTagAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InstructorTagAssignmentInclude<ExtArgs> | null
   }
 
 
@@ -24311,6 +26798,29 @@ export namespace Prisma {
   export type InstructorScalarFieldEnum = (typeof InstructorScalarFieldEnum)[keyof typeof InstructorScalarFieldEnum]
 
 
+  export const InstructorTagCatalogScalarFieldEnum: {
+    id: 'id',
+    label: 'label',
+    sortOrder: 'sortOrder',
+    createdBy: 'createdBy',
+    createdAt: 'createdAt',
+    deletedAt: 'deletedAt',
+    deletedBy: 'deletedBy'
+  };
+
+  export type InstructorTagCatalogScalarFieldEnum = (typeof InstructorTagCatalogScalarFieldEnum)[keyof typeof InstructorTagCatalogScalarFieldEnum]
+
+
+  export const InstructorTagAssignmentScalarFieldEnum: {
+    instructorId: 'instructorId',
+    tagId: 'tagId',
+    updatedBy: 'updatedBy',
+    updatedAt: 'updatedAt'
+  };
+
+  export type InstructorTagAssignmentScalarFieldEnum = (typeof InstructorTagAssignmentScalarFieldEnum)[keyof typeof InstructorTagAssignmentScalarFieldEnum]
+
+
   export const CustomerScalarFieldEnum: {
     id: 'id',
     name: 'name',
@@ -24653,6 +27163,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeListRelationFilter
     instructorSchedules?: InstructorScheduleListRelationFilter
     recurringClasses?: RecurringClassListRelationFilter
+    tagAssignments?: InstructorTagAssignmentListRelationFilter
   }
 
   export type InstructorOrderByWithRelationInput = {
@@ -24681,6 +27192,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeOrderByRelationAggregateInput
     instructorSchedules?: InstructorScheduleOrderByRelationAggregateInput
     recurringClasses?: RecurringClassOrderByRelationAggregateInput
+    tagAssignments?: InstructorTagAssignmentOrderByRelationAggregateInput
   }
 
   export type InstructorWhereUniqueInput = Prisma.AtLeast<{
@@ -24712,6 +27224,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeListRelationFilter
     instructorSchedules?: InstructorScheduleListRelationFilter
     recurringClasses?: RecurringClassListRelationFilter
+    tagAssignments?: InstructorTagAssignmentListRelationFilter
   }, "id" | "email" | "classURL" | "icon" | "nickname" | "meetingId" | "passcode">
 
   export type InstructorOrderByWithAggregationInput = {
@@ -24766,6 +27279,129 @@ export namespace Prisma {
     terminationAt?: DateTimeNullableWithAggregatesFilter<"Instructor"> | Date | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"Instructor"> | Date | string
     englishBackground?: IntWithAggregatesFilter<"Instructor"> | number
+  }
+
+  export type InstructorTagCatalogWhereInput = {
+    AND?: InstructorTagCatalogWhereInput | InstructorTagCatalogWhereInput[]
+    OR?: InstructorTagCatalogWhereInput[]
+    NOT?: InstructorTagCatalogWhereInput | InstructorTagCatalogWhereInput[]
+    id?: IntFilter<"InstructorTagCatalog"> | number
+    label?: StringFilter<"InstructorTagCatalog"> | string
+    sortOrder?: IntFilter<"InstructorTagCatalog"> | number
+    createdBy?: IntNullableFilter<"InstructorTagCatalog"> | number | null
+    createdAt?: DateTimeFilter<"InstructorTagCatalog"> | Date | string
+    deletedAt?: DateTimeNullableFilter<"InstructorTagCatalog"> | Date | string | null
+    deletedBy?: IntNullableFilter<"InstructorTagCatalog"> | number | null
+    assignments?: InstructorTagAssignmentListRelationFilter
+  }
+
+  export type InstructorTagCatalogOrderByWithRelationInput = {
+    id?: SortOrder
+    label?: SortOrder
+    sortOrder?: SortOrder
+    createdBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    deletedAt?: SortOrderInput | SortOrder
+    deletedBy?: SortOrderInput | SortOrder
+    assignments?: InstructorTagAssignmentOrderByRelationAggregateInput
+  }
+
+  export type InstructorTagCatalogWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    label?: string
+    AND?: InstructorTagCatalogWhereInput | InstructorTagCatalogWhereInput[]
+    OR?: InstructorTagCatalogWhereInput[]
+    NOT?: InstructorTagCatalogWhereInput | InstructorTagCatalogWhereInput[]
+    sortOrder?: IntFilter<"InstructorTagCatalog"> | number
+    createdBy?: IntNullableFilter<"InstructorTagCatalog"> | number | null
+    createdAt?: DateTimeFilter<"InstructorTagCatalog"> | Date | string
+    deletedAt?: DateTimeNullableFilter<"InstructorTagCatalog"> | Date | string | null
+    deletedBy?: IntNullableFilter<"InstructorTagCatalog"> | number | null
+    assignments?: InstructorTagAssignmentListRelationFilter
+  }, "id" | "label">
+
+  export type InstructorTagCatalogOrderByWithAggregationInput = {
+    id?: SortOrder
+    label?: SortOrder
+    sortOrder?: SortOrder
+    createdBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    deletedAt?: SortOrderInput | SortOrder
+    deletedBy?: SortOrderInput | SortOrder
+    _count?: InstructorTagCatalogCountOrderByAggregateInput
+    _avg?: InstructorTagCatalogAvgOrderByAggregateInput
+    _max?: InstructorTagCatalogMaxOrderByAggregateInput
+    _min?: InstructorTagCatalogMinOrderByAggregateInput
+    _sum?: InstructorTagCatalogSumOrderByAggregateInput
+  }
+
+  export type InstructorTagCatalogScalarWhereWithAggregatesInput = {
+    AND?: InstructorTagCatalogScalarWhereWithAggregatesInput | InstructorTagCatalogScalarWhereWithAggregatesInput[]
+    OR?: InstructorTagCatalogScalarWhereWithAggregatesInput[]
+    NOT?: InstructorTagCatalogScalarWhereWithAggregatesInput | InstructorTagCatalogScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"InstructorTagCatalog"> | number
+    label?: StringWithAggregatesFilter<"InstructorTagCatalog"> | string
+    sortOrder?: IntWithAggregatesFilter<"InstructorTagCatalog"> | number
+    createdBy?: IntNullableWithAggregatesFilter<"InstructorTagCatalog"> | number | null
+    createdAt?: DateTimeWithAggregatesFilter<"InstructorTagCatalog"> | Date | string
+    deletedAt?: DateTimeNullableWithAggregatesFilter<"InstructorTagCatalog"> | Date | string | null
+    deletedBy?: IntNullableWithAggregatesFilter<"InstructorTagCatalog"> | number | null
+  }
+
+  export type InstructorTagAssignmentWhereInput = {
+    AND?: InstructorTagAssignmentWhereInput | InstructorTagAssignmentWhereInput[]
+    OR?: InstructorTagAssignmentWhereInput[]
+    NOT?: InstructorTagAssignmentWhereInput | InstructorTagAssignmentWhereInput[]
+    instructorId?: IntFilter<"InstructorTagAssignment"> | number
+    tagId?: IntFilter<"InstructorTagAssignment"> | number
+    updatedBy?: IntNullableFilter<"InstructorTagAssignment"> | number | null
+    updatedAt?: DateTimeFilter<"InstructorTagAssignment"> | Date | string
+    instructor?: XOR<InstructorScalarRelationFilter, InstructorWhereInput>
+    tag?: XOR<InstructorTagCatalogScalarRelationFilter, InstructorTagCatalogWhereInput>
+  }
+
+  export type InstructorTagAssignmentOrderByWithRelationInput = {
+    instructorId?: SortOrder
+    tagId?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    instructor?: InstructorOrderByWithRelationInput
+    tag?: InstructorTagCatalogOrderByWithRelationInput
+  }
+
+  export type InstructorTagAssignmentWhereUniqueInput = Prisma.AtLeast<{
+    instructorId_tagId?: InstructorTagAssignmentInstructorIdTagIdCompoundUniqueInput
+    AND?: InstructorTagAssignmentWhereInput | InstructorTagAssignmentWhereInput[]
+    OR?: InstructorTagAssignmentWhereInput[]
+    NOT?: InstructorTagAssignmentWhereInput | InstructorTagAssignmentWhereInput[]
+    instructorId?: IntFilter<"InstructorTagAssignment"> | number
+    tagId?: IntFilter<"InstructorTagAssignment"> | number
+    updatedBy?: IntNullableFilter<"InstructorTagAssignment"> | number | null
+    updatedAt?: DateTimeFilter<"InstructorTagAssignment"> | Date | string
+    instructor?: XOR<InstructorScalarRelationFilter, InstructorWhereInput>
+    tag?: XOR<InstructorTagCatalogScalarRelationFilter, InstructorTagCatalogWhereInput>
+  }, "instructorId_tagId">
+
+  export type InstructorTagAssignmentOrderByWithAggregationInput = {
+    instructorId?: SortOrder
+    tagId?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    _count?: InstructorTagAssignmentCountOrderByAggregateInput
+    _avg?: InstructorTagAssignmentAvgOrderByAggregateInput
+    _max?: InstructorTagAssignmentMaxOrderByAggregateInput
+    _min?: InstructorTagAssignmentMinOrderByAggregateInput
+    _sum?: InstructorTagAssignmentSumOrderByAggregateInput
+  }
+
+  export type InstructorTagAssignmentScalarWhereWithAggregatesInput = {
+    AND?: InstructorTagAssignmentScalarWhereWithAggregatesInput | InstructorTagAssignmentScalarWhereWithAggregatesInput[]
+    OR?: InstructorTagAssignmentScalarWhereWithAggregatesInput[]
+    NOT?: InstructorTagAssignmentScalarWhereWithAggregatesInput | InstructorTagAssignmentScalarWhereWithAggregatesInput[]
+    instructorId?: IntWithAggregatesFilter<"InstructorTagAssignment"> | number
+    tagId?: IntWithAggregatesFilter<"InstructorTagAssignment"> | number
+    updatedBy?: IntNullableWithAggregatesFilter<"InstructorTagAssignment"> | number | null
+    updatedAt?: DateTimeWithAggregatesFilter<"InstructorTagAssignment"> | Date | string
   }
 
   export type CustomerWhereInput = {
@@ -25891,6 +28527,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassCreateNestedManyWithoutInstructorInput
+    tagAssignments?: InstructorTagAssignmentCreateNestedManyWithoutInstructorInput
   }
 
   export type InstructorUncheckedCreateInput = {
@@ -25919,6 +28556,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassUncheckedCreateNestedManyWithoutInstructorInput
+    tagAssignments?: InstructorTagAssignmentUncheckedCreateNestedManyWithoutInstructorInput
   }
 
   export type InstructorUpdateInput = {
@@ -25946,6 +28584,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUpdateManyWithoutInstructorNestedInput
+    tagAssignments?: InstructorTagAssignmentUpdateManyWithoutInstructorNestedInput
   }
 
   export type InstructorUncheckedUpdateInput = {
@@ -25974,6 +28613,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUncheckedUpdateManyWithoutInstructorNestedInput
+    tagAssignments?: InstructorTagAssignmentUncheckedUpdateManyWithoutInstructorNestedInput
   }
 
   export type InstructorCreateManyInput = {
@@ -26042,6 +28682,124 @@ export namespace Prisma {
     terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     englishBackground?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type InstructorTagCatalogCreateInput = {
+    label: string
+    sortOrder?: number
+    createdBy?: number | null
+    createdAt?: Date | string
+    deletedAt?: Date | string | null
+    deletedBy?: number | null
+    assignments?: InstructorTagAssignmentCreateNestedManyWithoutTagInput
+  }
+
+  export type InstructorTagCatalogUncheckedCreateInput = {
+    id?: number
+    label: string
+    sortOrder?: number
+    createdBy?: number | null
+    createdAt?: Date | string
+    deletedAt?: Date | string | null
+    deletedBy?: number | null
+    assignments?: InstructorTagAssignmentUncheckedCreateNestedManyWithoutTagInput
+  }
+
+  export type InstructorTagCatalogUpdateInput = {
+    label?: StringFieldUpdateOperationsInput | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdBy?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    assignments?: InstructorTagAssignmentUpdateManyWithoutTagNestedInput
+  }
+
+  export type InstructorTagCatalogUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    label?: StringFieldUpdateOperationsInput | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdBy?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    assignments?: InstructorTagAssignmentUncheckedUpdateManyWithoutTagNestedInput
+  }
+
+  export type InstructorTagCatalogCreateManyInput = {
+    id?: number
+    label: string
+    sortOrder?: number
+    createdBy?: number | null
+    createdAt?: Date | string
+    deletedAt?: Date | string | null
+    deletedBy?: number | null
+  }
+
+  export type InstructorTagCatalogUpdateManyMutationInput = {
+    label?: StringFieldUpdateOperationsInput | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdBy?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedBy?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type InstructorTagCatalogUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    label?: StringFieldUpdateOperationsInput | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdBy?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedBy?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type InstructorTagAssignmentCreateInput = {
+    updatedBy?: number | null
+    updatedAt?: Date | string
+    instructor: InstructorCreateNestedOneWithoutTagAssignmentsInput
+    tag: InstructorTagCatalogCreateNestedOneWithoutAssignmentsInput
+  }
+
+  export type InstructorTagAssignmentUncheckedCreateInput = {
+    instructorId: number
+    tagId: number
+    updatedBy?: number | null
+    updatedAt?: Date | string
+  }
+
+  export type InstructorTagAssignmentUpdateInput = {
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    instructor?: InstructorUpdateOneRequiredWithoutTagAssignmentsNestedInput
+    tag?: InstructorTagCatalogUpdateOneRequiredWithoutAssignmentsNestedInput
+  }
+
+  export type InstructorTagAssignmentUncheckedUpdateInput = {
+    instructorId?: IntFieldUpdateOperationsInput | number
+    tagId?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InstructorTagAssignmentCreateManyInput = {
+    instructorId: number
+    tagId: number
+    updatedBy?: number | null
+    updatedAt?: Date | string
+  }
+
+  export type InstructorTagAssignmentUpdateManyMutationInput = {
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InstructorTagAssignmentUncheckedUpdateManyInput = {
+    instructorId?: IntFieldUpdateOperationsInput | number
+    tagId?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type CustomerCreateInput = {
@@ -27172,6 +29930,12 @@ export namespace Prisma {
     none?: RecurringClassWhereInput
   }
 
+  export type InstructorTagAssignmentListRelationFilter = {
+    every?: InstructorTagAssignmentWhereInput
+    some?: InstructorTagAssignmentWhereInput
+    none?: InstructorTagAssignmentWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -27194,6 +29958,10 @@ export namespace Prisma {
   }
 
   export type RecurringClassOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type InstructorTagAssignmentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -27338,6 +30106,125 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type InstructorTagCatalogCountOrderByAggregateInput = {
+    id?: SortOrder
+    label?: SortOrder
+    sortOrder?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    deletedAt?: SortOrder
+    deletedBy?: SortOrder
+  }
+
+  export type InstructorTagCatalogAvgOrderByAggregateInput = {
+    id?: SortOrder
+    sortOrder?: SortOrder
+    createdBy?: SortOrder
+    deletedBy?: SortOrder
+  }
+
+  export type InstructorTagCatalogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    label?: SortOrder
+    sortOrder?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    deletedAt?: SortOrder
+    deletedBy?: SortOrder
+  }
+
+  export type InstructorTagCatalogMinOrderByAggregateInput = {
+    id?: SortOrder
+    label?: SortOrder
+    sortOrder?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    deletedAt?: SortOrder
+    deletedBy?: SortOrder
+  }
+
+  export type InstructorTagCatalogSumOrderByAggregateInput = {
+    id?: SortOrder
+    sortOrder?: SortOrder
+    createdBy?: SortOrder
+    deletedBy?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type InstructorScalarRelationFilter = {
+    is?: InstructorWhereInput
+    isNot?: InstructorWhereInput
+  }
+
+  export type InstructorTagCatalogScalarRelationFilter = {
+    is?: InstructorTagCatalogWhereInput
+    isNot?: InstructorTagCatalogWhereInput
+  }
+
+  export type InstructorTagAssignmentInstructorIdTagIdCompoundUniqueInput = {
+    instructorId: number
+    tagId: number
+  }
+
+  export type InstructorTagAssignmentCountOrderByAggregateInput = {
+    instructorId?: SortOrder
+    tagId?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type InstructorTagAssignmentAvgOrderByAggregateInput = {
+    instructorId?: SortOrder
+    tagId?: SortOrder
+    updatedBy?: SortOrder
+  }
+
+  export type InstructorTagAssignmentMaxOrderByAggregateInput = {
+    instructorId?: SortOrder
+    tagId?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type InstructorTagAssignmentMinOrderByAggregateInput = {
+    instructorId?: SortOrder
+    tagId?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type InstructorTagAssignmentSumOrderByAggregateInput = {
+    instructorId?: SortOrder
+    tagId?: SortOrder
+    updatedBy?: SortOrder
+  }
+
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
@@ -27416,17 +30303,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type EnumStatusFilter<$PrismaModel = never> = {
@@ -27528,22 +30404,6 @@ export namespace Prisma {
     customerId?: SortOrder
     recurringClassId?: SortOrder
     subscriptionId?: SortOrder
-  }
-
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type EnumStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -27885,11 +30745,6 @@ export namespace Prisma {
 
   export type EventSumOrderByAggregateInput = {
     id?: SortOrder
-  }
-
-  export type InstructorScalarRelationFilter = {
-    is?: InstructorWhereInput
-    isNot?: InstructorWhereInput
   }
 
   export type InstructorSlotListRelationFilter = {
@@ -28234,6 +31089,13 @@ export namespace Prisma {
     connect?: RecurringClassWhereUniqueInput | RecurringClassWhereUniqueInput[]
   }
 
+  export type InstructorTagAssignmentCreateNestedManyWithoutInstructorInput = {
+    create?: XOR<InstructorTagAssignmentCreateWithoutInstructorInput, InstructorTagAssignmentUncheckedCreateWithoutInstructorInput> | InstructorTagAssignmentCreateWithoutInstructorInput[] | InstructorTagAssignmentUncheckedCreateWithoutInstructorInput[]
+    connectOrCreate?: InstructorTagAssignmentCreateOrConnectWithoutInstructorInput | InstructorTagAssignmentCreateOrConnectWithoutInstructorInput[]
+    createMany?: InstructorTagAssignmentCreateManyInstructorInputEnvelope
+    connect?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+  }
+
   export type ClassUncheckedCreateNestedManyWithoutInstructorInput = {
     create?: XOR<ClassCreateWithoutInstructorInput, ClassUncheckedCreateWithoutInstructorInput> | ClassCreateWithoutInstructorInput[] | ClassUncheckedCreateWithoutInstructorInput[]
     connectOrCreate?: ClassCreateOrConnectWithoutInstructorInput | ClassCreateOrConnectWithoutInstructorInput[]
@@ -28267,6 +31129,13 @@ export namespace Prisma {
     connectOrCreate?: RecurringClassCreateOrConnectWithoutInstructorInput | RecurringClassCreateOrConnectWithoutInstructorInput[]
     createMany?: RecurringClassCreateManyInstructorInputEnvelope
     connect?: RecurringClassWhereUniqueInput | RecurringClassWhereUniqueInput[]
+  }
+
+  export type InstructorTagAssignmentUncheckedCreateNestedManyWithoutInstructorInput = {
+    create?: XOR<InstructorTagAssignmentCreateWithoutInstructorInput, InstructorTagAssignmentUncheckedCreateWithoutInstructorInput> | InstructorTagAssignmentCreateWithoutInstructorInput[] | InstructorTagAssignmentUncheckedCreateWithoutInstructorInput[]
+    connectOrCreate?: InstructorTagAssignmentCreateOrConnectWithoutInstructorInput | InstructorTagAssignmentCreateOrConnectWithoutInstructorInput[]
+    createMany?: InstructorTagAssignmentCreateManyInstructorInputEnvelope
+    connect?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -28359,6 +31228,20 @@ export namespace Prisma {
     deleteMany?: RecurringClassScalarWhereInput | RecurringClassScalarWhereInput[]
   }
 
+  export type InstructorTagAssignmentUpdateManyWithoutInstructorNestedInput = {
+    create?: XOR<InstructorTagAssignmentCreateWithoutInstructorInput, InstructorTagAssignmentUncheckedCreateWithoutInstructorInput> | InstructorTagAssignmentCreateWithoutInstructorInput[] | InstructorTagAssignmentUncheckedCreateWithoutInstructorInput[]
+    connectOrCreate?: InstructorTagAssignmentCreateOrConnectWithoutInstructorInput | InstructorTagAssignmentCreateOrConnectWithoutInstructorInput[]
+    upsert?: InstructorTagAssignmentUpsertWithWhereUniqueWithoutInstructorInput | InstructorTagAssignmentUpsertWithWhereUniqueWithoutInstructorInput[]
+    createMany?: InstructorTagAssignmentCreateManyInstructorInputEnvelope
+    set?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    disconnect?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    delete?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    connect?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    update?: InstructorTagAssignmentUpdateWithWhereUniqueWithoutInstructorInput | InstructorTagAssignmentUpdateWithWhereUniqueWithoutInstructorInput[]
+    updateMany?: InstructorTagAssignmentUpdateManyWithWhereWithoutInstructorInput | InstructorTagAssignmentUpdateManyWithWhereWithoutInstructorInput[]
+    deleteMany?: InstructorTagAssignmentScalarWhereInput | InstructorTagAssignmentScalarWhereInput[]
+  }
+
   export type ClassUncheckedUpdateManyWithoutInstructorNestedInput = {
     create?: XOR<ClassCreateWithoutInstructorInput, ClassUncheckedCreateWithoutInstructorInput> | ClassCreateWithoutInstructorInput[] | ClassUncheckedCreateWithoutInstructorInput[]
     connectOrCreate?: ClassCreateOrConnectWithoutInstructorInput | ClassCreateOrConnectWithoutInstructorInput[]
@@ -28427,6 +31310,98 @@ export namespace Prisma {
     update?: RecurringClassUpdateWithWhereUniqueWithoutInstructorInput | RecurringClassUpdateWithWhereUniqueWithoutInstructorInput[]
     updateMany?: RecurringClassUpdateManyWithWhereWithoutInstructorInput | RecurringClassUpdateManyWithWhereWithoutInstructorInput[]
     deleteMany?: RecurringClassScalarWhereInput | RecurringClassScalarWhereInput[]
+  }
+
+  export type InstructorTagAssignmentUncheckedUpdateManyWithoutInstructorNestedInput = {
+    create?: XOR<InstructorTagAssignmentCreateWithoutInstructorInput, InstructorTagAssignmentUncheckedCreateWithoutInstructorInput> | InstructorTagAssignmentCreateWithoutInstructorInput[] | InstructorTagAssignmentUncheckedCreateWithoutInstructorInput[]
+    connectOrCreate?: InstructorTagAssignmentCreateOrConnectWithoutInstructorInput | InstructorTagAssignmentCreateOrConnectWithoutInstructorInput[]
+    upsert?: InstructorTagAssignmentUpsertWithWhereUniqueWithoutInstructorInput | InstructorTagAssignmentUpsertWithWhereUniqueWithoutInstructorInput[]
+    createMany?: InstructorTagAssignmentCreateManyInstructorInputEnvelope
+    set?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    disconnect?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    delete?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    connect?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    update?: InstructorTagAssignmentUpdateWithWhereUniqueWithoutInstructorInput | InstructorTagAssignmentUpdateWithWhereUniqueWithoutInstructorInput[]
+    updateMany?: InstructorTagAssignmentUpdateManyWithWhereWithoutInstructorInput | InstructorTagAssignmentUpdateManyWithWhereWithoutInstructorInput[]
+    deleteMany?: InstructorTagAssignmentScalarWhereInput | InstructorTagAssignmentScalarWhereInput[]
+  }
+
+  export type InstructorTagAssignmentCreateNestedManyWithoutTagInput = {
+    create?: XOR<InstructorTagAssignmentCreateWithoutTagInput, InstructorTagAssignmentUncheckedCreateWithoutTagInput> | InstructorTagAssignmentCreateWithoutTagInput[] | InstructorTagAssignmentUncheckedCreateWithoutTagInput[]
+    connectOrCreate?: InstructorTagAssignmentCreateOrConnectWithoutTagInput | InstructorTagAssignmentCreateOrConnectWithoutTagInput[]
+    createMany?: InstructorTagAssignmentCreateManyTagInputEnvelope
+    connect?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+  }
+
+  export type InstructorTagAssignmentUncheckedCreateNestedManyWithoutTagInput = {
+    create?: XOR<InstructorTagAssignmentCreateWithoutTagInput, InstructorTagAssignmentUncheckedCreateWithoutTagInput> | InstructorTagAssignmentCreateWithoutTagInput[] | InstructorTagAssignmentUncheckedCreateWithoutTagInput[]
+    connectOrCreate?: InstructorTagAssignmentCreateOrConnectWithoutTagInput | InstructorTagAssignmentCreateOrConnectWithoutTagInput[]
+    createMany?: InstructorTagAssignmentCreateManyTagInputEnvelope
+    connect?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type InstructorTagAssignmentUpdateManyWithoutTagNestedInput = {
+    create?: XOR<InstructorTagAssignmentCreateWithoutTagInput, InstructorTagAssignmentUncheckedCreateWithoutTagInput> | InstructorTagAssignmentCreateWithoutTagInput[] | InstructorTagAssignmentUncheckedCreateWithoutTagInput[]
+    connectOrCreate?: InstructorTagAssignmentCreateOrConnectWithoutTagInput | InstructorTagAssignmentCreateOrConnectWithoutTagInput[]
+    upsert?: InstructorTagAssignmentUpsertWithWhereUniqueWithoutTagInput | InstructorTagAssignmentUpsertWithWhereUniqueWithoutTagInput[]
+    createMany?: InstructorTagAssignmentCreateManyTagInputEnvelope
+    set?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    disconnect?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    delete?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    connect?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    update?: InstructorTagAssignmentUpdateWithWhereUniqueWithoutTagInput | InstructorTagAssignmentUpdateWithWhereUniqueWithoutTagInput[]
+    updateMany?: InstructorTagAssignmentUpdateManyWithWhereWithoutTagInput | InstructorTagAssignmentUpdateManyWithWhereWithoutTagInput[]
+    deleteMany?: InstructorTagAssignmentScalarWhereInput | InstructorTagAssignmentScalarWhereInput[]
+  }
+
+  export type InstructorTagAssignmentUncheckedUpdateManyWithoutTagNestedInput = {
+    create?: XOR<InstructorTagAssignmentCreateWithoutTagInput, InstructorTagAssignmentUncheckedCreateWithoutTagInput> | InstructorTagAssignmentCreateWithoutTagInput[] | InstructorTagAssignmentUncheckedCreateWithoutTagInput[]
+    connectOrCreate?: InstructorTagAssignmentCreateOrConnectWithoutTagInput | InstructorTagAssignmentCreateOrConnectWithoutTagInput[]
+    upsert?: InstructorTagAssignmentUpsertWithWhereUniqueWithoutTagInput | InstructorTagAssignmentUpsertWithWhereUniqueWithoutTagInput[]
+    createMany?: InstructorTagAssignmentCreateManyTagInputEnvelope
+    set?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    disconnect?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    delete?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    connect?: InstructorTagAssignmentWhereUniqueInput | InstructorTagAssignmentWhereUniqueInput[]
+    update?: InstructorTagAssignmentUpdateWithWhereUniqueWithoutTagInput | InstructorTagAssignmentUpdateWithWhereUniqueWithoutTagInput[]
+    updateMany?: InstructorTagAssignmentUpdateManyWithWhereWithoutTagInput | InstructorTagAssignmentUpdateManyWithWhereWithoutTagInput[]
+    deleteMany?: InstructorTagAssignmentScalarWhereInput | InstructorTagAssignmentScalarWhereInput[]
+  }
+
+  export type InstructorCreateNestedOneWithoutTagAssignmentsInput = {
+    create?: XOR<InstructorCreateWithoutTagAssignmentsInput, InstructorUncheckedCreateWithoutTagAssignmentsInput>
+    connectOrCreate?: InstructorCreateOrConnectWithoutTagAssignmentsInput
+    connect?: InstructorWhereUniqueInput
+  }
+
+  export type InstructorTagCatalogCreateNestedOneWithoutAssignmentsInput = {
+    create?: XOR<InstructorTagCatalogCreateWithoutAssignmentsInput, InstructorTagCatalogUncheckedCreateWithoutAssignmentsInput>
+    connectOrCreate?: InstructorTagCatalogCreateOrConnectWithoutAssignmentsInput
+    connect?: InstructorTagCatalogWhereUniqueInput
+  }
+
+  export type InstructorUpdateOneRequiredWithoutTagAssignmentsNestedInput = {
+    create?: XOR<InstructorCreateWithoutTagAssignmentsInput, InstructorUncheckedCreateWithoutTagAssignmentsInput>
+    connectOrCreate?: InstructorCreateOrConnectWithoutTagAssignmentsInput
+    upsert?: InstructorUpsertWithoutTagAssignmentsInput
+    connect?: InstructorWhereUniqueInput
+    update?: XOR<XOR<InstructorUpdateToOneWithWhereWithoutTagAssignmentsInput, InstructorUpdateWithoutTagAssignmentsInput>, InstructorUncheckedUpdateWithoutTagAssignmentsInput>
+  }
+
+  export type InstructorTagCatalogUpdateOneRequiredWithoutAssignmentsNestedInput = {
+    create?: XOR<InstructorTagCatalogCreateWithoutAssignmentsInput, InstructorTagCatalogUncheckedCreateWithoutAssignmentsInput>
+    connectOrCreate?: InstructorTagCatalogCreateOrConnectWithoutAssignmentsInput
+    upsert?: InstructorTagCatalogUpsertWithoutAssignmentsInput
+    connect?: InstructorTagCatalogWhereUniqueInput
+    update?: XOR<XOR<InstructorTagCatalogUpdateToOneWithWhereWithoutAssignmentsInput, InstructorTagCatalogUpdateWithoutAssignmentsInput>, InstructorTagCatalogUncheckedUpdateWithoutAssignmentsInput>
   }
 
   export type ChildCreateNestedManyWithoutCustomerInput = {
@@ -28651,14 +31626,6 @@ export namespace Prisma {
     update?: ClassAttendanceUpdateWithWhereUniqueWithoutClassInput | ClassAttendanceUpdateWithWhereUniqueWithoutClassInput[]
     updateMany?: ClassAttendanceUpdateManyWithWhereWithoutClassInput | ClassAttendanceUpdateManyWithWhereWithoutClassInput[]
     deleteMany?: ClassAttendanceScalarWhereInput | ClassAttendanceScalarWhereInput[]
-  }
-
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type ClassAttendanceUncheckedUpdateManyWithoutClassNestedInput = {
@@ -29387,26 +32354,6 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type NestedEnumStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.Status | EnumStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.Status[] | ListEnumStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Status[] | ListEnumStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumStatusFilter<$PrismaModel> | $Enums.Status
-  }
-
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -29432,6 +32379,26 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedEnumStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.Status | EnumStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.Status[] | ListEnumStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Status[] | ListEnumStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusFilter<$PrismaModel> | $Enums.Status
   }
 
   export type NestedEnumStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -29617,6 +32584,28 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type InstructorTagAssignmentCreateWithoutInstructorInput = {
+    updatedBy?: number | null
+    updatedAt?: Date | string
+    tag: InstructorTagCatalogCreateNestedOneWithoutAssignmentsInput
+  }
+
+  export type InstructorTagAssignmentUncheckedCreateWithoutInstructorInput = {
+    tagId: number
+    updatedBy?: number | null
+    updatedAt?: Date | string
+  }
+
+  export type InstructorTagAssignmentCreateOrConnectWithoutInstructorInput = {
+    where: InstructorTagAssignmentWhereUniqueInput
+    create: XOR<InstructorTagAssignmentCreateWithoutInstructorInput, InstructorTagAssignmentUncheckedCreateWithoutInstructorInput>
+  }
+
+  export type InstructorTagAssignmentCreateManyInstructorInputEnvelope = {
+    data: InstructorTagAssignmentCreateManyInstructorInput | InstructorTagAssignmentCreateManyInstructorInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ClassUpsertWithWhereUniqueWithoutInstructorInput = {
     where: ClassWhereUniqueInput
     update: XOR<ClassUpdateWithoutInstructorInput, ClassUncheckedUpdateWithoutInstructorInput>
@@ -29759,6 +32748,250 @@ export namespace Prisma {
     subscriptionId?: IntNullableFilter<"RecurringClass"> | number | null
     startAt?: DateTimeNullableFilter<"RecurringClass"> | Date | string | null
     endAt?: DateTimeNullableFilter<"RecurringClass"> | Date | string | null
+  }
+
+  export type InstructorTagAssignmentUpsertWithWhereUniqueWithoutInstructorInput = {
+    where: InstructorTagAssignmentWhereUniqueInput
+    update: XOR<InstructorTagAssignmentUpdateWithoutInstructorInput, InstructorTagAssignmentUncheckedUpdateWithoutInstructorInput>
+    create: XOR<InstructorTagAssignmentCreateWithoutInstructorInput, InstructorTagAssignmentUncheckedCreateWithoutInstructorInput>
+  }
+
+  export type InstructorTagAssignmentUpdateWithWhereUniqueWithoutInstructorInput = {
+    where: InstructorTagAssignmentWhereUniqueInput
+    data: XOR<InstructorTagAssignmentUpdateWithoutInstructorInput, InstructorTagAssignmentUncheckedUpdateWithoutInstructorInput>
+  }
+
+  export type InstructorTagAssignmentUpdateManyWithWhereWithoutInstructorInput = {
+    where: InstructorTagAssignmentScalarWhereInput
+    data: XOR<InstructorTagAssignmentUpdateManyMutationInput, InstructorTagAssignmentUncheckedUpdateManyWithoutInstructorInput>
+  }
+
+  export type InstructorTagAssignmentScalarWhereInput = {
+    AND?: InstructorTagAssignmentScalarWhereInput | InstructorTagAssignmentScalarWhereInput[]
+    OR?: InstructorTagAssignmentScalarWhereInput[]
+    NOT?: InstructorTagAssignmentScalarWhereInput | InstructorTagAssignmentScalarWhereInput[]
+    instructorId?: IntFilter<"InstructorTagAssignment"> | number
+    tagId?: IntFilter<"InstructorTagAssignment"> | number
+    updatedBy?: IntNullableFilter<"InstructorTagAssignment"> | number | null
+    updatedAt?: DateTimeFilter<"InstructorTagAssignment"> | Date | string
+  }
+
+  export type InstructorTagAssignmentCreateWithoutTagInput = {
+    updatedBy?: number | null
+    updatedAt?: Date | string
+    instructor: InstructorCreateNestedOneWithoutTagAssignmentsInput
+  }
+
+  export type InstructorTagAssignmentUncheckedCreateWithoutTagInput = {
+    instructorId: number
+    updatedBy?: number | null
+    updatedAt?: Date | string
+  }
+
+  export type InstructorTagAssignmentCreateOrConnectWithoutTagInput = {
+    where: InstructorTagAssignmentWhereUniqueInput
+    create: XOR<InstructorTagAssignmentCreateWithoutTagInput, InstructorTagAssignmentUncheckedCreateWithoutTagInput>
+  }
+
+  export type InstructorTagAssignmentCreateManyTagInputEnvelope = {
+    data: InstructorTagAssignmentCreateManyTagInput | InstructorTagAssignmentCreateManyTagInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type InstructorTagAssignmentUpsertWithWhereUniqueWithoutTagInput = {
+    where: InstructorTagAssignmentWhereUniqueInput
+    update: XOR<InstructorTagAssignmentUpdateWithoutTagInput, InstructorTagAssignmentUncheckedUpdateWithoutTagInput>
+    create: XOR<InstructorTagAssignmentCreateWithoutTagInput, InstructorTagAssignmentUncheckedCreateWithoutTagInput>
+  }
+
+  export type InstructorTagAssignmentUpdateWithWhereUniqueWithoutTagInput = {
+    where: InstructorTagAssignmentWhereUniqueInput
+    data: XOR<InstructorTagAssignmentUpdateWithoutTagInput, InstructorTagAssignmentUncheckedUpdateWithoutTagInput>
+  }
+
+  export type InstructorTagAssignmentUpdateManyWithWhereWithoutTagInput = {
+    where: InstructorTagAssignmentScalarWhereInput
+    data: XOR<InstructorTagAssignmentUpdateManyMutationInput, InstructorTagAssignmentUncheckedUpdateManyWithoutTagInput>
+  }
+
+  export type InstructorCreateWithoutTagAssignmentsInput = {
+    name: string
+    email: string
+    password: string
+    classURL: string
+    icon: string
+    nickname: string
+    meetingId: string
+    passcode: string
+    createdAt?: Date | string
+    birthdate: Date | string
+    favoriteFood: string
+    hobby: string
+    lifeHistory: string
+    messageForChildren: string
+    skill: string
+    workingTime: string
+    terminationAt?: Date | string | null
+    updatedAt?: Date | string
+    englishBackground: number
+    classes?: ClassCreateNestedManyWithoutInstructorInput
+    instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
+    instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
+    instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
+    recurringClasses?: RecurringClassCreateNestedManyWithoutInstructorInput
+  }
+
+  export type InstructorUncheckedCreateWithoutTagAssignmentsInput = {
+    id?: number
+    name: string
+    email: string
+    password: string
+    classURL: string
+    icon: string
+    nickname: string
+    meetingId: string
+    passcode: string
+    createdAt?: Date | string
+    birthdate: Date | string
+    favoriteFood: string
+    hobby: string
+    lifeHistory: string
+    messageForChildren: string
+    skill: string
+    workingTime: string
+    terminationAt?: Date | string | null
+    updatedAt?: Date | string
+    englishBackground: number
+    classes?: ClassUncheckedCreateNestedManyWithoutInstructorInput
+    instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
+    instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
+    instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
+    recurringClasses?: RecurringClassUncheckedCreateNestedManyWithoutInstructorInput
+  }
+
+  export type InstructorCreateOrConnectWithoutTagAssignmentsInput = {
+    where: InstructorWhereUniqueInput
+    create: XOR<InstructorCreateWithoutTagAssignmentsInput, InstructorUncheckedCreateWithoutTagAssignmentsInput>
+  }
+
+  export type InstructorTagCatalogCreateWithoutAssignmentsInput = {
+    label: string
+    sortOrder?: number
+    createdBy?: number | null
+    createdAt?: Date | string
+    deletedAt?: Date | string | null
+    deletedBy?: number | null
+  }
+
+  export type InstructorTagCatalogUncheckedCreateWithoutAssignmentsInput = {
+    id?: number
+    label: string
+    sortOrder?: number
+    createdBy?: number | null
+    createdAt?: Date | string
+    deletedAt?: Date | string | null
+    deletedBy?: number | null
+  }
+
+  export type InstructorTagCatalogCreateOrConnectWithoutAssignmentsInput = {
+    where: InstructorTagCatalogWhereUniqueInput
+    create: XOR<InstructorTagCatalogCreateWithoutAssignmentsInput, InstructorTagCatalogUncheckedCreateWithoutAssignmentsInput>
+  }
+
+  export type InstructorUpsertWithoutTagAssignmentsInput = {
+    update: XOR<InstructorUpdateWithoutTagAssignmentsInput, InstructorUncheckedUpdateWithoutTagAssignmentsInput>
+    create: XOR<InstructorCreateWithoutTagAssignmentsInput, InstructorUncheckedCreateWithoutTagAssignmentsInput>
+    where?: InstructorWhereInput
+  }
+
+  export type InstructorUpdateToOneWithWhereWithoutTagAssignmentsInput = {
+    where?: InstructorWhereInput
+    data: XOR<InstructorUpdateWithoutTagAssignmentsInput, InstructorUncheckedUpdateWithoutTagAssignmentsInput>
+  }
+
+  export type InstructorUpdateWithoutTagAssignmentsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    classURL?: StringFieldUpdateOperationsInput | string
+    icon?: StringFieldUpdateOperationsInput | string
+    nickname?: StringFieldUpdateOperationsInput | string
+    meetingId?: StringFieldUpdateOperationsInput | string
+    passcode?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    birthdate?: DateTimeFieldUpdateOperationsInput | Date | string
+    favoriteFood?: StringFieldUpdateOperationsInput | string
+    hobby?: StringFieldUpdateOperationsInput | string
+    lifeHistory?: StringFieldUpdateOperationsInput | string
+    messageForChildren?: StringFieldUpdateOperationsInput | string
+    skill?: StringFieldUpdateOperationsInput | string
+    workingTime?: StringFieldUpdateOperationsInput | string
+    terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    englishBackground?: IntFieldUpdateOperationsInput | number
+    classes?: ClassUpdateManyWithoutInstructorNestedInput
+    instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
+    instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
+    instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
+    recurringClasses?: RecurringClassUpdateManyWithoutInstructorNestedInput
+  }
+
+  export type InstructorUncheckedUpdateWithoutTagAssignmentsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    classURL?: StringFieldUpdateOperationsInput | string
+    icon?: StringFieldUpdateOperationsInput | string
+    nickname?: StringFieldUpdateOperationsInput | string
+    meetingId?: StringFieldUpdateOperationsInput | string
+    passcode?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    birthdate?: DateTimeFieldUpdateOperationsInput | Date | string
+    favoriteFood?: StringFieldUpdateOperationsInput | string
+    hobby?: StringFieldUpdateOperationsInput | string
+    lifeHistory?: StringFieldUpdateOperationsInput | string
+    messageForChildren?: StringFieldUpdateOperationsInput | string
+    skill?: StringFieldUpdateOperationsInput | string
+    workingTime?: StringFieldUpdateOperationsInput | string
+    terminationAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    englishBackground?: IntFieldUpdateOperationsInput | number
+    classes?: ClassUncheckedUpdateManyWithoutInstructorNestedInput
+    instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
+    instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
+    instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
+    recurringClasses?: RecurringClassUncheckedUpdateManyWithoutInstructorNestedInput
+  }
+
+  export type InstructorTagCatalogUpsertWithoutAssignmentsInput = {
+    update: XOR<InstructorTagCatalogUpdateWithoutAssignmentsInput, InstructorTagCatalogUncheckedUpdateWithoutAssignmentsInput>
+    create: XOR<InstructorTagCatalogCreateWithoutAssignmentsInput, InstructorTagCatalogUncheckedCreateWithoutAssignmentsInput>
+    where?: InstructorTagCatalogWhereInput
+  }
+
+  export type InstructorTagCatalogUpdateToOneWithWhereWithoutAssignmentsInput = {
+    where?: InstructorTagCatalogWhereInput
+    data: XOR<InstructorTagCatalogUpdateWithoutAssignmentsInput, InstructorTagCatalogUncheckedUpdateWithoutAssignmentsInput>
+  }
+
+  export type InstructorTagCatalogUpdateWithoutAssignmentsInput = {
+    label?: StringFieldUpdateOperationsInput | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdBy?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedBy?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type InstructorTagCatalogUncheckedUpdateWithoutAssignmentsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    label?: StringFieldUpdateOperationsInput | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdBy?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedBy?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type ChildCreateWithoutCustomerInput = {
@@ -29993,6 +33226,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassCreateNestedManyWithoutInstructorInput
+    tagAssignments?: InstructorTagAssignmentCreateNestedManyWithoutInstructorInput
   }
 
   export type InstructorUncheckedCreateWithoutClassesInput = {
@@ -30020,6 +33254,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassUncheckedCreateNestedManyWithoutInstructorInput
+    tagAssignments?: InstructorTagAssignmentUncheckedCreateNestedManyWithoutInstructorInput
   }
 
   export type InstructorCreateOrConnectWithoutClassesInput = {
@@ -30166,6 +33401,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUpdateManyWithoutInstructorNestedInput
+    tagAssignments?: InstructorTagAssignmentUpdateManyWithoutInstructorNestedInput
   }
 
   export type InstructorUncheckedUpdateWithoutClassesInput = {
@@ -30193,6 +33429,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUncheckedUpdateManyWithoutInstructorNestedInput
+    tagAssignments?: InstructorTagAssignmentUncheckedUpdateManyWithoutInstructorNestedInput
   }
 
   export type RecurringClassUpsertWithoutClassesInput = {
@@ -30755,6 +33992,7 @@ export namespace Prisma {
     instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
+    tagAssignments?: InstructorTagAssignmentCreateNestedManyWithoutInstructorInput
   }
 
   export type InstructorUncheckedCreateWithoutRecurringClassesInput = {
@@ -30782,6 +34020,7 @@ export namespace Prisma {
     instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
+    tagAssignments?: InstructorTagAssignmentUncheckedCreateNestedManyWithoutInstructorInput
   }
 
   export type InstructorCreateOrConnectWithoutRecurringClassesInput = {
@@ -30882,6 +34121,7 @@ export namespace Prisma {
     instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
+    tagAssignments?: InstructorTagAssignmentUpdateManyWithoutInstructorNestedInput
   }
 
   export type InstructorUncheckedUpdateWithoutRecurringClassesInput = {
@@ -30909,6 +34149,7 @@ export namespace Prisma {
     instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
+    tagAssignments?: InstructorTagAssignmentUncheckedUpdateManyWithoutInstructorNestedInput
   }
 
   export type SubscriptionUpsertWithoutRecurringClassInput = {
@@ -31179,6 +34420,7 @@ export namespace Prisma {
     instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassCreateNestedManyWithoutInstructorInput
+    tagAssignments?: InstructorTagAssignmentCreateNestedManyWithoutInstructorInput
   }
 
   export type InstructorUncheckedCreateWithoutInstructorSchedulesInput = {
@@ -31206,6 +34448,7 @@ export namespace Prisma {
     instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
     instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassUncheckedCreateNestedManyWithoutInstructorInput
+    tagAssignments?: InstructorTagAssignmentUncheckedCreateNestedManyWithoutInstructorInput
   }
 
   export type InstructorCreateOrConnectWithoutInstructorSchedulesInput = {
@@ -31268,6 +34511,7 @@ export namespace Prisma {
     instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUpdateManyWithoutInstructorNestedInput
+    tagAssignments?: InstructorTagAssignmentUpdateManyWithoutInstructorNestedInput
   }
 
   export type InstructorUncheckedUpdateWithoutInstructorSchedulesInput = {
@@ -31295,6 +34539,7 @@ export namespace Prisma {
     instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
     instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUncheckedUpdateManyWithoutInstructorNestedInput
+    tagAssignments?: InstructorTagAssignmentUncheckedUpdateManyWithoutInstructorNestedInput
   }
 
   export type InstructorSlotUpsertWithWhereUniqueWithoutScheduleInput = {
@@ -31392,6 +34637,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassCreateNestedManyWithoutInstructorInput
+    tagAssignments?: InstructorTagAssignmentCreateNestedManyWithoutInstructorInput
   }
 
   export type InstructorUncheckedCreateWithoutInstructorAbsencesInput = {
@@ -31419,6 +34665,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeUncheckedCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassUncheckedCreateNestedManyWithoutInstructorInput
+    tagAssignments?: InstructorTagAssignmentUncheckedCreateNestedManyWithoutInstructorInput
   }
 
   export type InstructorCreateOrConnectWithoutInstructorAbsencesInput = {
@@ -31461,6 +34708,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUpdateManyWithoutInstructorNestedInput
+    tagAssignments?: InstructorTagAssignmentUpdateManyWithoutInstructorNestedInput
   }
 
   export type InstructorUncheckedUpdateWithoutInstructorAbsencesInput = {
@@ -31488,6 +34736,7 @@ export namespace Prisma {
     instructorFees?: InstructorFeeUncheckedUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUncheckedUpdateManyWithoutInstructorNestedInput
+    tagAssignments?: InstructorTagAssignmentUncheckedUpdateManyWithoutInstructorNestedInput
   }
 
   export type InstructorCreateWithoutInstructorFeesInput = {
@@ -31514,6 +34763,7 @@ export namespace Prisma {
     instructorAbsences?: InstructorAbsenceCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassCreateNestedManyWithoutInstructorInput
+    tagAssignments?: InstructorTagAssignmentCreateNestedManyWithoutInstructorInput
   }
 
   export type InstructorUncheckedCreateWithoutInstructorFeesInput = {
@@ -31541,6 +34791,7 @@ export namespace Prisma {
     instructorAbsences?: InstructorAbsenceUncheckedCreateNestedManyWithoutInstructorInput
     instructorSchedules?: InstructorScheduleUncheckedCreateNestedManyWithoutInstructorInput
     recurringClasses?: RecurringClassUncheckedCreateNestedManyWithoutInstructorInput
+    tagAssignments?: InstructorTagAssignmentUncheckedCreateNestedManyWithoutInstructorInput
   }
 
   export type InstructorCreateOrConnectWithoutInstructorFeesInput = {
@@ -31583,6 +34834,7 @@ export namespace Prisma {
     instructorAbsences?: InstructorAbsenceUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUpdateManyWithoutInstructorNestedInput
+    tagAssignments?: InstructorTagAssignmentUpdateManyWithoutInstructorNestedInput
   }
 
   export type InstructorUncheckedUpdateWithoutInstructorFeesInput = {
@@ -31610,6 +34862,7 @@ export namespace Prisma {
     instructorAbsences?: InstructorAbsenceUncheckedUpdateManyWithoutInstructorNestedInput
     instructorSchedules?: InstructorScheduleUncheckedUpdateManyWithoutInstructorNestedInput
     recurringClasses?: RecurringClassUncheckedUpdateManyWithoutInstructorNestedInput
+    tagAssignments?: InstructorTagAssignmentUncheckedUpdateManyWithoutInstructorNestedInput
   }
 
   export type CustomerCreateWithoutChildrenInput = {
@@ -31798,6 +35051,12 @@ export namespace Prisma {
     endAt?: Date | string | null
   }
 
+  export type InstructorTagAssignmentCreateManyInstructorInput = {
+    tagId: number
+    updatedBy?: number | null
+    updatedAt?: Date | string
+  }
+
   export type ClassUpdateWithoutInstructorInput = {
     dateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
@@ -31932,6 +35191,48 @@ export namespace Prisma {
     subscriptionId?: NullableIntFieldUpdateOperationsInput | number | null
     startAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type InstructorTagAssignmentUpdateWithoutInstructorInput = {
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tag?: InstructorTagCatalogUpdateOneRequiredWithoutAssignmentsNestedInput
+  }
+
+  export type InstructorTagAssignmentUncheckedUpdateWithoutInstructorInput = {
+    tagId?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InstructorTagAssignmentUncheckedUpdateManyWithoutInstructorInput = {
+    tagId?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InstructorTagAssignmentCreateManyTagInput = {
+    instructorId: number
+    updatedBy?: number | null
+    updatedAt?: Date | string
+  }
+
+  export type InstructorTagAssignmentUpdateWithoutTagInput = {
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    instructor?: InstructorUpdateOneRequiredWithoutTagAssignmentsNestedInput
+  }
+
+  export type InstructorTagAssignmentUncheckedUpdateWithoutTagInput = {
+    instructorId?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InstructorTagAssignmentUncheckedUpdateManyWithoutTagInput = {
+    instructorId?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ChildCreateManyCustomerInput = {

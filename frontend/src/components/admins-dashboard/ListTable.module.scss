@@ -85,6 +85,10 @@ $font_size: 0.9rem;
 .filterButtonInactive {
   background-color: $blue_primary;
   color: #ffffff;
+
+  &:hover {
+    background-color: $blue_primary_hover;
+  }
 }
 
 .tableWrapper {
