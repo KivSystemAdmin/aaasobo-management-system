@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Image from "next/image";
 import styles from "./InstructorItem.module.scss";
-import { textLight } from "@/styles/colors";
 import { defaultUserImageUrl } from "@/lib/data/data";
 
 interface InstructorItemProps {
