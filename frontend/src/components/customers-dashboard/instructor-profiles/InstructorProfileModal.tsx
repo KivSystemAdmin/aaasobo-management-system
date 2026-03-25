@@ -6,7 +6,6 @@ import InstructorProfile from "@/components/instructors-dashboard/instructor-pro
 const InstructorProfileModal = ({
   instructor,
   userSessionType,
-  width = "100%",
   isCustomerView,
 }: {
   instructor: InstructorProfile;
@@ -15,7 +14,7 @@ const InstructorProfileModal = ({
   isCustomerView?: boolean;
 }) => {
   return (
-    <div className={styles.modalContent} style={{ width }}>
+    <div className={styles.modalContent}>
       <InstructorProfile
         instructor={instructor}
         userSessionType={userSessionType}
