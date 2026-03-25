@@ -973,6 +973,92 @@ async function insertInstructors() {
   });
 }
 
+async function insertInstructorTagCatalogs() {
+  await prisma.instructorTagCatalog.createMany({
+    data: [
+      { label: "Minecraft", sortOrder: 1 },
+      { label: "Kids Specialist", sortOrder: 2 },
+      { label: "Phonics Expert", sortOrder: 3 },
+      { label: "Grammar Coach", sortOrder: 4 },
+      { label: "Conversation Focus", sortOrder: 5 },
+      { label: "Beginner Friendly", sortOrder: 6 },
+      { label: "Pronunciation Focus", sortOrder: 7 },
+      { label: "Exam Preparation", sortOrder: 8 },
+      { label: "Reading Support", sortOrder: 9 },
+      { label: "Writing Support", sortOrder: 10 },
+      { label: "Listening Training", sortOrder: 11 },
+      { label: "Speaking Training", sortOrder: 12 },
+      { label: "Homework Support", sortOrder: 13 },
+      { label: "Interactive Lessons", sortOrder: 14 },
+      { label: "Storytelling", sortOrder: 15 },
+      { label: "Music Activities", sortOrder: 16 },
+      { label: "Game-based Learning", sortOrder: 17 },
+      { label: "STEM English", sortOrder: 18 },
+      { label: "Art Activities", sortOrder: 19 },
+      { label: "Travel English", sortOrder: 20 },
+      { label: "Business English", sortOrder: 21 },
+      { label: "Daily Conversation", sortOrder: 22 },
+      { label: "Parent Feedback", sortOrder: 23 },
+      { label: "Flexible Schedule", sortOrder: 24 },
+      { label: "Weekend Available", sortOrder: 25 },
+      { label: "Morning Available", sortOrder: 26 },
+      { label: "Evening Available", sortOrder: 27 },
+      { label: "Advanced Learners", sortOrder: 28 },
+      { label: "Shy Kids Support", sortOrder: 29 },
+      { label: "Motivational Coach", sortOrder: 30 },
+    ],
+    skipDuplicates: true,
+  });
+}
+
+async function insertInstructorTagAssignments() {
+  const [instructors, tags] = await Promise.all([
+    prisma.instructor.findMany({
+      select: { id: true },
+      orderBy: { id: "asc" },
+    }),
+    prisma.instructorTagCatalog.findMany({
+      where: { deletedAt: null },
+      select: { id: true },
+      orderBy: { sortOrder: "asc" },
+    }),
+  ]);
+
+  const tagIds = tags.map(({ id }) => id);
+
+  const data = instructors.flatMap(({ id: instructorId }, instructorIndex) => {
+    const tagCount = tagIds.length;
+    if (tagCount === 0) {
+      return [];
+    }
+    const selectedCount = Math.min(tagCount, 3 + (instructorIndex % 8));
+    const startIndex = instructorIndex % tagCount;
+    const step = (instructorIndex % 4) + 1;
+
+    const selectedTagIds = new Set<number>();
+    let cursor = startIndex;
+
+    while (selectedTagIds.size < selectedCount) {
+      selectedTagIds.add(tagIds[cursor]);
+      cursor = (cursor + step) % tagCount;
+    }
+
+    const updatedBy =
+      instructorIndex % 3 === 0 ? null : (instructorIndex % 2) + 1;
+
+    return [...selectedTagIds].map((tagId) => ({
+      instructorId,
+      tagId,
+      updatedBy,
+    }));
+  });
+
+  await prisma.instructorTagAssignment.createMany({
+    data,
+    skipDuplicates: true,
+  });
+}
+
 async function insertCustomers() {
   await prisma.customer.createMany({
     data: [
@@ -3543,6 +3629,12 @@ async function deleteAll(table: Uncapitalize<Prisma.ModelName>) {
     case "instructorFee":
       await prisma.instructorFee.deleteMany();
       return;
+    case "instructorTagAssignment":
+      await prisma.instructorTagAssignment.deleteMany();
+      return;
+    case "instructorTagCatalog":
+      await prisma.instructorTagCatalog.deleteMany();
+      return;
     case "instructorSchedule":
       await prisma.instructorSchedule.deleteMany();
       return;
@@ -3582,6 +3674,7 @@ async function main() {
     await deleteAll("class");
     await deleteAll("recurringClass");
     await deleteAll("instructorSlot");
+    await deleteAll("instructorTagAssignment");
 
     // Dependent on the below
     await deleteAll("child");
@@ -3594,6 +3687,7 @@ async function main() {
     // Independent
     await deleteAll("admin");
     await deleteAll("instructor");
+    await deleteAll("instructorTagCatalog");
     await deleteAll("customer");
     await deleteAll("plan");
     await deleteAll("event");
@@ -3604,11 +3698,13 @@ async function main() {
     await insertPlans();
     await insertCustomers();
     await insertInstructors();
+    await insertInstructorTagCatalogs();
     await insertAdmins();
     await insertEvents();
     await insertSystemStatus();
 
     // Dependant on the above
+    await insertInstructorTagAssignments();
     await insertInstructorFees();
     await insertInstructorSchedules();
     await insertSubscriptions();
