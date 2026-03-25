@@ -33,6 +33,7 @@ import {
   getInstructorFees,
   InstructorFeeError,
 } from "../services/instructorFeeService";
+import { getTagsByInstructorIds } from "../services/instructorTagsService";
 import { getClassesWithinPeriod } from "../services/classesService";
 import {
   getAllCustomers,
@@ -706,6 +707,8 @@ export const updateInstructorProfileController = async (
       passcode,
       englishBackgroundNum,
     );
+    const instructorId = Number(id);
+    const tags = await getTagsByInstructorIds([instructorId]);
 
     // Create a new instructor object with the updated termination date (JST).
     // This is because the termination date needs to be in UTC format on the database.
@@ -713,6 +716,10 @@ export const updateInstructorProfileController = async (
     const updatedInstructor = {
       ...instructor,
       terminationAt: normalizedLeavingDate,
+      tags: tags.map((tag) => ({
+        id: tag.id,
+        label: tag.label,
+      })),
     };
 
     res.status(200).json({
