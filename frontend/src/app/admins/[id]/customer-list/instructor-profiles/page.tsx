@@ -32,6 +32,9 @@ async function InstructorProfilesPage({
   // Define the breadcrumb links
   const breadcrumbLink = `/admins/${adminId}/customer-list/${customerId}`;
 
+  // From this page, admins can only view instructor profiles with limited information the same as customers.
+  const isCustomerView = true;
+
   return (
     <>
       <InstructorsList
@@ -41,6 +44,7 @@ async function InstructorProfilesPage({
           instructorId ? parseInt(instructorId) : undefined
         }
         breadcrumbLink={breadcrumbLink}
+        isCustomerView={isCustomerView}
       />
     </>
   );
