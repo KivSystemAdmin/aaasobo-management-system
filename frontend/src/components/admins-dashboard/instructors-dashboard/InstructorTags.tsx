@@ -27,6 +27,10 @@ export default function InstructorTags({
     useState<
       { id: number; label: string; sortOrder: number; assignedCount?: number }[]
     >(initialTagCatalog);
+  const [catalog, setCatalog] =
+    useState<
+      { id: number; label: string; sortOrder: number; assignedCount?: number }[]
+    >(initialTagCatalog);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
     initialInstructorTags?.selectedTagIds ?? [],
   );
@@ -59,6 +63,10 @@ export default function InstructorTags({
   const save = async () => {
     setIsSaving(true);
     try {
+      const result = await saveInstructorTagsAction(
+        instructorId,
+        selectedTagIds,
+      );
       const result = await saveInstructorTagsAction(
         instructorId,
         selectedTagIds,
@@ -113,16 +121,25 @@ export default function InstructorTags({
     }
 
     if (result.tag) {
+      const { id, label, sortOrder } = result.tag;
       setCatalog((prevCatalog) => [
         ...prevCatalog,
-        { ...result.tag, assignedCount: 0 },
+        { id, label, sortOrder, assignedCount: 0 },
       ]);
       setNewTagLabel("");
     }
     toast.success(result.successMessage ?? "Tag created successfully.");
   };
 
-  const deleteTag = async (tagId: number) => {
+  const deleteTag = async (tagId: number, tagLabel: string) => {
+    const isConfirmed = window.confirm(
+      `Are you sure you want to delete the "${tagLabel}" tag?`,
+    );
+
+    if (!isConfirmed) {
+      return;
+    }
+
     const result = await deleteInstructorTagAction(tagId);
     setUpdateResultState(result);
 
@@ -203,7 +220,7 @@ export default function InstructorTags({
               <span>{tag.label}</span>
               <span>{tag.assignedCount ?? 0} instructors</span>
               <button
-                onClick={() => deleteTag(tag.id)}
+                onClick={() => deleteTag(tag.id, tag.label)}
                 className={styles.delete}
                 type="button"
               >

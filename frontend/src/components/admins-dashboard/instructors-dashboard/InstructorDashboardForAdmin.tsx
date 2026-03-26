@@ -27,7 +27,7 @@ export default async function InstructorDashboardForAdmin({
   // Get the cookies from the request headers
   const cookie = await getCookie();
 
-  let instructor = null;
+  let instructor: Instructor | string = "";
   const blobReadWriteToken = process.env.BLOB_READ_WRITE_TOKEN;
   const extractTokenLetters = (token: string) => {
     const parts = token.split("_");
