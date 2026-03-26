@@ -2,7 +2,7 @@ import Swal from "sweetalert2";
 
 const buildAlertHtml = (text: string): string => `
   <div style="text-align:center;">
-    <div style="display:inline-block; text-align:left; margin:0 auto;">
+    <div style="display:inline-block; text-align:left; margin:0 auto; max-width: 100%; width: fit-content; white-space: normal; overflow-wrap: break-word;">
       ${text}
     </div>
   </div>
