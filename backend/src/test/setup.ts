@@ -25,13 +25,13 @@ await (async () => {
 
     const workerDatabaseUrl = withDatabase(baseDatabaseUrl, workerDbName);
     process.env.DATABASE_URL = workerDatabaseUrl;
-    process.env.AMS_PRISMA_DATABASE_URL = workerDatabaseUrl;
+    process.env.POSTGRES_PRISMA_URL = workerDatabaseUrl;
 
     await ensureDatabaseExists(baseDatabaseUrl, workerDbName);
 
     // Initialize Prisma client (engineType="client" requires a driver adapter)
     const adapter = new PrismaPg({
-      connectionString: process.env.AMS_PRISMA_DATABASE_URL,
+      connectionString: process.env.POSTGRES_PRISMA_URL,
     });
     prisma = new PrismaClient({ adapter });
 
