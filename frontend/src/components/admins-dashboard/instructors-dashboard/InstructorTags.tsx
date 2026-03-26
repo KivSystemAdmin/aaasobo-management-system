@@ -13,6 +13,7 @@ import type {
   InstructorTagsResponse,
   TagCatalogResponse,
 } from "@shared/schemas/instructors";
+import { confirmAlert } from "@/lib/utils/alertUtils";
 
 export default function InstructorTags({
   instructorId,
@@ -124,11 +125,10 @@ export default function InstructorTags({
   };
 
   const deleteTag = async (tagId: number, tagLabel: string) => {
-    const isConfirmed = window.confirm(
+    const confirmed = await confirmAlert(
       `Are you sure you want to delete the "${tagLabel}" tag?`,
     );
-
-    if (!isConfirmed) {
+    if (!confirmed) {
       return;
     }
 
