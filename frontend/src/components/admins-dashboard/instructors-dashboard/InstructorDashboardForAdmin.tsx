@@ -1,10 +1,16 @@
 import {
   getInstructor,
+  getInstructorTagCatalog,
+  getInstructorTags,
   getInstructorScheduleById,
   getInstructorSchedules,
   type InstructorScheduleWithSlots,
 } from "@/lib/api/instructorsApi";
-import type { InstructorSchedule } from "@shared/schemas/instructors";
+import type {
+  InstructorSchedule,
+  InstructorTagsResponse,
+  TagCatalogResponse,
+} from "@shared/schemas/instructors";
 import InstructorCalendar from "../../instructors-dashboard/class-schedule/instructorCalendar/InstructorCalendar";
 import InstructorDashboardClient from "@/components/admins-dashboard/instructors-dashboard/InstructorDashboardClient";
 import { getCookie } from "../../../proxy";
@@ -21,15 +27,7 @@ export default async function InstructorDashboardForAdmin({
   // Get the cookies from the request headers
   const cookie = await getCookie();
 
-  // Fetch instructor's data
-  // [For InstructorProfile]
-  const data = await getInstructor(instructorId, cookie);
   let instructor = null;
-  if ("message" in data) {
-    instructor = data.message;
-  } else {
-    instructor = data.instructor;
-  }
   const blobReadWriteToken = process.env.BLOB_READ_WRITE_TOKEN;
   const extractTokenLetters = (token: string) => {
     const parts = token.split("_");
@@ -40,12 +38,27 @@ export default async function InstructorDashboardForAdmin({
   let initialSchedules: InstructorSchedule[] = [];
   let initialSelectedScheduleId: number | null = null;
   let initialSelectedSchedule: InstructorScheduleWithSlots | null = null;
+  let initialInstructorTags: InstructorTagsResponse | null = null;
+  let initialTagCatalog: TagCatalogResponse["tags"] = [];
   try {
-    const schedulesResponse = await getInstructorSchedules(
-      instructorId,
-      cookie,
-    );
+    const [instructorData, schedulesResponse, instructorTags, tagCatalog] =
+      await Promise.all([
+        getInstructor(instructorId, cookie),
+        getInstructorSchedules(instructorId, cookie),
+        getInstructorTags(instructorId, cookie),
+        getInstructorTagCatalog(cookie),
+      ]);
+
+    if ("message" in instructorData) {
+      instructor = instructorData.message;
+    } else {
+      instructor = instructorData.instructor;
+    }
+
     initialSchedules = schedulesResponse.schedules;
+    initialInstructorTags = instructorTags;
+    initialTagCatalog = tagCatalog;
+
     const activeSchedule = initialSchedules.find(
       (schedule) => schedule.effectiveTo === null,
     );
@@ -72,6 +85,8 @@ export default async function InstructorDashboardForAdmin({
       initialSchedules={initialSchedules}
       initialSelectedScheduleId={initialSelectedScheduleId}
       initialSelectedSchedule={initialSelectedSchedule}
+      initialInstructorTags={initialInstructorTags}
+      initialTagCatalog={initialTagCatalog}
       classScheduleComponent={
         <InstructorCalendar
           adminId={adminId}

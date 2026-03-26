@@ -538,6 +538,11 @@ export const createInstructorTag = async (label: string, cookie: string) => {
     const data = await response.json();
     throw new Error(data.message || "Failed to create tag");
   }
+
+  const data = (await response.json()) as {
+    tag: TagCatalogResponse["tags"][number];
+  };
+  return data.tag;
 };
 
 export const deleteInstructorTag = async (tagId: number, cookie: string) => {
@@ -549,6 +554,8 @@ export const deleteInstructorTag = async (tagId: number, cookie: string) => {
   if (response.status !== 200) {
     throw new Error("Failed to delete tag");
   }
+
+  return (await response.json()) as { success: boolean };
 };
 
 export const saveInstructorTags = async (
@@ -565,6 +572,8 @@ export const saveInstructorTags = async (
   if (response.status !== 200) {
     throw new Error("Failed to save instructor tags");
   }
+
+  return (await response.json()) as { success: boolean };
 };
 
 export const getCalendarClasses = async (

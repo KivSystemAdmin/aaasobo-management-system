@@ -10,7 +10,11 @@ import AvailabilityCalendar from "./instructor-schedule/AvailabilityCalendar";
 import Loading from "@/components/elements/loading/Loading";
 import InstructorPayroll from "./InstructorPayroll";
 import InstructorTagsTab from "./InstructorTags";
-import type { InstructorSchedule as InstructorScheduleType } from "@shared/schemas/instructors";
+import type {
+  InstructorSchedule as InstructorScheduleType,
+  InstructorTagsResponse,
+  TagCatalogResponse,
+} from "@shared/schemas/instructors";
 import type { InstructorScheduleWithSlots } from "@/lib/api/instructorsApi";
 
 export default function InstructorTabs({
@@ -22,6 +26,8 @@ export default function InstructorTabs({
   initialSchedules,
   initialSelectedScheduleId,
   initialSelectedSchedule,
+  initialInstructorTags,
+  initialTagCatalog,
   classScheduleComponent,
 }: {
   adminId: number;
@@ -32,6 +38,8 @@ export default function InstructorTabs({
   initialSchedules: InstructorScheduleType[];
   initialSelectedScheduleId: number | null;
   initialSelectedSchedule: InstructorScheduleWithSlots | null;
+  initialInstructorTags: InstructorTagsResponse | null;
+  initialTagCatalog: TagCatalogResponse["tags"];
   classScheduleComponent: React.ReactNode;
 }) {
   const nickname = typeof instructor !== "string" ? instructor.nickname : null;
@@ -104,7 +112,13 @@ export default function InstructorTabs({
     },
     {
       label: "Tags",
-      content: <InstructorTagsTab instructorId={instructorId} />,
+      content: (
+        <InstructorTagsTab
+          instructorId={instructorId}
+          initialInstructorTags={initialInstructorTags}
+          initialTagCatalog={initialTagCatalog}
+        />
+      ),
     },
   ];
 
