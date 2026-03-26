@@ -40,24 +40,59 @@ export default async function InstructorDashboardForAdmin({
   let initialSelectedSchedule: InstructorScheduleWithSlots | null = null;
   let initialInstructorTags: InstructorTagsResponse | null = null;
   let initialTagCatalog: TagCatalogResponse["tags"] = [];
-  try {
-    const [instructorData, schedulesResponse, instructorTags, tagCatalog] =
-      await Promise.all([
-        getInstructor(instructorId, cookie),
-        getInstructorSchedules(instructorId, cookie),
-        getInstructorTags(instructorId, cookie),
-        getInstructorTagCatalog(cookie),
-      ]);
 
-    if ("message" in instructorData) {
-      instructor = instructorData.message;
+  try {
+    const [
+      instructorResult,
+      schedulesResult,
+      instructorTagsResult,
+      tagCatalogResult,
+    ] = await Promise.allSettled([
+      getInstructor(instructorId, cookie),
+      getInstructorSchedules(instructorId, cookie),
+      getInstructorTags(instructorId, cookie),
+      getInstructorTagCatalog(cookie),
+    ]);
+
+    if (instructorResult.status === "fulfilled") {
+      if ("message" in instructorResult.value) {
+        instructor = instructorResult.value.message;
+      } else {
+        instructor = instructorResult.value.instructor;
+      }
     } else {
-      instructor = instructorData.instructor;
+      console.error(
+        "Failed to load instructor profile:",
+        instructorResult.reason,
+      );
     }
 
-    initialSchedules = schedulesResponse.schedules;
-    initialInstructorTags = instructorTags;
-    initialTagCatalog = tagCatalog;
+    if (schedulesResult.status === "fulfilled") {
+      initialSchedules = schedulesResult.value.schedules;
+    } else {
+      console.error(
+        "Failed to load instructor schedules:",
+        schedulesResult.reason,
+      );
+    }
+
+    if (instructorTagsResult.status === "fulfilled") {
+      initialInstructorTags = instructorTagsResult.value;
+    } else {
+      console.error(
+        "Failed to load instructor tags:",
+        instructorTagsResult.reason,
+      );
+    }
+
+    if (tagCatalogResult.status === "fulfilled") {
+      initialTagCatalog = tagCatalogResult.value;
+    } else {
+      console.error(
+        "Failed to load instructor tag catalog:",
+        tagCatalogResult.reason,
+      );
+    }
 
     const activeSchedule = initialSchedules.find(
       (schedule) => schedule.effectiveTo === null,
@@ -72,7 +107,7 @@ export default async function InstructorDashboardForAdmin({
       initialSelectedSchedule = scheduleDetailResponse.schedule;
     }
   } catch (error) {
-    console.error("Failed to load instructor schedules:", error);
+    console.error("Failed to load instructor dashboard data:", error);
   }
 
   return (
