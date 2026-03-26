@@ -11,7 +11,7 @@ const globalForPrisma = globalThis as unknown as {
 const pool =
   globalForPrisma.pool ??
   new Pool({
-    connectionString: process.env.POSTGRES_PRISMA_URL,
+    connectionString: process.env.AMS_PRISMA_DATABASE_URL,
     max: 2,
     idleTimeoutMillis: 30000, // 30 seconds idle timeout
     connectionTimeoutMillis: 2000, // 2 seconds connection timeout

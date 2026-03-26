@@ -9,10 +9,10 @@ export default {
     path: "prisma/migrations",
   },
   datasource: {
-    url: env("POSTGRES_PRISMA_URL"),
+    url: env("AMS_PRISMA_DATABASE_URL"),
   },
 } satisfies PrismaConfig;
 
 export const adapter = new PrismaPg({
-  connectionString: process.env.POSTGRES_PRISMA_URL,
+  connectionString: process.env.AMS_PRISMA_DATABASE_URL,
 });

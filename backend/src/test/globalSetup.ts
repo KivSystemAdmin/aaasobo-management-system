@@ -68,7 +68,8 @@ export default async function globalSetup() {
 
   const baseDatabaseUrl = await (async () => {
     if (process.env.TEST_DATABASE_URL) return process.env.TEST_DATABASE_URL;
-    if (process.env.POSTGRES_PRISMA_URL) return process.env.POSTGRES_PRISMA_URL;
+    if (process.env.AMS_PRISMA_DATABASE_URL)
+      return process.env.AMS_PRISMA_DATABASE_URL;
     if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
 
     try {
@@ -86,7 +87,7 @@ export default async function globalSetup() {
           "No test database connection is configured.",
           "Testcontainers PostgreSQL startup failed.",
           message,
-          "Fix: start a container runtime (e.g. Docker), set TEST_DATABASE_URL, or set POSTGRES_PRISMA_URL/DATABASE_URL in `backend/.env`.",
+          "Fix: start a container runtime (e.g. Docker), set TEST_DATABASE_URL, or set AMS_PRISMA_DATABASE_URL/DATABASE_URL in `backend/.env`.",
         ].join("\n"),
         { cause: error },
       );
