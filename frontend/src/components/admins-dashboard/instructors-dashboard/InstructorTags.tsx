@@ -27,10 +27,6 @@ export default function InstructorTags({
     useState<
       { id: number; label: string; sortOrder: number; assignedCount?: number }[]
     >(initialTagCatalog);
-  const [catalog, setCatalog] =
-    useState<
-      { id: number; label: string; sortOrder: number; assignedCount?: number }[]
-    >(initialTagCatalog);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
     initialInstructorTags?.selectedTagIds ?? [],
   );
@@ -63,10 +59,6 @@ export default function InstructorTags({
   const save = async () => {
     setIsSaving(true);
     try {
-      const result = await saveInstructorTagsAction(
-        instructorId,
-        selectedTagIds,
-      );
       const result = await saveInstructorTagsAction(
         instructorId,
         selectedTagIds,
