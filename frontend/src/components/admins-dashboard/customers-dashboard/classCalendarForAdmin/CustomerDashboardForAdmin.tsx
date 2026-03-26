@@ -15,8 +15,22 @@ export default async function CustomerDashboardForAdmin({
   // Get the cookies from the request headers
   const cookie = await getCookie();
 
-  const customerProfile = await getCustomerById(customerId, cookie);
-  const childProfiles = await getChildProfiles(customerId, cookie);
+  const [customerProfileResult, childProfilesResult] = await Promise.allSettled(
+    [getCustomerById(customerId, cookie), getChildProfiles(customerId, cookie)],
+  );
+
+  if (customerProfileResult.status === "rejected") {
+    throw customerProfileResult.reason;
+  }
+
+  const customerProfile = customerProfileResult.value;
+
+  let childProfiles: Awaited<ReturnType<typeof getChildProfiles>> = [];
+  if (childProfilesResult.status === "fulfilled") {
+    childProfiles = childProfilesResult.value;
+  } else {
+    console.error("Failed to load child profiles:", childProfilesResult.reason);
+  }
 
   return (
     <CustomerDashboardClient
