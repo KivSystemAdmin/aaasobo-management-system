@@ -24,8 +24,13 @@ export default async function CustomerDashboardForAdmin({
   }
 
   const customerProfile = customerProfileResult.value;
-  const childProfiles =
-    childProfilesResult.status === "fulfilled" ? childProfilesResult.value : [];
+
+  let childProfiles: Awaited<ReturnType<typeof getChildProfiles>> = [];
+  if (childProfilesResult.status === "fulfilled") {
+    childProfiles = childProfilesResult.value;
+  } else {
+    console.error("Failed to load child profiles:", childProfilesResult.reason);
+  }
 
   return (
     <CustomerDashboardClient
