@@ -23,9 +23,10 @@ export default function InstructorTags({
   initialInstructorTags: InstructorTagsResponse | null;
   initialTagCatalog: TagCatalogResponse["tags"];
 }) {
-  const [catalog, setCatalog] = useState<
-    { id: number; label: string; sortOrder: number; assignedCount?: number }[]
-  >(initialTagCatalog);
+  const [catalog, setCatalog] =
+    useState<
+      { id: number; label: string; sortOrder: number; assignedCount?: number }[]
+    >(initialTagCatalog);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
     initialInstructorTags?.selectedTagIds ?? [],
   );
@@ -58,7 +59,10 @@ export default function InstructorTags({
   const save = async () => {
     setIsSaving(true);
     try {
-      const result = await saveInstructorTagsAction(instructorId, selectedTagIds);
+      const result = await saveInstructorTagsAction(
+        instructorId,
+        selectedTagIds,
+      );
       setUpdateResultState(result);
 
       if (result.errorMessage) {
@@ -109,7 +113,10 @@ export default function InstructorTags({
     }
 
     if (result.tag) {
-      setCatalog((prevCatalog) => [...prevCatalog, { ...result.tag, assignedCount: 0 }]);
+      setCatalog((prevCatalog) => [
+        ...prevCatalog,
+        { ...result.tag, assignedCount: 0 },
+      ]);
       setNewTagLabel("");
     }
     toast.success(result.successMessage ?? "Tag created successfully.");
@@ -186,10 +193,7 @@ export default function InstructorTags({
             placeholder="New tag name..."
             className={styles.search}
           />
-          <button
-            className={styles.primary + " " + styles.add}
-            type="submit"
-          >
+          <button className={styles.primary + " " + styles.add} type="submit">
             Add
           </button>
         </div>
