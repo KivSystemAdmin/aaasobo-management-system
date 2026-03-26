@@ -55,7 +55,7 @@ jobs:
           --health-retries 10
     env:
       TEST_DATABASE_URL: postgresql://postgres:summer@localhost:5432/postgres?schema=public
-      AMS_PRISMA_DATABASE_URL: postgresql://postgres:summer@localhost:5432/postgres?schema=public
+      POSTGRES_PRISMA_URL: postgresql://postgres:summer@localhost:5432/postgres?schema=public
       FRONTEND_ORIGIN: http://localhost:3000
       RESEND_API_KEY: re_test_dummy
     steps:
