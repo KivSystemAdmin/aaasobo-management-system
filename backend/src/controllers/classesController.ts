@@ -243,7 +243,10 @@ export const rebookClassController = async (
         ? String((error as { message?: unknown }).message)
         : "";
 
-    if (error instanceof InstructorUnavailableError) {
+    if (
+      error instanceof InstructorUnavailableError ||
+      message === "instructor unavailable"
+    ) {
       return res.status(400).json({ errorType: "instructor unavailable" });
     }
     if (error instanceof RebookControllerError) {

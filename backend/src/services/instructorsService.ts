@@ -234,6 +234,17 @@ export const getInstructorByEmail = async (
   });
 };
 
+export const getInstructorAuthByEmail = async (email: string) => {
+  return await prisma.instructor.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      name: true,
+      password: true,
+    },
+  });
+};
+
 // Fetch the instructor by the nickname
 export const getInstructorByNickname = async (
   nickname: string,
