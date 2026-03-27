@@ -2,7 +2,14 @@ import type { NextAuthConfig } from "next-auth";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { SignJWT, jwtVerify } from "jose";
+import { z } from "zod";
 import { convertToSingular } from "@/lib/utils/stringUtils";
+
+const credentialSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  userType: z.enum(["admin", "customer", "instructor"]),
+});
 
 export const authConfig: NextAuthConfig = {
   pages: {
@@ -20,7 +27,7 @@ export const authConfig: NextAuthConfig = {
       name: "next-auth.session-token",
       options: {
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
       },
@@ -92,20 +99,33 @@ export const authConfig: NextAuthConfig = {
     Credentials({
       async authorize(credentials) {
         try {
-          const userId = String(credentials.userId);
-          const userType = credentials.userType as UserType;
-
-          if (!userId || !userType) {
-            console.warn(
-              `Missing required credentials in authorize: userId:${userId}, userType:${userType}`,
-            );
+          const parsedCredentials = credentialSchema.safeParse(credentials);
+          if (!parsedCredentials.success) {
             return null;
           }
 
-          // Return user data for NextAuth session, including custom userType for role-based access.
+          const backendOrigin = process.env.BACKEND_ORIGIN;
+          if (!backendOrigin) {
+            console.error("Missing BACKEND_ORIGIN in auth authorize");
+            return null;
+          }
+
+          const response = await fetch(`${backendOrigin}/users/authenticate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(parsedCredentials.data),
+            cache: "no-store",
+          });
+
+          if (!response.ok) {
+            return null;
+          }
+
+          const data = (await response.json()) as { id: number };
+
           return {
-            id: userId,
-            userType,
+            id: String(data.id),
+            userType: parsedCredentials.data.userType,
           };
         } catch (error) {
           console.error("Unexpected error in authorize:", error);

@@ -37,10 +37,10 @@ FRONTEND_ORIGIN="http://localhost:3000"
 POSTGRES_PRISMA_URL="postgresql://postgres:summer@localhost:5432/mydb?schema=public"
 POSTGRES_URL_NON_POOLING="postgresql://postgres:summer@localhost:5432/mydb?schema=public"
 PORT=4000
-KEY1=98b5b9c9ef24f4280561d95beb2ee54c00e81dfa1abc9d008b35b66e6c2095cc
-KEY2=7e3caf8440ad740910137a1890940347c44a5258f73784e822d0d705a1db3b70
+KEY1="<generate_with_openssl_rand_hex_32>"
+KEY2="<generate_with_openssl_rand_hex_32>"
 RESEND_API_KEY="Dummy Resend API Key"
-AUTH_SECRET="5e13a7ccb2e88d1a5c21dce34abbdc0c3d70f9c9dea9f994a4af4d5b7383caf5"
+AUTH_SECRET="<generate_with_openssl_rand_hex_32>"
 AUTH_SALT="next-auth.session-token"
 ```
 
@@ -123,8 +123,8 @@ npm install
 Create a `.env` file in the `frontend` directory with the following content:
 
 ```
-NEXTAUTH_SECRET="915bd2a1349be118cc299fef89b324b42d5c35a8dfabf3c272e96a1fafa05eeb"
-AUTH_SECRET="1d42a8ad0d6e0d143f9a3da2459c8979079281ec97d94b369272daa8ca5497b1"
+NEXTAUTH_SECRET="<generate_with_openssl_rand_hex_32>"
+AUTH_SECRET="<generate_with_openssl_rand_hex_32>"
 AUTH_SALT="798ceed428885abab905b5291e9eb97b"
 AUTH_TRUST_HOST=true
 NEXT_PUBLIC_FRONTEND_ORIGIN="http://localhost:3000"

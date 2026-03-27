@@ -39,7 +39,18 @@ const allowedOrigin = process.env.FRONTEND_ORIGIN || "";
 // CORS Configuration
 server.use(
   cors({
-    origin: allowedOrigin,
+    origin(origin, callback) {
+      // Allow server-to-server requests without Origin header
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (origin === allowedOrigin) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -48,6 +59,13 @@ server.use(
 );
 
 // Middleware
+server.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "geolocation=(), microphone=()");
+  next();
+});
 server.use(express.json());
 server.use(cookieParser());
 

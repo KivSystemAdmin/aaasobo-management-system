@@ -13,8 +13,6 @@ import {
   UNEXPECTED_ERROR_MESSAGE,
 } from "../messages/formValidation";
 import type {
-  AuthenticateRequest,
-  AuthenticateResponse,
   SendPasswordResetRequest,
   VerifyResetTokenRequest,
   UpdatePasswordRequest,
@@ -22,53 +20,6 @@ import type {
 
 const BACKEND_ORIGIN =
   process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
-
-export const authenticateUser = async (
-  email: string,
-  password: string,
-  userType: UserType,
-  language: LanguageType,
-): Promise<{ userId: number } | { errorMessage: string }> => {
-  try {
-    const apiUrl = `${BACKEND_ORIGIN}/users/authenticate`;
-    const method = "POST";
-    const headers = { "Content-Type": "application/json" };
-    const body = JSON.stringify({
-      email,
-      password,
-      userType,
-    } as AuthenticateRequest);
-
-    const statusErrorMessages: Record<number, string> = {
-      401: LOGIN_FAILED_MESSAGE[language],
-      503: CONFIRMATION_EMAIL_RESEND_FAILURE[language],
-      403: EMAIL_VERIFICATION_RESENT_NOTICE[language],
-    };
-
-    const response = await fetch(apiUrl, {
-      method,
-      headers,
-      body,
-    });
-
-    const errorMessage = statusErrorMessages[response.status];
-    if (errorMessage) {
-      return { errorMessage };
-    }
-
-    if (response.status !== 200) {
-      throw new Error(`HTTP Status: ${response.status} ${response.statusText}`);
-    }
-
-    const data: AuthenticateResponse = await response.json();
-    return { userId: data.id };
-  } catch (error) {
-    console.error("API error while authenticating[logging in] user:", error);
-    return {
-      errorMessage: UNEXPECTED_ERROR_MESSAGE[language],
-    };
-  }
-};
 
 export const sendUserResetEmail = async (
   email: string,
@@ -98,7 +49,7 @@ export const sendUserResetEmail = async (
       return { errorMessage };
     }
 
-    if (response.status !== 200) {
+    if (![200, 201].includes(response.status)) {
       throw new Error(`HTTP Status: ${response.status} ${response.statusText}`);
     }
 

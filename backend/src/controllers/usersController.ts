@@ -75,7 +75,8 @@ export const authenticateUserController = async (
 
       // Resend email to verify the registered email address if it is not verified yet.
       if (!customer.emailVerified) {
-        const verificationToken = await generateVerificationToken(email);
+        const verificationToken =
+          await generateVerificationToken(normalizedEmail);
 
         const resendResult = await resendVerificationEmail(
           verificationToken.email,
@@ -84,7 +85,7 @@ export const authenticateUserController = async (
         );
 
         if (!resendResult.success) {
-          await deleteVerificationToken(email);
+          await deleteVerificationToken(normalizedEmail);
           return res.sendStatus(503); // Failed to resend verification email. 503 Service Unavailable
         }
 
@@ -188,10 +189,10 @@ export const updatePasswordController = async (
     return res.sendStatus(201);
   } catch (error) {
     console.error("Error updating password", {
-      error,
+      error: error instanceof Error ? error.message : "unknown_error",
       context: {
-        token,
         userType,
+        tokenPresent: Boolean(token),
         time: new Date().toISOString(),
       },
     });

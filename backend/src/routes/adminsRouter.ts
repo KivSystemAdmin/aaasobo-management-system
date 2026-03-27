@@ -96,7 +96,8 @@ import {
 import { AUTH_ROLES } from "../utils/commonUtils";
 import { verifyAuthentication } from "../middlewares/auth.middleware";
 import upload, {
-  uploadAdminImportFile,
+  uploadAdminImportSourceFile,
+  uploadAdminImportZipFile,
 } from "../middlewares/upload.middleware";
 
 // Route configurations
@@ -962,7 +963,7 @@ const normalizeImportSourceConfig = {
   method: "post" as const,
   middleware: [
     verifyAuthentication(AUTH_ROLES.A),
-    uploadAdminImportFile,
+    uploadAdminImportSourceFile,
   ] as RequestHandler[],
   handler: normalizeImportSourceController,
   openapi: {
@@ -1028,7 +1029,7 @@ const executeNormalizedImportConfig = {
   bodySchema: ImportExecuteRequest,
   middleware: [
     verifyAuthentication(AUTH_ROLES.A),
-    uploadAdminImportFile,
+    uploadAdminImportZipFile,
   ] as RequestHandler[],
   handler: executeNormalizedImportController,
   openapi: {
