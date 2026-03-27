@@ -56,7 +56,7 @@ export const authenticateUser = async (
       return { errorMessage };
     }
 
-    if (response.status !== 200) {
+    if (![200, 201].includes(response.status)) {
       throw new Error(`HTTP Status: ${response.status} ${response.statusText}`);
     }
 
@@ -98,7 +98,7 @@ export const sendUserResetEmail = async (
       return { errorMessage };
     }
 
-    if (response.status !== 200) {
+    if (![200, 201].includes(response.status)) {
       throw new Error(`HTTP Status: ${response.status} ${response.statusText}`);
     }
 

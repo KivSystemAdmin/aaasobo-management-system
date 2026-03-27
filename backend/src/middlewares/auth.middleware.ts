@@ -7,6 +7,14 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
+let joseModulePromise: Promise<{ jwtVerify: Function }> | undefined;
+const getJoseModule = () => {
+  if (!joseModulePromise) {
+    joseModulePromise = import("jose");
+  }
+  return joseModulePromise;
+};
+
 // Verify user authentication using JWT
 export function verifyAuthentication(
   requiredUserType: string[],
@@ -36,17 +44,7 @@ export function verifyAuthentication(
     // console.log("[Client Component] Parsed cookies:", req.cookies);
 
     // Extract the JWT token from cookies
-    let token: string | undefined;
-    if (req.headers.cookie) {
-      // From server-side requests
-      token = req.headers.cookie
-        ?.split("; ")
-        .find((cookie) => cookie.startsWith(`${salt}=`))
-        ?.split("=")[1];
-    } else {
-      // From client-side requests
-      token = req.cookies?.[salt];
-    }
+    const token = req.cookies?.[salt];
 
     // If no token is found, return 401 Unauthorized
     if (!token) {
@@ -55,7 +53,7 @@ export function verifyAuthentication(
 
     try {
       // Verify the JWT signature
-      const { jwtVerify } = await import("jose");
+      const { jwtVerify } = await getJoseModule();
       const { payload } = await jwtVerify(
         token,
         new TextEncoder().encode(secret),

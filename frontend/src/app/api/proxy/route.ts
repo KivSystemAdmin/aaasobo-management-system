@@ -3,10 +3,32 @@ import { getCookie } from "../../../proxy";
 
 const BACKEND_ORIGIN = process.env.BACKEND_ORIGIN;
 const RESPONSE_HEADERS_TO_REMOVE = ["content-encoding", "content-length"];
+const ALLOWED_ENDPOINT_PREFIXES = [
+  "/admins",
+  "/instructors",
+  "/customers",
+  "/classes",
+  "/children",
+  "/plans",
+  "/events",
+  "/subscriptions",
+  "/recurring-classes",
+];
 
 const createBackendUrl = (backendEndpoint: string | null) => {
   if (!BACKEND_ORIGIN || !backendEndpoint) {
     throw new Error("Missing backend proxy configuration");
+  }
+
+  if (
+    backendEndpoint.includes("://") ||
+    backendEndpoint.includes("..") ||
+    !backendEndpoint.startsWith("/") ||
+    !ALLOWED_ENDPOINT_PREFIXES.some((prefix) =>
+      backendEndpoint.startsWith(prefix),
+    )
+  ) {
+    throw new Error("Invalid backend endpoint");
   }
 
   return `${BACKEND_ORIGIN}${backendEndpoint}`;
