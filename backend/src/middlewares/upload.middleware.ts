@@ -98,14 +98,4 @@ export const uploadAdminImportZipFile = (
   uploadSingleFile(importZipUpload, req, res, next);
 };
 
-const uploadAdminImportFile = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  uploadSingleFile(importUpload, req, res, next);
-};
-
-export { uploadAdminImportFile };
-
 export default upload;
