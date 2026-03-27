@@ -37,14 +37,22 @@ export const generateVerificationToken = async (
 export const getVerificationTokenByToken = async (token: string) => {
   const hashedToken = hashToken(token);
   const verificationToken = await prisma.verificationToken.findFirst({
-    where: { token: hashedToken },
+    where: {
+      OR: [{ token: hashedToken }, { token }],
+    },
   });
 
   if (!verificationToken) {
     return null;
   }
 
-  if (!safeCompareHash(verificationToken.token, hashedToken)) {
+  const isHashedTokenMatch = safeCompareHash(
+    verificationToken.token,
+    hashedToken,
+  );
+  const isPlainTextTokenMatch = verificationToken.token === token;
+
+  if (!isHashedTokenMatch && !isPlainTextTokenMatch) {
     return null;
   }
 

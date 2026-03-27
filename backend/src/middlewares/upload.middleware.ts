@@ -4,31 +4,58 @@ import { Request, Response, NextFunction } from "express";
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const IMPORT_FILE_SIZE_LIMIT_BYTES = 10 * 1024 * 1024;
-const ALLOWED_IMPORT_MIME_TYPES = [
+const ALLOWED_IMPORT_ZIP_MIME_TYPES = [
   "application/zip",
   "application/x-zip-compressed",
 ];
-const importUpload = multer({
-  storage,
-  limits: { fileSize: IMPORT_FILE_SIZE_LIMIT_BYTES, files: 1 },
-  fileFilter: (_req, file, callback) => {
-    const hasZipExtension = /\.zip$/i.test(file.originalname);
-    const isAllowedMime = ALLOWED_IMPORT_MIME_TYPES.includes(file.mimetype);
+const ALLOWED_IMPORT_CSV_MIME_TYPES = [
+  "text/csv",
+  "application/csv",
+  "text/plain",
+  "application/vnd.ms-excel",
+];
 
-    if (!hasZipExtension || !isAllowedMime) {
-      return callback(new Error("Only zip files are allowed"));
-    }
+const createImportUpload = (options: {
+  allowedExtensions: RegExp;
+  allowedMimeTypes: readonly string[];
+  invalidTypeMessage: string;
+}) =>
+  multer({
+    storage,
+    limits: { fileSize: IMPORT_FILE_SIZE_LIMIT_BYTES, files: 1 },
+    fileFilter: (_req, file, callback) => {
+      const hasAllowedExtension = options.allowedExtensions.test(
+        file.originalname,
+      );
+      const isAllowedMime = options.allowedMimeTypes.includes(file.mimetype);
 
-    return callback(null, true);
-  },
+      if (!hasAllowedExtension || !isAllowedMime) {
+        return callback(new Error(options.invalidTypeMessage));
+      }
+
+      return callback(null, true);
+    },
+  });
+
+const importZipUpload = createImportUpload({
+  allowedExtensions: /\.zip$/i,
+  allowedMimeTypes: ALLOWED_IMPORT_ZIP_MIME_TYPES,
+  invalidTypeMessage: "Only zip files are allowed",
 });
 
-export const uploadAdminImportFile = (
+const importCsvUpload = createImportUpload({
+  allowedExtensions: /\.csv$/i,
+  allowedMimeTypes: ALLOWED_IMPORT_CSV_MIME_TYPES,
+  invalidTypeMessage: "Only csv files are allowed",
+});
+
+const uploadSingleFile = (
+  uploadMiddleware: ReturnType<typeof multer>,
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  importUpload.single("file")(req, res, (error: unknown) => {
+  uploadMiddleware.single("file")(req, res, (error: unknown) => {
     if (
       error instanceof multer.MulterError &&
       error.code === "LIMIT_FILE_SIZE"
@@ -45,5 +72,40 @@ export const uploadAdminImportFile = (
     return next();
   });
 };
+
+const importUpload = createImportUpload({
+  allowedExtensions: /\.(zip|csv)$/i,
+  allowedMimeTypes: [
+    ...ALLOWED_IMPORT_ZIP_MIME_TYPES,
+    ...ALLOWED_IMPORT_CSV_MIME_TYPES,
+  ],
+  invalidTypeMessage: "Only zip or csv files are allowed",
+});
+
+export const uploadAdminImportSourceFile = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  uploadSingleFile(importCsvUpload, req, res, next);
+};
+
+export const uploadAdminImportZipFile = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  uploadSingleFile(importZipUpload, req, res, next);
+};
+
+const uploadAdminImportFile = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  uploadSingleFile(importUpload, req, res, next);
+};
+
+export { uploadAdminImportFile };
 
 export default upload;

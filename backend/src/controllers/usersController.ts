@@ -135,7 +135,7 @@ export const sendUserResetEmailController = async (
       return res.sendStatus(503); // Failed to send password reset email. 503 Service Unavailable
     }
 
-    return res.sendStatus(200);
+    return res.sendStatus(201);
   } catch (error) {
     console.error("Error sending password reset email", {
       error,
@@ -186,7 +186,7 @@ export const updatePasswordController = async (
         break;
     }
 
-    return res.sendStatus(200);
+    return res.sendStatus(201);
   } catch (error) {
     console.error("Error updating password", {
       error: error instanceof Error ? error.message : "unknown_error",

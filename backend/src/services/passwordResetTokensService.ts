@@ -39,14 +39,22 @@ export const getPasswordResetTokenByToken = async (token: string) => {
   const hashedToken = hashToken(token);
 
   const passwordResetToken = await prisma.passwordResetToken.findFirst({
-    where: { token: hashedToken },
+    where: {
+      OR: [{ token: hashedToken }, { token }],
+    },
   });
 
   if (!passwordResetToken) {
     return null;
   }
 
-  if (!safeCompareHash(passwordResetToken.token, hashedToken)) {
+  const isHashedTokenMatch = safeCompareHash(
+    passwordResetToken.token,
+    hashedToken,
+  );
+  const isPlainTextTokenMatch = passwordResetToken.token === token;
+
+  if (!isHashedTokenMatch && !isPlainTextTokenMatch) {
     return null;
   }
 
