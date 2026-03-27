@@ -150,6 +150,18 @@ export const getCustomerByEmail = async (
   });
 };
 
+export const getCustomerAuthByEmail = async (email: string) => {
+  return await prisma.customer.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      name: true,
+      password: true,
+      emailVerified: true,
+    },
+  });
+};
+
 export const registerCustomer = async (
   data: {
     name: string;

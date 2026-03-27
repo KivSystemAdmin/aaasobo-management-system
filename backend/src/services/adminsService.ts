@@ -90,6 +90,17 @@ export const getAdminByEmail = async (email: string): Promise<Admin | null> => {
   });
 };
 
+export const getAdminAuthByEmail = async (email: string) => {
+  return await prisma.admin.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      name: true,
+      password: true,
+    },
+  });
+};
+
 // Fetch the admin using the ID
 export async function getAdminById(id: number) {
   try {
