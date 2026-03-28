@@ -27,6 +27,7 @@ type MonthlyData = {
 };
 
 type InstructorAttendanceMonthly = {
+  year: number;
   month: string;
   trialLessons: number;
   regularLessons: number;
@@ -137,6 +138,12 @@ export default function DashboardClient({
   const [feedback, setFeedback] = useState("");
   const [selectedInstructor, setSelectedInstructor] =
     useState<InstructorAttendanceItem | null>(null);
+  const [instructorSearch, setInstructorSearch] = useState("");
+
+  const normalizedSearch = instructorSearch.trim().toLowerCase();
+  const filteredInstructors = instructorAttendance.filter((instructor) =>
+    instructor.nickname.toLowerCase().includes(normalizedSearch),
+  );
 
   const submitMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -231,22 +238,32 @@ export default function DashboardClient({
         <p className={styles.attendanceDescription}>
           Choose an instructor to view monthly performance details.
         </p>
-        <div className={styles.instructorPickerGrid}>
-          {instructorAttendance.map((item) => (
-            <button
-              type="button"
-              key={item.id}
-              className={styles.instructorPickerItem}
-              onClick={() => setSelectedInstructor(item)}
-            >
-              <InstructorAvatar
-                imageUrl={item.imageUrl}
-                nickname={item.nickname}
-                englishBackgroundClass={item.englishBackgroundClass}
-              />
-              <span>{item.nickname}</span>
-            </button>
-          ))}
+        <input
+          type="search"
+          value={instructorSearch}
+          onChange={(event) => setInstructorSearch(event.target.value)}
+          className={styles.instructorSearchInput}
+          placeholder="Search instructor name"
+          aria-label="Search instructors"
+        />
+        <div className={styles.instructorPickerScrollableArea}>
+          <div className={styles.instructorPickerGrid}>
+            {filteredInstructors.map((item) => (
+              <button
+                type="button"
+                key={item.id}
+                className={styles.instructorPickerItem}
+                onClick={() => setSelectedInstructor(item)}
+              >
+                <InstructorAvatar
+                  imageUrl={item.imageUrl}
+                  nickname={item.nickname}
+                  englishBackgroundClass={item.englishBackgroundClass}
+                />
+                <span>{item.nickname}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -277,6 +294,7 @@ export default function DashboardClient({
               <table className={styles.attendanceTable}>
                 <thead>
                   <tr>
+                    <th>Year</th>
                     <th>Month</th>
                     <th>Trial</th>
                     <th>Regular</th>
@@ -287,7 +305,8 @@ export default function DashboardClient({
                 </thead>
                 <tbody>
                   {selectedInstructor.monthly.map((monthItem) => (
-                    <tr key={monthItem.month}>
+                    <tr key={`${monthItem.year}-${monthItem.month}`}>
+                      <td>{monthItem.year}</td>
                       <td>{monthItem.month}</td>
                       <td>{monthItem.trialLessons}</td>
                       <td>{monthItem.regularLessons}</td>

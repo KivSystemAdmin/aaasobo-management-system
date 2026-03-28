@@ -16,6 +16,7 @@ type MonthlyData = {
 };
 
 type InstructorAttendanceMonthly = {
+  year: number;
   month: string;
   trialLessons: number;
   regularLessons: number;
@@ -298,7 +299,9 @@ function calcAttendanceByInstructor(
     const monthly = monthKeys.map((monthKey) => {
       const bucket = monthlyBuckets.get(monthKey);
       if (!bucket) {
+        const [year] = monthKey.split("-").map(Number);
         return {
+          year: year || 0,
           month: monthLabelFromKey(monthKey),
           trialLessons: 0,
           regularLessons: 0,
@@ -315,8 +318,10 @@ function calcAttendanceByInstructor(
         attendanceDenominator <= 0
           ? 0
           : Math.round((bucket.completedLessons / attendanceDenominator) * 100);
+      const [year] = monthKey.split("-").map(Number);
 
       return {
+        year: year || 0,
         month: monthLabelFromKey(monthKey),
         ...bucket,
         attendanceRate,

@@ -165,6 +165,26 @@
   color: #6c6a8c;
 }
 
+.instructorSearchInput {
+  width: 100%;
+  border: 1px solid #d9d8eb;
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  font-size: 1rem;
+  color: #2b295a;
+  margin-bottom: 0.8rem;
+
+  &::placeholder {
+    color: #8a88a7;
+  }
+}
+
+.instructorPickerScrollableArea {
+  max-height: 430px;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
 .instructorPickerGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
