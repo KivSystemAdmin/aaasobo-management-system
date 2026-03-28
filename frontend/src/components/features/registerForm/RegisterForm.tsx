@@ -21,7 +21,7 @@ import {
   HandThumbUpIcon,
 } from "@heroicons/react/24/outline";
 import ActionButton from "../../elements/buttons/actionButton/ActionButton";
-import TextInput from "../../elements/textInput/TextInput";
+import InputField from "../../elements/inputField/InputField";
 import PasswordStrengthMeter from "../../elements/passwordStrengthMeter/PasswordStrengthMeter";
 import { registerUser } from "@/app/actions/registerUser";
 import { registerContent } from "@/app/actions/registerContent";
@@ -109,7 +109,7 @@ const RegisterForm = ({
           <p className={styles.required}>*Required</p>
 
           {/* Name */}
-          <TextInput
+          <InputField
             id="name"
             label="Name"
             type="text"
@@ -125,7 +125,7 @@ const RegisterForm = ({
           {userType === "instructor" && (
             <>
               {/* Nickname */}
-              <TextInput
+              <InputField
                 id="nickname"
                 label="Nickname"
                 type="text"
@@ -139,7 +139,7 @@ const RegisterForm = ({
               />
 
               {/* Birthday */}
-              <TextInput
+              <InputField
                 id="birthdate"
                 label="Birthday"
                 type="date"
@@ -154,7 +154,7 @@ const RegisterForm = ({
           )}
 
           {/* Email */}
-          <TextInput
+          <InputField
             id="email"
             label="Email"
             type="email"
@@ -168,7 +168,7 @@ const RegisterForm = ({
           />
 
           {/* Password */}
-          <TextInput
+          <InputField
             id="password"
             label="Password"
             type="password"
@@ -194,7 +194,7 @@ const RegisterForm = ({
           />
 
           {/* Password Confirmation */}
-          <TextInput
+          <InputField
             id="passConfirmation"
             label="Password Confirmation"
             type="password"
@@ -212,7 +212,7 @@ const RegisterForm = ({
           {userType === "instructor" && (
             <>
               {/* Class URL */}
-              <TextInput
+              <InputField
                 id="classURL"
                 label="Class URL"
                 type="text"
@@ -225,7 +225,7 @@ const RegisterForm = ({
               />
 
               {/* Meeting ID */}
-              <TextInput
+              <InputField
                 id="meetingId"
                 label="Meeting ID"
                 type="text"
@@ -238,7 +238,7 @@ const RegisterForm = ({
               />
 
               {/* Pass Code */}
-              <TextInput
+              <InputField
                 id="passcode"
                 label="Pass Code"
                 type="text"
@@ -410,7 +410,7 @@ const RegisterForm = ({
       {userType === "admin" && categoryType === "plan" && (
         <>
           <p className={styles.required}>*Required</p>
-          <TextInput
+          <InputField
             id="name"
             label="Plan Name (Japanese)"
             type="text"
@@ -422,7 +422,7 @@ const RegisterForm = ({
             error={localMessages.planNameJpn}
             onChange={() => clearErrorMessage("planNameJpn")}
           />
-          <TextInput
+          <InputField
             id="name"
             label="Plan Name (English)"
             type="text"
@@ -434,7 +434,7 @@ const RegisterForm = ({
             error={localMessages.planNameEng}
             onChange={() => clearErrorMessage("planNameEng")}
           />
-          <TextInput
+          <InputField
             id="weeklyClassTimes"
             label="Weekly Class Times"
             type="number"
@@ -446,7 +446,7 @@ const RegisterForm = ({
             error={localMessages.weeklyClassTimes}
             onChange={() => clearErrorMessage("weeklyClassTimes")}
           />
-          <TextInput
+          <InputField
             id="description"
             label="Description"
             type="text"
@@ -493,7 +493,7 @@ const RegisterForm = ({
       {userType === "admin" && categoryType === "event" && (
         <>
           <p className={styles.required}>*Required</p>
-          <TextInput
+          <InputField
             id="eventNameJpn"
             label="Event Name (Japanese)"
             type="text"
@@ -505,7 +505,7 @@ const RegisterForm = ({
             error={localMessages.eventNameJpn}
             onChange={() => clearErrorMessage("eventNameJpn")}
           />
-          <TextInput
+          <InputField
             id="eventNameEng"
             label="Event Name (English)"
             type="text"
@@ -518,7 +518,7 @@ const RegisterForm = ({
             onChange={() => clearErrorMessage("eventNameEng")}
           />
           <div className={styles.eventColor}>
-            <TextInput
+            <InputField
               id="color"
               label="Color Code"
               type="color"

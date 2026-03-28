@@ -3,7 +3,7 @@
 import React, { useActionState, useState } from "react";
 import styles from "./LoginForm.module.scss";
 import { authenticate } from "@/app/actions/authActions";
-import TextInput from "../../elements/textInput/TextInput";
+import InputField from "../../elements/inputField/InputField";
 import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import ActionButton from "../../elements/buttons/actionButton/ActionButton";
 import Link from "next/link";
@@ -21,7 +21,7 @@ export default function LoginForm({
 
   return (
     <form action={formAction} className={styles.form}>
-      <TextInput
+      <InputField
         id="email"
         type="email"
         name="email"
@@ -30,7 +30,7 @@ export default function LoginForm({
         required={true}
       />
 
-      <TextInput
+      <InputField
         id="password"
         type="password"
         name="password"
