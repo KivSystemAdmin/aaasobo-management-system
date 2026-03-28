@@ -22,20 +22,25 @@
 
 .closeButton {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  height: 35px;
-  width: 35px;
-  padding: 3px;
-  color: #333;
+  top: 12px;
+  right: 16px;
+  min-height: 52px;
+  min-width: 96px;
+  padding: 12px 20px;
+  color: #fff;
   transition: all 0.3s ease;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 180px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #6f63ff 0%, #5046e5 100%);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
   &:hover {
     cursor: pointer;
-    background-color: rgba(black, 0.1);
+    filter: brightness(1.04);
   }
 }
 
@@ -70,10 +75,8 @@
   .closeButton {
     top: 10px;
     right: 10px;
-    color: white;
-    background-color: rgba(black, 0.4);
     &:hover {
-      background-color: rgba(black, 0.7);
+      filter: brightness(1.04);
     }
   }
 }

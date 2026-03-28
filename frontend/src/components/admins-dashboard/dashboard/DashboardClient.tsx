@@ -114,81 +114,6 @@ function SimpleBarChart({
   );
 }
 
-function AttendanceRateBarChart({
-  data,
-}: {
-  data: InstructorAttendanceMonthly[];
-}) {
-  const width = 720;
-  const height = 220;
-  const padding = 20;
-  const chartWidth = width - padding * 2;
-  const barGap = 8;
-  const barWidth = Math.max(
-    (chartWidth - barGap * (data.length - 1)) / data.length,
-    8,
-  );
-
-  return (
-    <div className={styles.modalChart}>
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        role="img"
-        aria-label="Instructor monthly attendance rate"
-      >
-        <line
-          x1={padding}
-          y1={height - padding}
-          x2={width - padding}
-          y2={height - padding}
-          className={styles.axisLine}
-        />
-        <line
-          x1={padding}
-          y1={padding}
-          x2={padding}
-          y2={height - padding}
-          className={styles.axisLine}
-        />
-        {data.map((item, index) => {
-          const x = padding + index * (barWidth + barGap);
-          const clampedRate = Math.min(Math.max(item.attendanceRate, 0), 100);
-          const barHeight = (clampedRate * (height - padding * 2)) / 100;
-          const y = height - padding - barHeight;
-
-          return (
-            <g key={item.month}>
-              <rect
-                x={x}
-                y={y}
-                width={barWidth}
-                height={barHeight}
-                className={styles.attendanceBar}
-              />
-              <text
-                x={x + barWidth / 2}
-                y={height - 6}
-                textAnchor="middle"
-                className={styles.tickLabel}
-              >
-                {item.month}
-              </text>
-            </g>
-          );
-        })}
-        {[0, 25, 50, 75, 100].map((tick) => {
-          const y = height - padding - (tick * (height - padding * 2)) / 100;
-          return (
-            <text key={tick} x={4} y={y + 4} className={styles.tickLabel}>
-              {tick}%
-            </text>
-          );
-        })}
-      </svg>
-    </div>
-  );
-}
-
 export default function DashboardClient({
   metrics,
   monthRangeLabel,
@@ -207,8 +132,25 @@ export default function DashboardClient({
   const [message, setMessage] = useState("");
   const [recentMessages, setRecentMessages] = useState<MessageItem[]>([]);
   const [feedback, setFeedback] = useState("");
-  const [selectedInstructor, setSelectedInstructor] =
-    useState<InstructorAttendanceItem | null>(null);
+  const chartWidth = 720;
+  const chartHeight = 220;
+  const chartPadding = 20;
+
+  const attendancePoints = attendanceByMonth.map((item, index) => {
+    const x =
+      chartPadding +
+      (index * (chartWidth - chartPadding * 2)) /
+        Math.max(attendanceByMonth.length - 1, 1);
+    const y =
+      chartHeight -
+      chartPadding -
+      (Math.min(item.value, 100) * (chartHeight - chartPadding * 2)) / 100;
+    return { ...item, x, y };
+  });
+
+  const attendancePolyline = attendancePoints
+    .map((point) => `${point.x},${point.y}`)
+    .join(" ");
 
   const submitMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -298,79 +240,55 @@ export default function DashboardClient({
         />
       </div>
 
-      <div className={styles.chartCard}>
-        <h3>{`Instructor Attendance Rate (${monthRangeLabel})`}</h3>
-        <p className={styles.attendanceDescription}>
-          Choose an instructor to view monthly performance details.
-        </p>
-        <div className={styles.instructorPickerGrid}>
-          {instructorAttendance.map((item) => (
-            <button
-              type="button"
-              key={item.id}
-              className={styles.instructorPickerItem}
-              onClick={() => setSelectedInstructor(item)}
-            >
-              <InstructorAvatar
-                imageUrl={item.imageUrl}
-                nickname={item.nickname}
-              />
-              <span>{item.nickname}</span>
-            </button>
+      <div className={`${styles.chartCard} ${styles.attendanceChart}`}>
+        <h3>Instructor Lesson Report</h3>
+        <svg
+          viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+          role="img"
+          aria-label="Instructor Lesson Report"
+        >
+          <line
+            x1={chartPadding}
+            y1={chartHeight - chartPadding}
+            x2={chartWidth - chartPadding}
+            y2={chartHeight - chartPadding}
+            className={styles.axisLine}
+          />
+          <line
+            x1={chartPadding}
+            y1={chartPadding}
+            x2={chartPadding}
+            y2={chartHeight - chartPadding}
+            className={styles.axisLine}
+          />
+          <polyline points={attendancePolyline} className={styles.linePath} />
+          {attendancePoints.map((point) => (
+            <circle
+              key={point.month}
+              cx={point.x}
+              cy={point.y}
+              r="4"
+              className={styles.linePoint}
+            />
+          ))}
+          {[0, 25, 50, 75, 100].map((tick) => {
+            const y =
+              chartHeight -
+              chartPadding -
+              (tick * (chartHeight - chartPadding * 2)) / 100;
+            return (
+              <text key={tick} x={4} y={y + 4} className={styles.tickLabel}>
+                {tick}%
+              </text>
+            );
+          })}
+        </svg>
+        <div className={styles.monthLabels}>
+          {attendanceByMonth.map((item) => (
+            <span key={item.month}>{item.month}</span>
           ))}
         </div>
       </div>
-
-      {selectedInstructor ? (
-        <div
-          className={styles.modalOverlay}
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${selectedInstructor.nickname} attendance details`}
-          onClick={() => setSelectedInstructor(null)}
-        >
-          <div
-            className={styles.modalCard}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className={styles.modalHeader}>
-              <h3>{selectedInstructor.nickname} - Monthly Results</h3>
-              <button type="button" onClick={() => setSelectedInstructor(null)}>
-                Close
-              </button>
-            </div>
-
-            <AttendanceRateBarChart data={selectedInstructor.monthly} />
-
-            <div className={styles.attendanceTableWrapper}>
-              <table className={styles.attendanceTable}>
-                <thead>
-                  <tr>
-                    <th>Month</th>
-                    <th>Booked lesson</th>
-                    <th>Completed lesson</th>
-                    <th>Canceled by customer lesson</th>
-                    <th>Canceled by instructor lesson</th>
-                    <th>Instructor attendance rate</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedInstructor.monthly.map((monthItem) => (
-                    <tr key={monthItem.month}>
-                      <td>{monthItem.month}</td>
-                      <td>{monthItem.bookedLessons}</td>
-                      <td>{monthItem.completedLessons}</td>
-                      <td>{monthItem.canceledByCustomerLessons}</td>
-                      <td>{monthItem.canceledByInstructorLessons}</td>
-                      <td>{monthItem.attendanceRate}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      ) : null}
 
       <div className={styles.messageBoardCard}>
         <div className={styles.messageHeader}>

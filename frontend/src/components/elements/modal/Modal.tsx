@@ -1,6 +1,5 @@
 import React from "react";
 import styles from "./Modal.module.scss";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 
 interface ModalProps {
   isOpen: boolean;
@@ -47,9 +46,13 @@ const Modal: React.FC<ModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {onClose && (
-          <div className={styles.closeButton} onClick={handleCloseClick}>
-            <XMarkIcon strokeWidth={2.5} />
-          </div>
+          <button
+            type="button"
+            className={styles.closeButton}
+            onClick={handleCloseClick}
+          >
+            Close
+          </button>
         )}
         {children}
       </div>
