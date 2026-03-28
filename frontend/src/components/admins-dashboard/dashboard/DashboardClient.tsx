@@ -234,7 +234,7 @@ export default function DashboardClient({
       </div>
 
       <div className={styles.chartCard}>
-        <h3>Instructor Class Report</h3>
+        <h3>Instructor Class Attendance Report</h3>
         <p className={styles.attendanceDescription}>
           Choose an instructor to view monthly performance details.
         </p>
