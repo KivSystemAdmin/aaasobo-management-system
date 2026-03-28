@@ -502,6 +502,7 @@ type RebookingFormProps = {
 
 type RebookableClassesListProps = {
   customerId: number;
+  adminId?: number;
   rebookableClasses: RebookableClass[] | [];
   onRebookableClassSelect: (classId: number) => void;
   language: LanguageType;

@@ -11,6 +11,7 @@ import RebookableClassList from "../../rebookableClassList/RebookableClassList";
 
 export default function RebookableClassesList({
   customerId,
+  adminId,
   rebookableClasses,
   onRebookableClassSelect,
   language,
@@ -61,6 +62,7 @@ export default function RebookableClassesList({
           <Table className="rebookableClassList" headItems={headItems}>
             <RebookableClassList
               customerId={customerId}
+              adminId={adminId}
               rebookableClasses={rebookableClasses}
               onRebookableClassSelect={onRebookableClassSelect}
               language={language}
