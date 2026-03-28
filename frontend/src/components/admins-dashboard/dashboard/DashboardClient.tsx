@@ -50,6 +50,7 @@ function SimpleBarChart({
           const height = `${normalizedHeight}%`;
           return (
             <div key={item.month} className={styles.barItem}>
+              <span className={styles.barValue}>{item.value}</span>
               <div
                 className={`${styles.bar} ${
                   color === "blue" ? styles.barBlue : styles.barPink
@@ -138,11 +139,13 @@ function SimpleLineChart({
 
 export default function DashboardClient({
   metrics,
+  currentYear,
   newCustomersByMonth,
   churnCustomersByMonth,
   attendanceByMonth,
 }: {
   metrics: DashboardMetric;
+  currentYear: number;
   newCustomersByMonth: MonthlyData[];
   churnCustomersByMonth: MonthlyData[];
   attendanceByMonth: MonthlyData[];
@@ -238,12 +241,12 @@ export default function DashboardClient({
 
       <div className={styles.twoColumnCharts}>
         <SimpleBarChart
-          title="New Customers (Monthly)"
+          title={`New Customers (${currentYear})`}
           data={visibleData.newCustomers}
           color="blue"
         />
         <SimpleBarChart
-          title="Customer Churn (Monthly)"
+          title={`Customer Churn (${currentYear})`}
           data={visibleData.churn}
           color="pink"
         />

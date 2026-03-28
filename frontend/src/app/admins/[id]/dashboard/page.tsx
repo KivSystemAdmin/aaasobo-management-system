@@ -36,41 +36,6 @@ function getLastMonthKeys(months: number, anchorMonthKey?: string): string[] {
   return keys;
 }
 
-function getAnchorMonthKey(
-  customers: Awaited<ReturnType<typeof getAllCustomers>>,
-  classes: Awaited<ReturnType<typeof getAllClasses>>,
-  pastCustomers: Awaited<ReturnType<typeof getAllPastCustomers>>,
-) {
-  const monthCandidates: string[] = [];
-
-  customers.forEach((item) => {
-    const key = parseMonthKey(item["Start Date (JST)"]);
-    if (key) {
-      monthCandidates.push(key);
-    }
-  });
-
-  classes.forEach((item) => {
-    const key = parseMonthKey(item["Date/Time (JST)"]);
-    if (key) {
-      monthCandidates.push(key);
-    }
-  });
-
-  pastCustomers.forEach((item) => {
-    const key = parseMonthKey(item["End Date (JST)"]);
-    if (key) {
-      monthCandidates.push(key);
-    }
-  });
-
-  if (monthCandidates.length === 0) {
-    return undefined;
-  }
-
-  return monthCandidates.sort().at(-1);
-}
-
 function parseMonthKey(value: string): string | null {
   const normalized = value.trim();
   const direct = normalized.match(/(\d{4})[-/](\d{1,2})/);
@@ -204,8 +169,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     getAllPastCustomers(cookie),
   ]);
 
-  const anchorMonthKey = getAnchorMonthKey(customers, classes, pastCustomers);
-  const monthKeys = getLastMonthKeys(MONTH_WINDOW, anchorMonthKey);
+  const monthKeys = getLastMonthKeys(MONTH_WINDOW);
+  const currentYear = new Date().getFullYear();
   const newCustomersByMonth = calcNewCustomersByMonth(
     customers,
     pastCustomers,
@@ -222,6 +187,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         attendanceRateThisMonth:
           attendanceByMonth[attendanceByMonth.length - 1]?.value ?? 0,
       }}
+      currentYear={currentYear}
       newCustomersByMonth={newCustomersByMonth}
       churnCustomersByMonth={churnCustomersByMonth}
       attendanceByMonth={attendanceByMonth}
