@@ -2,7 +2,7 @@
 
 import React, { useActionState, useState } from "react";
 import styles from "./ResetPasswordForm.module.scss";
-import TextInput from "../../elements/textInput/TextInput";
+import InputField from "../../elements/inputField/InputField";
 import { LockClosedIcon } from "@heroicons/react/24/outline";
 import ActionButton from "../../elements/buttons/actionButton/ActionButton";
 import Link from "next/link";
@@ -64,7 +64,7 @@ export default function ResetPasswordForm({
       </h2>
 
       <form action={formAction} className={styles.form}>
-        <TextInput
+        <InputField
           id="password"
           label={language === "ja" ? "新しいパスワード" : "New Password"}
           type="password"
@@ -88,7 +88,7 @@ export default function ResetPasswordForm({
           passwordStrength={passwordStrength}
           language={language}
         />
-        <TextInput
+        <InputField
           id="passConfirmation"
           type="password"
           name="passConfirmation"

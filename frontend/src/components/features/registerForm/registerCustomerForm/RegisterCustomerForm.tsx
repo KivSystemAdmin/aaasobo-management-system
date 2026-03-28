@@ -6,7 +6,7 @@ import {
   LockClosedIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
-import TextInput from "@/components/elements/textInput/TextInput";
+import InputField from "@/components/elements/inputField/InputField";
 import { usePasswordStrength } from "@/hooks/usePasswordStrength";
 import { ChangeEvent, useCallback, useState } from "react";
 import PasswordStrengthMeter from "@/components/elements/passwordStrengthMeter/PasswordStrengthMeter";
@@ -89,7 +89,7 @@ const RegisterCustomerForm = ({
       }}
     >
       <>
-        <TextInput
+        <InputField
           id="name"
           type="text"
           defaultValue={customerData.name}
@@ -103,7 +103,7 @@ const RegisterCustomerForm = ({
           }}
         />
 
-        <TextInput
+        <InputField
           id="email"
           type="email"
           defaultValue={customerData.email}
@@ -117,7 +117,7 @@ const RegisterCustomerForm = ({
           }}
         />
 
-        <TextInput
+        <InputField
           type="password"
           defaultValue={customerData.password}
           required

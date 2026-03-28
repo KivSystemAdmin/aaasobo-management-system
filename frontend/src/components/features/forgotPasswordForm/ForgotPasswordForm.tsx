@@ -2,7 +2,7 @@
 
 import React, { useActionState } from "react";
 import styles from "./ForgotPasswordForm.module.scss";
-import TextInput from "../../elements/textInput/TextInput";
+import InputField from "../../elements/inputField/InputField";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
 import ActionButton from "../../elements/buttons/actionButton/ActionButton";
 import Link from "next/link";
@@ -26,7 +26,7 @@ export default function ForgotPasswordForm({
 
   return (
     <form action={formAction} className={styles.form}>
-      <TextInput
+      <InputField
         id="email"
         type="email"
         name="email"

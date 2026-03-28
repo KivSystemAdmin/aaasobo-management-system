@@ -3,7 +3,7 @@
 import styles from "./RegisterChildForm.module.scss";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import ActionButton from "@/components/elements/buttons/actionButton/ActionButton";
-import TextInput from "@/components/elements/textInput/TextInput";
+import InputField from "@/components/elements/inputField/InputField";
 import { useCallback, useState } from "react";
 import BirthdateInput from "../birthdateInput/BirthdateInput";
 import FormValidationMessage from "@/components/elements/formValidationMessage/FormValidationMessage";
@@ -80,7 +80,7 @@ export default function RegisterChildForm({
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <TextInput
+      <InputField
         id="name"
         type="text"
         defaultValue={childData.name}
