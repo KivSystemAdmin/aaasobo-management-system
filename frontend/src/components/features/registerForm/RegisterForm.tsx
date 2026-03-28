@@ -32,6 +32,7 @@ import FormValidationMessage from "../../elements/formValidationMessage/FormVali
 import Uploader from "./uploadImages/Uploader";
 import { EnglishBackground } from "@/types";
 import RadioButton from "../../elements/radioButton/RadioButton";
+import TextAreaInput from "../../elements/textAreaInput/TextAreaInput";
 
 const RegisterForm = ({
   categoryType,
@@ -251,104 +252,110 @@ const RegisterForm = ({
               />
 
               {/* Available Class */}
-              <label className={styles.label}>Available Class</label>
-              <div className={styles.textareaContainer}>
-                <div>
+              <TextAreaInput
+                id="workingTime"
+                name="workingTime"
+                label="Available Class"
+                defaultValue={persistedValues.workingTime}
+                placeholder="e.g., 9 AM - 5 PM (Philippines) on weekdays"
+                maxLength={500}
+                icon={
                   <CalendarDaysIcon
                     className={styles.textareaContainer__icon}
                   />
-                </div>
-                <textarea
-                  id="workingTime"
-                  name="workingTime"
-                  defaultValue={persistedValues.workingTime}
-                  placeholder="e.g., 9 AM - 5 PM (Philippines) on weekdays"
-                  className={styles.textarea}
-                  maxLength={500}
-                />
-              </div>
+                }
+                unstyled
+                labelTextClassName={styles.label}
+                inputWrapperClassName={styles.textareaContainer}
+                inputClassName={styles.textarea}
+              />
 
               {/* Life History */}
-              <label className={styles.label}>Life History</label>
-              <div className={styles.textareaContainer}>
-                <div>
+              <TextAreaInput
+                id="lifeHistory"
+                name="lifeHistory"
+                label="Life History"
+                defaultValue={persistedValues.lifeHistory}
+                placeholder="e.g., I am a dedicated instructor with a passion for teaching."
+                maxLength={500}
+                icon={
                   <NewspaperIcon className={styles.textareaContainer__icon} />
-                </div>
-                <textarea
-                  id="lifeHistory"
-                  name="lifeHistory"
-                  defaultValue={persistedValues.lifeHistory}
-                  placeholder="e.g., I am a dedicated instructor with a passion for teaching."
-                  className={styles.textarea}
-                  maxLength={500}
-                />
-              </div>
+                }
+                unstyled
+                labelTextClassName={styles.label}
+                inputWrapperClassName={styles.textareaContainer}
+                inputClassName={styles.textarea}
+              />
 
               {/* Favorite Food */}
-              <label className={styles.label}>Favorite Food</label>
-              <div className={styles.textareaContainer}>
-                <div>
+              <TextAreaInput
+                id="favoriteFood"
+                name="favoriteFood"
+                label="Favorite Food"
+                defaultValue={persistedValues.favoriteFood}
+                placeholder="e.g., Sushi"
+                maxLength={500}
+                icon={
                   <FaceSmileIcon className={styles.textareaContainer__icon} />
-                </div>
-                <textarea
-                  id="favoriteFood"
-                  name="favoriteFood"
-                  defaultValue={persistedValues.favoriteFood}
-                  placeholder="e.g., Sushi"
-                  className={styles.textarea}
-                  maxLength={500}
-                />
-              </div>
+                }
+                unstyled
+                labelTextClassName={styles.label}
+                inputWrapperClassName={styles.textareaContainer}
+                inputClassName={styles.textarea}
+              />
 
               {/* Hobby */}
-              <label className={styles.label}>Hobby</label>
-              <div className={styles.textareaContainer}>
-                <div>
+              <TextAreaInput
+                id="hobby"
+                name="hobby"
+                label="Hobby"
+                defaultValue={persistedValues.hobby}
+                placeholder="e.g., Reading"
+                maxLength={500}
+                icon={
                   <LightBulbIcon className={styles.textareaContainer__icon} />
-                </div>
-                <textarea
-                  id="hobby"
-                  name="hobby"
-                  defaultValue={persistedValues.hobby}
-                  placeholder="e.g., Reading"
-                  className={styles.textarea}
-                  maxLength={500}
-                />
-              </div>
+                }
+                unstyled
+                labelTextClassName={styles.label}
+                inputWrapperClassName={styles.textareaContainer}
+                inputClassName={styles.textarea}
+              />
 
               {/* Message For Children */}
-              <label className={styles.label}>Message For Children</label>
-              <div className={styles.textareaContainer}>
-                <div>
+              <TextAreaInput
+                id="messageForChildren"
+                name="messageForChildren"
+                label="Message For Children"
+                defaultValue={persistedValues.messageForChildren}
+                placeholder="e.g., Always do your best!"
+                maxLength={500}
+                icon={
                   <PencilSquareIcon
                     className={styles.textareaContainer__icon}
                   />
-                </div>
-                <textarea
-                  id="messageForChildren"
-                  name="messageForChildren"
-                  defaultValue={persistedValues.messageForChildren}
-                  placeholder="e.g., Always do your best!"
-                  className={styles.textarea}
-                  maxLength={500}
-                />
-              </div>
+                }
+                unstyled
+                labelTextClassName={styles.label}
+                inputWrapperClassName={styles.textareaContainer}
+                inputClassName={styles.textarea}
+              />
 
               {/* Skill */}
-              <label className={styles.label}>Skill</label>
-              <div className={styles.textareaContainer}>
-                <div>
+              <TextAreaInput
+                id="skill"
+                name="skill"
+                label="Skill"
+                defaultValue={persistedValues.skill}
+                placeholder="e.g., Japanese Language"
+                maxLength={500}
+                icon={
                   <HandThumbUpIcon className={styles.textareaContainer__icon} />
-                </div>
-                <textarea
-                  id="skill"
-                  name="skill"
-                  defaultValue={persistedValues.skill}
-                  placeholder="e.g., Japanese Language"
-                  className={styles.textarea}
-                  maxLength={500}
-                />
-              </div>
+                }
+                unstyled
+                labelTextClassName={styles.label}
+                inputWrapperClassName={styles.textareaContainer}
+                inputClassName={styles.textarea}
+              />
 
               {/* English Background Selection (radio button) */}
               <label className={styles.label}>English Background</label>
