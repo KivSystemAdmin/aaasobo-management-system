@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
+  UserIcon,
   UsersIcon,
   UserGroupIcon,
-  CheckCircleIcon,
   MegaphoneIcon,
 } from "@heroicons/react/24/outline";
 import styles from "./DashboardClient.module.scss";
@@ -12,7 +12,11 @@ import styles from "./DashboardClient.module.scss";
 type DashboardMetric = {
   totalCustomers: number;
   totalChildren: number;
-  attendanceRateThisMonth: number;
+  instructorsByEnglishBackground: {
+    nonNative: number;
+    nativeA: number;
+    nativeB: number;
+  };
 };
 
 type MonthlyData = {
@@ -139,36 +143,21 @@ function SimpleLineChart({
 
 export default function DashboardClient({
   metrics,
-  currentYear,
+  monthRangeLabel,
   newCustomersByMonth,
   churnCustomersByMonth,
   attendanceByMonth,
 }: {
   metrics: DashboardMetric;
-  currentYear: number;
+  monthRangeLabel: string;
   newCustomersByMonth: MonthlyData[];
   churnCustomersByMonth: MonthlyData[];
   attendanceByMonth: MonthlyData[];
 }) {
-  const [rangeMonths, setRangeMonths] = useState<6 | 12>(12);
   const [target, setTarget] = useState<MessageTarget>("customers");
   const [message, setMessage] = useState("");
   const [recentMessages, setRecentMessages] = useState<MessageItem[]>([]);
   const [feedback, setFeedback] = useState("");
-
-  const visibleData = useMemo(() => {
-    const pick = <T extends MonthlyData>(data: T[]) => data.slice(-rangeMonths);
-    return {
-      newCustomers: pick(newCustomersByMonth),
-      churn: pick(churnCustomersByMonth),
-      attendance: pick(attendanceByMonth),
-    };
-  }, [
-    rangeMonths,
-    newCustomersByMonth,
-    churnCustomersByMonth,
-    attendanceByMonth,
-  ]);
 
   const submitMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -192,26 +181,6 @@ export default function DashboardClient({
 
   return (
     <section className={styles.dashboardContainer}>
-      <header className={styles.headerArea}>
-        <h1>Dashboard</h1>
-        <div className={styles.rangeToggle}>
-          <button
-            type="button"
-            onClick={() => setRangeMonths(6)}
-            className={rangeMonths === 6 ? styles.activeRange : ""}
-          >
-            Last 6 months
-          </button>
-          <button
-            type="button"
-            onClick={() => setRangeMonths(12)}
-            className={rangeMonths === 12 ? styles.activeRange : ""}
-          >
-            Last 12 months
-          </button>
-        </div>
-      </header>
-
       <div className={styles.kpiGrid}>
         <article className={styles.kpiCard}>
           <UsersIcon className={styles.kpiIcon} />
@@ -230,31 +199,57 @@ export default function DashboardClient({
         </article>
 
         <article className={styles.kpiCard}>
-          <CheckCircleIcon className={styles.kpiIcon} />
-          <div>
-            <p>Instructor Attendance</p>
-            <strong>{metrics.attendanceRateThisMonth}%</strong>
-            <small>(this month)</small>
+          <UserGroupIcon className={styles.kpiIcon} />
+          <div className={styles.instructorKpiContent}>
+            <p>Total Instructors</p>
+            <strong>
+              {metrics.instructorsByEnglishBackground.nonNative +
+                metrics.instructorsByEnglishBackground.nativeA +
+                metrics.instructorsByEnglishBackground.nativeB}
+            </strong>
+          </div>
+        </article>
+        <article className={styles.kpiCard}>
+          <UserGroupIcon className={styles.kpiIcon} />
+          <div className={styles.instructorKpiContent}>
+            <p>Non-Native</p>
+            <strong>{metrics.instructorsByEnglishBackground.nonNative}</strong>
+          </div>
+        </article>
+        <article className={styles.kpiCard}>
+          <UsersIcon className={styles.kpiIcon} />
+          <div className={styles.instructorKpiContent}>
+            <p>Native A</p>
+            <strong>{metrics.instructorsByEnglishBackground.nativeA}</strong>
+          </div>
+        </article>
+        <article className={styles.kpiCard}>
+          <UserIcon className={styles.kpiIcon} />
+          <div className={styles.instructorKpiContent}>
+            <p>Native B</p>
+            <article>
+              <strong>{metrics.instructorsByEnglishBackground.nativeB}</strong>
+            </article>
           </div>
         </article>
       </div>
 
       <div className={styles.twoColumnCharts}>
         <SimpleBarChart
-          title={`New Customers (${currentYear})`}
-          data={visibleData.newCustomers}
+          title={`New Customers (${monthRangeLabel})`}
+          data={newCustomersByMonth}
           color="blue"
         />
         <SimpleBarChart
-          title={`Customer Churn (${currentYear})`}
-          data={visibleData.churn}
+          title={`Customer Churn (${monthRangeLabel})`}
+          data={churnCustomersByMonth}
           color="pink"
         />
       </div>
 
       <SimpleLineChart
         title="Instructor Attendance Rate (Monthly %)"
-        data={visibleData.attendance}
+        data={attendanceByMonth}
       />
 
       <div className={styles.messageBoardCard}>

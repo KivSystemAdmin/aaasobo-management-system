@@ -4,6 +4,7 @@ import {
   getAllClasses,
   getAllCustomers,
   getAllPastCustomers,
+  getAllInstructors,
 } from "@/lib/api/adminsApi";
 import { authenticateUserSession } from "@/lib/auth/sessionUtils";
 import { getCookie } from "../../../../proxy";
@@ -14,6 +15,12 @@ type MonthlyData = {
 };
 
 const MONTH_WINDOW = 12;
+
+type InstructorEnglishBackgroundCounts = {
+  nonNative: number;
+  nativeA: number;
+  nativeB: number;
+};
 
 function getLastMonthKeys(months: number, anchorMonthKey?: string): string[] {
   const now = new Date();
@@ -49,6 +56,47 @@ function parseMonthKey(value: string): string | null {
   }
 
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function monthYearLabelFromKey(monthKey: string): string {
+  const [year, month] = monthKey.split("-").map(Number);
+  const date = new Date(year, (month || 1) - 1, 1);
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function buildMonthRangeLabel(monthKeys: string[]): string {
+  const start = monthKeys[0];
+  const end = monthKeys[monthKeys.length - 1];
+
+  if (!start || !end) {
+    return "";
+  }
+
+  return `${monthYearLabelFromKey(start)} - ${monthYearLabelFromKey(end)}`;
+}
+
+function calcInstructorEnglishBackgroundCounts(
+  instructors: Awaited<ReturnType<typeof getAllInstructors>>,
+): InstructorEnglishBackgroundCounts {
+  return instructors.reduce<InstructorEnglishBackgroundCounts>(
+    (counts, instructor) => {
+      const normalized = instructor.English.trim().toLowerCase();
+
+      if (normalized === "non-native") {
+        counts.nonNative += 1;
+      } else if (normalized === "native a") {
+        counts.nativeA += 1;
+      } else if (normalized === "native b") {
+        counts.nativeB += 1;
+      }
+
+      return counts;
+    },
+    { nonNative: 0, nativeA: 0, nativeB: 0 },
+  );
 }
 
 function monthLabelFromKey(monthKey: string): string {
@@ -162,15 +210,17 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   await authenticateUserSession("admin", params.id);
 
   const cookie = await getCookie();
-  const [customers, children, classes, pastCustomers] = await Promise.all([
-    getAllCustomers(cookie),
-    getAllChildren(cookie),
-    getAllClasses(false, cookie),
-    getAllPastCustomers(cookie),
-  ]);
+  const [customers, children, classes, pastCustomers, instructors] =
+    await Promise.all([
+      getAllCustomers(cookie),
+      getAllChildren(cookie),
+      getAllClasses(false, cookie),
+      getAllPastCustomers(cookie),
+      getAllInstructors(cookie),
+    ]);
 
   const monthKeys = getLastMonthKeys(MONTH_WINDOW);
-  const currentYear = new Date().getFullYear();
+  const monthRangeLabel = buildMonthRangeLabel(monthKeys);
   const newCustomersByMonth = calcNewCustomersByMonth(
     customers,
     pastCustomers,
@@ -178,16 +228,16 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   );
   const churnCustomersByMonth = calcChurnByMonth(pastCustomers, monthKeys);
   const attendanceByMonth = calcAttendanceRateByMonth(classes, monthKeys);
+  const instructorCounts = calcInstructorEnglishBackgroundCounts(instructors);
 
   return (
     <DashboardClient
       metrics={{
         totalCustomers: customers.length,
         totalChildren: children.length,
-        attendanceRateThisMonth:
-          attendanceByMonth[attendanceByMonth.length - 1]?.value ?? 0,
+        instructorsByEnglishBackground: instructorCounts,
       }}
-      currentYear={currentYear}
+      monthRangeLabel={monthRangeLabel}
       newCustomersByMonth={newCustomersByMonth}
       churnCustomersByMonth={churnCustomersByMonth}
       attendanceByMonth={attendanceByMonth}
