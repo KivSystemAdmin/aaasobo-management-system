@@ -415,6 +415,8 @@ export const ClassListItem = z.object({
   CustomerID: z.number(),
   Status: z.string(),
   "Class Code": z.string(),
+  "Is Free Trial": z.boolean(),
+  "Canceled At": z.string().nullable(),
 });
 
 export const ClassesListResponse = z.object({

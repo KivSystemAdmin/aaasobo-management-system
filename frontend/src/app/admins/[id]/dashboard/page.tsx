@@ -17,10 +17,11 @@ type MonthlyData = {
 
 type InstructorAttendanceMonthly = {
   month: string;
-  bookedLessons: number;
+  trialLessons: number;
+  regularLessons: number;
   completedLessons: number;
-  canceledByCustomerLessons: number;
-  canceledByInstructorLessons: number;
+  cancelLessons: number;
+  cancelWithoutNoticeLessons: number;
   attendanceRate: number;
 };
 
@@ -28,6 +29,7 @@ type InstructorAttendanceItem = {
   id: number;
   nickname: string;
   imageUrl: string;
+  englishBackgroundClass: "non-native" | "native-a" | "native-b";
   monthly: InstructorAttendanceMonthly[];
 };
 
@@ -179,7 +181,38 @@ function calcAttendanceRateByMonth(
 }
 
 function normalizeStatus(value: string): string {
-  return value.trim().toLowerCase().replace(/\s+/g, "");
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z]/g, "")
+    .replace(/cancelled/g, "canceled");
+}
+
+function formatDateInJst(value: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(value);
+}
+
+function classifyInstructorCancel(
+  canceledAt: string | null,
+  classDateTimeJst: string,
+): "cancel" | "cancelWithoutNotice" {
+  if (!canceledAt) {
+    return "cancelWithoutNotice";
+  }
+
+  const classDate = classDateTimeJst.slice(0, 10);
+  const canceledDate = formatDateInJst(new Date(canceledAt));
+
+  if (canceledDate < classDate) {
+    return "cancel";
+  }
+
+  return "cancelWithoutNotice";
 }
 
 function calcAttendanceByInstructor(
@@ -199,18 +232,24 @@ function calcAttendanceByInstructor(
       string,
       {
         bookedLessons: number;
+        trialLessons: number;
+        regularLessons: number;
         completedLessons: number;
         canceledByCustomerLessons: number;
-        canceledByInstructorLessons: number;
+        cancelLessons: number;
+        cancelWithoutNoticeLessons: number;
       }
     >();
 
     monthKeys.forEach((monthKey) => {
       monthlyBuckets.set(monthKey, {
         bookedLessons: 0,
+        trialLessons: 0,
+        regularLessons: 0,
         completedLessons: 0,
         canceledByCustomerLessons: 0,
-        canceledByInstructorLessons: 0,
+        cancelLessons: 0,
+        cancelWithoutNoticeLessons: 0,
       });
     });
 
@@ -232,14 +271,27 @@ function calcAttendanceByInstructor(
       bucket.bookedLessons += 1;
 
       const status = normalizeStatus(item.Status);
-      if (status.includes("completed")) {
+      if (status === "completed") {
         bucket.completedLessons += 1;
+        if (item["Is Free Trial"]) {
+          bucket.trialLessons += 1;
+        } else {
+          bucket.regularLessons += 1;
+        }
       }
-      if (status.includes("canceledbycustomer")) {
+      if (status === "canceledcustomer") {
         bucket.canceledByCustomerLessons += 1;
       }
-      if (status.includes("canceledbyinstructor")) {
-        bucket.canceledByInstructorLessons += 1;
+      if (status === "canceledinstructor") {
+        const cancelType = classifyInstructorCancel(
+          item["Canceled At"],
+          item["Date/Time (JST)"],
+        );
+        if (cancelType === "cancelWithoutNotice") {
+          bucket.cancelWithoutNoticeLessons += 1;
+        } else {
+          bucket.cancelLessons += 1;
+        }
       }
     });
 
@@ -248,10 +300,11 @@ function calcAttendanceByInstructor(
       if (!bucket) {
         return {
           month: monthLabelFromKey(monthKey),
-          bookedLessons: 0,
+          trialLessons: 0,
+          regularLessons: 0,
           completedLessons: 0,
-          canceledByCustomerLessons: 0,
-          canceledByInstructorLessons: 0,
+          cancelLessons: 0,
+          cancelWithoutNoticeLessons: 0,
           attendanceRate: 0,
         };
       }
@@ -271,11 +324,19 @@ function calcAttendanceByInstructor(
     });
 
     const profile = profileMap.get(instructor.ID);
+    const normalizedEnglish = instructor.English.trim().toLowerCase();
+    const englishBackgroundClass =
+      normalizedEnglish === "native a"
+        ? "native-a"
+        : normalizedEnglish === "native b"
+          ? "native-b"
+          : "non-native";
 
     return {
       id: instructor.ID,
       nickname: profile?.nickname ?? instructor.Instructor,
       imageUrl: profile?.icon || defaultImageUrl,
+      englishBackgroundClass,
       monthly,
     };
   });

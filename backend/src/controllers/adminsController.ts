@@ -1152,6 +1152,8 @@ export const getClassesWithinPeriodController = async (
         dateTime,
         status,
         classCode,
+        isFreeTrial,
+        canceledAt,
         classAttendance,
       } = classItem;
 
@@ -1222,6 +1224,8 @@ export const getClassesWithinPeriodController = async (
         CustomerID: customer.id,
         Status: statusText,
         "Class Code": classCode,
+        "Is Free Trial": isFreeTrial,
+        "Canceled At": canceledAt ? canceledAt.toISOString() : null,
       };
     });
 

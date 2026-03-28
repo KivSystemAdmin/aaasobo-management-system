@@ -28,10 +28,10 @@ type MonthlyData = {
 
 type InstructorAttendanceMonthly = {
   month: string;
-  bookedLessons: number;
-  completedLessons: number;
-  canceledByCustomerLessons: number;
-  canceledByInstructorLessons: number;
+  trialLessons: number;
+  regularLessons: number;
+  cancelLessons: number;
+  cancelWithoutNoticeLessons: number;
   attendanceRate: number;
 };
 
@@ -39,6 +39,7 @@ type InstructorAttendanceItem = {
   id: number;
   nickname: string;
   imageUrl: string;
+  englishBackgroundClass: "non-native" | "native-a" | "native-b";
   monthly: InstructorAttendanceMonthly[];
 };
 
@@ -54,9 +55,11 @@ type MessageItem = {
 function InstructorAvatar({
   imageUrl,
   nickname,
+  englishBackgroundClass,
 }: {
   imageUrl: string;
   nickname: string;
+  englishBackgroundClass: "non-native" | "native-a" | "native-b";
 }) {
   const [imageError, setImageError] = useState(false);
   const safeSrc =
@@ -69,7 +72,7 @@ function InstructorAvatar({
       width={48}
       height={48}
       unoptimized
-      className={styles.instructorAvatar}
+      className={`${styles.instructorAvatar} ${styles[englishBackgroundClass]}`}
       onError={() => setImageError(true)}
     />
   );
@@ -110,81 +113,6 @@ function SimpleBarChart({
           );
         })}
       </div>
-    </div>
-  );
-}
-
-function AttendanceRateBarChart({
-  data,
-}: {
-  data: InstructorAttendanceMonthly[];
-}) {
-  const width = 720;
-  const height = 220;
-  const padding = 20;
-  const chartWidth = width - padding * 2;
-  const barGap = 8;
-  const barWidth = Math.max(
-    (chartWidth - barGap * (data.length - 1)) / data.length,
-    8,
-  );
-
-  return (
-    <div className={styles.modalChart}>
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        role="img"
-        aria-label="Instructor monthly attendance rate"
-      >
-        <line
-          x1={padding}
-          y1={height - padding}
-          x2={width - padding}
-          y2={height - padding}
-          className={styles.axisLine}
-        />
-        <line
-          x1={padding}
-          y1={padding}
-          x2={padding}
-          y2={height - padding}
-          className={styles.axisLine}
-        />
-        {data.map((item, index) => {
-          const x = padding + index * (barWidth + barGap);
-          const clampedRate = Math.min(Math.max(item.attendanceRate, 0), 100);
-          const barHeight = (clampedRate * (height - padding * 2)) / 100;
-          const y = height - padding - barHeight;
-
-          return (
-            <g key={item.month}>
-              <rect
-                x={x}
-                y={y}
-                width={barWidth}
-                height={barHeight}
-                className={styles.attendanceBar}
-              />
-              <text
-                x={x + barWidth / 2}
-                y={height - 6}
-                textAnchor="middle"
-                className={styles.tickLabel}
-              >
-                {item.month}
-              </text>
-            </g>
-          );
-        })}
-        {[0, 25, 50, 75, 100].map((tick) => {
-          const y = height - padding - (tick * (height - padding * 2)) / 100;
-          return (
-            <text key={tick} x={4} y={y + 4} className={styles.tickLabel}>
-              {tick}%
-            </text>
-          );
-        })}
-      </svg>
     </div>
   );
 }
@@ -299,7 +227,7 @@ export default function DashboardClient({
       </div>
 
       <div className={styles.chartCard}>
-        <h3>{`Instructor Attendance Rate (${monthRangeLabel})`}</h3>
+        <h3>Instructor Class Report</h3>
         <p className={styles.attendanceDescription}>
           Choose an instructor to view monthly performance details.
         </p>
@@ -314,6 +242,7 @@ export default function DashboardClient({
               <InstructorAvatar
                 imageUrl={item.imageUrl}
                 nickname={item.nickname}
+                englishBackgroundClass={item.englishBackgroundClass}
               />
               <span>{item.nickname}</span>
             </button>
@@ -335,33 +264,35 @@ export default function DashboardClient({
           >
             <div className={styles.modalHeader}>
               <h3>{selectedInstructor.nickname} - Monthly Results</h3>
-              <button type="button" onClick={() => setSelectedInstructor(null)}>
+              <button
+                type="button"
+                className={styles.closeButton}
+                onClick={() => setSelectedInstructor(null)}
+              >
                 Close
               </button>
             </div>
-
-            <AttendanceRateBarChart data={selectedInstructor.monthly} />
 
             <div className={styles.attendanceTableWrapper}>
               <table className={styles.attendanceTable}>
                 <thead>
                   <tr>
                     <th>Month</th>
-                    <th>Booked lesson</th>
-                    <th>Completed lesson</th>
-                    <th>Canceled by customer lesson</th>
-                    <th>Canceled by instructor lesson</th>
-                    <th>Instructor attendance rate</th>
+                    <th>Trial</th>
+                    <th>Regular</th>
+                    <th>Cancel</th>
+                    <th>Cancel Without Notice</th>
+                    <th>Attendance Rate</th>
                   </tr>
                 </thead>
                 <tbody>
                   {selectedInstructor.monthly.map((monthItem) => (
                     <tr key={monthItem.month}>
                       <td>{monthItem.month}</td>
-                      <td>{monthItem.bookedLessons}</td>
-                      <td>{monthItem.completedLessons}</td>
-                      <td>{monthItem.canceledByCustomerLessons}</td>
-                      <td>{monthItem.canceledByInstructorLessons}</td>
+                      <td>{monthItem.trialLessons}</td>
+                      <td>{monthItem.regularLessons}</td>
+                      <td>{monthItem.cancelLessons}</td>
+                      <td>{monthItem.cancelWithoutNoticeLessons}</td>
                       <td>{monthItem.attendanceRate}%</td>
                     </tr>
                   ))}
