@@ -119,6 +119,7 @@ export default function DashboardClient({
   monthRangeLabel,
   newCustomersByMonth,
   churnCustomersByMonth,
+  attendanceByMonth,
   instructorAttendance,
 }: {
   metrics: DashboardMetric;
