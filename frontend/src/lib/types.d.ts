@@ -467,19 +467,6 @@ type BirthdateInputProps = {
   useFormAction?: boolean;
 };
 
-type TextAreaInputProps = {
-  id?: string;
-  label?: string;
-  defaultValue?: string;
-  placeholder?: string;
-  required?: boolean;
-  error?: string;
-  onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void;
-  language?: LanguageType;
-  name?: string;
-  className?: string;
-};
-
 // Types related to RebookingForm
 type RebookingSteps =
   | "selectClass"

@@ -35,6 +35,7 @@ import { confirmAlert } from "@/lib/utils/alertUtils";
 import InstructorFeeRates from "./InstructorFeeRates";
 import { EnglishBackground } from "@/types";
 import RadioButton from "../../elements/radioButton/RadioButton";
+import TextAreaInput from "../../elements/textAreaInput/TextAreaInput";
 
 // Define the specific string fields that are editable in this component
 type EditableInstructorFields =
@@ -415,12 +416,15 @@ function InstructorProfile({
               <div className={styles.userInfo}>
                 <p>{language === "en" ? "Available Class" : "開講クラス"}</p>
                 {isEditing ? (
-                  <textarea
+                  <TextAreaInput
                     id="workingTime"
                     name="workingTime"
                     defaultValue={latestInstructor.workingTime || undefined}
                     onChange={(e) => handleInputChange(e, "workingTime")}
-                    className={`${styles.workingTime__inputField} ${isEditing ? styles.editable : ""}`}
+                    inputClassName={`${styles.workingTime__inputField} ${isEditing ? styles.editable : ""}`}
+                    containerClassName={styles.textareaInputContainer}
+                    unstyled
+                    withLabelWrapper={false}
                     maxLength={500}
                   />
                 ) : (
@@ -437,12 +441,15 @@ function InstructorProfile({
               <div className={styles.userInfo}>
                 <p>{language === "en" ? "Life History" : "経歴"}</p>
                 {isEditing ? (
-                  <textarea
+                  <TextAreaInput
                     id="lifeHistory"
                     name="lifeHistory"
                     defaultValue={latestInstructor.lifeHistory || undefined}
                     onChange={(e) => handleInputChange(e, "lifeHistory")}
-                    className={`${styles.lifeHistory__inputField} ${isEditing ? styles.editable : ""}`}
+                    inputClassName={`${styles.lifeHistory__inputField} ${isEditing ? styles.editable : ""}`}
+                    containerClassName={styles.textareaInputContainer}
+                    unstyled
+                    withLabelWrapper={false}
                     maxLength={500}
                   />
                 ) : (
@@ -459,11 +466,14 @@ function InstructorProfile({
               <div className={styles.userInfo}>
                 <p>{language === "en" ? "Favorite Food" : "好きな食べ物"}</p>
                 {isEditing ? (
-                  <textarea
+                  <TextAreaInput
                     name="favoriteFood"
                     defaultValue={latestInstructor.favoriteFood || undefined}
                     onChange={(e) => handleInputChange(e, "favoriteFood")}
-                    className={`${styles.favoriteFood__inputField} ${isEditing ? styles.editable : ""}`}
+                    inputClassName={`${styles.favoriteFood__inputField} ${isEditing ? styles.editable : ""}`}
+                    containerClassName={styles.textareaInputContainer}
+                    unstyled
+                    withLabelWrapper={false}
                     maxLength={500}
                   />
                 ) : (
@@ -480,11 +490,14 @@ function InstructorProfile({
               <div className={styles.userInfo}>
                 <p>{language === "en" ? "Hobby" : "趣味"}</p>
                 {isEditing ? (
-                  <textarea
+                  <TextAreaInput
                     name="hobby"
                     defaultValue={latestInstructor.hobby || undefined}
                     onChange={(e) => handleInputChange(e, "hobby")}
-                    className={`${styles.hobby__inputField} ${isEditing ? styles.editable : ""}`}
+                    inputClassName={`${styles.hobby__inputField} ${isEditing ? styles.editable : ""}`}
+                    containerClassName={styles.textareaInputContainer}
+                    unstyled
+                    withLabelWrapper={false}
                     maxLength={500}
                   />
                 ) : (
@@ -505,13 +518,16 @@ function InstructorProfile({
                     : "子どもたちへメッセージ"}
                 </p>
                 {isEditing ? (
-                  <textarea
+                  <TextAreaInput
                     name="messageForChildren"
                     defaultValue={
                       latestInstructor.messageForChildren || undefined
                     }
                     onChange={(e) => handleInputChange(e, "messageForChildren")}
-                    className={`${styles.messageForChildren__inputField} ${isEditing ? styles.editable : ""}`}
+                    inputClassName={`${styles.messageForChildren__inputField} ${isEditing ? styles.editable : ""}`}
+                    containerClassName={styles.textareaInputContainer}
+                    unstyled
+                    withLabelWrapper={false}
                     maxLength={500}
                   />
                 ) : (
@@ -528,11 +544,14 @@ function InstructorProfile({
               <div className={styles.userInfo}>
                 <p>{language === "en" ? "Skill" : "スキル"}</p>
                 {isEditing ? (
-                  <textarea
+                  <TextAreaInput
                     name="skill"
                     defaultValue={latestInstructor.skill || undefined}
                     onChange={(e) => handleInputChange(e, "skill")}
-                    className={`${styles.skill__inputField} ${isEditing ? styles.editable : ""}`}
+                    inputClassName={`${styles.skill__inputField} ${isEditing ? styles.editable : ""}`}
+                    containerClassName={styles.textareaInputContainer}
+                    unstyled
+                    withLabelWrapper={false}
                     maxLength={500}
                   />
                 ) : (

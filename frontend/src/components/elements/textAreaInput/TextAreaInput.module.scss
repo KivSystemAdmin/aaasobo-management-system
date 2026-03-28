@@ -20,6 +20,16 @@
 
 .inputWrapper {
   position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.inputIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .inputField {
