@@ -567,7 +567,7 @@ function InstructorProfile({
               <div className={styles.insideContainer}>
                 <EnvelopeIcon className={styles.icon} />
                 <div className={styles.userInfo}>
-                  <p>Email</p>
+                  <p>{language === "en" ? "Email" : "メール"}</p>
                   {isEditing ? (
                     <InputField
                       name="email"
@@ -599,7 +599,7 @@ function InstructorProfile({
               <div className={styles.insideContainer}>
                 <VideoCameraIcon className={styles.icon} />
                 <div className={styles.userInfo}>
-                  <p>Class URL</p>
+                  <p>{language === "en" ? "Class URL" : "クラスURL"}</p>
                   {isEditing ? (
                     <InputField
                       name="classURL"
@@ -637,7 +637,10 @@ function InstructorProfile({
                   )}
 
                   <div className={styles.urlInfo}>
-                    <p>Meeting ID&nbsp;:&nbsp;</p>
+                    <p>
+                      {language === "en" ? "Meeting ID" : "ミーティングID"}
+                      &nbsp;:&nbsp;
+                    </p>
                     {isEditing ? (
                       <InputField
                         name="meetingId"
@@ -664,7 +667,10 @@ function InstructorProfile({
                     )}
                   </div>
                   <div className={styles.urlInfo}>
-                    <p>Passcode&nbsp;&nbsp;:&nbsp;</p>
+                    <p>
+                      {language === "en" ? "Passcode" : "パスコード"}
+                      &nbsp;&nbsp;:&nbsp;
+                    </p>
                     {isEditing ? (
                       <InputField
                         name="passcode"

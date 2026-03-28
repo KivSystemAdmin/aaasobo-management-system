@@ -11,6 +11,7 @@ import {
 } from "@/lib/api/adminsApi";
 import { confirmAlert, errorAlert } from "@/lib/utils/alertUtils";
 import type { InstructorFeeRate } from "@shared/schemas/admins";
+import { useLanguage } from "@/contexts/LanguageContext";
 import styles from "./InstructorProfile.module.scss";
 
 const DEFAULT_CURRENCY = "JPY";
@@ -110,6 +111,7 @@ export default function InstructorFeeRates({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formState, setFormState] = useState(createFormState());
+  const { language } = useLanguage();
 
   const applyFees = (nextFees: InstructorFeeRate[]) => {
     setFees(nextFees);
@@ -243,7 +245,7 @@ export default function InstructorFeeRates({
     <div className={styles.insideContainer}>
       <BanknotesIcon className={styles.icon} />
       <div className={styles.userInfo}>
-        <p>Fee Rates</p>
+        <p>{language === "en" ? "Fee Rates" : "給料レート"}</p>
         <div className={styles.feeSection}>
           {isLoading ? (
             <p className={styles.feeMutedText}>Loading fee rates...</p>
