@@ -6,12 +6,29 @@ import {
   getAllPastCustomers,
   getAllInstructors,
 } from "@/lib/api/adminsApi";
+import { getInstructorProfiles } from "@/lib/api/instructorsApi";
 import { authenticateUserSession } from "@/lib/auth/sessionUtils";
 import { getCookie } from "../../../../proxy";
 
 type MonthlyData = {
   month: string;
   value: number;
+};
+
+type InstructorAttendanceMonthly = {
+  month: string;
+  bookedLessons: number;
+  completedLessons: number;
+  canceledByCustomerLessons: number;
+  canceledByInstructorLessons: number;
+  attendanceRate: number;
+};
+
+type InstructorAttendanceItem = {
+  id: number;
+  nickname: string;
+  imageUrl: string;
+  monthly: InstructorAttendanceMonthly[];
 };
 
 const MONTH_WINDOW = 12;
@@ -161,6 +178,109 @@ function calcAttendanceRateByMonth(
   });
 }
 
+function normalizeStatus(value: string): string {
+  return value.trim().toLowerCase().replace(/\s+/g, "");
+}
+
+function calcAttendanceByInstructor(
+  classes: Awaited<ReturnType<typeof getAllClasses>>,
+  monthKeys: string[],
+  instructors: Awaited<ReturnType<typeof getAllInstructors>>,
+  instructorProfiles: Awaited<ReturnType<typeof getInstructorProfiles>>,
+): InstructorAttendanceItem[] {
+  const monthLookup = new Set(monthKeys);
+  const defaultImageUrl = "/images/default-user-icon.jpg";
+  const profileMap = new Map(
+    instructorProfiles.map((profile) => [profile.id, profile]),
+  );
+
+  return instructors.map((instructor) => {
+    const monthlyBuckets = new Map<
+      string,
+      {
+        bookedLessons: number;
+        completedLessons: number;
+        canceledByCustomerLessons: number;
+        canceledByInstructorLessons: number;
+      }
+    >();
+
+    monthKeys.forEach((monthKey) => {
+      monthlyBuckets.set(monthKey, {
+        bookedLessons: 0,
+        completedLessons: 0,
+        canceledByCustomerLessons: 0,
+        canceledByInstructorLessons: 0,
+      });
+    });
+
+    classes.forEach((item) => {
+      if (item.InstructorID !== instructor.ID) {
+        return;
+      }
+
+      const monthKey = parseMonthKey(item["Date/Time (JST)"]);
+      if (!monthKey || !monthLookup.has(monthKey)) {
+        return;
+      }
+
+      const bucket = monthlyBuckets.get(monthKey);
+      if (!bucket) {
+        return;
+      }
+
+      bucket.bookedLessons += 1;
+
+      const status = normalizeStatus(item.Status);
+      if (status.includes("completed")) {
+        bucket.completedLessons += 1;
+      }
+      if (status.includes("canceledbycustomer")) {
+        bucket.canceledByCustomerLessons += 1;
+      }
+      if (status.includes("canceledbyinstructor")) {
+        bucket.canceledByInstructorLessons += 1;
+      }
+    });
+
+    const monthly = monthKeys.map((monthKey) => {
+      const bucket = monthlyBuckets.get(monthKey);
+      if (!bucket) {
+        return {
+          month: monthLabelFromKey(monthKey),
+          bookedLessons: 0,
+          completedLessons: 0,
+          canceledByCustomerLessons: 0,
+          canceledByInstructorLessons: 0,
+          attendanceRate: 0,
+        };
+      }
+
+      const attendanceDenominator =
+        bucket.bookedLessons - bucket.canceledByCustomerLessons;
+      const attendanceRate =
+        attendanceDenominator <= 0
+          ? 0
+          : Math.round((bucket.completedLessons / attendanceDenominator) * 100);
+
+      return {
+        month: monthLabelFromKey(monthKey),
+        ...bucket,
+        attendanceRate,
+      };
+    });
+
+    const profile = profileMap.get(instructor.ID);
+
+    return {
+      id: instructor.ID,
+      nickname: profile?.nickname ?? instructor.Instructor,
+      imageUrl: profile?.icon || defaultImageUrl,
+      monthly,
+    };
+  });
+}
+
 function calcNewCustomersByMonth(
   customers: Awaited<ReturnType<typeof getAllCustomers>>,
   pastCustomers: Awaited<ReturnType<typeof getAllPastCustomers>>,
@@ -210,14 +330,21 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   await authenticateUserSession("admin", params.id);
 
   const cookie = await getCookie();
-  const [customers, children, classes, pastCustomers, instructors] =
-    await Promise.all([
-      getAllCustomers(cookie),
-      getAllChildren(cookie),
-      getAllClasses(false, cookie),
-      getAllPastCustomers(cookie),
-      getAllInstructors(cookie),
-    ]);
+  const [
+    customers,
+    children,
+    classes,
+    pastCustomers,
+    instructors,
+    instructorProfiles,
+  ] = await Promise.all([
+    getAllCustomers(cookie),
+    getAllChildren(cookie),
+    getAllClasses(false, cookie),
+    getAllPastCustomers(cookie),
+    getAllInstructors(cookie),
+    getInstructorProfiles(cookie),
+  ]);
 
   const monthKeys = getLastMonthKeys(MONTH_WINDOW);
   const monthRangeLabel = buildMonthRangeLabel(monthKeys);
@@ -228,6 +355,12 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   );
   const churnCustomersByMonth = calcChurnByMonth(pastCustomers, monthKeys);
   const attendanceByMonth = calcAttendanceRateByMonth(classes, monthKeys);
+  const instructorAttendance = calcAttendanceByInstructor(
+    classes,
+    monthKeys,
+    instructors,
+    instructorProfiles,
+  );
   const instructorCounts = calcInstructorEnglishBackgroundCounts(instructors);
 
   return (
@@ -241,6 +374,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
       newCustomersByMonth={newCustomersByMonth}
       churnCustomersByMonth={churnCustomersByMonth}
       attendanceByMonth={attendanceByMonth}
+      instructorAttendance={instructorAttendance}
     />
   );
 }

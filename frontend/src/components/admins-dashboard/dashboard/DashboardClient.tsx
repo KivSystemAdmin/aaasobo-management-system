@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   UserIcon,
   UsersIcon,
@@ -8,6 +9,7 @@ import {
   MegaphoneIcon,
 } from "@heroicons/react/24/outline";
 import styles from "./DashboardClient.module.scss";
+import { defaultUserImageUrl } from "@/lib/data/data";
 
 type DashboardMetric = {
   totalCustomers: number;
@@ -24,6 +26,22 @@ type MonthlyData = {
   value: number;
 };
 
+type InstructorAttendanceMonthly = {
+  month: string;
+  bookedLessons: number;
+  completedLessons: number;
+  canceledByCustomerLessons: number;
+  canceledByInstructorLessons: number;
+  attendanceRate: number;
+};
+
+type InstructorAttendanceItem = {
+  id: number;
+  nickname: string;
+  imageUrl: string;
+  monthly: InstructorAttendanceMonthly[];
+};
+
 type MessageTarget = "customers" | "instructors" | "both";
 
 type MessageItem = {
@@ -32,6 +50,30 @@ type MessageItem = {
   body: string;
   createdAt: string;
 };
+
+function InstructorAvatar({
+  imageUrl,
+  nickname,
+}: {
+  imageUrl: string;
+  nickname: string;
+}) {
+  const [imageError, setImageError] = useState(false);
+  const safeSrc =
+    imageError || !imageUrl.trim() ? defaultUserImageUrl : imageUrl;
+
+  return (
+    <Image
+      src={safeSrc}
+      alt={nickname}
+      width={48}
+      height={48}
+      unoptimized
+      className={styles.instructorAvatar}
+      onError={() => setImageError(true)}
+    />
+  );
+}
 
 function SimpleBarChart({
   title,
@@ -72,33 +114,28 @@ function SimpleBarChart({
   );
 }
 
-function SimpleLineChart({
-  title,
+function AttendanceRateBarChart({
   data,
 }: {
-  title: string;
-  data: MonthlyData[];
+  data: InstructorAttendanceMonthly[];
 }) {
   const width = 720;
   const height = 220;
   const padding = 20;
-
-  const points = data.map((item, index) => {
-    const x =
-      padding + (index * (width - padding * 2)) / Math.max(data.length - 1, 1);
-    const y =
-      height -
-      padding -
-      (Math.min(item.value, 100) * (height - padding * 2)) / 100;
-    return { ...item, x, y };
-  });
-
-  const polyline = points.map((point) => `${point.x},${point.y}`).join(" ");
+  const chartWidth = width - padding * 2;
+  const barGap = 8;
+  const barWidth = Math.max(
+    (chartWidth - barGap * (data.length - 1)) / data.length,
+    8,
+  );
 
   return (
-    <div className={`${styles.chartCard} ${styles.attendanceChart}`}>
-      <h3>{title}</h3>
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={title}>
+    <div className={styles.modalChart}>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label="Instructor monthly attendance rate"
+      >
         <line
           x1={padding}
           y1={height - padding}
@@ -113,16 +150,32 @@ function SimpleLineChart({
           y2={height - padding}
           className={styles.axisLine}
         />
-        <polyline points={polyline} className={styles.linePath} />
-        {points.map((point) => (
-          <circle
-            key={point.month}
-            cx={point.x}
-            cy={point.y}
-            r="4"
-            className={styles.linePoint}
-          />
-        ))}
+        {data.map((item, index) => {
+          const x = padding + index * (barWidth + barGap);
+          const clampedRate = Math.min(Math.max(item.attendanceRate, 0), 100);
+          const barHeight = (clampedRate * (height - padding * 2)) / 100;
+          const y = height - padding - barHeight;
+
+          return (
+            <g key={item.month}>
+              <rect
+                x={x}
+                y={y}
+                width={barWidth}
+                height={barHeight}
+                className={styles.attendanceBar}
+              />
+              <text
+                x={x + barWidth / 2}
+                y={height - 6}
+                textAnchor="middle"
+                className={styles.tickLabel}
+              >
+                {item.month}
+              </text>
+            </g>
+          );
+        })}
         {[0, 25, 50, 75, 100].map((tick) => {
           const y = height - padding - (tick * (height - padding * 2)) / 100;
           return (
@@ -132,11 +185,6 @@ function SimpleLineChart({
           );
         })}
       </svg>
-      <div className={styles.monthLabels}>
-        {data.map((item) => (
-          <span key={item.month}>{item.month}</span>
-        ))}
-      </div>
     </div>
   );
 }
@@ -146,18 +194,21 @@ export default function DashboardClient({
   monthRangeLabel,
   newCustomersByMonth,
   churnCustomersByMonth,
-  attendanceByMonth,
+  instructorAttendance,
 }: {
   metrics: DashboardMetric;
   monthRangeLabel: string;
   newCustomersByMonth: MonthlyData[];
   churnCustomersByMonth: MonthlyData[];
   attendanceByMonth: MonthlyData[];
+  instructorAttendance: InstructorAttendanceItem[];
 }) {
   const [target, setTarget] = useState<MessageTarget>("customers");
   const [message, setMessage] = useState("");
   const [recentMessages, setRecentMessages] = useState<MessageItem[]>([]);
   const [feedback, setFeedback] = useState("");
+  const [selectedInstructor, setSelectedInstructor] =
+    useState<InstructorAttendanceItem | null>(null);
 
   const submitMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -247,10 +298,79 @@ export default function DashboardClient({
         />
       </div>
 
-      <SimpleLineChart
-        title="Instructor Attendance Rate (Monthly %)"
-        data={attendanceByMonth}
-      />
+      <div className={styles.chartCard}>
+        <h3>{`Instructor Attendance Rate (${monthRangeLabel})`}</h3>
+        <p className={styles.attendanceDescription}>
+          Choose an instructor to view monthly performance details.
+        </p>
+        <div className={styles.instructorPickerGrid}>
+          {instructorAttendance.map((item) => (
+            <button
+              type="button"
+              key={item.id}
+              className={styles.instructorPickerItem}
+              onClick={() => setSelectedInstructor(item)}
+            >
+              <InstructorAvatar
+                imageUrl={item.imageUrl}
+                nickname={item.nickname}
+              />
+              <span>{item.nickname}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {selectedInstructor ? (
+        <div
+          className={styles.modalOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${selectedInstructor.nickname} attendance details`}
+          onClick={() => setSelectedInstructor(null)}
+        >
+          <div
+            className={styles.modalCard}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className={styles.modalHeader}>
+              <h3>{selectedInstructor.nickname} - Monthly Results</h3>
+              <button type="button" onClick={() => setSelectedInstructor(null)}>
+                Close
+              </button>
+            </div>
+
+            <AttendanceRateBarChart data={selectedInstructor.monthly} />
+
+            <div className={styles.attendanceTableWrapper}>
+              <table className={styles.attendanceTable}>
+                <thead>
+                  <tr>
+                    <th>Month</th>
+                    <th>Booked lesson</th>
+                    <th>Completed lesson</th>
+                    <th>Canceled by customer lesson</th>
+                    <th>Canceled by instructor lesson</th>
+                    <th>Instructor attendance rate</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedInstructor.monthly.map((monthItem) => (
+                    <tr key={monthItem.month}>
+                      <td>{monthItem.month}</td>
+                      <td>{monthItem.bookedLessons}</td>
+                      <td>{monthItem.completedLessons}</td>
+                      <td>{monthItem.canceledByCustomerLessons}</td>
+                      <td>{monthItem.canceledByInstructorLessons}</td>
+                      <td>{monthItem.attendanceRate}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <div className={styles.messageBoardCard}>
         <div className={styles.messageHeader}>

@@ -150,28 +150,9 @@
   background: linear-gradient(180deg, #ff9cb0 0%, #f0528c 100%);
 }
 
-.attendanceChart {
-  svg {
-    width: 100%;
-    height: 230px;
-  }
-}
-
 .axisLine {
   stroke: #d9d8eb;
   stroke-width: 1;
-}
-
-.linePath {
-  fill: none;
-  stroke: #5788f8;
-  stroke-width: 3;
-}
-
-.linePoint {
-  fill: #fff;
-  stroke: #4f46e5;
-  stroke-width: 2;
 }
 
 .tickLabel {
@@ -179,15 +160,111 @@
   font-size: 10px;
 }
 
-.monthLabels {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 0.3rem;
+.attendanceDescription {
+  margin: 0 0 0.8rem;
+  color: #6c6a8c;
+}
 
-  span {
-    font-size: 0.75rem;
-    text-align: center;
-    color: #666385;
+.instructorPickerGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.instructorPickerItem {
+  border: 1px solid #dfdff0;
+  background: #f9f9ff;
+  border-radius: 10px;
+  padding: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 600;
+  color: #2b295a;
+}
+
+.instructorAvatar {
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 44, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modalCard {
+  background: #fff;
+  width: min(1100px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(17, 15, 65, 0.22);
+  padding: 1rem;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+
+  h3 {
+    margin: 0;
+    color: #2b295a;
+  }
+
+  button {
+    border: none;
+    border-radius: 9px;
+    padding: 0.45rem 0.85rem;
+    background: #5a55f5;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+  }
+}
+
+.modalChart {
+  svg {
+    width: 100%;
+    height: 250px;
+  }
+}
+
+.attendanceBar {
+  fill: #5788f8;
+}
+
+.attendanceTableWrapper {
+  overflow-x: auto;
+}
+
+.attendanceTable {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    border-bottom: 1px solid #ecebfa;
+    padding: 0.55rem;
+    text-align: left;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  th {
+    color: #4f4d75;
+    background: #f8f8fe;
   }
 }
 
@@ -324,8 +401,8 @@
     grid-template-columns: 1fr;
   }
 
-  .monthLabels {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+  .instructorPickerGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .messageHistory {
@@ -333,6 +410,12 @@
     border-top: 1px solid #ecebfa;
     padding-left: 0;
     padding-top: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .instructorPickerGrid {
+    grid-template-columns: 1fr;
   }
 }
 
