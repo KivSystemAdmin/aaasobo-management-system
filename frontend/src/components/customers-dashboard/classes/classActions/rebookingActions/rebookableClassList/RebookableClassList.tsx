@@ -22,6 +22,7 @@ import { errorAlert } from "@/lib/utils/alertUtils";
 
 export default function RebookableClassList({
   customerId,
+  adminId,
   rebookableClasses,
   onRebookableClassSelect,
   language,
@@ -172,6 +173,7 @@ export default function RebookableClassList({
           classCode={selectedClassCode}
           childProfiles={childProfiles}
           customerId={customerId}
+          adminId={adminId}
           plan={plan}
         />
       )}

@@ -19,6 +19,7 @@ interface ProgressiveBookingFlowProps {
   language: LanguageType;
   onClose: () => void;
   classCode?: string;
+  adminId?: number;
   childProfiles: Child[];
   customerId: number;
   plan?: Plan;
@@ -41,6 +42,7 @@ export default function ProgressiveBookingFlow({
   classCode,
   childProfiles,
   customerId,
+  adminId,
   plan,
 }: ProgressiveBookingFlowProps) {
   // All hooks must be called at the top level
@@ -349,6 +351,8 @@ export default function ProgressiveBookingFlow({
                   onInstructorSelect={handleInstructorSelect}
                   plan={plan}
                   language={language}
+                  customerId={customerId}
+                  adminId={adminId}
                 />
               </div>
             )}
@@ -452,6 +456,8 @@ export default function ProgressiveBookingFlow({
                   onInstructorSelect={handleInstructorSelectFromDateTime}
                   language={language}
                   availableInstructors={availableInstructors}
+                  customerId={customerId}
+                  adminId={adminId}
                 />
               </div>
             )}

@@ -98,6 +98,7 @@ export default function RebookingForm({
       {rebookingStep === "selectClass" && (
         <RebookableClassesList
           customerId={customerId}
+          adminId={adminId}
           rebookableClasses={rebookableClasses}
           onRebookableClassSelect={handleRebookableClassSelect}
           language={language}
