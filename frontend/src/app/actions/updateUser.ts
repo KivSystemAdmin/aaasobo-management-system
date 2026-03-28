@@ -12,7 +12,11 @@ import {
   instructorUpdateSchema,
   instructorIconUpdateSchema,
 } from "@/schemas/authSchema";
-import { revalidateAdminList, revalidateInstructorList } from "./revalidate";
+import {
+  revalidateAdminList,
+  revalidateCustomerList,
+  revalidateInstructorList,
+} from "./revalidate";
 import { getCookie } from "../../proxy";
 import {
   childProfileSchema,
@@ -239,6 +243,9 @@ export async function updateCustomerProfileAction(
 
   revalidatePath(path);
 
+  // Refresh cached customer data for the customer list page
+  revalidateCustomerList();
+
   return updateResultMessage;
 }
 
@@ -295,6 +302,9 @@ export async function updateChildProfileAction(
 
   revalidatePath(path);
 
+  // Refresh cached customer data for the customer list page
+  revalidateCustomerList();
+
   return updateResultMessage;
 }
 
@@ -348,6 +358,9 @@ export async function addChildProfileAction(
       : `/customers/${loggedInUserId}/children-profiles`;
 
   revalidatePath(path);
+
+  // Refresh cached customer data for the customer list page
+  revalidateCustomerList();
 
   return resultMessage;
 }
