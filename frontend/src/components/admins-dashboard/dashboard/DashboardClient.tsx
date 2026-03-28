@@ -45,7 +45,9 @@ function SimpleBarChart({
       <h3>{title}</h3>
       <div className={styles.barChart}>
         {data.map((item) => {
-          const height = `${Math.max((item.value / maxValue) * 100, 4)}%`;
+          const normalizedHeight =
+            item.value === 0 ? 0 : Math.max((item.value / maxValue) * 100, 4);
+          const height = `${normalizedHeight}%`;
           return (
             <div key={item.month} className={styles.barItem}>
               <div
