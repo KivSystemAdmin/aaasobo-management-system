@@ -1,0 +1,327 @@
+@use "@/styles/variables.module.scss" as *;
+
+.dashboardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.headerArea {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+
+  h1 {
+    font-size: 2rem;
+    color: $blue_primary;
+  }
+}
+
+.rangeToggle {
+  display: inline-flex;
+  border: 1px solid #d9d8eb;
+  border-radius: 10px;
+  overflow: hidden;
+
+  button {
+    border: none;
+    background: #ffffff;
+    color: #5e5c80;
+    padding: 0.45rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+  }
+}
+
+.activeRange {
+  background: $blue_primary !important;
+  color: white !important;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.kpiCard {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 4px 14px rgba(18, 16, 65, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+
+  p {
+    margin: 0;
+    font-weight: 600;
+    color: #34325f;
+  }
+
+  strong {
+    display: block;
+    font-size: 2rem;
+    line-height: 1.2;
+    color: #17153d;
+  }
+
+  small {
+    color: #666385;
+  }
+}
+
+.kpiIcon {
+  width: 2.25rem;
+  height: 2.25rem;
+  color: #4f46e5;
+}
+
+.twoColumnCharts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.chartCard {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(18, 16, 65, 0.08);
+  padding: 1rem;
+
+  h3 {
+    margin: 0 0 1rem 0;
+    color: #2b295a;
+    font-size: 1.35rem;
+  }
+}
+
+.barChart {
+  min-height: 220px;
+  display: flex;
+  align-items: end;
+  gap: 0.45rem;
+}
+
+.barItem {
+  flex: 1;
+  text-align: center;
+
+  span {
+    margin-top: 0.45rem;
+    display: block;
+    font-size: 0.8rem;
+    color: #666385;
+  }
+}
+
+.bar {
+  width: 100%;
+  border-radius: 8px 8px 3px 3px;
+}
+
+.barBlue {
+  background: linear-gradient(180deg, #95c6ff 0%, #5788f8 100%);
+}
+
+.barPink {
+  background: linear-gradient(180deg, #ff9cb0 0%, #f0528c 100%);
+}
+
+.attendanceChart {
+  svg {
+    width: 100%;
+    height: 230px;
+  }
+}
+
+.axisLine {
+  stroke: #d9d8eb;
+  stroke-width: 1;
+}
+
+.linePath {
+  fill: none;
+  stroke: #5788f8;
+  stroke-width: 3;
+}
+
+.linePoint {
+  fill: #fff;
+  stroke: #4f46e5;
+  stroke-width: 2;
+}
+
+.tickLabel {
+  fill: #8e8ca7;
+  font-size: 10px;
+}
+
+.monthLabels {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.3rem;
+
+  span {
+    font-size: 0.75rem;
+    text-align: center;
+    color: #666385;
+  }
+}
+
+.messageBoardCard {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(18, 16, 65, 0.08);
+  padding: 1rem;
+}
+
+.messageHeader h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.8rem;
+  color: #2b295a;
+}
+
+.messageIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.messageBoardContent {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+}
+
+.messageForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  textarea {
+    border: 1px solid #d9d8eb;
+    border-radius: 10px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    resize: vertical;
+  }
+}
+
+.segmentedControl {
+  display: inline-flex;
+  border: 1px solid #d9d8eb;
+  border-radius: 10px;
+  overflow: hidden;
+  width: fit-content;
+
+  button {
+    border: none;
+    background: #fff;
+    color: #5e5c80;
+    padding: 0.45rem 0.75rem;
+    cursor: pointer;
+  }
+}
+
+.activeTarget {
+  background: $purple-accent !important;
+  color: white !important;
+}
+
+.messageActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  p {
+    margin: 0;
+    color: #4f46e5;
+  }
+
+  button {
+    border: none;
+    background: $purple-accent;
+    color: white;
+    border-radius: 10px;
+    padding: 0.55rem 1.25rem;
+    cursor: pointer;
+    font-weight: 600;
+  }
+}
+
+.messageHistory {
+  border-left: 1px solid #ecebfa;
+  padding-left: 1rem;
+
+  h3 {
+    margin-top: 0;
+    color: #2b295a;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  li {
+    background: #f8f8fe;
+    border-radius: 10px;
+    padding: 0.65rem;
+
+    strong {
+      text-transform: capitalize;
+      color: #4f46e5;
+    }
+
+    p {
+      margin: 0.3rem 0;
+      color: #2a294f;
+    }
+
+    time {
+      font-size: 0.75rem;
+      color: #7f7d9d;
+    }
+  }
+}
+
+.emptyText {
+  color: #7f7d9d;
+}
+
+@media (max-width: 1024px) {
+  .kpiGrid,
+  .twoColumnCharts,
+  .messageBoardContent {
+    grid-template-columns: 1fr;
+  }
+
+  .monthLabels {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .messageHistory {
+    border-left: none;
+    border-top: 1px solid #ecebfa;
+    padding-left: 0;
+    padding-top: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .headerArea {
+    flex-direction: column;
+    align-items: flex-start;
+
+    h1 {
+      font-size: 1.7rem;
+    }
+  }
+}

@@ -7,6 +7,159 @@ const adapter = new PrismaPg({
 });
 export const prisma = new PrismaClient({ adapter });
 
+type SyntheticCustomerSeed = {
+  name: string;
+  email: string;
+  prefecture: string;
+  hasSeenWelcome: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  terminationAt: Date | null;
+  childNames: [string, string];
+};
+
+const syntheticCustomerSeeds: SyntheticCustomerSeed[] = Array.from(
+  { length: 30 },
+  (_, index) => {
+    const customerNames = [
+      "Asami Takeda",
+      "Kazuya Oshima",
+      "Natsuki Morita",
+      "Ryohei Shibata",
+      "Emi Kurihara",
+      "Takumi Nishio",
+      "Aya Hoshino",
+      "Daigo Matsuda",
+      "Miyu Fujisaki",
+      "Koki Arai",
+      "Sayaka Arakawa",
+      "Tatsuya Imai",
+      "Rena Kawaguchi",
+      "Yoshiki Kitamura",
+      "Hina Kuroda",
+      "Soma Nagasawa",
+      "Yurika Ogata",
+      "Keisuke Sakurai",
+      "Maho Sugawara",
+      "Naoto Tomita",
+      "Ami Uematsu",
+      "Shin Watanabe",
+      "Yuka Yamamoto",
+      "Reo Yoshida",
+      "Kanna Aoyama",
+      "Hikaru Endo",
+      "Misato Goto",
+      "Riku Honda",
+      "Yui Ishii",
+      "Takeru Jinno",
+    ];
+    const childNamesPool = [
+      "Arisa",
+      "Sorato",
+      "Miori",
+      "Keito",
+      "Nanaka",
+      "Rento",
+      "Sakina",
+      "Ryusei",
+      "Akari",
+      "Haruma",
+      "Yuina",
+      "Kosei",
+      "Minori",
+      "Renji",
+      "Aona",
+      "Kaito",
+      "Rinka",
+      "Taiga",
+      "Ayane",
+      "Yuto",
+      "Nene",
+      "Sotaro",
+      "Koharu",
+      "Rikuto",
+      "Meika",
+      "Itsuki",
+      "Hinano",
+      "Reona",
+      "Suzuka",
+      "Naoto",
+      "Rio",
+      "Shunta",
+      "Airi",
+      "Towa",
+      "Yuika",
+      "Kentaro",
+      "Hana",
+      "Ryoma",
+      "Mao",
+      "Sena",
+      "Riko",
+      "Haru",
+      "Miu",
+      "Yuma",
+      "Noa",
+      "Koki",
+      "Yuzuki",
+      "Taichi",
+      "Mina",
+      "Ren",
+      "Karin",
+      "Sho",
+      "Sara",
+      "Yusei",
+      "Niko",
+      "Rui",
+      "Rina",
+      "Yudai",
+      "Asuka",
+      "Hinata",
+    ];
+    const prefectures = [
+      "東京都 / Tokyo",
+      "神奈川県 / Kanagawa",
+      "大阪府 / Osaka",
+      "愛知県 / Aichi",
+      "福岡県 / Fukuoka",
+      "北海道 / Hokkaido",
+    ];
+
+    const name = customerNames[index];
+    const createdAt = new Date(
+      Date.UTC(2024, 6 + (index % 18), 3 + (index % 17)),
+    );
+    const updatedAt = new Date(
+      Date.UTC(
+        createdAt.getUTCFullYear(),
+        createdAt.getUTCMonth(),
+        createdAt.getUTCDate() + 4 + (index % 5),
+      ),
+    );
+    const graduationOffsetMonths = 2 + (index % 6);
+    const terminationAt =
+      index % 4 === 0
+        ? new Date(
+            Date.UTC(
+              createdAt.getUTCFullYear(),
+              createdAt.getUTCMonth() + graduationOffsetMonths,
+              25,
+            ),
+          )
+        : null;
+
+    return {
+      name,
+      email: `sample-family-${String(index + 1).padStart(2, "0")}@example.com`,
+      prefecture: prefectures[index % prefectures.length],
+      hasSeenWelcome: index % 2 === 0,
+      createdAt,
+      updatedAt,
+      terminationAt,
+      childNames: [childNamesPool[index * 2], childNamesPool[index * 2 + 1]],
+    };
+  },
+);
+
 async function insertInstructors() {
   await prisma.instructor.createMany({
     data: [
@@ -1656,6 +1809,21 @@ async function insertCustomers() {
         updatedAt: "2025-09-01T00:00:00.000Z",
         terminationAt: null,
       },
+      ...syntheticCustomerSeeds.map((customerSeed, index) => ({
+        name: customerSeed.name,
+        email: customerSeed.email,
+        password:
+          "$2b$12$47fH6clEdzE2Dd8d7KCeQe2WM2KVeGD25KugHll808LBI6kI.dQqK", // AaasoBo!Admin
+        prefecture: customerSeed.prefecture,
+        hasSeenWelcome: customerSeed.hasSeenWelcome,
+        emailVerified:
+          index % 5 === 0 ? null : customerSeed.updatedAt.toISOString(),
+        createdAt: customerSeed.createdAt.toISOString(),
+        updatedAt: customerSeed.updatedAt.toISOString(),
+        terminationAt: customerSeed.terminationAt
+          ? customerSeed.terminationAt.toISOString()
+          : null,
+      })),
     ],
   });
 }
@@ -1711,6 +1879,7 @@ async function insertInstructorFees() {
 async function insertClasses() {
   const alice = await getCustomer("Alice");
   const bob = await getCustomer("Bob");
+  const hana = await getCustomer("山田 花");
   const helen = await getInstructor("Helen");
   const elian = await getInstructor("Elian");
   const aliceHelenRecurringClass = await prisma.recurringClass.findFirst({
@@ -2176,11 +2345,87 @@ async function insertClasses() {
       // },
     ],
   });
+
+  const monthlyTrendSeed = Array.from({ length: 12 }, (_, index) => {
+    const date = new Date(Date.UTC(2025, 3 + index, 15));
+    const month = `${date.getUTCFullYear()}-${String(
+      date.getUTCMonth() + 1,
+    ).padStart(2, "0")}`;
+    const customer = syntheticCustomerSeeds[index].name;
+    const statusCycle = [
+      "completed",
+      "completed",
+      "canceledByCustomer",
+      "completed",
+      "canceledByInstructor",
+    ] as const;
+
+    return {
+      month,
+      customer,
+      status: statusCycle[index % statusCycle.length],
+    };
+  });
+
+  const additionalClasses = await Promise.all(
+    monthlyTrendSeed.map(async (seed, index) => {
+      const customer = await getCustomer(seed.customer);
+      const classDate = new Date(`${seed.month}-15T07:00:00.000Z`);
+      const isWithInstructor = index % 3 !== 0;
+      const instructorId = isWithInstructor
+        ? index % 2 === 0
+          ? helen.id
+          : elian.id
+        : null;
+
+      const subscriptionId =
+        customer.name === alice.name
+          ? alice.subscription[0].id
+          : customer.name === bob.name
+            ? bob.subscription[0].id
+            : customer.name === hana.name
+              ? hana.subscription[0].id
+              : null;
+
+      return {
+        instructorId,
+        customerId: customer.id,
+        dateTime: classDate,
+        status: seed.status,
+        subscriptionId,
+        rebookableUntil: new Date(
+          classDate.getTime() + 1000 * 60 * 60 * 24 * 7,
+        ),
+        createdAt: new Date(classDate.getTime() - 1000 * 60 * 60 * 24 * 2),
+        updatedAt: new Date(classDate.getTime() - 1000 * 60 * 60 * 24),
+        classCode: `dashboard-trend-${index + 1}`,
+        isFreeTrial: subscriptionId === null,
+      };
+    }),
+  );
+
+  await prisma.class.createMany({
+    data: additionalClasses,
+  });
 }
 
 async function insertChildren() {
   const alice = await getCustomer("Alice");
   const bob = await getCustomer("Bob");
+  const charlie = await getCustomer("Charlie");
+  const emily = await getCustomer("Emily");
+  const taro = await getCustomer("佐藤 太郎");
+  const david = await getCustomer("David");
+  const ethan = await getCustomer("Ethan");
+  const olivia = await getCustomer("Olivia");
+  const james = await getCustomer("James");
+  const lucas = await getCustomer("Lucas");
+  const henry = await getCustomer("Henry");
+  const sophia = await getCustomer("Sophia");
+  const benjamin = await getCustomer("Benjamin");
+  const demoCustomers = await Promise.all(
+    syntheticCustomerSeeds.map(({ name }) => getCustomer(name)),
+  );
 
   await prisma.child.createMany({
     data: [
@@ -2205,6 +2450,109 @@ async function insertChildren() {
         personalInfo:
           "Age: 7 years, English Level: Intermediate. Loves drawing and is very creative. Enjoys reading stories.",
       },
+      {
+        name: "Mio",
+        customerId: charlie.id,
+        birthdate: new Date("2017-02-19"),
+        personalInfo:
+          "Age: 8 years, English Level: Beginner. Loves animals and learning songs in English.",
+      },
+      {
+        name: "Riku",
+        customerId: emily.id,
+        birthdate: new Date("2016-10-11"),
+        personalInfo:
+          "Age: 9 years, English Level: Intermediate. Enjoys science topics and speaking challenges.",
+      },
+      {
+        name: "Hina",
+        customerId: taro.id,
+        birthdate: new Date("2018-07-03"),
+        personalInfo:
+          "Age: 7 years, English Level: Beginner. Likes roleplay and practicing greetings.",
+      },
+      {
+        name: "Aoi",
+        customerId: david.id,
+        birthdate: new Date("2017-12-21"),
+        personalInfo:
+          "Age: 8 years, English Level: Beginner. Very active and enjoys game-based lessons.",
+      },
+      {
+        name: "Leo",
+        customerId: ethan.id,
+        birthdate: new Date("2016-05-09"),
+        personalInfo:
+          "Age: 9 years, English Level: Intermediate. Interested in sports and vocabulary quizzes.",
+      },
+      {
+        name: "Sora",
+        customerId: olivia.id,
+        birthdate: new Date("2019-01-14"),
+        personalInfo:
+          "Age: 7 years, English Level: Beginner. Enjoys picture books and short conversations.",
+      },
+      {
+        name: "Mina",
+        customerId: james.id,
+        birthdate: new Date("2017-08-30"),
+        personalInfo:
+          "Age: 8 years, English Level: Intermediate. Likes discussing favorite foods and hobbies.",
+      },
+      {
+        name: "Ren",
+        customerId: lucas.id,
+        birthdate: new Date("2018-03-08"),
+        personalInfo:
+          "Age: 8 years, English Level: Beginner. Enjoys phonics and speaking in complete sentences.",
+      },
+      {
+        name: "Yuna",
+        customerId: henry.id,
+        birthdate: new Date("2016-09-17"),
+        personalInfo:
+          "Age: 9 years, English Level: Intermediate. Loves storytelling and question-answer practice.",
+      },
+      {
+        name: "Kaito",
+        customerId: sophia.id,
+        birthdate: new Date("2017-04-26"),
+        personalInfo:
+          "Age: 8 years, English Level: Beginner. Enjoys songs and repeating useful classroom phrases.",
+      },
+      {
+        name: "Nico",
+        customerId: benjamin.id,
+        birthdate: new Date("2018-11-05"),
+        personalInfo:
+          "Age: 7 years, English Level: Beginner. Likes introducing himself and talking about school.",
+      },
+      ...demoCustomers.flatMap((customer, index) => {
+        const [firstChildName, secondChildName] =
+          syntheticCustomerSeeds[index].childNames;
+        const baseChild = {
+          name: firstChildName,
+          customerId: customer.id,
+          birthdate: new Date(2017, (index + 1) % 12, 10),
+          personalInfo:
+            "Sample profile: beginner learner with varied interests for dashboard data.",
+        };
+
+        if (index % 2 === 0) {
+          return [
+            baseChild,
+            {
+              name: secondChildName,
+              customerId: customer.id,
+              birthdate: new Date(2019, (index + 4) % 12, 20),
+              personalInfo:
+                "Sample profile: sibling account to diversify child count in dashboard data.",
+            },
+          ];
+        }
+
+        return [baseChild];
+      }),
     ],
   });
 }
@@ -3563,7 +3911,7 @@ async function insertSystemStatus() {
   });
 }
 
-async function getCustomer(name: "Alice" | "Bob" | "山田 花") {
+async function getCustomer(name: string) {
   const customer = await prisma.customer.findFirst({
     where: { name },
     include: { children: true, subscription: true },

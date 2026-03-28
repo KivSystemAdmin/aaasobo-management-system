@@ -2,6 +2,7 @@ import {
   UsersIcon,
   CalendarDaysIcon,
   ClipboardDocumentListIcon,
+  HomeModernIcon,
   UserIcon,
   UserGroupIcon,
   CalendarIcon,
@@ -55,6 +56,11 @@ export function getLinks(
   ];
 
   const adminLinks: LinkType[] = [
+    {
+      name: "Dashboard",
+      href: `/admins/${userId}/dashboard`,
+      icon: HomeModernIcon,
+    },
     {
       name: "Class List",
       href: `/admins/${userId}/class-list`,
