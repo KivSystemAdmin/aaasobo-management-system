@@ -215,6 +215,9 @@ export async function updateAttendanceAction(
 
   revalidatePath(path);
 
+  // Refresh cached class data for the class list page
+  revalidateClassList();
+
   return { success: true, message: "Attendance updated successfully." };
 }
 
@@ -253,6 +256,9 @@ export async function updateClassStatusAction(
 
   revalidatePath(path);
 
+  // Refresh cached class data for the class list page
+  revalidateClassList();
+
   return {
     success: true,
     message:
@@ -290,6 +296,7 @@ export async function generateClassesAction(
     // Update the business schedule
     await generateClasses(Number(year), month, cookie);
 
+    // Refresh cached class data for the class list page
     revalidateClassList();
 
     return {

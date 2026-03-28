@@ -1,7 +1,7 @@
 "use server";
 
 import { rebookClass } from "@/lib/api/classesApi";
-import { revalidateCustomerCalendar } from "./revalidate";
+import { revalidateClassList, revalidateCustomerCalendar } from "./revalidate";
 import { validateSession } from "./validateSession";
 import { getCookie } from "../../proxy";
 
@@ -48,6 +48,9 @@ export async function rebookClassWithValidation({
   ``;
 
   await revalidateCustomerCalendar(customerId, userSessionType);
+
+  // Refresh cached class data for the class list page
+  revalidateClassList();
 
   return { success: true };
 }

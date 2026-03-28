@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cancelClass, cancelClasses } from "@/lib/api/classesApi";
 import { getUserSession } from "@/lib/auth/sessionUtils";
 import { getCookie } from "../../proxy";
+import { revalidateClassList } from "./revalidate";
 
 export const cancelSelectedClasses = async (
   classesToCancel: number[],
@@ -44,6 +45,7 @@ export const cancelSelectedClasses = async (
 
   if (cancelationResult.success) {
     revalidatePath(path);
+    revalidateClassList();
   }
 
   return cancelationResult;
@@ -88,6 +90,7 @@ export const cancelClassAction = async (
 
   if (cancelationResult.success) {
     revalidatePath(path);
+    revalidateClassList();
   }
 
   return cancelationResult;

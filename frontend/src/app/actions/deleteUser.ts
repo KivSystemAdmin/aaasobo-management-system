@@ -100,5 +100,9 @@ export async function deleteChildProfileAction(
 
   revalidatePath(path);
 
+  // Refresh cached customer data for the customer list page
+  revalidateCustomerList();
+  revalidateClassList();
+
   return resultMessage;
 }
