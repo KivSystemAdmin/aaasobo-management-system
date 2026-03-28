@@ -325,6 +325,7 @@ export const CustomerListItem = z.object({
   Children: z.string().nullable(),
   Email: z.string(),
   Prefecture: z.string(),
+  "Start Date (JST)": z.string(),
 });
 
 export const CustomersListResponse = z.object({
@@ -337,6 +338,7 @@ export const PastCustomerListItem = z.object({
   ID: z.number(),
   "Past Customer": z.string(),
   "Past Children": z.string().nullable(),
+  "Start Date (JST)": z.string(),
   "End Date (JST)": z.string(),
 });
 

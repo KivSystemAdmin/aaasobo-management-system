@@ -271,7 +271,7 @@ export const getAllCustomersController = async (_: Request, res: Response) => {
 
     // Transform the data structure.
     const data = customers.map((customer, number) => {
-      let { id, name, email, prefecture, children } = customer;
+      let { id, name, email, prefecture, children, createdAt } = customer;
 
       // Format children names as a comma-separated string
       const childrenNames = children.map((child) => child.name).join(", ");
@@ -283,6 +283,9 @@ export const getAllCustomersController = async (_: Request, res: Response) => {
         Children: childrenNames,
         Email: email,
         Prefecture: prefecture,
+        "Start Date (JST)": convertToTimezoneDate(createdAt, "Asia/Tokyo")
+          .toISOString()
+          .slice(0, 10),
       };
     });
 
@@ -303,7 +306,7 @@ export const getAllPastCustomersController = async (
 
     // Transform the data structure.
     const data = customers.map((customer, number) => {
-      let { id, name, children, terminationAt } = customer;
+      let { id, name, children, terminationAt, createdAt } = customer;
 
       // Format children names as a comma-separated string
       const childrenNames = children.map((child) => child.name).join(", ");
@@ -324,6 +327,9 @@ export const getAllPastCustomersController = async (
         ID: id,
         "Past Customer": name,
         "Past Children": childrenNames,
+        "Start Date (JST)": convertToTimezoneDate(createdAt, "Asia/Tokyo")
+          .toISOString()
+          .slice(0, 10),
         "End Date (JST)": formattedTerminationDate,
       };
     });

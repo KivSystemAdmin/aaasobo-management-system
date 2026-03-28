@@ -37,10 +37,18 @@ function getLastMonthKeys(months: number, anchorMonthKey?: string): string[] {
 }
 
 function getAnchorMonthKey(
+  customers: Awaited<ReturnType<typeof getAllCustomers>>,
   classes: Awaited<ReturnType<typeof getAllClasses>>,
   pastCustomers: Awaited<ReturnType<typeof getAllPastCustomers>>,
 ) {
   const monthCandidates: string[] = [];
+
+  customers.forEach((item) => {
+    const key = parseMonthKey(item["Start Date (JST)"]);
+    if (key) {
+      monthCandidates.push(key);
+    }
+  });
 
   classes.forEach((item) => {
     const key = parseMonthKey(item["Date/Time (JST)"]);
@@ -141,32 +149,26 @@ function calcAttendanceRateByMonth(
 }
 
 function calcNewCustomersByMonth(
-  classes: Awaited<ReturnType<typeof getAllClasses>>,
+  customers: Awaited<ReturnType<typeof getAllCustomers>>,
+  pastCustomers: Awaited<ReturnType<typeof getAllPastCustomers>>,
   monthKeys: string[],
 ): MonthlyData[] {
-  const firstMonthByCustomer = new Map<number, string>();
-
-  classes.forEach((item) => {
-    const monthKey = parseMonthKey(item["Date/Time (JST)"]);
-    if (!monthKey) {
-      return;
-    }
-
-    const customerId = item.CustomerID;
-    const registered = firstMonthByCustomer.get(customerId);
-
-    if (!registered || monthKey < registered) {
-      firstMonthByCustomer.set(customerId, monthKey);
-    }
-  });
-
   const monthlyCount = new Map<string, number>();
-  firstMonthByCustomer.forEach((monthKey) => {
-    if (!monthKeys.includes(monthKey)) {
+  const pushRegistration = (registrationDate: string) => {
+    const monthKey = parseMonthKey(registrationDate);
+    if (!monthKey || !monthKeys.includes(monthKey)) {
       return;
     }
 
     monthlyCount.set(monthKey, (monthlyCount.get(monthKey) ?? 0) + 1);
+  };
+
+  customers.forEach((item) => {
+    pushRegistration(item["Start Date (JST)"]);
+  });
+
+  pastCustomers.forEach((item) => {
+    pushRegistration(item["Start Date (JST)"]);
   });
 
   return toMonthlyData(monthKeys, monthlyCount);
@@ -202,9 +204,13 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     getAllPastCustomers(cookie),
   ]);
 
-  const anchorMonthKey = getAnchorMonthKey(classes, pastCustomers);
+  const anchorMonthKey = getAnchorMonthKey(customers, classes, pastCustomers);
   const monthKeys = getLastMonthKeys(MONTH_WINDOW, anchorMonthKey);
-  const newCustomersByMonth = calcNewCustomersByMonth(classes, monthKeys);
+  const newCustomersByMonth = calcNewCustomersByMonth(
+    customers,
+    pastCustomers,
+    monthKeys,
+  );
   const churnCustomersByMonth = calcChurnByMonth(pastCustomers, monthKeys);
   const attendanceByMonth = calcAttendanceRateByMonth(classes, monthKeys);
 

@@ -105,6 +105,7 @@ export const getAllCustomers = async () => {
         name: true,
         email: true,
         prefecture: true,
+        createdAt: true,
         children: {
           select: { name: true },
         },
@@ -127,6 +128,7 @@ export const getAllPastCustomers = async () => {
       select: {
         id: true,
         name: true,
+        createdAt: true,
         children: {
           select: { name: true },
         },
