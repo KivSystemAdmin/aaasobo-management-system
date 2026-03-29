@@ -118,6 +118,11 @@ export type Admin = $Result.DefaultSelection<Prisma.$AdminPayload>
  * 
  */
 export type Child = $Result.DefaultSelection<Prisma.$ChildPayload>
+/**
+ * Model MessageBoardPost
+ * 
+ */
+export type MessageBoardPost = $Result.DefaultSelection<Prisma.$MessageBoardPostPayload>
 
 /**
  * Enums
@@ -467,6 +472,16 @@ export class PrismaClient<
     * ```
     */
   get child(): Prisma.ChildDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.messageBoardPost`: Exposes CRUD operations for the **MessageBoardPost** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MessageBoardPosts
+    * const messageBoardPosts = await prisma.messageBoardPost.findMany()
+    * ```
+    */
+  get messageBoardPost(): Prisma.MessageBoardPostDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -921,7 +936,8 @@ export namespace Prisma {
     InstructorFee: 'InstructorFee',
     SystemStatus: 'SystemStatus',
     Admin: 'Admin',
-    Child: 'Child'
+    Child: 'Child',
+    MessageBoardPost: 'MessageBoardPost'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -937,7 +953,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "instructor" | "instructorTagCatalog" | "instructorTagAssignment" | "customer" | "class" | "classAttendance" | "plan" | "subscription" | "recurringClass" | "recurringClassAttendance" | "verificationToken" | "passwordResetToken" | "schedule" | "event" | "instructorSchedule" | "instructorSlot" | "instructorAbsence" | "instructorFee" | "systemStatus" | "admin" | "child"
+      modelProps: "instructor" | "instructorTagCatalog" | "instructorTagAssignment" | "customer" | "class" | "classAttendance" | "plan" | "subscription" | "recurringClass" | "recurringClassAttendance" | "verificationToken" | "passwordResetToken" | "schedule" | "event" | "instructorSchedule" | "instructorSlot" | "instructorAbsence" | "instructorFee" | "systemStatus" | "admin" | "child" | "messageBoardPost"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2495,6 +2511,80 @@ export namespace Prisma {
           }
         }
       }
+      MessageBoardPost: {
+        payload: Prisma.$MessageBoardPostPayload<ExtArgs>
+        fields: Prisma.MessageBoardPostFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MessageBoardPostFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessageBoardPostPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MessageBoardPostFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessageBoardPostPayload>
+          }
+          findFirst: {
+            args: Prisma.MessageBoardPostFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessageBoardPostPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MessageBoardPostFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessageBoardPostPayload>
+          }
+          findMany: {
+            args: Prisma.MessageBoardPostFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessageBoardPostPayload>[]
+          }
+          create: {
+            args: Prisma.MessageBoardPostCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessageBoardPostPayload>
+          }
+          createMany: {
+            args: Prisma.MessageBoardPostCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MessageBoardPostCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessageBoardPostPayload>[]
+          }
+          delete: {
+            args: Prisma.MessageBoardPostDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessageBoardPostPayload>
+          }
+          update: {
+            args: Prisma.MessageBoardPostUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessageBoardPostPayload>
+          }
+          deleteMany: {
+            args: Prisma.MessageBoardPostDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MessageBoardPostUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MessageBoardPostUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessageBoardPostPayload>[]
+          }
+          upsert: {
+            args: Prisma.MessageBoardPostUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessageBoardPostPayload>
+          }
+          aggregate: {
+            args: Prisma.MessageBoardPostAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMessageBoardPost>
+          }
+          groupBy: {
+            args: Prisma.MessageBoardPostGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MessageBoardPostGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MessageBoardPostCountArgs<ExtArgs>
+            result: $Utils.Optional<MessageBoardPostCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2624,6 +2714,7 @@ export namespace Prisma {
     systemStatus?: SystemStatusOmit
     admin?: AdminOmit
     child?: ChildOmit
+    messageBoardPost?: MessageBoardPostOmit
   }
 
   /* Types for Logging */
@@ -26759,6 +26850,1035 @@ export namespace Prisma {
 
 
   /**
+   * Model MessageBoardPost
+   */
+
+  export type AggregateMessageBoardPost = {
+    _count: MessageBoardPostCountAggregateOutputType | null
+    _avg: MessageBoardPostAvgAggregateOutputType | null
+    _sum: MessageBoardPostSumAggregateOutputType | null
+    _min: MessageBoardPostMinAggregateOutputType | null
+    _max: MessageBoardPostMaxAggregateOutputType | null
+  }
+
+  export type MessageBoardPostAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type MessageBoardPostSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type MessageBoardPostMinAggregateOutputType = {
+    id: number | null
+    target: string | null
+    body: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MessageBoardPostMaxAggregateOutputType = {
+    id: number | null
+    target: string | null
+    body: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MessageBoardPostCountAggregateOutputType = {
+    id: number
+    target: number
+    body: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MessageBoardPostAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type MessageBoardPostSumAggregateInputType = {
+    id?: true
+  }
+
+  export type MessageBoardPostMinAggregateInputType = {
+    id?: true
+    target?: true
+    body?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MessageBoardPostMaxAggregateInputType = {
+    id?: true
+    target?: true
+    body?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MessageBoardPostCountAggregateInputType = {
+    id?: true
+    target?: true
+    body?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MessageBoardPostAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MessageBoardPost to aggregate.
+     */
+    where?: MessageBoardPostWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MessageBoardPosts to fetch.
+     */
+    orderBy?: MessageBoardPostOrderByWithRelationInput | MessageBoardPostOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MessageBoardPostWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MessageBoardPosts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MessageBoardPosts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MessageBoardPosts
+    **/
+    _count?: true | MessageBoardPostCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MessageBoardPostAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MessageBoardPostSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MessageBoardPostMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MessageBoardPostMaxAggregateInputType
+  }
+
+  export type GetMessageBoardPostAggregateType<T extends MessageBoardPostAggregateArgs> = {
+        [P in keyof T & keyof AggregateMessageBoardPost]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMessageBoardPost[P]>
+      : GetScalarType<T[P], AggregateMessageBoardPost[P]>
+  }
+
+
+
+
+  export type MessageBoardPostGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MessageBoardPostWhereInput
+    orderBy?: MessageBoardPostOrderByWithAggregationInput | MessageBoardPostOrderByWithAggregationInput[]
+    by: MessageBoardPostScalarFieldEnum[] | MessageBoardPostScalarFieldEnum
+    having?: MessageBoardPostScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MessageBoardPostCountAggregateInputType | true
+    _avg?: MessageBoardPostAvgAggregateInputType
+    _sum?: MessageBoardPostSumAggregateInputType
+    _min?: MessageBoardPostMinAggregateInputType
+    _max?: MessageBoardPostMaxAggregateInputType
+  }
+
+  export type MessageBoardPostGroupByOutputType = {
+    id: number
+    target: string
+    body: string
+    createdAt: Date
+    updatedAt: Date
+    _count: MessageBoardPostCountAggregateOutputType | null
+    _avg: MessageBoardPostAvgAggregateOutputType | null
+    _sum: MessageBoardPostSumAggregateOutputType | null
+    _min: MessageBoardPostMinAggregateOutputType | null
+    _max: MessageBoardPostMaxAggregateOutputType | null
+  }
+
+  type GetMessageBoardPostGroupByPayload<T extends MessageBoardPostGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MessageBoardPostGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MessageBoardPostGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MessageBoardPostGroupByOutputType[P]>
+            : GetScalarType<T[P], MessageBoardPostGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MessageBoardPostSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    target?: boolean
+    body?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["messageBoardPost"]>
+
+  export type MessageBoardPostSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    target?: boolean
+    body?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["messageBoardPost"]>
+
+  export type MessageBoardPostSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    target?: boolean
+    body?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["messageBoardPost"]>
+
+  export type MessageBoardPostSelectScalar = {
+    id?: boolean
+    target?: boolean
+    body?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MessageBoardPostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "target" | "body" | "createdAt" | "updatedAt", ExtArgs["result"]["messageBoardPost"]>
+
+  export type $MessageBoardPostPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MessageBoardPost"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      target: string
+      body: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["messageBoardPost"]>
+    composites: {}
+  }
+
+  type MessageBoardPostGetPayload<S extends boolean | null | undefined | MessageBoardPostDefaultArgs> = $Result.GetResult<Prisma.$MessageBoardPostPayload, S>
+
+  type MessageBoardPostCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MessageBoardPostFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MessageBoardPostCountAggregateInputType | true
+    }
+
+  export interface MessageBoardPostDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MessageBoardPost'], meta: { name: 'MessageBoardPost' } }
+    /**
+     * Find zero or one MessageBoardPost that matches the filter.
+     * @param {MessageBoardPostFindUniqueArgs} args - Arguments to find a MessageBoardPost
+     * @example
+     * // Get one MessageBoardPost
+     * const messageBoardPost = await prisma.messageBoardPost.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MessageBoardPostFindUniqueArgs>(args: SelectSubset<T, MessageBoardPostFindUniqueArgs<ExtArgs>>): Prisma__MessageBoardPostClient<$Result.GetResult<Prisma.$MessageBoardPostPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MessageBoardPost that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MessageBoardPostFindUniqueOrThrowArgs} args - Arguments to find a MessageBoardPost
+     * @example
+     * // Get one MessageBoardPost
+     * const messageBoardPost = await prisma.messageBoardPost.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MessageBoardPostFindUniqueOrThrowArgs>(args: SelectSubset<T, MessageBoardPostFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MessageBoardPostClient<$Result.GetResult<Prisma.$MessageBoardPostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MessageBoardPost that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageBoardPostFindFirstArgs} args - Arguments to find a MessageBoardPost
+     * @example
+     * // Get one MessageBoardPost
+     * const messageBoardPost = await prisma.messageBoardPost.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MessageBoardPostFindFirstArgs>(args?: SelectSubset<T, MessageBoardPostFindFirstArgs<ExtArgs>>): Prisma__MessageBoardPostClient<$Result.GetResult<Prisma.$MessageBoardPostPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MessageBoardPost that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageBoardPostFindFirstOrThrowArgs} args - Arguments to find a MessageBoardPost
+     * @example
+     * // Get one MessageBoardPost
+     * const messageBoardPost = await prisma.messageBoardPost.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MessageBoardPostFindFirstOrThrowArgs>(args?: SelectSubset<T, MessageBoardPostFindFirstOrThrowArgs<ExtArgs>>): Prisma__MessageBoardPostClient<$Result.GetResult<Prisma.$MessageBoardPostPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MessageBoardPosts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageBoardPostFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MessageBoardPosts
+     * const messageBoardPosts = await prisma.messageBoardPost.findMany()
+     * 
+     * // Get first 10 MessageBoardPosts
+     * const messageBoardPosts = await prisma.messageBoardPost.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const messageBoardPostWithIdOnly = await prisma.messageBoardPost.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MessageBoardPostFindManyArgs>(args?: SelectSubset<T, MessageBoardPostFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessageBoardPostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MessageBoardPost.
+     * @param {MessageBoardPostCreateArgs} args - Arguments to create a MessageBoardPost.
+     * @example
+     * // Create one MessageBoardPost
+     * const MessageBoardPost = await prisma.messageBoardPost.create({
+     *   data: {
+     *     // ... data to create a MessageBoardPost
+     *   }
+     * })
+     * 
+     */
+    create<T extends MessageBoardPostCreateArgs>(args: SelectSubset<T, MessageBoardPostCreateArgs<ExtArgs>>): Prisma__MessageBoardPostClient<$Result.GetResult<Prisma.$MessageBoardPostPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MessageBoardPosts.
+     * @param {MessageBoardPostCreateManyArgs} args - Arguments to create many MessageBoardPosts.
+     * @example
+     * // Create many MessageBoardPosts
+     * const messageBoardPost = await prisma.messageBoardPost.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MessageBoardPostCreateManyArgs>(args?: SelectSubset<T, MessageBoardPostCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MessageBoardPosts and returns the data saved in the database.
+     * @param {MessageBoardPostCreateManyAndReturnArgs} args - Arguments to create many MessageBoardPosts.
+     * @example
+     * // Create many MessageBoardPosts
+     * const messageBoardPost = await prisma.messageBoardPost.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MessageBoardPosts and only return the `id`
+     * const messageBoardPostWithIdOnly = await prisma.messageBoardPost.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MessageBoardPostCreateManyAndReturnArgs>(args?: SelectSubset<T, MessageBoardPostCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessageBoardPostPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MessageBoardPost.
+     * @param {MessageBoardPostDeleteArgs} args - Arguments to delete one MessageBoardPost.
+     * @example
+     * // Delete one MessageBoardPost
+     * const MessageBoardPost = await prisma.messageBoardPost.delete({
+     *   where: {
+     *     // ... filter to delete one MessageBoardPost
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MessageBoardPostDeleteArgs>(args: SelectSubset<T, MessageBoardPostDeleteArgs<ExtArgs>>): Prisma__MessageBoardPostClient<$Result.GetResult<Prisma.$MessageBoardPostPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MessageBoardPost.
+     * @param {MessageBoardPostUpdateArgs} args - Arguments to update one MessageBoardPost.
+     * @example
+     * // Update one MessageBoardPost
+     * const messageBoardPost = await prisma.messageBoardPost.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MessageBoardPostUpdateArgs>(args: SelectSubset<T, MessageBoardPostUpdateArgs<ExtArgs>>): Prisma__MessageBoardPostClient<$Result.GetResult<Prisma.$MessageBoardPostPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MessageBoardPosts.
+     * @param {MessageBoardPostDeleteManyArgs} args - Arguments to filter MessageBoardPosts to delete.
+     * @example
+     * // Delete a few MessageBoardPosts
+     * const { count } = await prisma.messageBoardPost.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MessageBoardPostDeleteManyArgs>(args?: SelectSubset<T, MessageBoardPostDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MessageBoardPosts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageBoardPostUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MessageBoardPosts
+     * const messageBoardPost = await prisma.messageBoardPost.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MessageBoardPostUpdateManyArgs>(args: SelectSubset<T, MessageBoardPostUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MessageBoardPosts and returns the data updated in the database.
+     * @param {MessageBoardPostUpdateManyAndReturnArgs} args - Arguments to update many MessageBoardPosts.
+     * @example
+     * // Update many MessageBoardPosts
+     * const messageBoardPost = await prisma.messageBoardPost.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MessageBoardPosts and only return the `id`
+     * const messageBoardPostWithIdOnly = await prisma.messageBoardPost.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MessageBoardPostUpdateManyAndReturnArgs>(args: SelectSubset<T, MessageBoardPostUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessageBoardPostPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MessageBoardPost.
+     * @param {MessageBoardPostUpsertArgs} args - Arguments to update or create a MessageBoardPost.
+     * @example
+     * // Update or create a MessageBoardPost
+     * const messageBoardPost = await prisma.messageBoardPost.upsert({
+     *   create: {
+     *     // ... data to create a MessageBoardPost
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MessageBoardPost we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MessageBoardPostUpsertArgs>(args: SelectSubset<T, MessageBoardPostUpsertArgs<ExtArgs>>): Prisma__MessageBoardPostClient<$Result.GetResult<Prisma.$MessageBoardPostPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MessageBoardPosts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageBoardPostCountArgs} args - Arguments to filter MessageBoardPosts to count.
+     * @example
+     * // Count the number of MessageBoardPosts
+     * const count = await prisma.messageBoardPost.count({
+     *   where: {
+     *     // ... the filter for the MessageBoardPosts we want to count
+     *   }
+     * })
+    **/
+    count<T extends MessageBoardPostCountArgs>(
+      args?: Subset<T, MessageBoardPostCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MessageBoardPostCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MessageBoardPost.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageBoardPostAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MessageBoardPostAggregateArgs>(args: Subset<T, MessageBoardPostAggregateArgs>): Prisma.PrismaPromise<GetMessageBoardPostAggregateType<T>>
+
+    /**
+     * Group by MessageBoardPost.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageBoardPostGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MessageBoardPostGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MessageBoardPostGroupByArgs['orderBy'] }
+        : { orderBy?: MessageBoardPostGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MessageBoardPostGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMessageBoardPostGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MessageBoardPost model
+   */
+  readonly fields: MessageBoardPostFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MessageBoardPost.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MessageBoardPostClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MessageBoardPost model
+   */
+  interface MessageBoardPostFieldRefs {
+    readonly id: FieldRef<"MessageBoardPost", 'Int'>
+    readonly target: FieldRef<"MessageBoardPost", 'String'>
+    readonly body: FieldRef<"MessageBoardPost", 'String'>
+    readonly createdAt: FieldRef<"MessageBoardPost", 'DateTime'>
+    readonly updatedAt: FieldRef<"MessageBoardPost", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MessageBoardPost findUnique
+   */
+  export type MessageBoardPostFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageBoardPost
+     */
+    select?: MessageBoardPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MessageBoardPost
+     */
+    omit?: MessageBoardPostOmit<ExtArgs> | null
+    /**
+     * Filter, which MessageBoardPost to fetch.
+     */
+    where: MessageBoardPostWhereUniqueInput
+  }
+
+  /**
+   * MessageBoardPost findUniqueOrThrow
+   */
+  export type MessageBoardPostFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageBoardPost
+     */
+    select?: MessageBoardPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MessageBoardPost
+     */
+    omit?: MessageBoardPostOmit<ExtArgs> | null
+    /**
+     * Filter, which MessageBoardPost to fetch.
+     */
+    where: MessageBoardPostWhereUniqueInput
+  }
+
+  /**
+   * MessageBoardPost findFirst
+   */
+  export type MessageBoardPostFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageBoardPost
+     */
+    select?: MessageBoardPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MessageBoardPost
+     */
+    omit?: MessageBoardPostOmit<ExtArgs> | null
+    /**
+     * Filter, which MessageBoardPost to fetch.
+     */
+    where?: MessageBoardPostWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MessageBoardPosts to fetch.
+     */
+    orderBy?: MessageBoardPostOrderByWithRelationInput | MessageBoardPostOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MessageBoardPosts.
+     */
+    cursor?: MessageBoardPostWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MessageBoardPosts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MessageBoardPosts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MessageBoardPosts.
+     */
+    distinct?: MessageBoardPostScalarFieldEnum | MessageBoardPostScalarFieldEnum[]
+  }
+
+  /**
+   * MessageBoardPost findFirstOrThrow
+   */
+  export type MessageBoardPostFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageBoardPost
+     */
+    select?: MessageBoardPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MessageBoardPost
+     */
+    omit?: MessageBoardPostOmit<ExtArgs> | null
+    /**
+     * Filter, which MessageBoardPost to fetch.
+     */
+    where?: MessageBoardPostWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MessageBoardPosts to fetch.
+     */
+    orderBy?: MessageBoardPostOrderByWithRelationInput | MessageBoardPostOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MessageBoardPosts.
+     */
+    cursor?: MessageBoardPostWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MessageBoardPosts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MessageBoardPosts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MessageBoardPosts.
+     */
+    distinct?: MessageBoardPostScalarFieldEnum | MessageBoardPostScalarFieldEnum[]
+  }
+
+  /**
+   * MessageBoardPost findMany
+   */
+  export type MessageBoardPostFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageBoardPost
+     */
+    select?: MessageBoardPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MessageBoardPost
+     */
+    omit?: MessageBoardPostOmit<ExtArgs> | null
+    /**
+     * Filter, which MessageBoardPosts to fetch.
+     */
+    where?: MessageBoardPostWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MessageBoardPosts to fetch.
+     */
+    orderBy?: MessageBoardPostOrderByWithRelationInput | MessageBoardPostOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MessageBoardPosts.
+     */
+    cursor?: MessageBoardPostWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MessageBoardPosts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MessageBoardPosts.
+     */
+    skip?: number
+    distinct?: MessageBoardPostScalarFieldEnum | MessageBoardPostScalarFieldEnum[]
+  }
+
+  /**
+   * MessageBoardPost create
+   */
+  export type MessageBoardPostCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageBoardPost
+     */
+    select?: MessageBoardPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MessageBoardPost
+     */
+    omit?: MessageBoardPostOmit<ExtArgs> | null
+    /**
+     * The data needed to create a MessageBoardPost.
+     */
+    data: XOR<MessageBoardPostCreateInput, MessageBoardPostUncheckedCreateInput>
+  }
+
+  /**
+   * MessageBoardPost createMany
+   */
+  export type MessageBoardPostCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MessageBoardPosts.
+     */
+    data: MessageBoardPostCreateManyInput | MessageBoardPostCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MessageBoardPost createManyAndReturn
+   */
+  export type MessageBoardPostCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageBoardPost
+     */
+    select?: MessageBoardPostSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MessageBoardPost
+     */
+    omit?: MessageBoardPostOmit<ExtArgs> | null
+    /**
+     * The data used to create many MessageBoardPosts.
+     */
+    data: MessageBoardPostCreateManyInput | MessageBoardPostCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MessageBoardPost update
+   */
+  export type MessageBoardPostUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageBoardPost
+     */
+    select?: MessageBoardPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MessageBoardPost
+     */
+    omit?: MessageBoardPostOmit<ExtArgs> | null
+    /**
+     * The data needed to update a MessageBoardPost.
+     */
+    data: XOR<MessageBoardPostUpdateInput, MessageBoardPostUncheckedUpdateInput>
+    /**
+     * Choose, which MessageBoardPost to update.
+     */
+    where: MessageBoardPostWhereUniqueInput
+  }
+
+  /**
+   * MessageBoardPost updateMany
+   */
+  export type MessageBoardPostUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MessageBoardPosts.
+     */
+    data: XOR<MessageBoardPostUpdateManyMutationInput, MessageBoardPostUncheckedUpdateManyInput>
+    /**
+     * Filter which MessageBoardPosts to update
+     */
+    where?: MessageBoardPostWhereInput
+    /**
+     * Limit how many MessageBoardPosts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MessageBoardPost updateManyAndReturn
+   */
+  export type MessageBoardPostUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageBoardPost
+     */
+    select?: MessageBoardPostSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MessageBoardPost
+     */
+    omit?: MessageBoardPostOmit<ExtArgs> | null
+    /**
+     * The data used to update MessageBoardPosts.
+     */
+    data: XOR<MessageBoardPostUpdateManyMutationInput, MessageBoardPostUncheckedUpdateManyInput>
+    /**
+     * Filter which MessageBoardPosts to update
+     */
+    where?: MessageBoardPostWhereInput
+    /**
+     * Limit how many MessageBoardPosts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MessageBoardPost upsert
+   */
+  export type MessageBoardPostUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageBoardPost
+     */
+    select?: MessageBoardPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MessageBoardPost
+     */
+    omit?: MessageBoardPostOmit<ExtArgs> | null
+    /**
+     * The filter to search for the MessageBoardPost to update in case it exists.
+     */
+    where: MessageBoardPostWhereUniqueInput
+    /**
+     * In case the MessageBoardPost found by the `where` argument doesn't exist, create a new MessageBoardPost with this data.
+     */
+    create: XOR<MessageBoardPostCreateInput, MessageBoardPostUncheckedCreateInput>
+    /**
+     * In case the MessageBoardPost was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MessageBoardPostUpdateInput, MessageBoardPostUncheckedUpdateInput>
+  }
+
+  /**
+   * MessageBoardPost delete
+   */
+  export type MessageBoardPostDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageBoardPost
+     */
+    select?: MessageBoardPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MessageBoardPost
+     */
+    omit?: MessageBoardPostOmit<ExtArgs> | null
+    /**
+     * Filter which MessageBoardPost to delete.
+     */
+    where: MessageBoardPostWhereUniqueInput
+  }
+
+  /**
+   * MessageBoardPost deleteMany
+   */
+  export type MessageBoardPostDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MessageBoardPosts to delete
+     */
+    where?: MessageBoardPostWhereInput
+    /**
+     * Limit how many MessageBoardPosts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MessageBoardPost without action
+   */
+  export type MessageBoardPostDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageBoardPost
+     */
+    select?: MessageBoardPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MessageBoardPost
+     */
+    omit?: MessageBoardPostOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -27023,6 +28143,17 @@ export namespace Prisma {
   };
 
   export type ChildScalarFieldEnum = (typeof ChildScalarFieldEnum)[keyof typeof ChildScalarFieldEnum]
+
+
+  export const MessageBoardPostScalarFieldEnum: {
+    id: 'id',
+    target: 'target',
+    body: 'body',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MessageBoardPostScalarFieldEnum = (typeof MessageBoardPostScalarFieldEnum)[keyof typeof MessageBoardPostScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -28502,6 +29633,60 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Child"> | Date | string
   }
 
+  export type MessageBoardPostWhereInput = {
+    AND?: MessageBoardPostWhereInput | MessageBoardPostWhereInput[]
+    OR?: MessageBoardPostWhereInput[]
+    NOT?: MessageBoardPostWhereInput | MessageBoardPostWhereInput[]
+    id?: IntFilter<"MessageBoardPost"> | number
+    target?: StringFilter<"MessageBoardPost"> | string
+    body?: StringFilter<"MessageBoardPost"> | string
+    createdAt?: DateTimeFilter<"MessageBoardPost"> | Date | string
+    updatedAt?: DateTimeFilter<"MessageBoardPost"> | Date | string
+  }
+
+  export type MessageBoardPostOrderByWithRelationInput = {
+    id?: SortOrder
+    target?: SortOrder
+    body?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MessageBoardPostWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: MessageBoardPostWhereInput | MessageBoardPostWhereInput[]
+    OR?: MessageBoardPostWhereInput[]
+    NOT?: MessageBoardPostWhereInput | MessageBoardPostWhereInput[]
+    target?: StringFilter<"MessageBoardPost"> | string
+    body?: StringFilter<"MessageBoardPost"> | string
+    createdAt?: DateTimeFilter<"MessageBoardPost"> | Date | string
+    updatedAt?: DateTimeFilter<"MessageBoardPost"> | Date | string
+  }, "id">
+
+  export type MessageBoardPostOrderByWithAggregationInput = {
+    id?: SortOrder
+    target?: SortOrder
+    body?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MessageBoardPostCountOrderByAggregateInput
+    _avg?: MessageBoardPostAvgOrderByAggregateInput
+    _max?: MessageBoardPostMaxOrderByAggregateInput
+    _min?: MessageBoardPostMinOrderByAggregateInput
+    _sum?: MessageBoardPostSumOrderByAggregateInput
+  }
+
+  export type MessageBoardPostScalarWhereWithAggregatesInput = {
+    AND?: MessageBoardPostScalarWhereWithAggregatesInput | MessageBoardPostScalarWhereWithAggregatesInput[]
+    OR?: MessageBoardPostScalarWhereWithAggregatesInput[]
+    NOT?: MessageBoardPostScalarWhereWithAggregatesInput | MessageBoardPostScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"MessageBoardPost"> | number
+    target?: StringWithAggregatesFilter<"MessageBoardPost"> | string
+    body?: StringWithAggregatesFilter<"MessageBoardPost"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"MessageBoardPost"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MessageBoardPost"> | Date | string
+  }
+
   export type InstructorCreateInput = {
     name: string
     email: string
@@ -29852,6 +31037,59 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MessageBoardPostCreateInput = {
+    target: string
+    body: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MessageBoardPostUncheckedCreateInput = {
+    id?: number
+    target: string
+    body: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MessageBoardPostUpdateInput = {
+    target?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MessageBoardPostUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    target?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MessageBoardPostCreateManyInput = {
+    id?: number
+    target: string
+    body: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MessageBoardPostUpdateManyMutationInput = {
+    target?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MessageBoardPostUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    target?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -31052,6 +32290,38 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type MessageBoardPostCountOrderByAggregateInput = {
+    id?: SortOrder
+    target?: SortOrder
+    body?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MessageBoardPostAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type MessageBoardPostMaxOrderByAggregateInput = {
+    id?: SortOrder
+    target?: SortOrder
+    body?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MessageBoardPostMinOrderByAggregateInput = {
+    id?: SortOrder
+    target?: SortOrder
+    body?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MessageBoardPostSumOrderByAggregateInput = {
+    id?: SortOrder
   }
 
   export type ClassCreateNestedManyWithoutInstructorInput = {

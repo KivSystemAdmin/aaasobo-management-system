@@ -55,6 +55,11 @@ import {
 } from "../services/eventsService";
 import { getAllSubscriptions } from "../services/subscriptionsService";
 import {
+  createMessageBoardPost,
+  getMessageBoardPosts,
+  isValidMessageTarget,
+} from "../services/messageBoardService";
+import {
   days,
   convertToISOString,
   convertToTimezoneDate,
@@ -64,6 +69,7 @@ import { EVENT_CONFLICT_ITEMS } from "../utils/commonUtils";
 import type {
   AdminIdParams,
   ClassListQuery,
+  CreateMessageBoardPostRequest,
   CustomerIdParams,
   InstructorIdParams,
   InstructorPayrollQuery,
@@ -1232,5 +1238,66 @@ export const getClassesWithinPeriodController = async (
     res.json({ data });
   } catch (error) {
     res.status(500).json({ error });
+  }
+};
+
+export const getMessageBoardPostsController = async (
+  _: unknown,
+  res: Response,
+) => {
+  interface MessageBoardPost {
+    id: number;
+    target: string;
+    body: string;
+    createdAt: Date;
+  }
+
+  try {
+    const posts: MessageBoardPost[] = await getMessageBoardPosts();
+    const data = posts.map((post) => ({
+      id: post.id,
+      target: post.target,
+      body: post.body,
+      createdAt: post.createdAt.toISOString(),
+    }));
+
+    res.status(200).json({ data });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+};
+
+export const createMessageBoardPostController = async (
+  req: RequestWithBody<CreateMessageBoardPostRequest>,
+  res: Response,
+) => {
+  const { target, body } = req.body;
+  const normalizedTarget = target.trim().toLowerCase();
+  const normalizedBody = body.trim();
+
+  if (!isValidMessageTarget(normalizedTarget)) {
+    return res.status(400).json({ message: "Invalid target selected." });
+  }
+
+  if (!normalizedBody) {
+    return res.status(400).json({ message: "Message body is required." });
+  }
+
+  try {
+    const created = await createMessageBoardPost(
+      normalizedTarget,
+      normalizedBody,
+    );
+    return res.status(201).json({
+      message: "Message posted successfully",
+      data: {
+        id: created.id,
+        target: created.target,
+        body: created.body,
+        createdAt: created.createdAt.toISOString(),
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ error });
   }
 };

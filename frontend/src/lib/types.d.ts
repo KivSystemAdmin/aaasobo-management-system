@@ -354,7 +354,15 @@ type CustomerCalendarProps = {
   createdAt: string;
   businessSchedule: BusinessSchedule[];
   colorsForEvents: { event: string; color: string }[];
+  messageBoardPosts: MessageBoardPostItem[];
   userSessionType?: UserType;
+};
+
+type MessageBoardPostItem = {
+  id: number;
+  target: "customers" | "instructors" | "both";
+  body: string;
+  createdAt: string;
 };
 
 type InstructorCalendarClientProps = {
@@ -368,6 +376,7 @@ type InstructorCalendarClientProps = {
   };
   businessSchedule: BusinessSchedule[];
   colorsForEvents: { event: string; color: string }[];
+  messageBoardPosts?: MessageBoardPostItem[];
 };
 
 type RebookableClass = {

@@ -310,6 +310,14 @@ exports.Prisma.ChildScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.MessageBoardPostScalarFieldEnum = {
+  id: 'id',
+  target: 'target',
+  body: 'body',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -355,7 +363,8 @@ exports.Prisma.ModelName = {
   InstructorFee: 'InstructorFee',
   SystemStatus: 'SystemStatus',
   Admin: 'Admin',
-  Child: 'Child'
+  Child: 'Child',
+  MessageBoardPost: 'MessageBoardPost'
 };
 
 /**

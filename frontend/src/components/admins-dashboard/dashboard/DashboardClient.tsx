@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import {
   UserIcon,
@@ -14,6 +14,10 @@ import Modal from "@/components/elements/modal/Modal";
 import InputField from "@/components/elements/inputField/InputField";
 import RadioButton from "@/components/elements/radioButton/RadioButton";
 import TextAreaInput from "@/components/elements/textAreaInput/TextAreaInput";
+import {
+  createMessageBoardPost,
+  getMessageBoardPosts,
+} from "@/lib/api/adminsApi";
 
 type DashboardMetric = {
   totalCustomers: number;
@@ -51,7 +55,7 @@ type InstructorAttendanceItem = {
 type MessageTarget = "customers" | "instructors" | "both";
 
 type MessageItem = {
-  id: string;
+  id: number;
   target: MessageTarget;
   body: string;
   createdAt: string;
@@ -142,6 +146,8 @@ export default function DashboardClient({
   const [message, setMessage] = useState("");
   const [recentMessages, setRecentMessages] = useState<MessageItem[]>([]);
   const [feedback, setFeedback] = useState("");
+  const [isRecentMessagesModalOpen, setIsRecentMessagesModalOpen] =
+    useState(false);
   const [selectedInstructor, setSelectedInstructor] =
     useState<InstructorAttendanceItem | null>(null);
   const [instructorSearch, setInstructorSearch] = useState("");
@@ -149,6 +155,24 @@ export default function DashboardClient({
     useState<EnglishBackgroundFilter>("all");
 
   const normalizedSearch = instructorSearch.trim().toLowerCase();
+  const latestMessage = useMemo(
+    () => recentMessages[0] ?? null,
+    [recentMessages],
+  );
+
+  useEffect(() => {
+    const loadMessages = async () => {
+      try {
+        const data = await getMessageBoardPosts();
+        setRecentMessages(data.slice(0, 20));
+      } catch (error) {
+        console.error("Failed to load message board posts:", error);
+      }
+    };
+
+    loadMessages();
+  }, []);
+
   const filteredInstructors = instructorAttendance.filter((instructor) => {
     const matchesSearch = instructor.nickname
       .toLowerCase()
@@ -160,7 +184,7 @@ export default function DashboardClient({
     return matchesSearch && matchesEnglishBackground;
   });
 
-  const submitMessage = (event: React.FormEvent<HTMLFormElement>) => {
+  const submitMessage = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!message.trim()) {
@@ -168,16 +192,18 @@ export default function DashboardClient({
       return;
     }
 
-    const item: MessageItem = {
-      id: crypto.randomUUID(),
-      target,
-      body: message.trim(),
-      createdAt: new Date().toISOString(),
-    };
-
-    setRecentMessages((prev) => [item, ...prev].slice(0, 8));
-    setMessage("");
-    setFeedback("Message sent successfully.");
+    try {
+      const response = await createMessageBoardPost({
+        target,
+        body: message.trim(),
+      });
+      setRecentMessages((prev) => [response.data, ...prev].slice(0, 20));
+      setMessage("");
+      setFeedback("Message sent successfully.");
+    } catch (error) {
+      console.error("Failed to post a message:", error);
+      setFeedback("Failed to send message. Please try again.");
+    }
   };
 
   return (
@@ -227,19 +253,50 @@ export default function DashboardClient({
                 No messages sent in this session yet.
               </p>
             ) : (
-              <ul>
-                {recentMessages.map((item) => (
-                  <li key={item.id}>
-                    <strong>{item.target}</strong>
-                    <p>{item.body}</p>
-                    <time>{new Date(item.createdAt).toLocaleString()}</time>
-                  </li>
-                ))}
-              </ul>
+              <div className={styles.messagePreview}>
+                {latestMessage ? (
+                  <article>
+                    <strong>{latestMessage.target}</strong>
+                    <p>{latestMessage.body}</p>
+                    <time>
+                      {new Date(latestMessage.createdAt).toLocaleString()}
+                    </time>
+                  </article>
+                ) : null}
+                <button
+                  type="button"
+                  className={styles.historyButton}
+                  onClick={() => setIsRecentMessagesModalOpen(true)}
+                >
+                  View all messages
+                </button>
+              </div>
             )}
           </aside>
         </div>
       </div>
+      <Modal
+        isOpen={isRecentMessagesModalOpen}
+        onClose={() => setIsRecentMessagesModalOpen(false)}
+        overlayClosable
+      >
+        <div className={styles.recentMessagesModal}>
+          <h3>Recent Messages</h3>
+          {recentMessages.length === 0 ? (
+            <p className={styles.emptyText}>No messages posted yet.</p>
+          ) : (
+            <ul>
+              {recentMessages.map((item) => (
+                <li key={item.id}>
+                  <strong>{item.target}</strong>
+                  <p>{item.body}</p>
+                  <time>{new Date(item.createdAt).toLocaleString()}</time>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </Modal>
 
       <div className={styles.kpiGrid}>
         <article className={styles.kpiCard}>

@@ -27,6 +27,8 @@ import {
   getAllSubscriptionsController,
   getAllEventsController,
   getClassesWithinPeriodController,
+  getMessageBoardPostsController,
+  createMessageBoardPostController,
 } from "../../src/controllers/adminsController";
 import {
   downloadNormalizedImportPackageController,
@@ -45,6 +47,7 @@ import {
 import {
   AdminIdParams,
   ClassListQuery,
+  CreateMessageBoardPostRequest,
   CustomerIdParams,
   InstructorIdParams,
   InstructorPayrollQuery,
@@ -77,6 +80,8 @@ import {
   SubscriptionsListResponse,
   EventsListResponse,
   ClassesListResponse,
+  MessageBoardPostsResponse,
+  CreateMessageBoardPostResponse,
   SchedulesListResponse,
   UpdateAdminResponse,
   UpdateInstructorResponse,
@@ -911,6 +916,55 @@ const getClassesWithinPeriodConfig = {
   },
 } as const;
 
+const getMessageBoardPostsConfig = {
+  method: "get" as const,
+  middleware: [verifyAuthentication(AUTH_ROLES.ACI)] as RequestHandler[],
+  handler: getMessageBoardPostsController,
+  openapi: {
+    summary: "Get message board posts",
+    description: "Get message board posts for dashboard and calendars",
+    responses: {
+      200: {
+        description: "Message board posts retrieved successfully",
+        schema: MessageBoardPostsResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const createMessageBoardPostConfig = {
+  method: "post" as const,
+  bodySchema: CreateMessageBoardPostRequest,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: createMessageBoardPostController,
+  openapi: {
+    summary: "Create message board post",
+    description: "Create a new message board post",
+    responses: {
+      201: {
+        description: "Message posted successfully",
+        schema: CreateMessageBoardPostResponse,
+      },
+      400: {
+        description: "Invalid request data",
+        schema: MessageErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
 const updateBusinessScheduleConfig = {
   method: "post" as const,
   bodySchema: UpdateBusinessScheduleRequest,
@@ -1093,6 +1147,7 @@ const validatedRouteConfigs = {
   "/import/normalize": [normalizeImportSourceConfig],
   "/import/execute": [executeNormalizedImportConfig],
   "/import/normalized/:jobId/download": [downloadNormalizedImportPackageConfig],
+  "/message-board": [getMessageBoardPostsConfig, createMessageBoardPostConfig],
   "/plan-list": [getAllPlansConfig],
   "/plan-list/delete/:id": [deletePlanConfig],
   "/plan-list/register": [registerPlanConfig],
