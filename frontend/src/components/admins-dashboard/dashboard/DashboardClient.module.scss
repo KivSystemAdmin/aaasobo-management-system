@@ -339,12 +339,33 @@
   padding: 1rem;
 }
 
-.messageHeader h2 {
+.messageHeader {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.45rem;
-  margin: 0 0 0.8rem;
-  color: #2b295a;
+  gap: 0.75rem;
+  margin-bottom: 0.8rem;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    color: #2b295a;
+  }
+}
+
+.toggleButton {
+  border: 1px solid #d9d8eb;
+  background: #fff;
+  color: $blue_primary;
+  border-radius: 10px;
+  min-width: 2rem;
+  min-height: 2rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .messageIcon {

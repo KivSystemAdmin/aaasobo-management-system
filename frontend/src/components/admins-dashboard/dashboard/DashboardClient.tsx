@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import {
   UserIcon,
@@ -147,6 +147,8 @@ export default function DashboardClient({
   const [feedback, setFeedback] = useState("");
   const [isRecentMessagesModalOpen, setIsRecentMessagesModalOpen] =
     useState(false);
+  const [isMessageBoardOpen, setIsMessageBoardOpen] = useState(true);
+  const hasLoadedMessageBoardOpenState = useRef(false);
   const [selectedInstructor, setSelectedInstructor] =
     useState<InstructorAttendanceItem | null>(null);
   const [instructorSearch, setInstructorSearch] = useState("");
@@ -158,6 +160,26 @@ export default function DashboardClient({
     () => recentMessages[0] ?? null,
     [recentMessages],
   );
+
+  useEffect(() => {
+    const savedOpenState = localStorage.getItem(
+      "adminDashboardMessageBoardOpenState",
+    );
+
+    queueMicrotask(() => {
+      setIsMessageBoardOpen(savedOpenState !== "closed");
+      hasLoadedMessageBoardOpenState.current = true;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedMessageBoardOpenState.current) return;
+
+    localStorage.setItem(
+      "adminDashboardMessageBoardOpenState",
+      isMessageBoardOpen ? "open" : "closed",
+    );
+  }, [isMessageBoardOpen]);
 
   useEffect(() => {
     const loadMessages = async () => {
@@ -210,67 +232,83 @@ export default function DashboardClient({
       <div className={styles.messageBoardCard}>
         <div className={styles.messageHeader}>
           <h2>Message Board</h2>
+          <button
+            type="button"
+            className={styles.toggleButton}
+            onClick={() => setIsMessageBoardOpen((prev) => !prev)}
+            aria-label={
+              isMessageBoardOpen
+                ? "Collapse message board"
+                : "Expand message board"
+            }
+          >
+            {isMessageBoardOpen ? "-" : "+"}
+          </button>
         </div>
 
-        <div className={styles.messageBoardContent}>
-          <form onSubmit={submitMessage} className={styles.messageForm}>
-            <div className={styles.segmentedControl}>
-              {(["customers", "instructors", "both"] as const).map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  className={target === option ? styles.activeTarget : ""}
-                  onClick={() => setTarget(option)}
-                >
-                  {"For "} {option[0].toUpperCase() + option.slice(1)}
-                </button>
-              ))}
-            </div>
-            <TextAreaInput
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
-              rows={4}
-              placeholder="Write a message for your selected audience..."
-              unstyled
-              withLabelWrapper={false}
-              containerClassName={styles.messageTextAreaField}
-              inputWrapperClassName={styles.messageTextAreaWrapper}
-              inputClassName={styles.messageTextAreaInput}
-            />
-            <div className={styles.messageActions}>
-              {feedback ? <p>{feedback}</p> : null}
-              <button type="submit">Send</button>
-            </div>
-          </form>
-
-          <aside className={styles.messageHistory}>
-            <h3>Recent Messages</h3>
-            {recentMessages.length === 0 ? (
-              <p className={styles.emptyText}>
-                No messages sent in this session yet.
-              </p>
-            ) : (
-              <div className={styles.messagePreview}>
-                {latestMessage ? (
-                  <article>
-                    <strong>{latestMessage.target}</strong>
-                    <p>{latestMessage.body}</p>
-                    <time>
-                      {new Date(latestMessage.createdAt).toLocaleString()}
-                    </time>
-                  </article>
-                ) : null}
-                <button
-                  type="button"
-                  className={styles.historyButton}
-                  onClick={() => setIsRecentMessagesModalOpen(true)}
-                >
-                  View all messages
-                </button>
+        {isMessageBoardOpen ? (
+          <div className={styles.messageBoardContent}>
+            <form onSubmit={submitMessage} className={styles.messageForm}>
+              <div className={styles.segmentedControl}>
+                {(["customers", "instructors", "both"] as const).map(
+                  (option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      className={target === option ? styles.activeTarget : ""}
+                      onClick={() => setTarget(option)}
+                    >
+                      {"For "} {option[0].toUpperCase() + option.slice(1)}
+                    </button>
+                  ),
+                )}
               </div>
-            )}
-          </aside>
-        </div>
+              <TextAreaInput
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+                rows={4}
+                placeholder="Write a message for your selected audience..."
+                unstyled
+                withLabelWrapper={false}
+                containerClassName={styles.messageTextAreaField}
+                inputWrapperClassName={styles.messageTextAreaWrapper}
+                inputClassName={styles.messageTextAreaInput}
+              />
+              <div className={styles.messageActions}>
+                {feedback ? <p>{feedback}</p> : null}
+                <button type="submit">Send</button>
+              </div>
+            </form>
+
+            <aside className={styles.messageHistory}>
+              <h3>Recent Messages</h3>
+              {recentMessages.length === 0 ? (
+                <p className={styles.emptyText}>
+                  No messages sent in this session yet.
+                </p>
+              ) : (
+                <div className={styles.messagePreview}>
+                  {latestMessage ? (
+                    <article>
+                      <strong>{latestMessage.target}</strong>
+                      <p>{latestMessage.body}</p>
+                      <time>
+                        {new Date(latestMessage.createdAt).toLocaleString()}
+                      </time>
+                    </article>
+                  ) : null}
+                  <button
+                    type="button"
+                    className={styles.historyButton}
+                    onClick={() => setIsRecentMessagesModalOpen(true)}
+                  >
+                    View all messages
+                  </button>
+                </div>
+              )}
+            </aside>
+          </div>
+        ) : null}
       </div>
       <Modal
         isOpen={isRecentMessagesModalOpen}
