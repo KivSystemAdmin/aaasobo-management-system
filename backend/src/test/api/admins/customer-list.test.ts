@@ -19,6 +19,14 @@ describe("GET /admins/customer-list", () => {
       .set("Cookie", authCookie)
       .expect(200);
 
+    const formatDateInJst = (date: Date) =>
+      new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Tokyo",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(date);
+
     expect(response.body.data).toEqual([
       {
         No: 1,
@@ -27,6 +35,7 @@ describe("GET /admins/customer-list", () => {
         Children: "",
         Email: customer1.email,
         Prefecture: customer1.prefecture,
+        "Start Date (JST)": formatDateInJst(customer1.createdAt),
       },
       {
         No: 2,
@@ -35,6 +44,7 @@ describe("GET /admins/customer-list", () => {
         Children: "",
         Email: customer2.email,
         Prefecture: customer2.prefecture,
+        "Start Date (JST)": formatDateInJst(customer2.createdAt),
       },
     ]);
   });
