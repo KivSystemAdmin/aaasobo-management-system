@@ -515,46 +515,86 @@
 }
 
 .recentMessagesModal {
-  max-width: 800px;
+  width: min(860px, 95vw);
+  max-height: min(80vh, 760px);
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+}
+
+.recentMessagesModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
 
   h3 {
-    margin: 0 0 0.8rem;
+    margin: 0;
     color: #2b295a;
   }
+}
 
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    max-height: min(70vh, 560px);
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-  }
+.recentMessagesCount {
+  border-radius: 999px;
+  background: #eef1ff;
+  color: #4f46e5;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.32rem 0.62rem;
+  white-space: nowrap;
+}
 
-  li {
-    background: #f8f8fe;
-    border-radius: 10px;
-    padding: 0.65rem;
-  }
+.recentMessagesList {
+  list-style: none;
+  margin: 0;
+  padding: 0 0.2rem 0 0;
+  max-height: min(70vh, 620px);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.72rem;
+}
 
-  strong {
-    text-transform: capitalize;
-    color: #4f46e5;
-  }
+.recentMessageItem {
+  border: 1px solid #e8eafd;
+  background: linear-gradient(180deg, #fcfcff 0%, #f6f7ff 100%);
+  border-radius: 12px;
+  padding: 0.85rem 0.9rem;
+  box-shadow: 0 1px 2px rgba(27, 24, 79, 0.05);
 
   p {
-    margin: 0.3rem 0;
+    margin: 0;
     color: #2a294f;
-    overflow-wrap: anywhere;
+    line-height: 1.5;
     white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
+}
+
+.recentMessageMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
 
   time {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: #7f7d9d;
   }
+}
+
+.recentMessageTarget {
+  text-transform: capitalize;
+  color: #4338ca;
+  background: #ecefff;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
 }
 
 .emptyText {

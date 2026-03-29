@@ -62,6 +62,12 @@ type MessageItem = {
 
 type EnglishBackgroundFilter = "all" | "non-native" | "native-a" | "native-b";
 
+const messageTargetLabel: Record<MessageTarget, string> = {
+  customers: "Customers",
+  instructors: "Instructors",
+  both: "Both",
+};
+
 function InstructorAvatar({
   imageUrl,
   nickname,
@@ -316,16 +322,24 @@ export default function DashboardClient({
         overlayClosable
       >
         <div className={styles.recentMessagesModal}>
-          <h3>Recent Messages</h3>
+          <header className={styles.recentMessagesModalHeader}>
+            <h3>Message History</h3>
+          </header>
           {recentMessages.length === 0 ? (
             <p className={styles.emptyText}>No messages posted yet.</p>
           ) : (
-            <ul>
+            <ul className={styles.recentMessagesList}>
               {recentMessages.map((item) => (
-                <li key={item.id}>
-                  <strong>{item.target}</strong>
-                  <p>{item.body}</p>
-                  <time>{new Date(item.createdAt).toLocaleString()}</time>
+                <li key={item.id} className={styles.recentMessageItem}>
+                  <article>
+                    <div className={styles.recentMessageMeta}>
+                      <span className={styles.recentMessageTarget}>
+                        {"For "} {messageTargetLabel[item.target]}
+                      </span>
+                      <time>{new Date(item.createdAt).toLocaleString()}</time>
+                    </div>
+                    <p>{item.body}</p>
+                  </article>
                 </li>
               ))}
             </ul>
