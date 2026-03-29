@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Modal from "@/components/elements/modal/Modal";
 import styles from "./MessageBoardPanel.module.scss";
+import { MegaphoneIcon } from "@heroicons/react/24/outline";
 
 type MessageBoardPanelProps = {
   posts: MessageBoardPostItem[];
@@ -19,6 +21,7 @@ export default function MessageBoardPanel({
   });
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const latestPost = posts[0] ?? null;
+  const { language } = useLanguage();
 
   useEffect(() => {
     localStorage.setItem(storageKey, isOpen ? "open" : "closed");
@@ -30,7 +33,10 @@ export default function MessageBoardPanel({
     <>
       <section className={styles.messageBanner}>
         <div className={styles.headerRow}>
-          <h3>Message Board</h3>
+          <h3>
+            <MegaphoneIcon className={styles.icon} />
+            {language === "en" ? "Announcements" : "お知らせ"}
+          </h3>
           <button
             type="button"
             className={styles.toggleButton}
@@ -48,7 +54,9 @@ export default function MessageBoardPanel({
             <time>{new Date(latestPost.createdAt).toLocaleString()}</time>
             {posts.length > 1 ? (
               <button type="button" onClick={() => setIsHistoryOpen(true)}>
-                View past messages
+                {language === "en"
+                  ? "View past messages"
+                  : "過去のメッセージを表示"}
               </button>
             ) : null}
           </div>
@@ -61,7 +69,7 @@ export default function MessageBoardPanel({
         overlayClosable={false}
       >
         <div className={styles.messageModalContent}>
-          <h3>Message History</h3>
+          <h3>{language === "en" ? "Message History" : "メッセージ履歴"}</h3>
           <ul>
             {posts.map((post) => (
               <li key={post.id}>

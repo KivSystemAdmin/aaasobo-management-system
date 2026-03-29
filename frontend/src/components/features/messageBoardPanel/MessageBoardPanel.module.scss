@@ -13,6 +13,14 @@
   align-items: center;
   gap: 0.8rem;
 
+  .icon {
+    width: 25px;
+    height: 25px;
+    color: $blue_primary;
+    flex-shrink: 0;
+    margin: 3px 5px -6px 0px;
+  }
+
   h3 {
     margin: 0;
     color: #2b295a;
