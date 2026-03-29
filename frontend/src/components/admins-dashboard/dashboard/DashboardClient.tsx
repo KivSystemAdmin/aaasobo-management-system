@@ -13,6 +13,7 @@ import { defaultUserImageUrl } from "@/lib/data/data";
 import Modal from "@/components/elements/modal/Modal";
 import InputField from "@/components/elements/inputField/InputField";
 import RadioButton from "@/components/elements/radioButton/RadioButton";
+import TextAreaInput from "@/components/elements/textAreaInput/TextAreaInput";
 
 type DashboardMetric = {
   totalCustomers: number;
@@ -202,11 +203,16 @@ export default function DashboardClient({
                 </button>
               ))}
             </div>
-            <textarea
+            <TextAreaInput
               value={message}
               onChange={(event) => setMessage(event.target.value)}
               rows={4}
               placeholder="Write a message for your selected audience..."
+              unstyled
+              withLabelWrapper={false}
+              containerClassName={styles.messageTextAreaField}
+              inputWrapperClassName={styles.messageTextAreaWrapper}
+              inputClassName={styles.messageTextAreaInput}
             />
             <div className={styles.messageActions}>
               {feedback ? <p>{feedback}</p> : null}
