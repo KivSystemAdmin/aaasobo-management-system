@@ -181,6 +181,60 @@ export default function DashboardClient({
 
   return (
     <section className={styles.dashboardContainer}>
+      <div className={styles.messageBoardCard}>
+        <div className={styles.messageHeader}>
+          <h2>
+            <MegaphoneIcon className={styles.messageIcon} /> Message Board
+          </h2>
+        </div>
+
+        <div className={styles.messageBoardContent}>
+          <form onSubmit={submitMessage} className={styles.messageForm}>
+            <div className={styles.segmentedControl}>
+              {(["customers", "instructors", "both"] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={target === option ? styles.activeTarget : ""}
+                  onClick={() => setTarget(option)}
+                >
+                  {option[0].toUpperCase() + option.slice(1)}
+                </button>
+              ))}
+            </div>
+            <textarea
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              rows={4}
+              placeholder="Write a message for your selected audience..."
+            />
+            <div className={styles.messageActions}>
+              {feedback ? <p>{feedback}</p> : null}
+              <button type="submit">Send</button>
+            </div>
+          </form>
+
+          <aside className={styles.messageHistory}>
+            <h3>Recent Messages</h3>
+            {recentMessages.length === 0 ? (
+              <p className={styles.emptyText}>
+                No messages sent in this session yet.
+              </p>
+            ) : (
+              <ul>
+                {recentMessages.map((item) => (
+                  <li key={item.id}>
+                    <strong>{item.target}</strong>
+                    <p>{item.body}</p>
+                    <time>{new Date(item.createdAt).toLocaleString()}</time>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </aside>
+        </div>
+      </div>
+
       <div className={styles.kpiGrid}>
         <article className={styles.kpiCard}>
           <UsersIcon className={styles.kpiIcon} />
@@ -351,60 +405,6 @@ export default function DashboardClient({
           </div>
         ) : null}
       </Modal>
-
-      <div className={styles.messageBoardCard}>
-        <div className={styles.messageHeader}>
-          <h2>
-            <MegaphoneIcon className={styles.messageIcon} /> Message Board
-          </h2>
-        </div>
-
-        <div className={styles.messageBoardContent}>
-          <form onSubmit={submitMessage} className={styles.messageForm}>
-            <div className={styles.segmentedControl}>
-              {(["customers", "instructors", "both"] as const).map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  className={target === option ? styles.activeTarget : ""}
-                  onClick={() => setTarget(option)}
-                >
-                  {option[0].toUpperCase() + option.slice(1)}
-                </button>
-              ))}
-            </div>
-            <textarea
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
-              rows={4}
-              placeholder="Write a message for your selected audience..."
-            />
-            <div className={styles.messageActions}>
-              {feedback ? <p>{feedback}</p> : null}
-              <button type="submit">Send</button>
-            </div>
-          </form>
-
-          <aside className={styles.messageHistory}>
-            <h3>Recent Messages</h3>
-            {recentMessages.length === 0 ? (
-              <p className={styles.emptyText}>
-                No messages sent in this session yet.
-              </p>
-            ) : (
-              <ul>
-                {recentMessages.map((item) => (
-                  <li key={item.id}>
-                    <strong>{item.target}</strong>
-                    <p>{item.body}</p>
-                    <time>{new Date(item.createdAt).toLocaleString()}</time>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </aside>
-        </div>
-      </div>
     </section>
   );
 }
