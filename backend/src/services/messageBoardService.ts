@@ -26,5 +26,3 @@ export const isValidMessageTarget = (
 ): target is MessageTarget => {
   return ["customers", "instructors", "both"].includes(target);
 };
-
-export type MessageBoardPostRecord = Prisma.MessageBoardPostGetPayload<object>;
