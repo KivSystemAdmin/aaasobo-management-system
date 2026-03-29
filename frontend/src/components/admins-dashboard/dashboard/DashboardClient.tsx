@@ -176,7 +176,7 @@ export default function DashboardClient({
 
     setRecentMessages((prev) => [item, ...prev].slice(0, 8));
     setMessage("");
-    setFeedback("✅ Message sent successfully.");
+    setFeedback("Message sent successfully.");
   };
 
   return (
@@ -266,7 +266,7 @@ export default function DashboardClient({
         <article className={styles.kpiCard}>
           <UserGroupIcon className={styles.kpiIcon} />
           <div className={styles.instructorKpiContent}>
-            <p>Non-Native</p>
+            <p>Non Native</p>
             <strong>{metrics.instructorsByEnglishBackground.nonNative}</strong>
           </div>
         </article>

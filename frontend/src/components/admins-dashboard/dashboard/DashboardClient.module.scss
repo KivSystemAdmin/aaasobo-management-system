@@ -382,14 +382,14 @@
   button {
     border: none;
     background: #fff;
-    color: #5e5c80;
+    color: $blue_primary;
     padding: 0.45rem 0.75rem;
     cursor: pointer;
   }
 }
 
 .activeTarget {
-  background: $purple-accent !important;
+  background: $blue_primary !important;
   color: white !important;
 }
 
@@ -405,7 +405,7 @@
 
   button {
     border: none;
-    background: $purple-accent;
+    background: $blue_primary;
     color: white;
     border-radius: 10px;
     padding: 0.55rem 1.25rem;
