@@ -319,7 +319,7 @@ export default function DashboardClient({
       <Modal
         isOpen={isRecentMessagesModalOpen}
         onClose={() => setIsRecentMessagesModalOpen(false)}
-        overlayClosable
+        overlayClosable={false}
       >
         <div className={styles.recentMessagesModal}>
           <header className={styles.recentMessagesModalHeader}>

@@ -58,10 +58,10 @@ export default function MessageBoardPanel({
       <Modal
         isOpen={isHistoryOpen}
         onClose={() => setIsHistoryOpen(false)}
-        overlayClosable
+        overlayClosable={false}
       >
         <div className={styles.messageModalContent}>
-          <h3>Message Board History</h3>
+          <h3>Message History</h3>
           <ul>
             {posts.map((post) => (
               <li key={post.id}>
