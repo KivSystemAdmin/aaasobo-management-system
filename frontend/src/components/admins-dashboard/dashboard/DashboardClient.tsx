@@ -10,6 +10,8 @@ import {
 } from "@heroicons/react/24/outline";
 import styles from "./DashboardClient.module.scss";
 import { defaultUserImageUrl } from "@/lib/data/data";
+import Modal from "@/components/elements/modal/Modal";
+import InputField from "@/components/elements/inputField/InputField";
 
 type DashboardMetric = {
   totalCustomers: number;
@@ -234,17 +236,14 @@ export default function DashboardClient({
       </div>
 
       <div className={styles.chartCard}>
-        <h3>Instructor Class Attendance Report</h3>
-        <p className={styles.attendanceDescription}>
-          Choose an instructor to view monthly performance details.
-        </p>
-        <input
+        <h3>Instructor Class Attendance</h3>
+        <InputField
           type="search"
           value={instructorSearch}
           onChange={(event) => setInstructorSearch(event.target.value)}
           className={styles.instructorSearchInput}
           placeholder="Search instructor name"
-          aria-label="Search instructors"
+          required={false}
         />
         <div className={styles.instructorPickerScrollableArea}>
           <div className={styles.instructorPickerGrid}>
@@ -267,27 +266,22 @@ export default function DashboardClient({
         </div>
       </div>
 
-      {selectedInstructor ? (
-        <div
-          className={styles.modalOverlay}
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${selectedInstructor.nickname} attendance details`}
-          onClick={() => setSelectedInstructor(null)}
-        >
+      <Modal
+        isOpen={Boolean(selectedInstructor)}
+        onClose={() => setSelectedInstructor(null)}
+        overlayClosable
+      >
+        {selectedInstructor ? (
           <div
             className={styles.modalCard}
-            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${selectedInstructor.nickname} attendance details`}
           >
             <div className={styles.modalHeader}>
-              <h3>{selectedInstructor.nickname} - Monthly Results</h3>
-              <button
-                type="button"
-                className={styles.closeButton}
-                onClick={() => setSelectedInstructor(null)}
-              >
-                Close
-              </button>
+              <h3>
+                Monthly Class Attendance Results ({selectedInstructor.nickname})
+              </h3>
             </div>
 
             <div className={styles.attendanceTableWrapper}>
@@ -319,8 +313,8 @@ export default function DashboardClient({
               </table>
             </div>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </Modal>
 
       <div className={styles.messageBoardCard}>
         <div className={styles.messageHeader}>
