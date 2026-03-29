@@ -165,17 +165,48 @@
   color: #6c6a8c;
 }
 
+.instructorFilters {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 0.8rem;
+  flex-wrap: wrap;
+}
+
 .instructorSearchInput {
   width: 100%;
+  flex: 2 1 520px;
+  min-width: min(100%, 420px);
   border: 1px solid #d9d8eb;
   border-radius: 10px;
   padding: 0.65rem 0.85rem;
   font-size: 1rem;
   color: #2b295a;
-  margin-bottom: 0.8rem;
 
   &::placeholder {
     color: #8a88a7;
+  }
+}
+
+.englishBackgroundFilterGroup {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.englishBackgroundRadio {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2b295a;
+  background: #f8fafc;
+  border: 1px solid #dce1f0;
+  border-radius: 999px;
+  padding: 0.35rem 0.6rem;
+
+  input {
+    accent-color: $blue_primary;
   }
 }
 

@@ -12,6 +12,7 @@ import styles from "./DashboardClient.module.scss";
 import { defaultUserImageUrl } from "@/lib/data/data";
 import Modal from "@/components/elements/modal/Modal";
 import InputField from "@/components/elements/inputField/InputField";
+import RadioButton from "@/components/elements/radioButton/RadioButton";
 
 type DashboardMetric = {
   totalCustomers: number;
@@ -54,6 +55,8 @@ type MessageItem = {
   body: string;
   createdAt: string;
 };
+
+type EnglishBackgroundFilter = "all" | "non-native" | "native-a" | "native-b";
 
 function InstructorAvatar({
   imageUrl,
@@ -141,11 +144,20 @@ export default function DashboardClient({
   const [selectedInstructor, setSelectedInstructor] =
     useState<InstructorAttendanceItem | null>(null);
   const [instructorSearch, setInstructorSearch] = useState("");
+  const [englishBackgroundFilter, setEnglishBackgroundFilter] =
+    useState<EnglishBackgroundFilter>("all");
 
   const normalizedSearch = instructorSearch.trim().toLowerCase();
-  const filteredInstructors = instructorAttendance.filter((instructor) =>
-    instructor.nickname.toLowerCase().includes(normalizedSearch),
-  );
+  const filteredInstructors = instructorAttendance.filter((instructor) => {
+    const matchesSearch = instructor.nickname
+      .toLowerCase()
+      .includes(normalizedSearch);
+    const matchesEnglishBackground =
+      englishBackgroundFilter === "all" ||
+      instructor.englishBackgroundClass === englishBackgroundFilter;
+
+    return matchesSearch && matchesEnglishBackground;
+  });
 
   const submitMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -237,14 +249,38 @@ export default function DashboardClient({
 
       <div className={styles.chartCard}>
         <h3>Instructor Class Attendance</h3>
-        <InputField
-          type="search"
-          value={instructorSearch}
-          onChange={(event) => setInstructorSearch(event.target.value)}
-          className={styles.instructorSearchInput}
-          placeholder="Search instructor name"
-          required={false}
-        />
+        <div className={styles.instructorFilters}>
+          <InputField
+            type="search"
+            value={instructorSearch}
+            onChange={(event) => setInstructorSearch(event.target.value)}
+            className={styles.instructorSearchInput}
+            placeholder="Search instructor name"
+            required={false}
+          />
+          <div className={styles.englishBackgroundFilterGroup}>
+            {[
+              { value: "all", label: "All" },
+              { value: "non-native", label: "Non Native" },
+              { value: "native-a", label: "Native A" },
+              { value: "native-b", label: "Native B" },
+            ].map((option) => (
+              <RadioButton
+                key={option.value}
+                name="instructor-english-background-filter"
+                value={option.value}
+                checked={englishBackgroundFilter === option.value}
+                onChange={(event) =>
+                  setEnglishBackgroundFilter(
+                    event.target.value as EnglishBackgroundFilter,
+                  )
+                }
+                label={option.label}
+                className={styles.englishBackgroundRadio}
+              />
+            ))}
+          </div>
+        </div>
         <div className={styles.instructorPickerScrollableArea}>
           <div className={styles.instructorPickerGrid}>
             {filteredInstructors.map((item) => (
