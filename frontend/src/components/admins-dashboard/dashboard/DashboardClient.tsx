@@ -166,6 +166,12 @@ export default function DashboardClient({
     () => recentMessages[0] ?? null,
     [recentMessages],
   );
+  const formatDate = (value: string) =>
+    new Date(value).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    });
 
   useEffect(() => {
     const savedOpenState = localStorage.getItem(
@@ -298,9 +304,7 @@ export default function DashboardClient({
                     <article>
                       <strong>{latestMessage.target}</strong>
                       <p>{latestMessage.body}</p>
-                      <time>
-                        {new Date(latestMessage.createdAt).toLocaleString()}
-                      </time>
+                      <time>{formatDate(latestMessage.createdAt)}</time>
                     </article>
                   ) : null}
                   <button
@@ -336,7 +340,7 @@ export default function DashboardClient({
                       <span className={styles.recentMessageTarget}>
                         {"For "} {messageTargetLabel[item.target]}
                       </span>
-                      <time>{new Date(item.createdAt).toLocaleString()}</time>
+                      <time>{formatDate(item.createdAt)}</time>
                     </div>
                     <p>{item.body}</p>
                   </article>

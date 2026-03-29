@@ -22,6 +22,19 @@ export default function MessageBoardPanel({
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const latestPost = posts[0] ?? null;
   const { language } = useLanguage();
+  const formatDate = (value: string) => {
+    const date = new Date(value);
+
+    if (language === "ja") {
+      return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+    }
+
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    });
+  };
 
   useEffect(() => {
     localStorage.setItem(storageKey, isOpen ? "open" : "closed");
@@ -51,7 +64,7 @@ export default function MessageBoardPanel({
         {isOpen ? (
           <div className={styles.body}>
             <p>{latestPost.body}</p>
-            <time>{new Date(latestPost.createdAt).toLocaleString()}</time>
+            <time>{formatDate(latestPost.createdAt)}</time>
             {posts.length > 1 ? (
               <button type="button" onClick={() => setIsHistoryOpen(true)}>
                 {language === "en"
@@ -74,7 +87,7 @@ export default function MessageBoardPanel({
             {posts.map((post) => (
               <li key={post.id}>
                 <p>{post.body}</p>
-                <time>{new Date(post.createdAt).toLocaleString()}</time>
+                <time>{formatDate(post.createdAt)}</time>
               </li>
             ))}
           </ul>
