@@ -10,92 +10,11 @@
   }
 }
 
-.messageBanner {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.8rem;
-  align-items: flex-start;
-  border: 1px solid #d9d8eb;
-  border-radius: 12px;
-  padding: 0.75rem;
-  background: #f8f8fe;
-
-  h3 {
-    margin: 0;
-    color: #2b295a;
-    font-size: 1rem;
-  }
-
-  p {
-    margin: 0.35rem 0;
-    color: #2a294f;
-    overflow-wrap: anywhere;
-    white-space: pre-wrap;
-  }
-
-  time {
-    color: #7f7d9d;
-    font-size: 0.8rem;
-  }
-
-  button {
-    border: 1px solid $blue_primary;
-    background: white;
-    color: $blue_primary;
-    border-radius: 8px;
-    padding: 0.35rem 0.6rem;
-    cursor: pointer;
-    font-weight: 600;
-    flex-shrink: 0;
-  }
-}
-
-.messageModalContent {
-  h3 {
-    margin: 0 0 0.85rem;
-    color: #2b295a;
-  }
-
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    max-height: min(70vh, 560px);
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-  }
-
-  li {
-    background: #f8f8fe;
-    border-radius: 10px;
-    padding: 0.65rem;
-  }
-
-  p {
-    margin: 0 0 0.25rem;
-    color: #2a294f;
-    overflow-wrap: anywhere;
-    white-space: pre-wrap;
-  }
-
-  time {
-    color: #7f7d9d;
-    font-size: 0.8rem;
-  }
-}
-
 .mobileToolbar {
   display: none;
 }
 
 @media (max-width: 640px) {
-  .messageBanner {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
   .mobileToolbar {
     display: grid;
     grid-template-columns: auto 1fr auto;

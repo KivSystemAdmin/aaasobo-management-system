@@ -3911,6 +3911,63 @@ async function insertSystemStatus() {
   });
 }
 
+async function insertMessageBoardPosts() {
+  await prisma.messageBoardPost.createMany({
+    data: [
+      {
+        target: "customers",
+        body: "Spring campaign starts next week. Please check your registered class times.",
+        createdAt: new Date("2026-03-01T09:00:00.000Z"),
+      },
+      {
+        target: "instructors",
+        body: "Please submit your March lesson reflections by Friday 18:00 JST.",
+        createdAt: new Date("2026-03-02T09:00:00.000Z"),
+      },
+      {
+        target: "both",
+        body: "The system will undergo maintenance on March 15 from 02:00 to 04:00 JST.",
+        createdAt: new Date("2026-03-03T09:00:00.000Z"),
+      },
+      {
+        target: "customers",
+        body: "Golden Week booking slots will be released early on April 1.",
+        createdAt: new Date("2026-03-04T09:00:00.000Z"),
+      },
+      {
+        target: "instructors",
+        body: "Please confirm your available schedule for next month by end of day Thursday.",
+        createdAt: new Date("2026-03-05T09:00:00.000Z"),
+      },
+      {
+        target: "both",
+        body: "A new Message Board toggle feature is now available on calendar pages.",
+        createdAt: new Date("2026-03-06T09:00:00.000Z"),
+      },
+      {
+        target: "customers",
+        body: "Need help with rebooking? Contact support and include the class code.",
+        createdAt: new Date("2026-03-07T09:00:00.000Z"),
+      },
+      {
+        target: "instructors",
+        body: "Reminder: update your profile self-introduction for the new school year.",
+        createdAt: new Date("2026-03-08T09:00:00.000Z"),
+      },
+      {
+        target: "both",
+        body: "Thank you for joining AaasoBo! Let's keep making English fun together.",
+        createdAt: new Date("2026-03-09T09:00:00.000Z"),
+      },
+      {
+        target: "both",
+        body: "Dashboard refresh speed was improved. Please report any loading issues.",
+        createdAt: new Date("2026-03-10T09:00:00.000Z"),
+      },
+    ],
+  });
+}
+
 async function getCustomer(name: string) {
   const customer = await prisma.customer.findFirst({
     where: { name },
@@ -3967,6 +4024,9 @@ async function deleteAll(table: Uncapitalize<Prisma.ModelName>) {
       return;
     case "event":
       await prisma.event.deleteMany();
+      return;
+    case "messageBoardPost":
+      await prisma.messageBoardPost.deleteMany();
       return;
     case "instructor":
       await prisma.instructor.deleteMany();
@@ -4039,6 +4099,7 @@ async function main() {
     await deleteAll("customer");
     await deleteAll("plan");
     await deleteAll("event");
+    await deleteAll("messageBoardPost");
   }
 
   {
@@ -4050,6 +4111,7 @@ async function main() {
     await insertAdmins();
     await insertEvents();
     await insertSystemStatus();
+    await insertMessageBoardPosts();
 
     // Dependant on the above
     await insertInstructorTagAssignments();

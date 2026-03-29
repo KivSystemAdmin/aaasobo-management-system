@@ -393,6 +393,7 @@
   button {
     border: none;
     background: #fff;
+    font-weight: 600;
     color: $blue_primary;
     padding: 0.45rem 0.75rem;
     cursor: pointer;
@@ -493,6 +494,8 @@
 }
 
 .recentMessagesModal {
+  max-width: 800px;
+
   h3 {
     margin: 0 0 0.8rem;
     color: #2b295a;

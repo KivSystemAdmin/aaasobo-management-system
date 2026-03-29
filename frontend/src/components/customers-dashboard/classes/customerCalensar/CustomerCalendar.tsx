@@ -24,11 +24,9 @@ export default function CustomerCalendar({
   createdAt,
   businessSchedule,
   colorsForEvents,
-  messageBoardPosts,
   userSessionType,
 }: CustomerCalendarProps) {
   const [isClassDetailModalOpen, setIsClassDetailModalOpen] = useState(false);
-  const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
   const [classDetail, setClassDetail] = useState<CustomerClass | null>(null);
   const cacheBust = useId();
   const { language } = useLanguage();
@@ -54,31 +52,10 @@ export default function CustomerCalendar({
   };
 
   const dayCellColors = getDayCellColorHandler(businessSchedule);
-  const visiblePosts = messageBoardPosts.filter(
-    (post) => post.target === "customers" || post.target === "both",
-  );
-  const latestPost = visiblePosts[0] ?? null;
 
   return (
     <>
       <div className={styles.calendarShell}>
-        {latestPost ? (
-          <section className={styles.messageBanner}>
-            <div>
-              <h3>Message Board</h3>
-              <p>{latestPost.body}</p>
-              <time>{new Date(latestPost.createdAt).toLocaleString()}</time>
-            </div>
-            {visiblePosts.length > 1 ? (
-              <button
-                type="button"
-                onClick={() => setIsMessagesModalOpen(true)}
-              >
-                View past messages
-              </button>
-            ) : null}
-          </section>
-        ) : null}
         <FullCalendar
           plugins={[
             dayGridPlugin,
@@ -129,23 +106,6 @@ export default function CustomerCalendar({
           language={language}
           userSessionType={userSessionType}
         />
-      </Modal>
-      <Modal
-        isOpen={isMessagesModalOpen}
-        onClose={() => setIsMessagesModalOpen(false)}
-        overlayClosable
-      >
-        <div className={styles.messageModalContent}>
-          <h3>Message Board History</h3>
-          <ul>
-            {visiblePosts.map((post) => (
-              <li key={post.id}>
-                <p>{post.body}</p>
-                <time>{new Date(post.createdAt).toLocaleString()}</time>
-              </li>
-            ))}
-          </ul>
-        </div>
       </Modal>
     </>
   );

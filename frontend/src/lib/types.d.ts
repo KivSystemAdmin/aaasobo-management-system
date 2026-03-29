@@ -354,7 +354,6 @@ type CustomerCalendarProps = {
   createdAt: string;
   businessSchedule: BusinessSchedule[];
   colorsForEvents: { event: string; color: string }[];
-  messageBoardPosts: MessageBoardPostItem[];
   userSessionType?: UserType;
 };
 

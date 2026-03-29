@@ -6,7 +6,6 @@ import {
   UserIcon,
   UsersIcon,
   UserGroupIcon,
-  MegaphoneIcon,
 } from "@heroicons/react/24/outline";
 import styles from "./DashboardClient.module.scss";
 import { defaultUserImageUrl } from "@/lib/data/data";
@@ -210,9 +209,7 @@ export default function DashboardClient({
     <section className={styles.dashboardContainer}>
       <div className={styles.messageBoardCard}>
         <div className={styles.messageHeader}>
-          <h2>
-            <MegaphoneIcon className={styles.messageIcon} /> Message Board
-          </h2>
+          <h2>Message Board</h2>
         </div>
 
         <div className={styles.messageBoardContent}>
@@ -225,7 +222,7 @@ export default function DashboardClient({
                   className={target === option ? styles.activeTarget : ""}
                   onClick={() => setTarget(option)}
                 >
-                  {option[0].toUpperCase() + option.slice(1)}
+                  {"For "} {option[0].toUpperCase() + option.slice(1)}
                 </button>
               ))}
             </div>

@@ -10,6 +10,7 @@ import {
   getMessageBoardPosts,
 } from "@/lib/api/adminsApi";
 import { getCookie } from "../../../proxy";
+import MessageBoardPanel from "@/components/features/messageBoardPanel/MessageBoardPanel";
 
 export default async function ClassCalendar({
   customerId,
@@ -42,9 +43,17 @@ export default async function ClassCalendar({
       color: e["Color Code"],
     }),
   );
+  const visiblePosts = messageBoardPosts.filter(
+    (post) => post.target === "customers" || post.target === "both",
+  );
 
   return (
     <main className={styles.calendarContainer}>
+      <MessageBoardPanel
+        posts={visiblePosts}
+        storageKey="customerClassCalendarMessageBoardOpenState"
+      />
+
       <ClassActions
         userSessionType={userSessionType}
         customerId={customerId}
@@ -58,7 +67,6 @@ export default async function ClassCalendar({
         createdAt={createdAt}
         businessSchedule={schedule.organizedData}
         colorsForEvents={colorsForEvents}
-        messageBoardPosts={messageBoardPosts}
         userSessionType={userSessionType}
       />
 

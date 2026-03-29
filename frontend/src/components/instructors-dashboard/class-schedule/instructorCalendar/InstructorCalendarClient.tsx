@@ -14,7 +14,7 @@ import {
   getDayCellColorHandler,
 } from "@/lib/utils/calendarUtils";
 import CalendarLegend from "@/components/features/calendarLegend/CalendarLegend";
-import Modal from "@/components/elements/modal/Modal";
+import MessageBoardPanel from "@/components/features/messageBoardPanel/MessageBoardPanel";
 import styles from "./InstructorCalendarClient.module.scss";
 
 const InstructorCalendarClient = ({
@@ -33,11 +33,9 @@ const InstructorCalendarClient = ({
   const [currentTitle, setCurrentTitle] = useState("");
   const [currentView, setCurrentView] = useState("timeGridWeek");
   const [isTodayInRange, setIsTodayInRange] = useState(false);
-  const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
   const visiblePosts = messageBoardPosts.filter(
     (post) => post.target === "instructors" || post.target === "both",
   );
-  const latestPost = visiblePosts[0] ?? null;
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     if (clickInfo.event.title === "No booked class") return;
@@ -75,20 +73,10 @@ const InstructorCalendarClient = ({
 
   return (
     <div className={styles.calendarContainer}>
-      {latestPost ? (
-        <section className={styles.messageBanner}>
-          <div>
-            <h3>Message Board</h3>
-            <p>{latestPost.body}</p>
-            <time>{new Date(latestPost.createdAt).toLocaleString()}</time>
-          </div>
-          {visiblePosts.length > 1 ? (
-            <button type="button" onClick={() => setIsMessagesModalOpen(true)}>
-              View past messages
-            </button>
-          ) : null}
-        </section>
-      ) : null}
+      <MessageBoardPanel
+        posts={visiblePosts}
+        storageKey="instructorClassScheduleMessageBoardOpenState"
+      />
       <div className={styles.mobileToolbar}>
         <div className={styles.navGroup}>
           <button
@@ -180,23 +168,6 @@ const InstructorCalendarClient = ({
       {colorsForEvents.length > 0 && (
         <CalendarLegend colorsForEvents={colorsForEvents} language="en" />
       )}
-      <Modal
-        isOpen={isMessagesModalOpen}
-        onClose={() => setIsMessagesModalOpen(false)}
-        overlayClosable
-      >
-        <div className={styles.messageModalContent}>
-          <h3>Message Board History</h3>
-          <ul>
-            {visiblePosts.map((post) => (
-              <li key={post.id}>
-                <p>{post.body}</p>
-                <time>{new Date(post.createdAt).toLocaleString()}</time>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Modal>
     </div>
   );
 };
