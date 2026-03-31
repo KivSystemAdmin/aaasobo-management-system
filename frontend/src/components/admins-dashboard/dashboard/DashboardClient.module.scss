@@ -397,11 +397,11 @@
   width: 100%;
   min-height: 120px;
   max-height: 120px;
-  border: 1px solid #d9d8eb;
-  border-radius: 10px;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
   padding: 0.75rem;
   font-size: 1rem;
-  resize: vertical;
+  resize: none;
 }
 
 .segmentedControl {

@@ -8,6 +8,8 @@ import {
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import styles from "./DashboardClient.module.scss";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { defaultUserImageUrl } from "@/lib/data/data";
 import Modal from "@/components/elements/modal/Modal";
 import InputField from "@/components/elements/inputField/InputField";
@@ -17,6 +19,7 @@ import {
   createMessageBoardPost,
   getMessageBoardPosts,
 } from "@/lib/api/adminsApi";
+import { confirmAlert } from "@/lib/utils/alertUtils";
 
 type DashboardMetric = {
   totalCustomers: number;
@@ -150,7 +153,6 @@ export default function DashboardClient({
   const [target, setTarget] = useState<MessageTarget>("customers");
   const [message, setMessage] = useState("");
   const [recentMessages, setRecentMessages] = useState<MessageItem[]>([]);
-  const [feedback, setFeedback] = useState("");
   const [isRecentMessagesModalOpen, setIsRecentMessagesModalOpen] =
     useState(false);
   const [isMessageBoardOpen, setIsMessageBoardOpen] = useState(true);
@@ -221,9 +223,15 @@ export default function DashboardClient({
     event.preventDefault();
 
     if (!message.trim()) {
-      setFeedback("Please enter a message before sending.");
       return;
     }
+
+    let confirmed = false;
+    confirmed = await confirmAlert(
+      `Please confirm your message before sending:
+      "${message.trim()}" ( for ${messageTargetLabel[target]} )`,
+    );
+    if (!confirmed) return;
 
     try {
       const response = await createMessageBoardPost({
@@ -232,10 +240,10 @@ export default function DashboardClient({
       });
       setRecentMessages((prev) => [response.data, ...prev].slice(0, 20));
       setMessage("");
-      setFeedback("Message sent successfully.");
+      toast.success("Message sent successfully");
     } catch (error) {
       console.error("Failed to post a message:", error);
-      setFeedback("Failed to send message. Please try again.");
+      toast.error("Failed to send message");
     }
   };
 
@@ -279,7 +287,7 @@ export default function DashboardClient({
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
                 rows={4}
-                placeholder="Write a message for your selected audience..."
+                placeholder="Write a message for selected users..."
                 unstyled
                 withLabelWrapper={false}
                 containerClassName={styles.messageTextAreaField}
@@ -287,7 +295,6 @@ export default function DashboardClient({
                 inputClassName={styles.messageTextAreaInput}
               />
               <div className={styles.messageActions}>
-                {feedback ? <p>{feedback}</p> : null}
                 <button type="submit">Send</button>
               </div>
             </form>
