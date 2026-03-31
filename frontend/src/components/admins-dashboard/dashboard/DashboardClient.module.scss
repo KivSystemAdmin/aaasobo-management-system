@@ -46,13 +46,6 @@
   }
 }
 
-.instructorKpiContent {
-  width: 100%;
-  p {
-    margin-bottom: 0.55rem;
-  }
-}
-
 .instructorBreakdownGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

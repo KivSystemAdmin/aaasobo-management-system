@@ -360,7 +360,7 @@ export default function DashboardClient({
 
       <div className={styles.kpiGrid}>
         <article className={styles.kpiCard}>
-          <UsersIcon className={styles.kpiIcon} />
+          <UserGroupIcon className={styles.kpiIcon} />
           <div>
             <p>Total Customers</p>
             <strong>{metrics.totalCustomers}</strong>
@@ -377,7 +377,7 @@ export default function DashboardClient({
 
         <article className={styles.kpiCard}>
           <UserGroupIcon className={styles.kpiIcon} />
-          <div className={styles.instructorKpiContent}>
+          <div>
             <p>Total Instructors</p>
             <strong>
               {metrics.instructorsByEnglishBackground.nonNative +
@@ -386,23 +386,24 @@ export default function DashboardClient({
             </strong>
           </div>
         </article>
+
         <article className={styles.kpiCard}>
-          <UserGroupIcon className={styles.kpiIcon} />
-          <div className={styles.instructorKpiContent}>
+          <UserIcon className={styles.kpiIcon} />
+          <div>
             <p>Non Native</p>
             <strong>{metrics.instructorsByEnglishBackground.nonNative}</strong>
           </div>
         </article>
         <article className={styles.kpiCard}>
-          <UsersIcon className={styles.kpiIcon} />
-          <div className={styles.instructorKpiContent}>
+          <UserIcon className={styles.kpiIcon} />
+          <div>
             <p>Native A</p>
             <strong>{metrics.instructorsByEnglishBackground.nativeA}</strong>
           </div>
         </article>
         <article className={styles.kpiCard}>
           <UserIcon className={styles.kpiIcon} />
-          <div className={styles.instructorKpiContent}>
+          <div>
             <p>Native B</p>
             <article>
               <strong>{metrics.instructorsByEnglishBackground.nativeB}</strong>
