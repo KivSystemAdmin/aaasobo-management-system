@@ -9,6 +9,7 @@ import {
 import { getInstructorProfiles } from "@/lib/api/instructorsApi";
 import { authenticateUserSession } from "@/lib/auth/sessionUtils";
 import { getCookie } from "../../../../proxy";
+import { defaultUserImageUrl } from "@/lib/data/data";
 
 type MonthlyData = {
   month: string;
@@ -223,7 +224,6 @@ function calcAttendanceByInstructor(
   instructorProfiles: Awaited<ReturnType<typeof getInstructorProfiles>>,
 ): InstructorAttendanceItem[] {
   const monthLookup = new Set(monthKeys);
-  const defaultImageUrl = "/images/default-user-icon.jpg";
   const profileMap = new Map(
     instructorProfiles.map((profile) => [profile.id, profile]),
   );
@@ -340,7 +340,7 @@ function calcAttendanceByInstructor(
     return {
       id: instructor.ID,
       nickname: profile?.nickname ?? instructor.Instructor,
-      imageUrl: profile?.icon || defaultImageUrl,
+      imageUrl: profile?.icon || defaultUserImageUrl,
       englishBackgroundClass,
       monthly,
     };

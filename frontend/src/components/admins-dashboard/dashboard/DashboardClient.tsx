@@ -2,11 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import {
-  UserIcon,
-  UsersIcon,
-  UserGroupIcon,
-} from "@heroicons/react/24/outline";
+import { UserIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import styles from "./DashboardClient.module.scss";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
