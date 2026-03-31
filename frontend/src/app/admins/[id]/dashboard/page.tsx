@@ -5,6 +5,7 @@ import {
   getAllCustomers,
   getAllPastCustomers,
   getAllInstructors,
+  getMessageBoardPosts,
 } from "@/lib/api/adminsApi";
 import { getInstructorProfiles } from "@/lib/api/instructorsApi";
 import { authenticateUserSession } from "@/lib/auth/sessionUtils";
@@ -33,6 +34,15 @@ type InstructorAttendanceItem = {
   imageUrl: string;
   englishBackgroundClass: "non-native" | "native-a" | "native-b";
   monthly: InstructorAttendanceMonthly[];
+};
+
+type MessageTarget = "customers" | "instructors" | "both";
+
+type MessageItem = {
+  id: number;
+  target: MessageTarget;
+  body: string;
+  createdAt: string;
 };
 
 const MONTH_WINDOW = 12;
@@ -403,6 +413,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     pastCustomers,
     instructors,
     instructorProfiles,
+    messageBoardPosts,
   ] = await Promise.all([
     getAllCustomers(cookie),
     getAllChildren(cookie),
@@ -410,6 +421,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     getAllPastCustomers(cookie),
     getAllInstructors(cookie),
     getInstructorProfiles(cookie),
+    getMessageBoardPosts(cookie),
   ]);
 
   const monthKeys = getLastMonthKeys(MONTH_WINDOW);
@@ -441,6 +453,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
       churnCustomersByMonth={churnCustomersByMonth}
       attendanceByMonth={attendanceByMonth}
       instructorAttendance={instructorAttendance}
+      recentMessages={messageBoardPosts.slice(0, 20) as MessageItem[]}
     />
   );
 }

@@ -11,10 +11,7 @@ import Modal from "@/components/elements/modal/Modal";
 import InputField from "@/components/elements/inputField/InputField";
 import RadioButton from "@/components/elements/radioButton/RadioButton";
 import TextAreaInput from "@/components/elements/textAreaInput/TextAreaInput";
-import {
-  createMessageBoardPost,
-  getMessageBoardPosts,
-} from "@/lib/api/adminsApi";
+import { createMessageBoardPost } from "@/lib/api/adminsApi";
 import { confirmAlert } from "@/lib/utils/alertUtils";
 
 type DashboardMetric = {
@@ -138,6 +135,7 @@ export default function DashboardClient({
   newCustomersByMonth,
   churnCustomersByMonth,
   instructorAttendance,
+  recentMessages: initialRecentMessages,
 }: {
   metrics: DashboardMetric;
   monthRangeLabel: string;
@@ -145,10 +143,13 @@ export default function DashboardClient({
   churnCustomersByMonth: MonthlyData[];
   attendanceByMonth: MonthlyData[];
   instructorAttendance: InstructorAttendanceItem[];
+  recentMessages: MessageItem[];
 }) {
   const [target, setTarget] = useState<MessageTarget>("customers");
   const [message, setMessage] = useState("");
-  const [recentMessages, setRecentMessages] = useState<MessageItem[]>([]);
+  const [recentMessages, setRecentMessages] = useState<MessageItem[]>(
+    initialRecentMessages,
+  );
   const [isRecentMessagesModalOpen, setIsRecentMessagesModalOpen] =
     useState(false);
   const [isMessageBoardOpen, setIsMessageBoardOpen] = useState(true);
@@ -190,19 +191,6 @@ export default function DashboardClient({
       isMessageBoardOpen ? "open" : "closed",
     );
   }, [isMessageBoardOpen]);
-
-  useEffect(() => {
-    const loadMessages = async () => {
-      try {
-        const data = await getMessageBoardPosts();
-        setRecentMessages(data.slice(0, 20));
-      } catch (error) {
-        console.error("Failed to load message board posts:", error);
-      }
-    };
-
-    loadMessages();
-  }, []);
 
   const filteredInstructors = instructorAttendance.filter((instructor) => {
     const matchesSearch = instructor.nickname
