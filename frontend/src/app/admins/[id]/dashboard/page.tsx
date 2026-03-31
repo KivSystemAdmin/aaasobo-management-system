@@ -12,46 +12,7 @@ import { authenticateUserSession } from "@/lib/auth/sessionUtils";
 import { getCookie } from "../../../../proxy";
 import { defaultUserImageUrl } from "@/lib/data/data";
 
-type MonthlyData = {
-  month: string;
-  value: number;
-};
-
-type InstructorAttendanceMonthly = {
-  year: number;
-  month: string;
-  trialLessons: number;
-  regularLessons: number;
-  completedLessons: number;
-  cancelLessons: number;
-  cancelWithoutNoticeLessons: number;
-  attendanceRate: number;
-};
-
-type InstructorAttendanceItem = {
-  id: number;
-  nickname: string;
-  imageUrl: string;
-  englishBackgroundClass: "non-native" | "native-a" | "native-b";
-  monthly: InstructorAttendanceMonthly[];
-};
-
-type MessageTarget = "customers" | "instructors" | "both";
-
-type MessageItem = {
-  id: number;
-  target: MessageTarget;
-  body: string;
-  createdAt: string;
-};
-
 const MONTH_WINDOW = 12;
-
-type InstructorEnglishBackgroundCounts = {
-  nonNative: number;
-  nativeA: number;
-  nativeB: number;
-};
 
 function getLastMonthKeys(months: number, anchorMonthKey?: string): string[] {
   const now = new Date();
