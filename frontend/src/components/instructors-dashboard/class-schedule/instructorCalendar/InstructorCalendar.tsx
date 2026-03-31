@@ -4,7 +4,11 @@ import {
 } from "@/lib/api/instructorsApi";
 import { getValidRange } from "@/lib/utils/calendarUtils";
 import InstructorCalendarClient from "./InstructorCalendarClient";
-import { getAllBusinessSchedules, getAllEvents } from "@/lib/api/adminsApi";
+import {
+  getAllBusinessSchedules,
+  getAllEvents,
+  getMessageBoardPosts,
+} from "@/lib/api/adminsApi";
 import { getCookie } from "../../../../proxy";
 
 async function InstructorCalendar({
@@ -19,12 +23,14 @@ async function InstructorCalendar({
   // Get the cookies from the request headers
   const cookie = await getCookie();
 
-  const [classes, profile, schedule, events] = await Promise.all([
-    getCalendarClasses(instructorId, cookie),
-    getInstructorProfile(instructorId, cookie),
-    getAllBusinessSchedules(cookie),
-    getAllEvents(cookie),
-  ]);
+  const [classes, profile, schedule, events, messageBoardPosts] =
+    await Promise.all([
+      getCalendarClasses(instructorId, cookie),
+      getInstructorProfile(instructorId, cookie),
+      getAllBusinessSchedules(cookie),
+      getAllEvents(cookie),
+      getMessageBoardPosts(cookie),
+    ]);
 
   const instructorCalendarEvents = classes;
   const createdAt: string = profile.createdAt;
@@ -46,6 +52,7 @@ async function InstructorCalendar({
       validRange={validRange}
       businessSchedule={schedule.organizedData}
       colorsForEvents={colorsForEvents}
+      messageBoardPosts={messageBoardPosts}
     />
   );
 }

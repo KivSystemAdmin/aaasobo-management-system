@@ -12,7 +12,7 @@ export default async function PostLoginPage() {
 
   switch (userType) {
     case "admin":
-      redirect(`/admins/${userId}/calendar`);
+      redirect(`/admins/${userId}/dashboard`);
     case "customer":
       redirect(`/customers/${userId}/classes`);
     case "instructor":

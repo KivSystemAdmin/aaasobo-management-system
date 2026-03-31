@@ -357,6 +357,13 @@ type CustomerCalendarProps = {
   userSessionType?: UserType;
 };
 
+type MessageBoardPostItem = {
+  id: number;
+  target: "customers" | "instructors" | "both";
+  body: string;
+  createdAt: string;
+};
+
 type InstructorCalendarClientProps = {
   adminId?: number | null;
   instructorId: number | null;
@@ -368,6 +375,7 @@ type InstructorCalendarClientProps = {
   };
   businessSchedule: BusinessSchedule[];
   colorsForEvents: { event: string; color: string }[];
+  messageBoardPosts?: MessageBoardPostItem[];
 };
 
 type RebookableClass = {
@@ -670,3 +678,54 @@ type PastListTableProps = {
 type ListTableProps = CurrentListTableProps & {
   pastListTableProps?: PastListTableProps;
 };
+
+type MonthlyData = {
+  month: string;
+  value: number;
+};
+
+type InstructorAttendanceMonthly = {
+  year: number;
+  month: string;
+  trialLessons: number;
+  regularLessons: number;
+  completedLessons: number;
+  cancelLessons: number;
+  cancelWithoutNoticeLessons: number;
+  attendanceRate: number;
+};
+
+type InstructorAttendanceItem = {
+  id: number;
+  nickname: string;
+  imageUrl: string;
+  englishBackgroundClass: "non-native" | "native-a" | "native-b";
+  monthly: InstructorAttendanceMonthly[];
+};
+
+type MessageTarget = "customers" | "instructors" | "both";
+
+type MessageItem = {
+  id: number;
+  target: MessageTarget;
+  body: string;
+  createdAt: string;
+};
+
+type InstructorEnglishBackgroundCounts = {
+  nonNative: number;
+  nativeA: number;
+  nativeB: number;
+};
+
+type DashboardMetric = {
+  totalCustomers: number;
+  totalChildren: number;
+  instructorsByEnglishBackground: {
+    nonNative: number;
+    nativeA: number;
+    nativeB: number;
+  };
+};
+
+type EnglishBackgroundFilter = "all" | "non-native" | "native-a" | "native-b";

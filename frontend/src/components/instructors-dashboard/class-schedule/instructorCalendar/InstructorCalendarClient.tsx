@@ -14,6 +14,7 @@ import {
   getDayCellColorHandler,
 } from "@/lib/utils/calendarUtils";
 import CalendarLegend from "@/components/features/calendarLegend/CalendarLegend";
+import MessageBoardPanel from "@/components/features/messageBoardPanel/MessageBoardPanel";
 import styles from "./InstructorCalendarClient.module.scss";
 
 const InstructorCalendarClient = ({
@@ -24,6 +25,7 @@ const InstructorCalendarClient = ({
   validRange,
   businessSchedule,
   colorsForEvents,
+  messageBoardPosts = [],
 }: InstructorCalendarClientProps) => {
   const router = useRouter();
   const cacheBust = useId();
@@ -31,6 +33,9 @@ const InstructorCalendarClient = ({
   const [currentTitle, setCurrentTitle] = useState("");
   const [currentView, setCurrentView] = useState("timeGridWeek");
   const [isTodayInRange, setIsTodayInRange] = useState(false);
+  const visiblePosts = messageBoardPosts.filter(
+    (post) => post.target === "instructors" || post.target === "both",
+  );
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     if (clickInfo.event.title === "No booked class") return;
@@ -68,6 +73,10 @@ const InstructorCalendarClient = ({
 
   return (
     <div className={styles.calendarContainer}>
+      <MessageBoardPanel
+        posts={visiblePosts}
+        storageKey="instructorClassScheduleMessageBoardOpenState"
+      />
       <div className={styles.mobileToolbar}>
         <div className={styles.navGroup}>
           <button

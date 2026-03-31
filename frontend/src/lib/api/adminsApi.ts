@@ -28,6 +28,9 @@ import {
   type DeleteResponse,
   type RegisterAdminRequest,
   type UpdateAdminRequest,
+  type MessageBoardPostsResponse,
+  type CreateMessageBoardPostRequest,
+  type CreateMessageBoardPostResponse,
 } from "@shared/schemas/admins";
 
 const BACKEND_ORIGIN =
@@ -591,6 +594,71 @@ export const getAllBusinessSchedules = async (
     console.error("Failed to fetch schedules:", error);
     throw error;
   }
+};
+
+export const getMessageBoardPosts = async (
+  cookie?: string,
+): Promise<MessageBoardPostsResponse["data"]> => {
+  try {
+    let apiURL;
+    let headers;
+    let response;
+    const method = "GET";
+
+    if (cookie) {
+      apiURL = `${BASE_URL}/message-board`;
+      headers = { "Content-Type": "application/json", Cookie: cookie };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+        cache: "no-store",
+      });
+    } else {
+      const backendEndpoint = "/admins/message-board";
+      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+      headers = {
+        "Content-Type": "application/json",
+        "backend-endpoint": backendEndpoint,
+        "no-cache": "no-cache",
+      };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+      });
+    }
+
+    if (response.status !== 200) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result: MessageBoardPostsResponse = await response.json();
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch message board posts:", error);
+    throw error;
+  }
+};
+
+export const createMessageBoardPost = async (
+  payload: CreateMessageBoardPostRequest,
+): Promise<CreateMessageBoardPostResponse> => {
+  const backendEndpoint = "/admins/message-board";
+  const apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+  const response = await fetch(apiURL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "backend-endpoint": backendEndpoint,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (response.status !== 201) {
+    const data = await response.json();
+    throw new Error(data?.message || `HTTP error! status: ${response.status}`);
+  }
+
+  return response.json();
 };
 
 export const getInstructorPayroll = async (

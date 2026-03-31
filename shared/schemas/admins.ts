@@ -34,6 +34,13 @@ export const ClassListQuery = z.object({
     .transform((value) => value === "true"),
 });
 
+export const MessageBoardTarget = z.enum(["customers", "instructors", "both"]);
+
+export const CreateMessageBoardPostRequest = z.object({
+  target: MessageBoardTarget,
+  body: z.string().trim().min(1, "Message body is required"),
+});
+
 export const CreateInstructorFeeRequest = z.object({
   currency: z.string().regex(/^[A-Z]{3}$/, "currency must be a 3-letter code"),
   effectiveFrom: z
@@ -325,6 +332,7 @@ export const CustomerListItem = z.object({
   Children: z.string().nullable(),
   Email: z.string(),
   Prefecture: z.string(),
+  "Start Date (JST)": z.string(),
 });
 
 export const CustomersListResponse = z.object({
@@ -337,6 +345,7 @@ export const PastCustomerListItem = z.object({
   ID: z.number(),
   "Past Customer": z.string(),
   "Past Children": z.string().nullable(),
+  "Start Date (JST)": z.string(),
   "End Date (JST)": z.string(),
 });
 
@@ -413,6 +422,8 @@ export const ClassListItem = z.object({
   CustomerID: z.number(),
   Status: z.string(),
   "Class Code": z.string(),
+  "Is Free Trial": z.boolean(),
+  "Canceled At": z.string().nullable(),
 });
 
 export const ClassesListResponse = z.object({
@@ -429,6 +440,22 @@ export const ScheduleListItem = z.object({
 
 export const SchedulesListResponse = z.object({
   organizedData: z.array(ScheduleListItem),
+});
+
+export const MessageBoardPostItem = z.object({
+  id: z.number().int().positive(),
+  target: MessageBoardTarget,
+  body: z.string(),
+  createdAt: z.iso.datetime(),
+});
+
+export const MessageBoardPostsResponse = z.object({
+  data: z.array(MessageBoardPostItem),
+});
+
+export const CreateMessageBoardPostResponse = z.object({
+  message: z.string(),
+  data: MessageBoardPostItem,
 });
 
 // Update response schemas
@@ -560,6 +587,10 @@ export type CustomerIdParams = z.infer<typeof CustomerIdParams>;
 export type InstructorIdParams = z.infer<typeof InstructorIdParams>;
 export type InstructorPayrollQuery = z.infer<typeof InstructorPayrollQuery>;
 export type ClassListQuery = z.infer<typeof ClassListQuery>;
+export type MessageBoardTarget = z.infer<typeof MessageBoardTarget>;
+export type CreateMessageBoardPostRequest = z.infer<
+  typeof CreateMessageBoardPostRequest
+>;
 export type CreateInstructorFeeRequest = z.infer<
   typeof CreateInstructorFeeRequest
 >;
@@ -625,6 +656,13 @@ export type SubscriptionsListResponse = z.infer<
 export type EventsListResponse = z.infer<typeof EventsListResponse>;
 export type ClassesListResponse = z.infer<typeof ClassesListResponse>;
 export type SchedulesListResponse = z.infer<typeof SchedulesListResponse>;
+export type MessageBoardPostItem = z.infer<typeof MessageBoardPostItem>;
+export type MessageBoardPostsResponse = z.infer<
+  typeof MessageBoardPostsResponse
+>;
+export type CreateMessageBoardPostResponse = z.infer<
+  typeof CreateMessageBoardPostResponse
+>;
 
 export type UpdateAdminResponse = z.infer<typeof UpdateAdminResponse>;
 export type UpdateInstructorResponse = z.infer<typeof UpdateInstructorResponse>;

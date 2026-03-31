@@ -27,7 +27,7 @@ describe("GET /admins/plan-list", () => {
         "Plan (English)": plan1NameEng,
         English:
           plan1.englishBackground === EnglishBackground.NonNative
-            ? "Non-Native"
+            ? "Non Native"
             : plan1.englishBackground === EnglishBackground.NativeA
               ? "Native A"
               : "Native B",
@@ -41,7 +41,7 @@ describe("GET /admins/plan-list", () => {
         "Plan (English)": plan2NameEng,
         English:
           plan2.englishBackground === EnglishBackground.NonNative
-            ? "Non-Native"
+            ? "Non Native"
             : plan2.englishBackground === EnglishBackground.NativeA
               ? "Native A"
               : "Native B",

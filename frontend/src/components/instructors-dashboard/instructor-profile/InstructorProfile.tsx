@@ -8,9 +8,9 @@ import StatusSwitcher from "@/components/elements/StatusSwitcher/StatusSwitcher"
 import InputField from "../../elements/inputField/InputField";
 import ActionButton from "../../elements/buttons/actionButton/ActionButton";
 import { formatBirthdateToISO, getLongMonth } from "@/lib/utils/dateUtils";
-import { CheckIcon } from "@heroicons/react/24/outline";
 import {
   CakeIcon,
+  CheckIcon,
   CalendarDaysIcon,
   NewspaperIcon,
   PencilSquareIcon,

@@ -55,6 +55,11 @@ import {
 } from "../services/eventsService";
 import { getAllSubscriptions } from "../services/subscriptionsService";
 import {
+  createMessageBoardPost,
+  getMessageBoardPosts,
+  isValidMessageTarget,
+} from "../services/messageBoardService";
+import {
   days,
   convertToISOString,
   convertToTimezoneDate,
@@ -64,6 +69,7 @@ import { EVENT_CONFLICT_ITEMS } from "../utils/commonUtils";
 import type {
   AdminIdParams,
   ClassListQuery,
+  CreateMessageBoardPostRequest,
   CustomerIdParams,
   InstructorIdParams,
   InstructorPayrollQuery,
@@ -271,7 +277,7 @@ export const getAllCustomersController = async (_: Request, res: Response) => {
 
     // Transform the data structure.
     const data = customers.map((customer, number) => {
-      let { id, name, email, prefecture, children } = customer;
+      let { id, name, email, prefecture, children, createdAt } = customer;
 
       // Format children names as a comma-separated string
       const childrenNames = children.map((child) => child.name).join(", ");
@@ -283,6 +289,9 @@ export const getAllCustomersController = async (_: Request, res: Response) => {
         Children: childrenNames,
         Email: email,
         Prefecture: prefecture,
+        "Start Date (JST)": convertToTimezoneDate(createdAt, "Asia/Tokyo")
+          .toISOString()
+          .slice(0, 10),
       };
     });
 
@@ -303,7 +312,7 @@ export const getAllPastCustomersController = async (
 
     // Transform the data structure.
     const data = customers.map((customer, number) => {
-      let { id, name, children, terminationAt } = customer;
+      let { id, name, children, terminationAt, createdAt } = customer;
 
       // Format children names as a comma-separated string
       const childrenNames = children.map((child) => child.name).join(", ");
@@ -324,6 +333,9 @@ export const getAllPastCustomersController = async (
         ID: id,
         "Past Customer": name,
         "Past Children": childrenNames,
+        "Start Date (JST)": convertToTimezoneDate(createdAt, "Asia/Tokyo")
+          .toISOString()
+          .slice(0, 10),
         "End Date (JST)": formattedTerminationDate,
       };
     });
@@ -347,7 +359,7 @@ export const getAllInstructorsController = async (
     const data = instructors.map((instructor, number) => {
       const { id, name, nickname, email } = instructor;
       const englishBackgroundLabel: Record<EnglishBackground, string> = {
-        [EnglishBackground.NonNative]: "Non-Native",
+        [EnglishBackground.NonNative]: "Non Native",
         [EnglishBackground.NativeA]: "Native A",
         [EnglishBackground.NativeB]: "Native B",
       };
@@ -825,7 +837,7 @@ export const getAllPlansController = async (_: Request, res: Response) => {
         plan;
       const [planNameJpn, planNameEng] = name.split(" / ");
       const englishBackgroundLabel: Record<EnglishBackground, string> = {
-        [EnglishBackground.NonNative]: "Non-Native",
+        [EnglishBackground.NonNative]: "Non Native",
         [EnglishBackground.NativeA]: "Native A",
         [EnglishBackground.NativeB]: "Native B",
       };
@@ -1146,6 +1158,8 @@ export const getClassesWithinPeriodController = async (
         dateTime,
         status,
         classCode,
+        isFreeTrial,
+        canceledAt,
         classAttendance,
       } = classItem;
 
@@ -1216,11 +1230,74 @@ export const getClassesWithinPeriodController = async (
         CustomerID: customer.id,
         Status: statusText,
         "Class Code": classCode,
+        "Is Free Trial": isFreeTrial,
+        "Canceled At": canceledAt ? canceledAt.toISOString() : null,
       };
     });
 
     res.json({ data });
   } catch (error) {
     res.status(500).json({ error });
+  }
+};
+
+export const getMessageBoardPostsController = async (
+  _: unknown,
+  res: Response,
+) => {
+  interface MessageBoardPost {
+    id: number;
+    target: string;
+    body: string;
+    createdAt: Date;
+  }
+
+  try {
+    const posts: MessageBoardPost[] = await getMessageBoardPosts();
+    const data = posts.map((post) => ({
+      id: post.id,
+      target: post.target,
+      body: post.body,
+      createdAt: post.createdAt.toISOString(),
+    }));
+
+    res.status(200).json({ data });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+};
+
+export const createMessageBoardPostController = async (
+  req: RequestWithBody<CreateMessageBoardPostRequest>,
+  res: Response,
+) => {
+  const { target, body } = req.body;
+  const normalizedTarget = target.trim().toLowerCase();
+  const normalizedBody = body.trim();
+
+  if (!isValidMessageTarget(normalizedTarget)) {
+    return res.status(400).json({ message: "Invalid target selected." });
+  }
+
+  if (!normalizedBody) {
+    return res.status(400).json({ message: "Message body is required." });
+  }
+
+  try {
+    const created = await createMessageBoardPost(
+      normalizedTarget,
+      normalizedBody,
+    );
+    return res.status(201).json({
+      message: "Message posted successfully",
+      data: {
+        id: created.id,
+        target: created.target,
+        body: created.body,
+        createdAt: created.createdAt.toISOString(),
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ error });
   }
 };

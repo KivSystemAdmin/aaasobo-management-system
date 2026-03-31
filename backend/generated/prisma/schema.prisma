@@ -292,6 +292,17 @@ model Child {
   @@index([customerId])
 }
 
+model MessageBoardPost {
+  id        Int      @id @default(autoincrement())
+  target    String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([target])
+  @@index([createdAt])
+}
+
 enum Status {
   booked
   completed

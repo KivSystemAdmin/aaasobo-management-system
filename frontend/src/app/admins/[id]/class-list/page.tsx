@@ -17,7 +17,13 @@ export default async function Page(props: {
 
   // Define table configuration
   const listType = "Class List";
-  const omitItems = ["ID", "InstructorID", "CustomerID"]; // Omit the item from the table
+  const omitItems = [
+    "ID",
+    "InstructorID",
+    "CustomerID",
+    "Is Free Trial",
+    "Canceled At",
+  ]; // Omit the item from the table
   const linkItems = ["Date/Time (JST)", "Instructor", "Customer"]; // Set the item to be a link
   const replaceItems = ["ID", "InstructorID", "CustomerID"]; // Replace the item with the value(e.g., ID -> 1,2,3...)
   const linkUrls = [
