@@ -418,7 +418,7 @@ export default function DashboardClient({
           color="blue"
         />
         <SimpleBarChart
-          title={`Customer Churn (${monthRangeLabel})`}
+          title={`Churned Customers (${monthRangeLabel})`}
           data={churnCustomersByMonth}
           color="pink"
         />
