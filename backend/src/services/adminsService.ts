@@ -50,6 +50,7 @@ export const updateAdminPassword = async (id: number, newPassword: string) => {
 };
 
 // Delete the selected admin
+// Technically, the record is not deleted at this time. Only terminationAt datetime is set.
 export const deleteAdmin = async (adminId: number) => {
   try {
     // Delete the Admin data.
