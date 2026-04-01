@@ -18,7 +18,7 @@ export default function AdminTabs({
 }) {
   const adminName =
     typeof admin !== "string"
-      ? MASKED_HEAD_LETTERS.includes(admin.name)
+      ? admin.email.includes(MASKED_HEAD_LETTERS)
         ? "Unknown"
         : admin.name
       : "Unknown";

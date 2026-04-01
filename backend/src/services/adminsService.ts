@@ -66,7 +66,6 @@ export const deleteAdmin = async (adminId: number) => {
         id: adminId,
       },
       data: {
-        name: maskedHeadLetters,
         email: `${maskedHeadLetters}@${suffix}${adminId}.xxx`,
         terminationAt: now,
       },
