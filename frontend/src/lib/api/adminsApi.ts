@@ -641,17 +641,33 @@ export const getMessageBoardPosts = async (
 
 export const createMessageBoardPost = async (
   payload: CreateMessageBoardPostRequest,
+  cookie?: string,
 ): Promise<CreateMessageBoardPostResponse> => {
-  const backendEndpoint = "/admins/message-board";
-  const apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
-  const response = await fetch(apiURL, {
-    method: "POST",
-    headers: {
+  let apiURL;
+  let headers;
+  let response;
+
+  if (cookie) {
+    apiURL = `${BASE_URL}/message-board`;
+    headers = { "Content-Type": "application/json", Cookie: cookie };
+    response = await fetch(apiURL, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+  } else {
+    const backendEndpoint = "/admins/message-board";
+    apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+    headers = {
       "Content-Type": "application/json",
       "backend-endpoint": backendEndpoint,
-    },
-    body: JSON.stringify(payload),
-  });
+    };
+    response = await fetch(apiURL, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+  }
 
   if (response.status !== 201) {
     const data = await response.json();

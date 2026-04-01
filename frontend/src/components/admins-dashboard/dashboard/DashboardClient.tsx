@@ -11,13 +11,17 @@ import Modal from "@/components/elements/modal/Modal";
 import InputField from "@/components/elements/inputField/InputField";
 import RadioButton from "@/components/elements/radioButton/RadioButton";
 import TextAreaInput from "@/components/elements/textAreaInput/TextAreaInput";
-import { createMessageBoardPost } from "@/lib/api/adminsApi";
+import {
+  createMessageBoardPostAction,
+  type MessageBoardActionState,
+} from "@/app/actions/messageBoard";
 import { confirmAlert } from "@/lib/utils/alertUtils";
+import { MessageTarget } from "@/types";
 
 const messageTargetLabel: Record<MessageTarget, string> = {
-  customers: "Customers",
-  instructors: "Instructors",
-  both: "Both",
+  [MessageTarget.customer]: "Customers",
+  [MessageTarget.instructor]: "Instructors",
+  [MessageTarget.both]: "Both",
 };
 
 function InstructorAvatar({
@@ -101,7 +105,7 @@ export default function DashboardClient({
   instructorAttendance: InstructorAttendanceItem[];
   recentMessages: MessageItem[];
 }) {
-  const [target, setTarget] = useState<MessageTarget>("customers");
+  const [target, setTarget] = useState<MessageTarget>(MessageTarget.customer);
   const [message, setMessage] = useState("");
   const [recentMessages, setRecentMessages] = useState<MessageItem[]>(
     initialRecentMessages,
@@ -115,6 +119,9 @@ export default function DashboardClient({
   const [instructorSearch, setInstructorSearch] = useState("");
   const [englishBackgroundFilter, setEnglishBackgroundFilter] =
     useState<EnglishBackgroundFilter>("all");
+  const [, setCreateMessageResultState] = useState<
+    MessageBoardActionState | undefined
+  >(undefined);
 
   const normalizedSearch = instructorSearch.trim().toLowerCase();
   const latestMessage = useMemo(
@@ -173,18 +180,25 @@ export default function DashboardClient({
     );
     if (!confirmed) return;
 
-    try {
-      const response = await createMessageBoardPost({
-        target,
-        body: message.trim(),
-      });
-      setRecentMessages((prev) => [response.data, ...prev].slice(0, 20));
-      setMessage("");
-      toast.success("Message sent successfully");
-    } catch (error) {
-      console.error("Failed to post a message:", error);
-      toast.error("Failed to send message");
+    const result = await createMessageBoardPostAction({
+      target,
+      body: message.trim(),
+    });
+
+    setCreateMessageResultState(result);
+
+    if (result.errorMessage) {
+      toast.error(result.errorMessage);
+      return;
     }
+
+    const createdMessage = result.message;
+    if (createdMessage) {
+      setRecentMessages((prev) => [createdMessage, ...prev].slice(0, 20));
+      setMessage("");
+    }
+
+    toast.success(result.successMessage ?? "Message sent successfully.");
   };
 
   return (
@@ -210,18 +224,22 @@ export default function DashboardClient({
           <div className={styles.messageBoardContent}>
             <form onSubmit={submitMessage} className={styles.messageForm}>
               <div className={styles.segmentedControl}>
-                {(["customers", "instructors", "both"] as const).map(
-                  (option) => (
-                    <button
-                      key={option}
-                      type="button"
-                      className={target === option ? styles.activeTarget : ""}
-                      onClick={() => setTarget(option)}
-                    >
-                      {"For "} {option[0].toUpperCase() + option.slice(1)}
-                    </button>
-                  ),
-                )}
+                {(
+                  [
+                    MessageTarget.customer,
+                    MessageTarget.instructor,
+                    MessageTarget.both,
+                  ] as const
+                ).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    className={target === option ? styles.activeTarget : ""}
+                    onClick={() => setTarget(option)}
+                  >
+                    {"For "} {messageTargetLabel[option]}
+                  </button>
+                ))}
               </div>
               <TextAreaInput
                 value={message}
@@ -249,7 +267,9 @@ export default function DashboardClient({
                 <div className={styles.messagePreview}>
                   {latestMessage ? (
                     <article>
-                      <strong>{latestMessage.target}</strong>
+                      <strong>
+                        {messageTargetLabel[latestMessage.target]}
+                      </strong>
                       <p>{latestMessage.body}</p>
                       <time>{formatDate(latestMessage.createdAt)}</time>
                     </article>

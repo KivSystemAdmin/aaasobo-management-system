@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, Prisma } from "../../generated/prisma/client";
+import { MessageTarget } from "../types";
 
 const adapter = new PrismaPg({
   connectionString: process.env.POSTGRES_PRISMA_URL,
@@ -3915,52 +3916,52 @@ async function insertMessageBoardPosts() {
   await prisma.messageBoardPost.createMany({
     data: [
       {
-        target: "customers",
+        target: MessageTarget.customer,
         body: "Spring campaign starts next week. Please check your registered class times.",
         createdAt: new Date("2026-03-01T09:00:00.000Z"),
       },
       {
-        target: "instructors",
+        target: MessageTarget.instructor,
         body: "Please submit your March lesson reflections by Friday 18:00 JST.",
         createdAt: new Date("2026-03-02T09:00:00.000Z"),
       },
       {
-        target: "both",
+        target: MessageTarget.both,
         body: "The system will undergo maintenance on March 15 from 02:00 to 04:00 JST.",
         createdAt: new Date("2026-03-03T09:00:00.000Z"),
       },
       {
-        target: "customers",
+        target: MessageTarget.customer,
         body: "Golden Week booking slots will be released early on April 1.",
         createdAt: new Date("2026-03-04T09:00:00.000Z"),
       },
       {
-        target: "instructors",
+        target: MessageTarget.instructor,
         body: "Please confirm your available schedule for next month by end of day Thursday.",
         createdAt: new Date("2026-03-05T09:00:00.000Z"),
       },
       {
-        target: "both",
+        target: MessageTarget.both,
         body: "A new Message Board toggle feature is now available on calendar pages.",
         createdAt: new Date("2026-03-06T09:00:00.000Z"),
       },
       {
-        target: "customers",
+        target: MessageTarget.customer,
         body: "Need help with rebooking? Contact support and include the class code.",
         createdAt: new Date("2026-03-07T09:00:00.000Z"),
       },
       {
-        target: "instructors",
+        target: MessageTarget.instructor,
         body: "Reminder: update your profile self-introduction for the new school year.",
         createdAt: new Date("2026-03-08T09:00:00.000Z"),
       },
       {
-        target: "both",
+        target: MessageTarget.both,
         body: "Thank you for joining AaasoBo! Let's keep making English fun together.",
         createdAt: new Date("2026-03-09T09:00:00.000Z"),
       },
       {
-        target: "both",
+        target: MessageTarget.both,
         body: "Dashboard refresh speed was improved. Please report any loading issues.",
         createdAt: new Date("2026-03-10T09:00:00.000Z"),
       },

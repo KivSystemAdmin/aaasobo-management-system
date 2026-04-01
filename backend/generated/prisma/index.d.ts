@@ -26863,15 +26863,17 @@ export namespace Prisma {
 
   export type MessageBoardPostAvgAggregateOutputType = {
     id: number | null
+    target: number | null
   }
 
   export type MessageBoardPostSumAggregateOutputType = {
     id: number | null
+    target: number | null
   }
 
   export type MessageBoardPostMinAggregateOutputType = {
     id: number | null
-    target: string | null
+    target: number | null
     body: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -26879,7 +26881,7 @@ export namespace Prisma {
 
   export type MessageBoardPostMaxAggregateOutputType = {
     id: number | null
-    target: string | null
+    target: number | null
     body: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -26897,10 +26899,12 @@ export namespace Prisma {
 
   export type MessageBoardPostAvgAggregateInputType = {
     id?: true
+    target?: true
   }
 
   export type MessageBoardPostSumAggregateInputType = {
     id?: true
+    target?: true
   }
 
   export type MessageBoardPostMinAggregateInputType = {
@@ -27016,7 +27020,7 @@ export namespace Prisma {
 
   export type MessageBoardPostGroupByOutputType = {
     id: number
-    target: string
+    target: number
     body: string
     createdAt: Date
     updatedAt: Date
@@ -27080,7 +27084,7 @@ export namespace Prisma {
     objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id: number
-      target: string
+      target: number
       body: string
       createdAt: Date
       updatedAt: Date
@@ -27508,7 +27512,7 @@ export namespace Prisma {
    */
   interface MessageBoardPostFieldRefs {
     readonly id: FieldRef<"MessageBoardPost", 'Int'>
-    readonly target: FieldRef<"MessageBoardPost", 'String'>
+    readonly target: FieldRef<"MessageBoardPost", 'Int'>
     readonly body: FieldRef<"MessageBoardPost", 'String'>
     readonly createdAt: FieldRef<"MessageBoardPost", 'DateTime'>
     readonly updatedAt: FieldRef<"MessageBoardPost", 'DateTime'>
@@ -29638,7 +29642,7 @@ export namespace Prisma {
     OR?: MessageBoardPostWhereInput[]
     NOT?: MessageBoardPostWhereInput | MessageBoardPostWhereInput[]
     id?: IntFilter<"MessageBoardPost"> | number
-    target?: StringFilter<"MessageBoardPost"> | string
+    target?: IntFilter<"MessageBoardPost"> | number
     body?: StringFilter<"MessageBoardPost"> | string
     createdAt?: DateTimeFilter<"MessageBoardPost"> | Date | string
     updatedAt?: DateTimeFilter<"MessageBoardPost"> | Date | string
@@ -29657,7 +29661,7 @@ export namespace Prisma {
     AND?: MessageBoardPostWhereInput | MessageBoardPostWhereInput[]
     OR?: MessageBoardPostWhereInput[]
     NOT?: MessageBoardPostWhereInput | MessageBoardPostWhereInput[]
-    target?: StringFilter<"MessageBoardPost"> | string
+    target?: IntFilter<"MessageBoardPost"> | number
     body?: StringFilter<"MessageBoardPost"> | string
     createdAt?: DateTimeFilter<"MessageBoardPost"> | Date | string
     updatedAt?: DateTimeFilter<"MessageBoardPost"> | Date | string
@@ -29681,7 +29685,7 @@ export namespace Prisma {
     OR?: MessageBoardPostScalarWhereWithAggregatesInput[]
     NOT?: MessageBoardPostScalarWhereWithAggregatesInput | MessageBoardPostScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"MessageBoardPost"> | number
-    target?: StringWithAggregatesFilter<"MessageBoardPost"> | string
+    target?: IntWithAggregatesFilter<"MessageBoardPost"> | number
     body?: StringWithAggregatesFilter<"MessageBoardPost"> | string
     createdAt?: DateTimeWithAggregatesFilter<"MessageBoardPost"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"MessageBoardPost"> | Date | string
@@ -31038,7 +31042,7 @@ export namespace Prisma {
   }
 
   export type MessageBoardPostCreateInput = {
-    target: string
+    target: number
     body: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31046,14 +31050,14 @@ export namespace Prisma {
 
   export type MessageBoardPostUncheckedCreateInput = {
     id?: number
-    target: string
+    target: number
     body: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type MessageBoardPostUpdateInput = {
-    target?: StringFieldUpdateOperationsInput | string
+    target?: IntFieldUpdateOperationsInput | number
     body?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31061,7 +31065,7 @@ export namespace Prisma {
 
   export type MessageBoardPostUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
-    target?: StringFieldUpdateOperationsInput | string
+    target?: IntFieldUpdateOperationsInput | number
     body?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31069,14 +31073,14 @@ export namespace Prisma {
 
   export type MessageBoardPostCreateManyInput = {
     id?: number
-    target: string
+    target: number
     body: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type MessageBoardPostUpdateManyMutationInput = {
-    target?: StringFieldUpdateOperationsInput | string
+    target?: IntFieldUpdateOperationsInput | number
     body?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31084,7 +31088,7 @@ export namespace Prisma {
 
   export type MessageBoardPostUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
-    target?: StringFieldUpdateOperationsInput | string
+    target?: IntFieldUpdateOperationsInput | number
     body?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32302,6 +32306,7 @@ export namespace Prisma {
 
   export type MessageBoardPostAvgOrderByAggregateInput = {
     id?: SortOrder
+    target?: SortOrder
   }
 
   export type MessageBoardPostMaxOrderByAggregateInput = {
@@ -32322,6 +32327,7 @@ export namespace Prisma {
 
   export type MessageBoardPostSumOrderByAggregateInput = {
     id?: SortOrder
+    target?: SortOrder
   }
 
   export type ClassCreateNestedManyWithoutInstructorInput = {

@@ -8,6 +8,7 @@ import {
   generateAuthCookie,
 } from "../../testUtils";
 import { prisma } from "../../setup";
+import { MessageTarget } from "../../../types";
 
 describe("GET /admins/message-board", () => {
   it("returns posts in descending createdAt order", async () => {
@@ -16,14 +17,14 @@ describe("GET /admins/message-board", () => {
 
     const first = await prisma.messageBoardPost.create({
       data: {
-        target: "customers",
+        target: MessageTarget.customer,
         body: "First message",
       },
     });
 
     const second = await prisma.messageBoardPost.create({
       data: {
-        target: "both",
+        target: MessageTarget.both,
         body: "Second message",
       },
     });
@@ -37,13 +38,13 @@ describe("GET /admins/message-board", () => {
       data: [
         {
           id: second.id,
-          target: "both",
+          target: MessageTarget.both,
           body: "Second message",
           createdAt: second.createdAt.toISOString(),
         },
         {
           id: first.id,
-          target: "customers",
+          target: MessageTarget.customer,
           body: "First message",
           createdAt: first.createdAt.toISOString(),
         },
@@ -62,7 +63,7 @@ describe("GET /admins/message-board", () => {
 
     await prisma.messageBoardPost.create({
       data: {
-        target: "instructors",
+        target: MessageTarget.instructor,
         body: "Instructor message",
       },
     });
@@ -92,13 +93,13 @@ describe("POST /admins/message-board", () => {
       .post("/admins/message-board")
       .set("Cookie", authCookie)
       .send({
-        target: "customers",
+        target: MessageTarget.customer,
         body: "  Important message for customers  ",
       })
       .expect(201);
 
     expect(response.body.message).toBe("Message posted successfully");
-    expect(response.body.data.target).toBe("customers");
+    expect(response.body.data.target).toBe(MessageTarget.customer);
     expect(response.body.data.body).toBe("Important message for customers");
 
     const createdPost = await prisma.messageBoardPost.findUnique({
@@ -107,7 +108,7 @@ describe("POST /admins/message-board", () => {
 
     expect(createdPost).toBeTruthy();
     expect(createdPost?.body).toBe("Important message for customers");
-    expect(createdPost?.target).toBe("customers");
+    expect(createdPost?.target).toBe(MessageTarget.customer);
   });
 
   it("fails for non-admin users", async () => {
@@ -118,7 +119,7 @@ describe("POST /admins/message-board", () => {
       .post("/admins/message-board")
       .set("Cookie", authCookie)
       .send({
-        target: "both",
+        target: MessageTarget.both,
         body: "Cannot post",
       })
       .expect(403);
@@ -141,7 +142,7 @@ describe("POST /admins/message-board", () => {
       .post("/admins/message-board")
       .set("Cookie", authCookie)
       .send({
-        target: "both",
+        target: MessageTarget.both,
         body: "   ",
       })
       .expect(400);

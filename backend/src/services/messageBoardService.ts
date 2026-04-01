@@ -1,7 +1,6 @@
 import { Prisma } from "../../generated/prisma";
 import { prisma } from "../../prisma/prismaClient";
-
-type MessageTarget = "customers" | "instructors" | "both";
+import { MessageTarget } from "../types";
 
 export const getMessageBoardPosts = async () => {
   return prisma.messageBoardPost.findMany({
@@ -22,7 +21,7 @@ export const createMessageBoardPost = async (
 };
 
 export const isValidMessageTarget = (
-  target: string,
+  target: number,
 ): target is MessageTarget => {
-  return ["customers", "instructors", "both"].includes(target);
+  return Object.values(MessageTarget).includes(target);
 };
