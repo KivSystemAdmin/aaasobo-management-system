@@ -1247,7 +1247,7 @@ export const getMessageBoardPostsController = async (
 ) => {
   interface MessageBoardPost {
     id: number;
-    target: string;
+    target: number;
     body: string;
     createdAt: Date;
   }
@@ -1272,10 +1272,9 @@ export const createMessageBoardPostController = async (
   res: Response,
 ) => {
   const { target, body } = req.body;
-  const normalizedTarget = target.trim().toLowerCase();
   const normalizedBody = body.trim();
 
-  if (!isValidMessageTarget(normalizedTarget)) {
+  if (!isValidMessageTarget(target)) {
     return res.status(400).json({ message: "Invalid target selected." });
   }
 
@@ -1284,10 +1283,7 @@ export const createMessageBoardPostController = async (
   }
 
   try {
-    const created = await createMessageBoardPost(
-      normalizedTarget,
-      normalizedBody,
-    );
+    const created = await createMessageBoardPost(target, normalizedBody);
     return res.status(201).json({
       message: "Message posted successfully",
       data: {

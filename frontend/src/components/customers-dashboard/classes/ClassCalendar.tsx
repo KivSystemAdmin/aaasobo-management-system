@@ -11,6 +11,7 @@ import {
 } from "@/lib/api/adminsApi";
 import { getCookie } from "../../../proxy";
 import MessageBoardPanel from "@/components/features/messageBoardPanel/MessageBoardPanel";
+import { MessageTarget } from "@/types";
 
 export default async function ClassCalendar({
   customerId,
@@ -44,7 +45,9 @@ export default async function ClassCalendar({
     }),
   );
   const visiblePosts = messageBoardPosts.filter(
-    (post) => post.target === "customers" || post.target === "both",
+    (post) =>
+      post.target === MessageTarget.customer ||
+      post.target === MessageTarget.both,
   );
 
   return (

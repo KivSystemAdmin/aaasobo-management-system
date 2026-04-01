@@ -359,7 +359,7 @@ type CustomerCalendarProps = {
 
 type MessageBoardPostItem = {
   id: number;
-  target: "customers" | "instructors" | "both";
+  target: MessageTarget;
   body: string;
   createdAt: string;
 };
@@ -703,7 +703,7 @@ type InstructorAttendanceItem = {
   monthly: InstructorAttendanceMonthly[];
 };
 
-type MessageTarget = "customers" | "instructors" | "both";
+type MessageTarget = import("@/types").MessageTarget;
 
 type MessageItem = {
   id: number;

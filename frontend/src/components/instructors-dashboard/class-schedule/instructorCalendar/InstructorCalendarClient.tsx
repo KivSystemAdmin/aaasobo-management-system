@@ -16,6 +16,7 @@ import {
 import CalendarLegend from "@/components/features/calendarLegend/CalendarLegend";
 import MessageBoardPanel from "@/components/features/messageBoardPanel/MessageBoardPanel";
 import styles from "./InstructorCalendarClient.module.scss";
+import { MessageTarget } from "@/types";
 
 const InstructorCalendarClient = ({
   adminId,
@@ -34,7 +35,9 @@ const InstructorCalendarClient = ({
   const [currentView, setCurrentView] = useState("timeGridWeek");
   const [isTodayInRange, setIsTodayInRange] = useState(false);
   const visiblePosts = messageBoardPosts.filter(
-    (post) => post.target === "instructors" || post.target === "both",
+    (post) =>
+      post.target === MessageTarget.instructor ||
+      post.target === MessageTarget.both,
   );
 
   const handleEventClick = (clickInfo: EventClickArg) => {

@@ -34,7 +34,11 @@ export const ClassListQuery = z.object({
     .transform((value) => value === "true"),
 });
 
-export const MessageBoardTarget = z.enum(["customers", "instructors", "both"]);
+export const MessageBoardTarget = z.union([
+  z.literal(0),
+  z.literal(1),
+  z.literal(2),
+]);
 
 export const CreateMessageBoardPostRequest = z.object({
   target: MessageBoardTarget,

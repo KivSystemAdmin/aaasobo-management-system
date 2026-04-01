@@ -16,11 +16,12 @@ import {
   type MessageBoardActionState,
 } from "@/app/actions/messageBoard";
 import { confirmAlert } from "@/lib/utils/alertUtils";
+import { MessageTarget } from "@/types";
 
 const messageTargetLabel: Record<MessageTarget, string> = {
-  customers: "Customers",
-  instructors: "Instructors",
-  both: "Both",
+  [MessageTarget.customer]: "Customers",
+  [MessageTarget.instructor]: "Instructors",
+  [MessageTarget.both]: "Both",
 };
 
 function InstructorAvatar({
@@ -104,7 +105,7 @@ export default function DashboardClient({
   instructorAttendance: InstructorAttendanceItem[];
   recentMessages: MessageItem[];
 }) {
-  const [target, setTarget] = useState<MessageTarget>("customers");
+  const [target, setTarget] = useState<MessageTarget>(MessageTarget.customer);
   const [message, setMessage] = useState("");
   const [recentMessages, setRecentMessages] = useState<MessageItem[]>(
     initialRecentMessages,
@@ -222,18 +223,22 @@ export default function DashboardClient({
           <div className={styles.messageBoardContent}>
             <form onSubmit={submitMessage} className={styles.messageForm}>
               <div className={styles.segmentedControl}>
-                {(["customers", "instructors", "both"] as const).map(
-                  (option) => (
-                    <button
-                      key={option}
-                      type="button"
-                      className={target === option ? styles.activeTarget : ""}
-                      onClick={() => setTarget(option)}
-                    >
-                      {"For "} {option[0].toUpperCase() + option.slice(1)}
-                    </button>
-                  ),
-                )}
+                {(
+                  [
+                    MessageTarget.customer,
+                    MessageTarget.instructor,
+                    MessageTarget.both,
+                  ] as const
+                ).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    className={target === option ? styles.activeTarget : ""}
+                    onClick={() => setTarget(option)}
+                  >
+                    {"For "} {messageTargetLabel[option]}
+                  </button>
+                ))}
               </div>
               <TextAreaInput
                 value={message}
@@ -261,7 +266,9 @@ export default function DashboardClient({
                 <div className={styles.messagePreview}>
                   {latestMessage ? (
                     <article>
-                      <strong>{latestMessage.target}</strong>
+                      <strong>
+                        {messageTargetLabel[latestMessage.target]}
+                      </strong>
                       <p>{latestMessage.body}</p>
                       <time>{formatDate(latestMessage.createdAt)}</time>
                     </article>
