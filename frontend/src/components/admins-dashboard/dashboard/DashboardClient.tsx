@@ -11,7 +11,10 @@ import Modal from "@/components/elements/modal/Modal";
 import InputField from "@/components/elements/inputField/InputField";
 import RadioButton from "@/components/elements/radioButton/RadioButton";
 import TextAreaInput from "@/components/elements/textAreaInput/TextAreaInput";
-import { createMessageBoardPost } from "@/lib/api/adminsApi";
+import {
+  createMessageBoardPostAction,
+  type MessageBoardActionState,
+} from "@/app/actions/messageBoard";
 import { confirmAlert } from "@/lib/utils/alertUtils";
 
 const messageTargetLabel: Record<MessageTarget, string> = {
@@ -115,6 +118,9 @@ export default function DashboardClient({
   const [instructorSearch, setInstructorSearch] = useState("");
   const [englishBackgroundFilter, setEnglishBackgroundFilter] =
     useState<EnglishBackgroundFilter>("all");
+  const [, setCreateMessageResultState] = useState<
+    MessageBoardActionState | undefined
+  >(undefined);
 
   const normalizedSearch = instructorSearch.trim().toLowerCase();
   const latestMessage = useMemo(
@@ -173,18 +179,24 @@ export default function DashboardClient({
     );
     if (!confirmed) return;
 
-    try {
-      const response = await createMessageBoardPost({
-        target,
-        body: message.trim(),
-      });
-      setRecentMessages((prev) => [response.data, ...prev].slice(0, 20));
-      setMessage("");
-      toast.success("Message sent successfully");
-    } catch (error) {
-      console.error("Failed to post a message:", error);
-      toast.error("Failed to send message");
+    const result = await createMessageBoardPostAction({
+      target,
+      body: message.trim(),
+    });
+
+    setCreateMessageResultState(result);
+
+    if (result.errorMessage) {
+      toast.error(result.errorMessage);
+      return;
     }
+
+    if (result.message) {
+      setRecentMessages((prev) => [result.message, ...prev].slice(0, 20));
+      setMessage("");
+    }
+
+    toast.success(result.successMessage ?? "Message sent successfully.");
   };
 
   return (
