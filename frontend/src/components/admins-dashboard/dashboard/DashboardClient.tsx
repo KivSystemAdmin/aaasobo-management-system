@@ -192,8 +192,9 @@ export default function DashboardClient({
       return;
     }
 
-    if (result.message) {
-      setRecentMessages((prev) => [result.message, ...prev].slice(0, 20));
+    const createdMessage = result.message;
+    if (createdMessage) {
+      setRecentMessages((prev) => [createdMessage, ...prev].slice(0, 20));
       setMessage("");
     }
 
