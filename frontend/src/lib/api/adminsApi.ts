@@ -893,7 +893,7 @@ export const registerAdmin = async (
       return { email: EMAIL_ALREADY_REGISTERED_ERROR.en };
     }
 
-    if (response.status !== 200) {
+    if (response.status !== 201) {
       throw new Error(`HTTP Status: ${response.status} ${response.statusText}`);
     }
 
