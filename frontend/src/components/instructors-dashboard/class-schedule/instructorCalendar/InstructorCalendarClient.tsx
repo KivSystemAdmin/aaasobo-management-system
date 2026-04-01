@@ -79,6 +79,8 @@ const InstructorCalendarClient = ({
       <MessageBoardPanel
         posts={visiblePosts}
         storageKey="instructorClassScheduleMessageBoardOpenState"
+        readMessageStorageKey={`readMessageNumber:instructor:${instructorId}`}
+        adminId={adminId}
       />
       <div className={styles.mobileToolbar}>
         <div className={styles.navGroup}>
