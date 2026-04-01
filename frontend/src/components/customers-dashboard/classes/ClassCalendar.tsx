@@ -55,8 +55,7 @@ export default async function ClassCalendar({
       <MessageBoardPanel
         posts={visiblePosts}
         storageKey="customerClassCalendarMessageBoardOpenState"
-        readMessageStorageKey={`readMessageNumber:customer:${customerId}`}
-        adminId={adminId}
+        readMessageStorageKey={"readCustomerMessageNumber"}
       />
 
       <ClassActions

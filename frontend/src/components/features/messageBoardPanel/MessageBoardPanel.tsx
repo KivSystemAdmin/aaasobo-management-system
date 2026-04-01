@@ -10,14 +10,12 @@ type MessageBoardPanelProps = {
   posts: MessageBoardPostItem[];
   storageKey: string;
   readMessageStorageKey: string;
-  adminId?: number;
 };
 
 export default function MessageBoardPanel({
   posts,
   storageKey,
   readMessageStorageKey,
-  adminId,
 }: MessageBoardPanelProps) {
   const [isOpen, setIsOpen] = useState(() => {
     if (typeof window === "undefined") return true;
@@ -105,7 +103,6 @@ export default function MessageBoardPanel({
                 <time>{formatDate(latestPost.createdAt)}</time>
                 <button
                   type="button"
-                  disabled={adminId !== undefined}
                   className={`${styles.readReactionButton} ${
                     hasReadLatestMessage ? styles.hasRead : ""
                   }`}
