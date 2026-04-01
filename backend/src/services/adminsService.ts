@@ -1,6 +1,10 @@
 import { prisma } from "../../prisma/prismaClient";
 import { Admin } from "../../generated/prisma";
-import { hashPassword } from "../utils/commonUtils";
+import {
+  hashPassword,
+  maskedHeadLetters,
+  maskedSuffix,
+} from "../utils/commonUtils";
 
 // Register a new admin in the DB
 export const registerAdmin = async (data: {
@@ -50,14 +54,23 @@ export const updateAdminPassword = async (id: number, newPassword: string) => {
 };
 
 // Delete the selected admin
-// Technically, the record is not deleted at this time. Only terminationAt datetime is set.
+// Technically, the record is not deleted at this time.
+// Only terminationAt datetime is set and mask email.
 export const deleteAdmin = async (adminId: number) => {
+  const now = new Date();
+  const suffix = maskedSuffix;
   try {
     // Delete the Admin data.
-    const admin = await prisma.admin.delete({
-      where: { id: adminId },
+    const admin = await prisma.admin.update({
+      where: {
+        id: adminId,
+      },
+      data: {
+        name: maskedHeadLetters,
+        email: `${maskedHeadLetters}@${suffix}${adminId}.xxx`,
+        terminationAt: now,
+      },
     });
-
     return admin;
   } catch (error) {
     console.error("Database Error:", error);
@@ -69,6 +82,9 @@ export const deleteAdmin = async (adminId: number) => {
 export const getAllAdmins = async () => {
   try {
     return await prisma.admin.findMany({
+      where: {
+        terminationAt: null,
+      },
       select: {
         id: true,
         name: true,

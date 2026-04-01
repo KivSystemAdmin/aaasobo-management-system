@@ -153,7 +153,6 @@ export const deleteAdminController = async (
 
   try {
     const deletedAdmin = await deleteAdmin(adminId);
-
     res.status(200).json({
       message: "The admin profile was deleted successfully",
       id: deletedAdmin.id,
