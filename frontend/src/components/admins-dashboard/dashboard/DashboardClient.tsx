@@ -205,7 +205,7 @@ export default function DashboardClient({
     <section className={styles.dashboardContainer}>
       <div className={styles.messageBoardCard}>
         <div className={styles.messageHeader}>
-          <h2>Message Board</h2>
+          <h3>Message Board</h3>
           <button
             type="button"
             className={styles.toggleButton}
