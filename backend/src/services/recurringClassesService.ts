@@ -13,10 +13,8 @@ interface CreateRegularClassParams {
   timezone: string;
 }
 
-interface UpdateRegularClassParams extends Omit<
-  CreateRegularClassParams,
-  "subscriptionId"
-> {
+interface UpdateRegularClassParams
+  extends Omit<CreateRegularClassParams, "subscriptionId"> {
   recurringClassId: number;
 }
 

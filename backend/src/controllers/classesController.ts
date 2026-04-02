@@ -411,9 +411,11 @@ const notifySameDayRebookIfNeeded = async ({
   if (!isSameDay) return;
 
   try {
-    const instructor = await getInstructorContactById(newClass.instructorId!);
-    const customer = await getCustomerContactById(newClass.customerId);
-    const children = await getChildrenNamesByIds(childrenIds);
+    const [instructor, customer, children] = await Promise.all([
+      getInstructorContactById(newClass.instructorId!),
+      getCustomerContactById(newClass.customerId),
+      getChildrenNamesByIds(childrenIds),
+    ]);
 
     if (!instructor || !customer || !children) {
       console.error(

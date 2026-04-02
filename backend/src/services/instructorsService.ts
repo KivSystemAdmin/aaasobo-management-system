@@ -13,7 +13,6 @@ import { convertToUTCDate } from "../utils/dateUtils";
 import { put, del } from "@vercel/blob";
 import { randomUUID } from "crypto";
 import { EnglishBackground } from "../types";
-import { getTagsByInstructorIds } from "./instructorTagsService";
 
 // Register a new instructor account in the DB
 export const registerInstructor = async (data: {
@@ -316,27 +315,40 @@ export const getInstructorProfiles = async () => {
         { terminationAt: { gt: now } }, // Active (Future termination)
       ],
     },
+    select: {
+      id: true,
+      name: true,
+      nickname: true,
+      icon: true,
+      englishBackground: true,
+      tagAssignments: {
+        where: {
+          tag: {
+            deletedAt: null,
+          },
+        },
+        select: {
+          tag: {
+            select: {
+              id: true,
+              label: true,
+              sortOrder: true,
+            },
+          },
+        },
+      },
+    },
   });
 
-  const tags = await getTagsByInstructorIds(instructors.map((row) => row.id));
-  const tagsByInstructorId = new Map<number, typeof tags>();
-  for (const tag of tags) {
-    const current = tagsByInstructorId.get(tag.instructorId) || [];
-    current.push(tag);
-    tagsByInstructorId.set(tag.instructorId, current);
-  }
-
-  const instructorProfiles = instructors.map((instructor: Instructor) => ({
+  const instructorProfiles = instructors.map((instructor) => ({
     id: instructor.id,
     name: instructor.name,
     nickname: instructor.nickname,
     icon: instructor.icon,
     englishBackground: instructor.englishBackground,
-    tags: (tagsByInstructorId.get(instructor.id) || []).map((tag) => ({
-      id: tag.id,
-      label: tag.label,
-      sortOrder: tag.sortOrder,
-    })),
+    tags: instructor.tagAssignments
+      .map((assignment) => assignment.tag)
+      .sort((a, b) => a.sortOrder - b.sortOrder),
   }));
 
   return instructorProfiles;
@@ -356,15 +368,30 @@ export const getInstructorProfilesByEnglishBackground = async (
         in: englishBackground,
       }, // Specific English background
     },
+    select: {
+      id: true,
+      name: true,
+      nickname: true,
+      icon: true,
+      englishBackground: true,
+      tagAssignments: {
+        where: {
+          tag: {
+            deletedAt: null,
+          },
+        },
+        select: {
+          tag: {
+            select: {
+              id: true,
+              label: true,
+              sortOrder: true,
+            },
+          },
+        },
+      },
+    },
   });
-
-  const tags = await getTagsByInstructorIds(instructors.map((row) => row.id));
-  const tagsByInstructorId = new Map<number, typeof tags>();
-  for (const tag of tags) {
-    const current = tagsByInstructorId.get(tag.instructorId) || [];
-    current.push(tag);
-    tagsByInstructorId.set(tag.instructorId, current);
-  }
 
   const instructorProfiles = instructors.map((instructor) => ({
     id: instructor.id,
@@ -372,11 +399,9 @@ export const getInstructorProfilesByEnglishBackground = async (
     nickname: instructor.nickname,
     icon: instructor.icon,
     englishBackground: instructor.englishBackground,
-    tags: (tagsByInstructorId.get(instructor.id) || []).map((tag) => ({
-      id: tag.id,
-      label: tag.label,
-      sortOrder: tag.sortOrder,
-    })),
+    tags: instructor.tagAssignments
+      .map((assignment) => assignment.tag)
+      .sort((a, b) => a.sortOrder - b.sortOrder),
   }));
 
   return instructorProfiles;
