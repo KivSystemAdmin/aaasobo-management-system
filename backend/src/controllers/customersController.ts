@@ -1,4 +1,5 @@
 import { Response } from "express";
+import { deletePastAdmins } from "../services/adminsService";
 import {
   deleteCustomer,
   deletePastCustomers,

@@ -296,6 +296,7 @@ exports.Prisma.AdminScalarFieldEnum = {
   name: 'name',
   email: 'email',
   password: 'password',
+  terminationAt: 'terminationAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

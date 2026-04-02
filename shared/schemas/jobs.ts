@@ -48,6 +48,12 @@ export const DeleteOldClassesResponse = z.object({
   }),
 });
 
+export const DeletePastAdminsResponse = z.object({
+  deletedAdmins: z.object({
+    count: z.number().describe("Number of deleted admins"),
+  }),
+});
+
 export const DeletePastCustomersResponse = z.object({
   deletedCustomers: z.object({
     count: z.number().describe("Number of deleted customers"),
@@ -57,6 +63,12 @@ export const DeletePastCustomersResponse = z.object({
 export const DeletePastInstructorsResponse = z.object({
   deletedInstructors: z.object({
     count: z.number().describe("Number of deleted instructors"),
+  }),
+});
+
+export const DeletePastMessageBoardPostsResponse = z.object({
+  deletedPosts: z.object({
+    count: z.number().describe("Number of deleted message board posts"),
   }),
 });
 
@@ -83,11 +95,15 @@ export type UpdateSundayColorResponse = z.infer<
 >;
 export type MaskInstructorsResponse = z.infer<typeof MaskInstructorsResponse>;
 export type DeleteOldClassesResponse = z.infer<typeof DeleteOldClassesResponse>;
+export type DeletePastAdminsResponse = z.infer<typeof DeletePastAdminsResponse>;
 export type DeletePastCustomersResponse = z.infer<
   typeof DeletePastCustomersResponse
 >;
 export type DeletePastInstructorsResponse = z.infer<
   typeof DeletePastInstructorsResponse
+>;
+export type DeletePastMessageBoardPostsResponse = z.infer<
+  typeof DeletePastMessageBoardPostsResponse
 >;
 export type DeleteOldBusinessCalendarResponse = z.infer<
   typeof DeleteOldBusinessCalendarResponse

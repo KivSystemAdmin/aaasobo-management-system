@@ -133,6 +133,11 @@ function AdminProfile({
   if (typeof admin === "string") {
     return <p>{admin}</p>;
   }
+
+  if (!latestAdmin) {
+    return <p>Admin not found</p>;
+  }
+
   const adminId = admin.id;
 
   return (

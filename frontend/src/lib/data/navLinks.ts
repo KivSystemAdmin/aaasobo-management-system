@@ -62,14 +62,14 @@ export function getLinks(
       icon: HomeModernIcon,
     },
     {
-      name: "Class List",
-      href: `/admins/${userId}/class-list`,
-      icon: ClipboardDocumentListIcon,
-    },
-    {
       name: "Class Calendar",
       href: `/admins/${userId}/calendar`,
       icon: CalendarDaysIcon,
+    },
+    {
+      name: "Class List",
+      href: `/admins/${userId}/class-list`,
+      icon: ClipboardDocumentListIcon,
     },
     {
       name: "Customer List",

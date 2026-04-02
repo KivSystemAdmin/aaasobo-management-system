@@ -893,7 +893,7 @@ export const registerAdmin = async (
       return { email: EMAIL_ALREADY_REGISTERED_ERROR.en };
     }
 
-    if (response.status !== 200) {
+    if (response.status !== 201) {
       throw new Error(`HTTP Status: ${response.status} ${response.statusText}`);
     }
 
@@ -972,5 +972,57 @@ export const deleteAdmin = async (
     return {
       errorMessage: GENERAL_ERROR_MESSAGE,
     };
+  }
+};
+
+// Delete admins who have left the service more than 3 years ago (Only for Vercel Cron Job)
+export const deletePastAdmins = async (authorization: string) => {
+  try {
+    // From server component
+    const apiUrl = `${BACKEND_ORIGIN}/jobs/delete/past-admins`;
+    const method = "DELETE";
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: authorization,
+    };
+    const response = await fetch(apiUrl, {
+      method,
+      headers,
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return data.error;
+    }
+  } catch (error) {
+    console.error("API error while deleting past admins:", error);
+    throw error;
+  }
+};
+
+// Delete message board posts that are older than the threshold (Only for Vercel Cron Job)
+export const deletePastMessageBoardPosts = async (authorization: string) => {
+  try {
+    // From server component
+    const apiUrl = `${BACKEND_ORIGIN}/jobs/delete/past-message-board-posts`;
+    const method = "DELETE";
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: authorization,
+    };
+    const response = await fetch(apiUrl, {
+      method,
+      headers,
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return data.error;
+    }
+  } catch (error) {
+    console.error("API error while deleting past message board posts:", error);
+    throw error;
   }
 };

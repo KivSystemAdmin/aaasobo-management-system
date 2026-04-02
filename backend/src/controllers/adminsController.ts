@@ -11,6 +11,7 @@ import {
   getAdminById,
   updateAdmin,
   deleteAdmin,
+  deletePastAdmins,
 } from "../services/adminsService";
 import {
   getAllInstructorsForAdminList,
@@ -58,6 +59,7 @@ import {
   createMessageBoardPost,
   getMessageBoardPosts,
   isValidMessageTarget,
+  deletePastMessageBoardPosts,
 } from "../services/messageBoardService";
 import {
   days,
@@ -153,7 +155,6 @@ export const deleteAdminController = async (
 
   try {
     const deletedAdmin = await deleteAdmin(adminId);
-
     res.status(200).json({
       message: "The admin profile was deleted successfully",
       id: deletedAdmin.id,
@@ -1295,5 +1296,40 @@ export const createMessageBoardPostController = async (
     });
   } catch (error) {
     return res.status(500).json({ error });
+  }
+};
+
+// Delete admins who have left the service more than 3 years ago
+export const deletePastAdminsController = async (_: Request, res: Response) => {
+  try {
+    const deletedAdmins = await deletePastAdmins();
+    res.status(200).json({ deletedAdmins });
+  } catch (error) {
+    console.error("Error deleting past admins", {
+      error,
+      context: {
+        time: new Date().toISOString(),
+      },
+    });
+    res.sendStatus(500);
+  }
+};
+
+// Delete message board posts that are older than the threshold
+export const deletePastMessageBoardPostsController = async (
+  _: Request,
+  res: Response,
+) => {
+  try {
+    const deletedPosts = await deletePastMessageBoardPosts();
+    res.status(200).json({ deletedPosts });
+  } catch (error) {
+    console.error("Error deleting past message board posts", {
+      error,
+      context: {
+        time: new Date().toISOString(),
+      },
+    });
+    res.sendStatus(500);
   }
 };
