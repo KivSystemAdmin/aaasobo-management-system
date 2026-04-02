@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { maskedHeadLetters } from "../../../utils/commonUtils";
 import request from "supertest";
 import { server } from "../../../server";
 import {
@@ -71,15 +72,37 @@ describe("DELETE /admins/admin-list/:id", () => {
     const targetAdmin = await createAdmin();
     const authCookie = await generateAuthCookie(authAdmin.id, "admin");
 
-    await request(server)
+    const response = await request(server)
       .delete(`/admins/admin-list/${targetAdmin.id}`)
       .set("Cookie", authCookie)
       .expect(200);
 
+    expect(response.body).toEqual({
+      message: "The admin profile was deleted successfully",
+      id: targetAdmin.id,
+    });
+
     const deletedAdmin = await prisma.admin.findUnique({
       where: { id: targetAdmin.id },
     });
-    expect(deletedAdmin).toBeNull();
+
+    expect(deletedAdmin).not.toBeNull();
+    expect(deletedAdmin?.terminationAt).not.toBeNull();
+    expect(deletedAdmin?.email).toContain(maskedHeadLetters);
+
+    const listResponse = await request(server)
+      .get("/admins/admin-list")
+      .set("Cookie", authCookie)
+      .expect(200);
+
+    expect(listResponse.body.data).toEqual([
+      {
+        No: 1,
+        ID: authAdmin.id,
+        Admin: authAdmin.name,
+        Email: authAdmin.email,
+      },
+    ]);
   });
 
   it("fail for unauthenticated request", async () => {
