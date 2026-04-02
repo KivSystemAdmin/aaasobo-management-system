@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -29,7 +29,6 @@ const InstructorCalendarClient = ({
   messageBoardPosts = [],
 }: InstructorCalendarClientProps) => {
   const router = useRouter();
-  const cacheBust = useId();
   const [calendarApi, setCalendarApi] = useState<CalendarApi | null>(null);
   const [currentTitle, setCurrentTitle] = useState("");
   const [currentView, setCurrentView] = useState("timeGridWeek");
@@ -52,10 +51,7 @@ const InstructorCalendarClient = ({
     router.push(redirectURL);
   };
 
-  const renderInstructorEventContent = createRenderEventContent(
-    "instructor",
-    cacheBust,
-  );
+  const renderInstructorEventContent = createRenderEventContent("instructor");
 
   const classSlotTimes = getClassSlotTimesForCalendar();
 

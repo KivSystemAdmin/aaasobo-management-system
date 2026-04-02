@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import styles from "./RegularClasses.module.scss";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { getSubscriptionsByCustomerId } from "@/lib/api/subscriptionsApi";
@@ -22,7 +21,6 @@ function RegularClasses({
   userSessionType?: UserType;
 }) {
   const { language } = useLanguage();
-  const router = useRouter();
   const [subscriptionsData, setSubscriptionsData] =
     useState<Subscriptions | null>(null);
   const [showAddPlan, setShowAddPlan] = useState(false);
@@ -38,7 +36,6 @@ function RegularClasses({
 
   const handleUpdateSubscription = () => {
     setUpdateCount((count) => count + 1);
-    router.refresh();
   };
 
   useEffect(() => {

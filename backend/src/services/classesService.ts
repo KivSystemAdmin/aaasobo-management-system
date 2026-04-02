@@ -16,6 +16,74 @@ import {
 } from "../utils/colors";
 import { getInstructorAvailableSlots } from "./instructorScheduleService";
 
+type ClassListItem = {
+  id: number;
+  dateTime: Date | null;
+  status: Status;
+  recurringClassId: number | null;
+  customer: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  instructor: {
+    id: number;
+    name: string;
+  } | null;
+};
+
+type CustomerClassListItem = {
+  id: number;
+  dateTime: Date | null;
+  status: Status;
+  recurringClassId: number | null;
+  rebookableUntil: Date | null;
+  updatedAt: Date;
+  classCode: string;
+  customer: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  instructor: {
+    id: number;
+    name: string;
+    icon: string;
+    classURL: string;
+    nickname: string;
+    meetingId: string;
+    passcode: string;
+  } | null;
+  classAttendance: Array<{
+    children: {
+      id: number;
+      name: string;
+    };
+  }>;
+};
+
+type AdminClassPeriodListItem = {
+  id: number;
+  dateTime: Date | null;
+  status: Status;
+  classCode: string;
+  isFreeTrial: boolean;
+  canceledAt: Date | null;
+  customer: {
+    id: number;
+    name: string;
+  };
+  instructor: {
+    id: number;
+    nickname: string;
+  } | null;
+  classAttendance: Array<{
+    children: {
+      name: string;
+    };
+  }>;
+};
+
 export class InstructorUnavailableError extends Error {
   constructor() {
     super("instructor unavailable");
@@ -25,8 +93,26 @@ export class InstructorUnavailableError extends Error {
 // Fetch all the classes with related instructors and customers data
 export const getAllClasses = async () => {
   try {
-    const classes = await prisma.class.findMany({
-      include: { instructor: true, customer: true },
+    const classes: ClassListItem[] = await prisma.class.findMany({
+      select: {
+        id: true,
+        dateTime: true,
+        status: true,
+        recurringClassId: true,
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        instructor: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
       orderBy: { dateTime: "desc" },
     });
 
@@ -43,17 +129,41 @@ export const getClassesWithinPeriod = async (
   endDate: Date,
 ) => {
   try {
-    const classes = await prisma.class.findMany({
+    const classes: AdminClassPeriodListItem[] = await prisma.class.findMany({
       where: {
         dateTime: {
           gte: startDate,
           lte: endDate,
         },
       },
-      include: {
-        instructor: true,
-        customer: true,
-        classAttendance: { include: { children: true } },
+      select: {
+        id: true,
+        dateTime: true,
+        status: true,
+        classCode: true,
+        isFreeTrial: true,
+        canceledAt: true,
+        instructor: {
+          select: {
+            id: true,
+            nickname: true,
+          },
+        },
+        customer: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        classAttendance: {
+          select: {
+            children: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { dateTime: "asc" },
     });
@@ -68,12 +178,44 @@ export const getClassesWithinPeriod = async (
 // Fetch classes by customer id along with related instructors and customers data
 export const getClassesByCustomerId = async (customerId: number) => {
   try {
-    const classes = await prisma.class.findMany({
+    const classes: CustomerClassListItem[] = await prisma.class.findMany({
       where: { customerId },
-      include: {
-        instructor: true,
-        customer: true,
-        classAttendance: { include: { children: true } },
+      select: {
+        id: true,
+        dateTime: true,
+        status: true,
+        recurringClassId: true,
+        rebookableUntil: true,
+        updatedAt: true,
+        classCode: true,
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        instructor: {
+          select: {
+            id: true,
+            name: true,
+            icon: true,
+            classURL: true,
+            nickname: true,
+            meetingId: true,
+            passcode: true,
+          },
+        },
+        classAttendance: {
+          select: {
+            children: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { dateTime: "asc" },
     });

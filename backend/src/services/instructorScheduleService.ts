@@ -138,12 +138,21 @@ export const createInstructorSchedule = async (data: {
 
         const effectiveWeekday = effectiveFrom.getUTCDay();
         const datePrefix = effectiveFrom.toISOString().slice(0, 10);
+        const lockedSlotDateTimes = Array.from(
+          new Set(
+            removedSlots
+              .filter((removedSlot) => removedSlot.weekday === effectiveWeekday)
+              .map((removedSlot) => {
+                const slotTime = removedSlot.startTime
+                  .toISOString()
+                  .slice(11, 19);
+                return new Date(`${datePrefix}T${slotTime}.000Z`).toISOString();
+              }),
+          ),
+        );
 
-        for (const removedSlot of removedSlots) {
-          if (removedSlot.weekday !== effectiveWeekday) continue;
-
-          const slotTime = removedSlot.startTime.toISOString().slice(11, 19);
-          const lockedSlotDateTime = new Date(`${datePrefix}T${slotTime}.000Z`);
+        for (const lockedSlotDateTimeIso of lockedSlotDateTimes) {
+          const lockedSlotDateTime = new Date(lockedSlotDateTimeIso);
           const now = new Date();
           const lockKey = `instructor:${instructorId}:${lockedSlotDateTime.toISOString()}`;
           await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;

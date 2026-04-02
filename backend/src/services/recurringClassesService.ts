@@ -431,6 +431,17 @@ export const getRegularClassesBySubscriptionId = async (
   });
 };
 
+export const getRecurringClassesHistoryCountBySubscriptionId = async (
+  subscriptionId: number,
+) => {
+  return prisma.recurringClass.count({
+    where: {
+      subscriptionId,
+      endAt: { not: null },
+    },
+  });
+};
+
 export const updateRegularClass = async (params: UpdateRegularClassParams) => {
   const {
     recurringClassId,

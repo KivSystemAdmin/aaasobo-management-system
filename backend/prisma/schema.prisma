@@ -113,6 +113,7 @@ model Class {
   @@index([customerId, status, dateTime])
   @@index([instructorId, status, dateTime])
   @@index([recurringClassId, dateTime])
+  @@index([subscriptionId])
   @@index([rebookableUntil])
   @@index([canceledAt])
 }
@@ -124,7 +125,6 @@ model ClassAttendance {
   class      Class @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   @@id([classId, childrenId])
-  @@index([classId])
   @@index([childrenId])
 }
 
@@ -138,6 +138,8 @@ model Plan {
   updatedAt         DateTime       @default(now()) @updatedAt
   englishBackground Int // 0: non-native, 1: native-A, 2: native-B
   subscription      Subscription[]
+
+  @@index([terminationAt])
 }
 
 model Subscription {
@@ -153,6 +155,8 @@ model Subscription {
   plan           Plan             @relation(fields: [planId], references: [id])
 
   @@index([customerId])
+  @@index([planId])
+  @@index([customerId, planId])
 }
 
 model RecurringClass {
@@ -178,7 +182,6 @@ model RecurringClassAttendance {
   recurringClass   RecurringClass @relation(fields: [recurringClassId], references: [id])
 
   @@id([recurringClassId, childrenId])
-  @@index([recurringClassId])
   @@index([childrenId])
 }
 
@@ -189,6 +192,7 @@ model VerificationToken {
   expires DateTime
 
   @@unique([email, token])
+  @@index([email])
 }
 
 model PasswordResetToken {
@@ -198,6 +202,7 @@ model PasswordResetToken {
   expires DateTime
 
   @@unique([email, token])
+  @@index([email])
 }
 
 model Schedule {
@@ -205,6 +210,8 @@ model Schedule {
   date    DateTime @unique
   eventId Int
   event   Event    @relation(fields: [eventId], references: [id])
+
+  @@index([eventId])
 }
 
 model Event {
@@ -224,7 +231,6 @@ model InstructorSchedule {
   slots         InstructorSlot[]
 
   @@unique([instructorId, effectiveTo])
-  @@index([instructorId, effectiveTo])
   @@index([instructorId, effectiveFrom])
   @@index([instructorId, timezone, effectiveFrom])
 }
@@ -236,6 +242,7 @@ model InstructorSlot {
   schedule   InstructorSchedule @relation(fields: [scheduleId], references: [id])
 
   @@id([scheduleId, weekday, startTime])
+  @@index([weekday, startTime])
 }
 
 model InstructorAbsence {
@@ -244,7 +251,6 @@ model InstructorAbsence {
   instructor   Instructor @relation(fields: [instructorId], references: [id])
 
   @@id([instructorId, absentAt])
-  @@index([instructorId])
   @@index([absentAt])
 }
 
@@ -259,6 +265,9 @@ model InstructorFee {
   cancelFee              Int
   cancelWithoutNoticeFee Int
   instructor             Instructor @relation(fields: [instructorId], references: [id])
+
+  @@index([instructorId, effectiveFrom])
+  @@index([instructorId, effectiveTo])
 }
 
 model SystemStatus {
@@ -276,6 +285,8 @@ model Admin {
   terminationAt DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now())
+
+  @@index([terminationAt])
 }
 
 model Child {

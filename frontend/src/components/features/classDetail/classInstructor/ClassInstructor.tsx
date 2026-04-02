@@ -1,6 +1,6 @@
 import styles from "./ClassInstructor.module.scss";
 import Image from "next/image";
-import { useId, useState } from "react";
+import { useState } from "react";
 import { defaultUserImageUrl } from "@/lib/data/data";
 
 const ClassInstructor = ({
@@ -19,16 +19,13 @@ const ClassInstructor = ({
   onClick?: () => void;
 }) => {
   const [imageError, setImageError] = useState(false);
-  const cacheBust = useId();
   const handleImageError = () => {
     setImageError(true);
   };
   return (
     <div className={`${styles.instructor} ${className && styles[className]}`}>
       <Image
-        src={
-          imageError ? defaultUserImageUrl : `${instructorIcon}?t=${cacheBust}`
-        }
+        src={imageError ? defaultUserImageUrl : instructorIcon}
         alt={instructorNickname}
         width={width}
         height={width}
