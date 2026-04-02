@@ -4,6 +4,7 @@ import {
   hashPassword,
   maskedHeadLetters,
   maskedSuffix,
+  MONTHS_TO_DELETE_ADMINS,
 } from "../utils/commonUtils";
 
 // Register a new admin in the DB
@@ -128,3 +129,17 @@ export async function getAdminById(id: number) {
     throw new Error("Failed to fetch admin.");
   }
 }
+
+// Delete admins who have left the service more than 3 years ago
+export const deletePastAdmins = async () => {
+  const thresholdDate = new Date();
+  thresholdDate.setMonth(thresholdDate.getMonth() - MONTHS_TO_DELETE_ADMINS);
+
+  return await prisma.admin.deleteMany({
+    where: {
+      terminationAt: {
+        lt: thresholdDate,
+      },
+    },
+  });
+};

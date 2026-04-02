@@ -6,6 +6,10 @@ import {
 } from "../controllers/maintenanceController";
 import { maskInstructorsController } from "../controllers/instructorsController";
 import { deleteOldClassesController } from "../controllers/classesController";
+import {
+  deletePastAdminsController,
+  deletePastMessageBoardPostsController,
+} from "../controllers/adminsController";
 import { deletePastCustomersController } from "../controllers/customersController";
 import { deletePastInstructorsController } from "../controllers/instructorsController";
 import { deleteOldBusinessCalendarController } from "../controllers/schedulesController";
@@ -20,8 +24,10 @@ import {
   UpdateSundayColorResponse,
   MaskInstructorsResponse,
   DeleteOldClassesResponse,
+  DeletePastAdminsResponse,
   DeletePastCustomersResponse,
   DeletePastInstructorsResponse,
+  DeletePastMessageBoardPostsResponse,
   DeleteOldBusinessCalendarResponse,
   DeleteUnnecessaryPlansResponse,
 } from "../../../shared/schemas/jobs";
@@ -148,6 +154,28 @@ const validatedRouteConfigs = {
       },
     },
   ] as const,
+  "/delete/past-admins": [
+    {
+      method: "delete",
+      middleware: [verifyCronJobAuthorization],
+      handler: deletePastAdminsController,
+      openapi: {
+        summary: "Delete past admins",
+        description:
+          "Deletes admins who have left the service more than 3 years ago. This is a scheduled cron job endpoint.",
+        responses: {
+          "200": {
+            description: "Past admins deleted successfully",
+            schema: DeletePastAdminsResponse,
+          },
+          "500": {
+            description: "Error deleting past admins",
+            schema: MessageErrorResponse,
+          },
+        },
+      },
+    },
+  ] as const,
   "/delete/past-customers": [
     {
       method: "delete",
@@ -186,6 +214,28 @@ const validatedRouteConfigs = {
           },
           "500": {
             description: "Error deleting past instructors",
+            schema: MessageErrorResponse,
+          },
+        },
+      },
+    },
+  ] as const,
+  "/delete/past-message-board-posts": [
+    {
+      method: "delete",
+      middleware: [verifyCronJobAuthorization],
+      handler: deletePastMessageBoardPostsController,
+      openapi: {
+        summary: "Delete past message board posts",
+        description:
+          "Deletes message board posts that are older than the threshold. This is a scheduled cron job endpoint.",
+        responses: {
+          "200": {
+            description: "Past message board posts deleted successfully",
+            schema: DeletePastMessageBoardPostsResponse,
+          },
+          "500": {
+            description: "Error deleting past message board posts",
             schema: MessageErrorResponse,
           },
         },
