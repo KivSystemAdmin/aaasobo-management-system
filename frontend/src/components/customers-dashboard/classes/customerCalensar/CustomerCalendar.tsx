@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useId, useState } from "react";
+import React, { useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -28,7 +28,6 @@ export default function CustomerCalendar({
 }: CustomerCalendarProps) {
   const [isClassDetailModalOpen, setIsClassDetailModalOpen] = useState(false);
   const [classDetail, setClassDetail] = useState<CustomerClass | null>(null);
-  const cacheBust = useId();
   const { language } = useLanguage();
 
   const handleEventClick = (clickInfo: EventClickArg) => {
@@ -41,10 +40,7 @@ export default function CustomerCalendar({
   };
 
   const validRange = () => getValidRange(createdAt, 3);
-  const renderCustomerEventContent = createRenderEventContent(
-    "customer",
-    cacheBust,
-  );
+  const renderCustomerEventContent = createRenderEventContent("customer");
 
   const handleModalClose = () => {
     setClassDetail(null);

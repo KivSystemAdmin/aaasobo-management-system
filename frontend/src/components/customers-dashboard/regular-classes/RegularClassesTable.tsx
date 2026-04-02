@@ -1,9 +1,11 @@
 "use client";
 
-import { getRecurringClassesBySubscriptionId } from "@/lib/api/recurringClassesApi";
+import {
+  getRecurringClassesBySubscriptionId,
+  getRecurringClassesHistoryCountBySubscriptionId,
+} from "@/lib/api/recurringClassesApi";
 import { getChildrenByCustomerId } from "@/lib/api/childrenApi";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import styles from "./RegularClassesTable.module.scss";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import RegularClassCard from "./RegularClassCard";
@@ -39,7 +41,6 @@ function RegularClassesTable({
   plan?: Plan;
   refreshKey?: number;
 }) {
-  const router = useRouter();
   const [activeRecurringClasses, setActiveRecurringClasses] = useState<
     RecurringClass[]
   >([]);
@@ -71,17 +72,15 @@ function RegularClassesTable({
 
     const fetchHistoryCount = async () => {
       try {
-        // For now, fetch history to get count - in production, we'd want a separate count endpoint
-        const data = await getRecurringClassesBySubscriptionId(
-          subscriptionId,
-          "history",
-        );
-        setHistoryCount(data.recurringClasses.length);
+        const count =
+          await getRecurringClassesHistoryCountBySubscriptionId(subscriptionId);
+        setHistoryCount(count);
         // Cache the data if it's small to avoid refetch
-        if (
-          data.recurringClasses.length > 0 &&
-          data.recurringClasses.length <= 10
-        ) {
+        if (count > 0 && count <= 10) {
+          const data = await getRecurringClassesBySubscriptionId(
+            subscriptionId,
+            "history",
+          );
           setHistoryRecurringClasses(data.recurringClasses);
           setHistoryLoaded(true);
         }
@@ -141,7 +140,6 @@ function RegularClassesTable({
 
   const handleEditSuccess = () => {
     setUpdateCount((count) => count + 1);
-    router.refresh();
     handleCloseEditModal();
   };
 

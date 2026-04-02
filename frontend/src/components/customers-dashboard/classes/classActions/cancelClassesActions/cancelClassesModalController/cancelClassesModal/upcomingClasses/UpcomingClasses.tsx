@@ -6,7 +6,7 @@ import {
 import styles from "./UpcomingClasses.module.scss";
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
-import { useEffect, useId } from "react";
+import { useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function UpcomingClasses({
@@ -15,7 +15,6 @@ export default function UpcomingClasses({
   setSelectedClasses,
   isCancelingModalOpen,
 }: UpcomingClassesProps) {
-  const cacheBust = useId();
   const { language } = useLanguage();
   useEffect(() => {
     if (!isCancelingModalOpen) setSelectedClasses([]);
@@ -89,7 +88,7 @@ export default function UpcomingClasses({
 
               <div className={`${styles.item} ${styles["item--instructor"]}`}>
                 <Image
-                  src={`${eachClass.instructor.icon}?t=${cacheBust}`}
+                  src={eachClass.instructor.icon}
                   alt={eachClass.instructor.nickname}
                   width={40}
                   height={40}

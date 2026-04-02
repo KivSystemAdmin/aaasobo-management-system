@@ -13,8 +13,10 @@ interface CreateRegularClassParams {
   timezone: string;
 }
 
-interface UpdateRegularClassParams
-  extends Omit<CreateRegularClassParams, "subscriptionId"> {
+interface UpdateRegularClassParams extends Omit<
+  CreateRegularClassParams,
+  "subscriptionId"
+> {
   recurringClassId: number;
 }
 
@@ -428,6 +430,17 @@ export const getRegularClassesBySubscriptionId = async (
       recurringClassAttendance,
       endAt: displayEndAt ? displayEndAt : null,
     };
+  });
+};
+
+export const getRecurringClassesHistoryCountBySubscriptionId = async (
+  subscriptionId: number,
+) => {
+  return prisma.recurringClass.count({
+    where: {
+      subscriptionId,
+      endAt: { not: null },
+    },
   });
 };
 
