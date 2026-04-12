@@ -26,6 +26,10 @@ function AddSubscription({
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectTypeValue, setSelectTypeValue] = useState<string>("");
+  const [selectedEnglishBG, setSelectedEnglishBG] = useState<number | null>(
+    null,
+  );
+  const englishBGs = [...new Set(plansData.map((p) => p.englishBackground))];
 
   // Selecting a plan from the dropdown.
   const handleSelectingPlan = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -47,6 +51,12 @@ function AddSubscription({
     handleSelectingPlan(event);
     setFilterColumn(event.target.value);
     changeOptionColor(event.target);
+  };
+
+  const handleEnglishBGChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = Number(e.target.value);
+    setSelectedEnglishBG(value);
+    setSelectedPlan(null);
   };
 
   // Change the input color based on the date input value
@@ -111,6 +121,30 @@ function AddSubscription({
               </div>
               <div className={styles.planDate}>
                 <div className={styles.fieldGroup}>
+                  <h4 className={styles.fieldLabel}>English Background</h4>
+                  <select
+                    value={selectedEnglishBG ?? ""}
+                    onChange={handleEnglishBGChange}
+                    className={styles.selectField}
+                  >
+                    <option>Select a category</option>
+                    {englishBGs.map((id) => {
+                      const label =
+                        id === 1
+                          ? "Native A"
+                          : id === 2
+                            ? "Native B"
+                            : "Non Native";
+
+                      return (
+                        <option key={id} value={id}>
+                          {label}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+                <div className={styles.fieldGroup}>
                   <h4 className={styles.fieldLabel}>Plan</h4>
                   <select
                     value={filterColumn}
@@ -121,7 +155,8 @@ function AddSubscription({
                       Select a plan
                     </option>
                     {plansData.map((plan) => {
-                      const { id, name, description } = plan;
+                      const { id, name, description, englishBackground } = plan;
+                      if (englishBackground !== selectedEnglishBG) return;
                       return (
                         <option key={id} value={id}>
                           {name} ({description})
