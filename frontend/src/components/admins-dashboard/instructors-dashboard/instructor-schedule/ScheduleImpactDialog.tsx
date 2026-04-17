@@ -32,15 +32,17 @@ export default function ScheduleImpactDialog({
           {terminatedRecurringClassCount > 0 && (
             <li>
               {terminatedRecurringClassCount} regular{" "}
-              {terminatedRecurringClassCount === 1 ? "class was" : "classes were"}{" "}
+              {terminatedRecurringClassCount === 1
+                ? "class was"
+                : "classes were"}{" "}
               terminated.
             </li>
           )}
           {canceledClassCount > 0 && (
             <li>
               {canceledClassCount} booked{" "}
-              {canceledClassCount === 1 ? "class was" : "classes were"}{" "}
-              canceled by the instructor.
+              {canceledClassCount === 1 ? "class was" : "classes were"} canceled
+              by the instructor.
             </li>
           )}
         </ul>
