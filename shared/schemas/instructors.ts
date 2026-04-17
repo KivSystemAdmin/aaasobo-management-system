@@ -209,6 +209,19 @@ export const ActiveInstructorSchedule = z.object({
   slots: z.array(InstructorSlot).describe("Array of instructor time slots"),
 });
 
+export const ScheduleUpdateImpactSummary = z.object({
+  canceledClassCount: z
+    .number()
+    .int()
+    .nonnegative()
+    .describe("Number of booked or rebooked classes canceled by the update"),
+  terminatedRecurringClassCount: z
+    .number()
+    .int()
+    .nonnegative()
+    .describe("Number of recurring classes terminated by the update"),
+});
+
 export const ActiveScheduleResponse = z.object({
   message: z.string().describe("Success message"),
   data: ActiveInstructorSchedule.describe(
@@ -355,9 +368,16 @@ export const CreateScheduleRequest = z.object({
 
 export const CreateScheduleResponse = z.object({
   message: z.string().describe("Success message"),
-  data: ActiveInstructorSchedule.describe(
-    "Created instructor schedule with slots",
-  ),
+  data: z
+    .object({
+      schedule: ActiveInstructorSchedule.describe(
+        "Created instructor schedule with slots",
+      ),
+      impactSummary: ScheduleUpdateImpactSummary.describe(
+        "Summary of regular classes and classes affected by the schedule update",
+      ),
+    })
+    .describe("Created schedule result"),
 });
 
 // Instructor absence schemas
@@ -432,6 +452,9 @@ export type ClassInstructorResponse = z.infer<typeof ClassInstructorResponse>;
 export type ActiveScheduleQuery = z.infer<typeof ActiveScheduleQuery>;
 export type InstructorSlot = z.infer<typeof InstructorSlot>;
 export type ActiveInstructorSchedule = z.infer<typeof ActiveInstructorSchedule>;
+export type ScheduleUpdateImpactSummary = z.infer<
+  typeof ScheduleUpdateImpactSummary
+>;
 export type ActiveScheduleResponse = z.infer<typeof ActiveScheduleResponse>;
 export type AvailableSlotsQuery = z.infer<typeof AvailableSlotsQuery>;
 export type InstructorAvailableSlotsQuery = z.infer<

@@ -1,0 +1,49 @@
+@use "@/styles/variables.module.scss" as *;
+
+.content {
+  width: min(520px, 90vw);
+  padding: 24px;
+}
+
+.title {
+  margin: 0 0 12px;
+  color: $blue_primary;
+  font-size: 1.35rem;
+}
+
+.description {
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+
+.impactList {
+  margin: 0 0 20px;
+  padding-left: 20px;
+  line-height: 1.7;
+}
+
+.note {
+  margin: 0 0 20px;
+  color: #5f6773;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.closeButton {
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 6px;
+  background-color: $blue_primary;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $blue_primary_hover;
+  }
+}

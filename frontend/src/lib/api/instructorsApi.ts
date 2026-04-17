@@ -20,6 +20,7 @@ import type {
   SimpleInstructorProfile,
   CreateScheduleRequest,
   ActiveInstructorSchedule,
+  ScheduleUpdateImpactSummary,
   AvailableSlotsQuery,
   AvailableSlotsResponse,
   InstructorAbsence,
@@ -825,10 +826,13 @@ export const createInstructorSchedule = async (
     }
 
     const result = (await response.json()) as {
-      data: ActiveInstructorSchedule;
+      data: {
+        schedule: ActiveInstructorSchedule;
+        impactSummary: ScheduleUpdateImpactSummary;
+      };
     };
 
-    return { schedule: result.data };
+    return result.data;
   } catch (error) {
     console.error("Failed to create instructor schedule:", error);
     throw error;
