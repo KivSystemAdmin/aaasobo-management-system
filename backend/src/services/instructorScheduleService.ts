@@ -124,6 +124,8 @@ export const createInstructorSchedule = async (data: {
     const { instructorId, effectiveFrom, timezone, slots } = data;
 
     return await prisma.$transaction(async (tx) => {
+      let canceledClassCount = 0;
+      const terminatedRecurringClassIds = new Set<number>();
       const existingSchedules = await tx.instructorSchedule.findMany({
         where: { instructorId: instructorId },
         select: {
@@ -191,7 +193,7 @@ export const createInstructorSchedule = async (data: {
           const lockKey = `instructor:${instructorId}:${lockedSlotDateTime.toISOString()}`;
           await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
 
-          await tx.class.updateMany({
+          const canceledClasses = await tx.class.updateMany({
             where: {
               instructorId,
               dateTime: lockedSlotDateTime,
@@ -206,6 +208,7 @@ export const createInstructorSchedule = async (data: {
               updatedAt: now,
             },
           });
+          canceledClassCount += canceledClasses.count;
         }
 
         if (removedSlots.length > 0) {
@@ -244,6 +247,7 @@ export const createInstructorSchedule = async (data: {
                 where: { id: recurringClass.id },
                 data: { endAt: removedSlotDateTime },
               });
+              terminatedRecurringClassIds.add(recurringClass.id);
 
               await tx.class.deleteMany({
                 where: {
@@ -306,11 +310,17 @@ export const createInstructorSchedule = async (data: {
       }
 
       return {
-        ...createdSchedule,
-        slots: createdSchedule.slots.map((slot) => ({
-          ...slot,
-          startTime: extractTime(slot.startTime),
-        })),
+        schedule: {
+          ...createdSchedule,
+          slots: createdSchedule.slots.map((slot) => ({
+            ...slot,
+            startTime: extractTime(slot.startTime),
+          })),
+        },
+        impactSummary: {
+          canceledClassCount,
+          terminatedRecurringClassCount: terminatedRecurringClassIds.size,
+        },
       };
     });
   } catch (error) {

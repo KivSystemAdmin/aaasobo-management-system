@@ -96,14 +96,14 @@ describe("POST /instructors/:id/schedules", () => {
         .send(requestBody)
         .expect(201);
 
-      expect(response.body.data).toMatchObject({
+      expect(response.body.data.schedule).toMatchObject({
         instructorId: instructor.id,
         effectiveFrom: "2025-02-01T00:00:00.000Z",
         effectiveTo: null,
         timezone: "Asia/Tokyo",
       });
-      expect(response.body.data.slots).toHaveLength(2);
-      expect(response.body.data.slots).toEqual(
+      expect(response.body.data.schedule.slots).toHaveLength(2);
+      expect(response.body.data.schedule.slots).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
             weekday: 1,
@@ -115,6 +115,10 @@ describe("POST /instructors/:id/schedules", () => {
           }),
         ]),
       );
+      expect(response.body.data.impactSummary).toEqual({
+        canceledClassCount: 0,
+        terminatedRecurringClassCount: 0,
+      });
     });
 
     it("succeed adding new schedule version and ending existing schedule", async () => {
@@ -151,11 +155,15 @@ describe("POST /instructors/:id/schedules", () => {
         .send(requestBody)
         .expect(201);
 
-      expect(response.body.data).toMatchObject({
+      expect(response.body.data.schedule).toMatchObject({
         instructorId: instructor.id,
         effectiveFrom: "2025-03-01T00:00:00.000Z",
         effectiveTo: null,
         timezone: "Asia/Tokyo",
+      });
+      expect(response.body.data.impactSummary).toEqual({
+        canceledClassCount: 0,
+        terminatedRecurringClassCount: 0,
       });
 
       // Verify existing schedule was ended
@@ -217,7 +225,7 @@ describe("POST /instructors/:id/schedules", () => {
         },
       );
 
-      await request(server)
+      const response = await request(server)
         .post(`/instructors/${instructor.id}/schedules`)
         .set("Cookie", authCookie)
         .send({
@@ -226,6 +234,11 @@ describe("POST /instructors/:id/schedules", () => {
           slots: [],
         })
         .expect(201);
+
+      expect(response.body.data.impactSummary).toEqual({
+        canceledClassCount: 1,
+        terminatedRecurringClassCount: 1,
+      });
 
       const updatedRecurringClass = await prisma.recurringClass.findUnique({
         where: { id: recurringClass.id },
@@ -1090,11 +1103,15 @@ describe("POST /instructors/:id/schedules", () => {
       })
       .expect(201);
 
-    expect(response.body.data).toMatchObject({
+    expect(response.body.data.schedule).toMatchObject({
       instructorId: instructor.id,
       effectiveFrom: "2025-02-01T00:00:00.000Z",
       effectiveTo: null,
       timezone: "Asia/Tokyo",
+    });
+    expect(response.body.data.impactSummary).toEqual({
+      canceledClassCount: 0,
+      terminatedRecurringClassCount: 0,
     });
   });
 });
