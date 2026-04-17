@@ -11,6 +11,8 @@ import {
   createInstructorAbsence,
   createClass,
   createCustomer,
+  createPlan,
+  createSubscription,
   generateAuthCookie,
   generateTestInstructor,
 } from "../../testUtils";
@@ -164,6 +166,86 @@ describe("POST /instructors/:id/schedules", () => {
       expect(updatedExistingSchedule?.effectiveTo).toEqual(
         new Date("2025-03-01"),
       );
+    });
+
+    it("terminates matching recurring classes when a slot is removed", async () => {
+      const admin = await createAdmin();
+      const authCookie = await generateAuthCookie(admin.id, "admin");
+      const instructor = await createInstructor();
+      const customer = await createCustomer();
+      const plan = await createPlan();
+      const subscription = await createSubscription(plan.id, customer.id, {
+        startAt: new Date("2025-01-01T00:00:00.000Z"),
+        endAt: new Date("2025-12-31T00:00:00.000Z"),
+      });
+
+      const existingSchedule = await createInstructorSchedule(instructor.id, {
+        effectiveFrom: new Date("2025-01-01T00:00:00.000Z"),
+        effectiveTo: null,
+        timezone: "Asia/Tokyo",
+      });
+      await createInstructorSlot(existingSchedule.id, 3, new Date(time`09:00`));
+
+      const recurringClass = await prisma.recurringClass.create({
+        data: {
+          instructorId: instructor.id,
+          subscriptionId: subscription.id,
+          startAt: new Date("2025-01-08T00:00:00.000Z"),
+          endAt: null,
+        },
+      });
+
+      const affectedClass = await createClass(
+        customer.id,
+        instructor.id,
+        new Date("2025-01-15T00:00:00.000Z"),
+        {
+          recurringClassId: recurringClass.id,
+          subscriptionId: subscription.id,
+          status: "booked",
+        },
+      );
+
+      const futureClass = await createClass(
+        customer.id,
+        instructor.id,
+        new Date("2025-01-22T00:00:00.000Z"),
+        {
+          recurringClassId: recurringClass.id,
+          subscriptionId: subscription.id,
+          status: "booked",
+        },
+      );
+
+      await request(server)
+        .post(`/instructors/${instructor.id}/schedules`)
+        .set("Cookie", authCookie)
+        .send({
+          effectiveFrom: "2025-01-15",
+          timezone: "Asia/Tokyo",
+          slots: [],
+        })
+        .expect(201);
+
+      const updatedRecurringClass = await prisma.recurringClass.findUnique({
+        where: { id: recurringClass.id },
+      });
+      expect(updatedRecurringClass?.endAt?.toISOString()).toBe(
+        "2025-01-15T00:00:00.000Z",
+      );
+
+      const canceledAffectedClass = await prisma.class.findUnique({
+        where: { id: affectedClass.id },
+      });
+      expect(canceledAffectedClass?.status).toBe("canceledByInstructor");
+      expect(canceledAffectedClass?.rebookableUntil?.toISOString()).toBe(
+        "2025-07-14T00:00:00.000Z",
+      );
+
+      const deletedFutureClass = await prisma.class.findUnique({
+        where: { id: futureClass.id },
+      });
+      expect(deletedFutureClass).toBeNull();
     });
   });
 });

@@ -1,7 +1,44 @@
 import { prisma } from "../../prisma/prismaClient";
 import { Prisma } from "../../generated/prisma";
-import { nDaysLater, nHoursLater } from "../utils/dateUtils";
+import { JAPAN_TIME_DIFF, nDaysLater, nHoursLater } from "../utils/dateUtils";
 import { EnglishBackground } from "../types";
+
+function findFirstSlotOccurrenceOnOrAfter(
+  effectiveFrom: Date,
+  weekday: number,
+  startTime: Date,
+): Date {
+  const slotHours = startTime.getUTCHours();
+  const slotMinutes = startTime.getUTCMinutes();
+  const currentWeekday = effectiveFrom.getUTCDay();
+  const daysUntilSlot = (weekday - currentWeekday + 7) % 7;
+
+  const occurrence = new Date(effectiveFrom);
+  occurrence.setUTCDate(occurrence.getUTCDate() + daysUntilSlot);
+  occurrence.setUTCHours(slotHours - JAPAN_TIME_DIFF, slotMinutes, 0, 0);
+
+  return occurrence;
+}
+
+function matchesRecurringSlotInJst(
+  startAt: Date | null,
+  weekday: number,
+  startTime: Date,
+): boolean {
+  if (!startAt) {
+    return false;
+  }
+
+  const jstStartAt = new Date(
+    startAt.getTime() + JAPAN_TIME_DIFF * 60 * 60 * 1000,
+  );
+
+  return (
+    jstStartAt.getUTCDay() === weekday &&
+    jstStartAt.getUTCHours() === startTime.getUTCHours() &&
+    jstStartAt.getUTCMinutes() === startTime.getUTCMinutes()
+  );
+}
 
 export const getInstructorSchedules = async (instructorId: number) => {
   try {
@@ -136,18 +173,15 @@ export const createInstructorSchedule = async (data: {
             ),
         );
 
-        const effectiveWeekday = effectiveFrom.getUTCDay();
-        const datePrefix = effectiveFrom.toISOString().slice(0, 10);
         const lockedSlotDateTimes = Array.from(
           new Set(
-            removedSlots
-              .filter((removedSlot) => removedSlot.weekday === effectiveWeekday)
-              .map((removedSlot) => {
-                const slotTime = removedSlot.startTime
-                  .toISOString()
-                  .slice(11, 19);
-                return new Date(`${datePrefix}T${slotTime}.000Z`).toISOString();
-              }),
+            removedSlots.map((removedSlot) =>
+              findFirstSlotOccurrenceOnOrAfter(
+                effectiveFrom,
+                removedSlot.weekday,
+                removedSlot.startTime,
+              ).toISOString(),
+            ),
           ),
         );
 
@@ -172,6 +206,53 @@ export const createInstructorSchedule = async (data: {
               updatedAt: now,
             },
           });
+        }
+
+        if (removedSlots.length > 0) {
+          const recurringClasses = await tx.recurringClass.findMany({
+            where: {
+              instructorId,
+              OR: [{ endAt: null }, { endAt: { gte: effectiveFrom } }],
+            },
+            select: {
+              id: true,
+              startAt: true,
+              endAt: true,
+            },
+          });
+
+          for (const removedSlot of removedSlots) {
+            const removedSlotDateTime = findFirstSlotOccurrenceOnOrAfter(
+              effectiveFrom,
+              removedSlot.weekday,
+              removedSlot.startTime,
+            );
+
+            const matchingRecurringClasses = recurringClasses.filter(
+              (recurringClass) =>
+                matchesRecurringSlotInJst(
+                  recurringClass.startAt,
+                  removedSlot.weekday,
+                  removedSlot.startTime,
+                ) &&
+                (!recurringClass.endAt ||
+                  recurringClass.endAt >= removedSlotDateTime),
+            );
+
+            for (const recurringClass of matchingRecurringClasses) {
+              await tx.recurringClass.update({
+                where: { id: recurringClass.id },
+                data: { endAt: removedSlotDateTime },
+              });
+
+              await tx.class.deleteMany({
+                where: {
+                  recurringClassId: recurringClass.id,
+                  dateTime: { gt: removedSlotDateTime },
+                },
+              });
+            }
+          }
         }
       }
 
