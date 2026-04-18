@@ -7,11 +7,18 @@ import InstructorSelection from "./InstructorSelection";
 import DateTimeSelection from "./DateTimeSelection";
 import ChildCheckbox from "./ChildCheckbox";
 import { UsersIcon } from "@heroicons/react/24/solid";
-import { rebookClass } from "@/lib/api/classesApi";
+import { checkChildConflicts, checkDoubleBooking } from "@/lib/api/classesApi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { errorAlert, warningAlert } from "@/lib/utils/alertUtils";
+import { confirmAlert, errorAlert, warningAlert } from "@/lib/utils/alertUtils";
 import { EnglishBackground } from "@/types";
+import { rebookClassWithValidation } from "@/app/actions/rebooking";
+import {
+  CONFIRM_BOOKING_WITH_CONFLICT_MESSAGE,
+  DOUBLE_BOOKING_CONFIRMATION_MESSAGE,
+  LOGIN_REQUIRED_MESSAGE,
+  SELECT_AT_LEAST_ONE_CHILD_MESSAGE,
+} from "@/lib/messages/customerDashboard";
 
 interface ProgressiveBookingFlowProps {
   classId: number;
@@ -216,11 +223,7 @@ export default function ProgressiveBookingFlow({
   }
 
   const handleConfirmBooking = async () => {
-    if (
-      !selectedInstructor ||
-      !selectedDateTime ||
-      selectedChildrenIds.length === 0
-    ) {
+    if (!selectedInstructor || !selectedDateTime) {
       warningAlert(
         language === "ja"
           ? "必要な項目をすべて選択してください"
@@ -229,7 +232,11 @@ export default function ProgressiveBookingFlow({
       return;
     }
 
-    // Validate that we have child profiles and customerId
+    if (selectedChildrenIds.length === 0) {
+      warningAlert(SELECT_AT_LEAST_ONE_CHILD_MESSAGE[language]);
+      return;
+    }
+
     if (childProfiles.length === 0) {
       errorAlert(
         language === "ja"
@@ -249,29 +256,75 @@ export default function ProgressiveBookingFlow({
     setIsBooking(true);
 
     try {
-      const result = await rebookClass(classId, {
+      const conflictsResult = await checkChildConflicts(
+        selectedDateTime,
+        selectedChildrenIds,
+      );
+
+      if ("message" in conflictsResult) {
+        errorAlert(conflictsResult.message[language]);
+        return;
+      }
+
+      if (conflictsResult.conflictingChildren.length > 0) {
+        const conflictingChildren =
+          conflictsResult.conflictingChildren.join(", ");
+
+        const confirmed = await confirmAlert(
+          `${CONFIRM_BOOKING_WITH_CONFLICT_MESSAGE[language]}\n${conflictingChildren}`,
+        );
+
+        if (!confirmed) {
+          return;
+        }
+      }
+
+      const doubleBookingResult = await checkDoubleBooking(
+        customerId,
+        selectedDateTime,
+      );
+
+      if ("message" in doubleBookingResult) {
+        errorAlert(doubleBookingResult.message[language]);
+        return;
+      }
+
+      if (doubleBookingResult.isDoubleBooked) {
+        const confirmed = await confirmAlert(
+          DOUBLE_BOOKING_CONFIRMATION_MESSAGE[language],
+        );
+
+        if (!confirmed) {
+          return;
+        }
+      }
+
+      const result = await rebookClassWithValidation({
+        customerId,
+        classId,
         dateTime: selectedDateTime,
         instructorId: selectedInstructor.id,
-        customerId: customerId,
         childrenIds: selectedChildrenIds,
+        userSessionType: adminId ? "admin" : "customer",
+        language,
       });
 
-      if (result.success) {
-        // Success! Show toast and close modal
-        toast.success(
-          language === "ja"
-            ? "予約が完了しました"
-            : "Booking completed successfully.",
-        );
-        onClose();
-        // Optionally reload the page to show the updated booking
-        window.location.reload();
-      } else {
-        // Show error message with alert
+      if (result.error) {
         errorAlert(
-          result.errorMessage.en || result.errorMessage.ja || "Booking failed",
+          result.error === "unauthorized"
+            ? LOGIN_REQUIRED_MESSAGE[language]
+            : result.error,
         );
+        return;
       }
+
+      toast.success(
+        language === "ja"
+          ? "予約が完了しました"
+          : "Booking completed successfully.",
+      );
+      onClose();
+      window.location.reload();
     } catch (error) {
       console.error("Booking failed:", error);
       errorAlert(language === "ja" ? "予約に失敗しました" : "Booking failed");
@@ -285,8 +338,12 @@ export default function ProgressiveBookingFlow({
       <div className={styles.modalHeader}>
         <h2>
           {language === "ja"
-            ? `${classCode || classId} の予約変更`
-            : `Rebook ${classCode || `Class ${classId}`}`}
+            ? isFreeTrial
+              ? `${classCode || classId} の予約`
+              : `${classCode || classId} の予約変更`
+            : isFreeTrial
+              ? `Book ${classCode || `Class ${classId}`}`
+              : `Rebook ${classCode || `Class ${classId}`}`}
         </h2>
       </div>
       <div className={styles.sectionsContainer}>
