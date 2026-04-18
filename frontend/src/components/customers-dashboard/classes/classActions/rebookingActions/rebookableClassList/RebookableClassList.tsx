@@ -24,7 +24,6 @@ export default function RebookableClassList({
   customerId,
   adminId,
   rebookableClasses,
-  onRebookableClassSelect,
   language,
   userSessionType,
   childProfiles,
@@ -54,12 +53,6 @@ export default function RebookableClassList({
       );
     }
 
-    if (!isFreeTrial) {
-      onRebookableClassSelect(id);
-      return;
-    }
-
-    // Use booking modal for the new flow
     setSelectedClassId(id);
     setSelectedIsFreeTrial(isFreeTrial);
     setSelectedClassCode(classCode || "");
