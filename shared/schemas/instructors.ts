@@ -398,6 +398,19 @@ export const InstructorAbsence = z.object({
   absentAt: z.string().describe("Absence date in ISO format"),
 });
 
+export const AbsenceCanceledClassSummary = z.object({
+  id: z.number().int().positive().describe("Canceled class ID"),
+  classCode: z.string().describe("Class code"),
+  dateTime: z.string().describe("Canceled class date/time in ISO format"),
+  rebookableUntil: z
+    .string()
+    .describe("Rebookable until date/time in ISO format"),
+  customer: z.object({
+    id: z.number().int().positive().describe("Customer ID"),
+    name: z.string().describe("Customer name"),
+  }),
+});
+
 export const InstructorAbsencesResponse = z.object({
   message: z.string().describe("Success message"),
   data: z.array(InstructorAbsence).describe("Array of instructor absences"),
@@ -405,7 +418,14 @@ export const InstructorAbsencesResponse = z.object({
 
 export const CreateAbsenceResponse = z.object({
   message: z.string().describe("Success message"),
-  data: InstructorAbsence.describe("Created instructor absence"),
+  data: z.object({
+    absence: InstructorAbsence.describe("Created instructor absence"),
+    canceledClasses: z
+      .array(AbsenceCanceledClassSummary)
+      .describe(
+        "Classes canceled because they matched the instructor absence slot",
+      ),
+  }),
 });
 
 export const DeleteAbsenceResponse = z.object({
@@ -478,6 +498,9 @@ export type CreateScheduleResponse = z.infer<typeof CreateScheduleResponse>;
 export type InstructorAbsenceParams = z.infer<typeof InstructorAbsenceParams>;
 export type CreateAbsenceRequest = z.infer<typeof CreateAbsenceRequest>;
 export type InstructorAbsence = z.infer<typeof InstructorAbsence>;
+export type AbsenceCanceledClassSummary = z.infer<
+  typeof AbsenceCanceledClassSummary
+>;
 export type InstructorAbsencesResponse = z.infer<
   typeof InstructorAbsencesResponse
 >;

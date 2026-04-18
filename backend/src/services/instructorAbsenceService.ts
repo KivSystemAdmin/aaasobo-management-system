@@ -1,3 +1,4 @@
+import { Prisma } from "../../generated/prisma";
 import { prisma } from "../../prisma/prismaClient";
 import { nHoursLater } from "../utils/dateUtils";
 
@@ -23,23 +24,41 @@ export const addInstructorAbsence = async (data: {
       const lockKey = `instructor:${data.instructorId}:${data.absentAt.toISOString()}`;
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
 
-      await tx.class.updateMany({
-        where: {
-          instructorId: data.instructorId,
-          dateTime: data.absentAt,
-          status: {
-            in: ["booked", "rebooked"],
+      const classWhere: Prisma.ClassWhereInput = {
+        instructorId: data.instructorId,
+        dateTime: data.absentAt,
+        status: {
+          in: ["booked", "rebooked"],
+        },
+      };
+      const rebookableUntil = nHoursLater(180 * 24, data.absentAt);
+
+      const canceledClasses = await tx.class.findMany({
+        where: classWhere,
+        select: {
+          id: true,
+          classCode: true,
+          dateTime: true,
+          customer: {
+            select: {
+              id: true,
+              name: true,
+            },
           },
         },
+      });
+
+      await tx.class.updateMany({
+        where: classWhere,
         data: {
           status: "canceledByInstructor",
           canceledAt: now,
-          rebookableUntil: nHoursLater(180 * 24, data.absentAt),
+          rebookableUntil,
           updatedAt: now,
         },
       });
 
-      return await tx.instructorAbsence.upsert({
+      const absence = await tx.instructorAbsence.upsert({
         where: {
           instructorId_absentAt: {
             instructorId: data.instructorId,
@@ -52,6 +71,17 @@ export const addInstructorAbsence = async (data: {
         },
         update: {},
       });
+
+      return {
+        absence,
+        canceledClasses: canceledClasses.map((classItem) => ({
+          id: classItem.id,
+          classCode: classItem.classCode,
+          dateTime: classItem.dateTime!.toISOString(),
+          rebookableUntil: rebookableUntil.toISOString(),
+          customer: classItem.customer,
+        })),
+      };
     });
   } catch (error) {
     console.error("Database Error:", error);

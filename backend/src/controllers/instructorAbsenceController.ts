@@ -44,14 +44,14 @@ export const addInstructorAbsenceController = async (
     const { absentAt } = req.body;
 
     const absentAtDate = new Date(absentAt);
-    const absence = await addInstructorAbsence({
+    const result = await addInstructorAbsence({
       instructorId,
       absentAt: absentAtDate,
     });
 
     res.status(201).json({
       message: "Instructor absence added successfully",
-      data: absence,
+      data: result,
     });
   } catch (error) {
     console.error("Error adding instructor absence:", error);

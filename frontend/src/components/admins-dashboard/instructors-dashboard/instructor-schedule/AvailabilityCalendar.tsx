@@ -9,7 +9,10 @@ import {
   batchUpdateInstructorAbsences,
   type AbsenceChange,
 } from "@/app/actions/instructorAbsence";
-import type { InstructorAbsence } from "@shared/schemas/instructors";
+import type {
+  AbsenceCanceledClassSummary,
+  InstructorAbsence,
+} from "@shared/schemas/instructors";
 import Calendar from "@/components/features/calendar/Calendar";
 import Modal from "@/components/elements/modal/Modal";
 import ActionButton from "@/components/elements/buttons/actionButton/ActionButton";
@@ -17,6 +20,7 @@ import { EventSourceFuncArg, EventClickArg } from "@fullcalendar/core";
 import { toast } from "react-toastify";
 import styles from "./AvailabilityCalendar.module.scss";
 import { errorAlert } from "@/lib/utils/alertUtils";
+import { formatYearDateTime } from "@/lib/utils/dateUtils";
 
 // Define proper event type for FullCalendar events
 interface CalendarEvent {
@@ -45,6 +49,9 @@ export default function AvailabilityCalendar({
     Map<string, AbsenceChange>
   >(new Map());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [canceledClasses, setCanceledClasses] = useState<
+    AbsenceCanceledClassSummary[]
+  >([]);
 
   const formatJSTDate = (date: Date) => {
     const year = date.getFullYear();
@@ -160,6 +167,7 @@ export default function AvailabilityCalendar({
       if (result.success) {
         // All changes successful
         setPendingChanges(new Map());
+        setCanceledClasses(result.canceledClasses);
         refreshCalendars();
         setIsEditModalOpen(false);
         // Show success message only if there were actual changes
@@ -172,6 +180,7 @@ export default function AvailabilityCalendar({
       ) {
         // Partial success
         setPendingChanges(new Map());
+        setCanceledClasses(result.canceledClasses);
         refreshCalendars();
         setIsEditModalOpen(false);
 
@@ -341,6 +350,58 @@ export default function AvailabilityCalendar({
                   ? "Submitting..."
                   : `Submit (${pendingChanges.size})`
               }
+            />
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={canceledClasses.length > 0}
+        onClose={() => setCanceledClasses([])}
+        overlayClosable={true}
+        maxHeight="90vh"
+        padding="40px"
+      >
+        <div className={styles.summaryModal}>
+          <div className={styles.summaryHeader}>
+            <h2>Classes Canceled</h2>
+            <p>
+              {canceledClasses.length} classes were canceled for the registered
+              absence and are now rebookable.
+            </p>
+          </div>
+
+          <div className={styles.summaryTableWrapper}>
+            <table className={styles.summaryTable}>
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Class Time</th>
+                  <th>Class Code</th>
+                  <th>Rebookable Until</th>
+                </tr>
+              </thead>
+              <tbody>
+                {canceledClasses.map((classItem) => (
+                  <tr key={classItem.id}>
+                    <td>{classItem.customer.name}</td>
+                    <td>{formatYearDateTime(new Date(classItem.dateTime))}</td>
+                    <td>{classItem.classCode}</td>
+                    <td>
+                      {formatYearDateTime(new Date(classItem.rebookableUntil))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.summaryActions}>
+            <ActionButton
+              type="button"
+              onClick={() => setCanceledClasses([])}
+              className="submitBtn"
+              btnText="Close"
             />
           </div>
         </div>

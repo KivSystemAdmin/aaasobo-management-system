@@ -1083,7 +1083,7 @@ export const addInstructorAbsence = async (
 
     const result: CreateAbsenceResponse = await response.json();
 
-    return { absence: result.data };
+    return result.data;
   } catch (error) {
     console.error("Failed to add instructor absence:", error);
     throw error;
