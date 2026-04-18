@@ -7,17 +7,10 @@ import InstructorSelection from "./InstructorSelection";
 import DateTimeSelection from "./DateTimeSelection";
 import ChildCheckbox from "./ChildCheckbox";
 import { UsersIcon } from "@heroicons/react/24/solid";
-import {
-  checkChildConflicts,
-  checkDoubleBooking,
-} from "@/lib/api/classesApi";
+import { checkChildConflicts, checkDoubleBooking } from "@/lib/api/classesApi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {
-  confirmAlert,
-  errorAlert,
-  warningAlert,
-} from "@/lib/utils/alertUtils";
+import { confirmAlert, errorAlert, warningAlert } from "@/lib/utils/alertUtils";
 import { EnglishBackground } from "@/types";
 import { rebookClassWithValidation } from "@/app/actions/rebooking";
 import {
