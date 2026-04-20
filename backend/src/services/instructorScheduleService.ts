@@ -510,7 +510,7 @@ const getSlotConstraints = async (
   const start = new Date(startDate);
   const end = new Date(endDate);
 
-  const [schedules, absences] = await Promise.all([
+  const [schedules, absences, completedClasses] = await Promise.all([
     prisma.instructorSchedule.findMany({
       where: {
         instructorId,
@@ -532,6 +532,17 @@ const getSlotConstraints = async (
         instructorId,
         absentAt: { gte: jst(startDate), lt: jst(endDate) },
       },
+    }),
+    prisma.class.findMany({
+      where: {
+        instructorId,
+        dateTime: {
+          gte: jst(startDate),
+          lt: jst(endDate),
+        },
+        status: "completed",
+      },
+      select: { instructorId: true, dateTime: true },
     }),
   ]);
 
@@ -555,13 +566,25 @@ const getSlotConstraints = async (
     ),
   );
 
+  const completedClassSet = new Set(
+    completedClasses
+      .filter((classItem) => classItem.dateTime !== null)
+      .map(
+        (classItem) => `${instructorId}-${classItem.dateTime!.toISOString()}`,
+      ),
+  );
+
   const bookingSet = new Set(
     bookings
       .filter((booking) => booking.dateTime !== null)
       .map((booking) => `${instructorId}-${booking.dateTime!.toISOString()}`),
   );
 
-  const excludeSlots = new Set([...absenceSet, ...bookingSet]);
+  const excludeSlots = new Set([
+    ...absenceSet,
+    ...completedClassSet,
+    ...bookingSet,
+  ]);
   return { schedules, excludeSlots };
 };
 

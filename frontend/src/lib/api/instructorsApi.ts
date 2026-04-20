@@ -1078,7 +1078,18 @@ export const addInstructorAbsence = async (
     });
 
     if (response.status !== 201) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      let errorMessage = `HTTP error! status: ${response.status}`;
+
+      try {
+        const errorBody = (await response.json()) as { message?: string };
+        if (errorBody.message) {
+          errorMessage = errorBody.message;
+        }
+      } catch {
+        // Keep the default message when the response body is not JSON.
+      }
+
+      throw new Error(errorMessage);
     }
 
     const result: CreateAbsenceResponse = await response.json();

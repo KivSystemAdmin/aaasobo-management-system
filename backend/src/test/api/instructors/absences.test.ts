@@ -99,6 +99,38 @@ describe("POST /instructors/:id/absences", () => {
     ]);
   });
 
+  it("rejects adding an absence on a completed class slot", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+    const instructor = await createInstructor();
+    const customer = await createCustomer();
+    const absentAt = new Date("2024-07-01T00:00:00.000Z");
+
+    await createClass(customer.id, instructor.id, absentAt, {
+      status: "completed",
+    });
+
+    const response = await request(server)
+      .post(`/instructors/${instructor.id}/absences`)
+      .set("Cookie", authCookie)
+      .send({ absentAt: absentAt.toISOString() })
+      .expect(409);
+
+    expect(response.body).toEqual({
+      message: "Cannot add absence on a completed class slot.",
+    });
+
+    const absence = await prisma.instructorAbsence.findUnique({
+      where: {
+        instructorId_absentAt: {
+          instructorId: instructor.id,
+          absentAt,
+        },
+      },
+    });
+    expect(absence).toBeNull();
+  });
+
   it("fail for unauthenticated request", async () => {
     const instructor = await createInstructor();
 

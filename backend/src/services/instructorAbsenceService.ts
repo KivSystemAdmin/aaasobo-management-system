@@ -2,6 +2,13 @@ import { Prisma } from "../../generated/prisma";
 import { prisma } from "../../prisma/prismaClient";
 import { nHoursLater } from "../utils/dateUtils";
 
+export class CompletedClassAbsenceConflictError extends Error {
+  constructor() {
+    super("Cannot add absence on a completed class slot.");
+    this.name = "CompletedClassAbsenceConflictError";
+  }
+}
+
 export const getInstructorAbsences = async (instructorId: number) => {
   try {
     return await prisma.instructorAbsence.findMany({
@@ -23,6 +30,19 @@ export const addInstructorAbsence = async (data: {
       const now = new Date();
       const lockKey = `instructor:${data.instructorId}:${data.absentAt.toISOString()}`;
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
+
+      const completedClass = await tx.class.findFirst({
+        where: {
+          instructorId: data.instructorId,
+          dateTime: data.absentAt,
+          status: "completed",
+        },
+        select: { id: true },
+      });
+
+      if (completedClass) {
+        throw new CompletedClassAbsenceConflictError();
+      }
 
       const classWhere: Prisma.ClassWhereInput = {
         instructorId: data.instructorId,
@@ -84,6 +104,9 @@ export const addInstructorAbsence = async (data: {
       };
     });
   } catch (error) {
+    if (error instanceof CompletedClassAbsenceConflictError) {
+      throw error;
+    }
     console.error("Database Error:", error);
     throw new Error("Failed to add instructor absence.");
   }
