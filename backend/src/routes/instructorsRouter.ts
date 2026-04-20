@@ -540,6 +540,10 @@ const createAbsenceConfig = {
         description: "Unauthorized - authentication required",
         schema: MessageErrorResponse,
       },
+      409: {
+        description: "Conflict with completed class at the target slot",
+        schema: MessageErrorResponse,
+      },
       500: {
         description: "Internal server error",
         schema: MessageErrorResponse,

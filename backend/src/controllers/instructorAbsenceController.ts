@@ -3,6 +3,7 @@ import {
   getInstructorAbsences,
   addInstructorAbsence,
   removeInstructorAbsence,
+  CompletedClassAbsenceConflictError,
 } from "../services/instructorAbsenceService";
 import {
   RequestWithParams,
@@ -55,6 +56,12 @@ export const addInstructorAbsenceController = async (
     });
   } catch (error) {
     console.error("Error adding instructor absence:", error);
+
+    if (error instanceof CompletedClassAbsenceConflictError) {
+      return res.status(409).json({
+        message: error.message,
+      });
+    }
 
     res.status(500).json({
       message: "Failed to add instructor absence",

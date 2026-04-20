@@ -909,6 +909,35 @@ describe("GET /instructors/:id/available-slots - With Absences", () => {
 
     expect(response.body.data).toEqual([{ dateTime: jst`2025-07-08 19:00` }]);
   });
+
+  it("filters out slots that already have completed classes", async () => {
+    const instructor = await createInstructor();
+    const customer = await createCustomer();
+    const schedule = await createInstructorSchedule(instructor.id, {
+      effectiveFrom: new Date("2025-07-07"),
+      effectiveTo: null,
+      timezone: "Asia/Tokyo",
+    });
+    await createInstructorSlot(schedule.id, 1, new Date(time`09:00`));
+    await createInstructorSlot(schedule.id, 2, new Date(time`19:00`));
+
+    await createClass(
+      customer.id,
+      instructor.id,
+      new Date(jst`2025-07-07 09:00`),
+      {
+        status: "completed",
+      },
+    );
+
+    const response = await request(server)
+      .get(`/instructors/${instructor.id}/available-slots`)
+      .set("Cookie", authCookie)
+      .query({ start: "2025-07-07", end: "2025-07-09", timezone: "Asia/Tokyo" })
+      .expect(200);
+
+    expect(response.body.data).toEqual([{ dateTime: jst`2025-07-08 19:00` }]);
+  });
 });
 
 describe("GET /instructors/available-slots - All Available Slots", () => {
