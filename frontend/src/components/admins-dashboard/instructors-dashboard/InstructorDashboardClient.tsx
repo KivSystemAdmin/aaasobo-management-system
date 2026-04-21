@@ -67,7 +67,7 @@ export default function InstructorTabs({
       default:
         return [];
     }
-  }, [adminId, nickname, previousListPage]);
+  }, [nickname, previousListPage]);
   const activeTabName = "activeInstructorTab";
 
   // Get the active tab from the local storage.

@@ -59,7 +59,7 @@ function CustomerDashboardClient({
       default:
         return [];
     }
-  }, [adminId, customerProfile.name, previousListPage]);
+  }, [customerProfile.name, previousListPage]);
 
   // Get the active tab name to set the active tab in the TabFunction component.
   const activeTabName = "activeCustomerTab";
