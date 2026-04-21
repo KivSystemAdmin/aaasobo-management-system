@@ -14,24 +14,23 @@ import {
 } from "@heroicons/react/24/outline";
 
 export function getLinks(
-  userId: number | null,
   userType: "admin" | "customer" | "instructor",
   language?: LanguageType,
 ): LinkType[] {
   const customerLinks: LinkType[] = [
     {
       name: language === "ja" ? "クラスカレンダー" : "Class Calendar",
-      href: `/customers/${userId}/classes`,
+      href: "/customers/classes",
       icon: CalendarDaysIcon,
     },
     {
       name: language === "ja" ? "プロフィール" : "Customer Profile",
-      href: `/customers/${userId}/profile`,
+      href: "/customers/profile",
       icon: UserIcon,
     },
     {
       name: language === "ja" ? "お子さまプロフィール" : "Children's Profiles",
-      href: `/customers/${userId}/children-profiles`,
+      href: "/customers/children-profiles",
       icon: UsersIcon,
     },
     {
@@ -39,18 +38,18 @@ export function getLinks(
         language === "ja"
           ? "インストラクター　　　プロフィール" // Full-width characters are needed for alignment
           : "Instructor Profiles",
-      href: `/customers/${userId}/instructor-profiles`,
+      href: "/customers/instructor-profiles",
       icon: UsersIcon,
     },
 
     {
       name: language === "ja" ? "レギュラークラス" : "Regular Classes",
-      href: `/customers/${userId}/regular-classes`,
+      href: "/customers/regular-classes",
       icon: ClipboardDocumentListIcon,
     },
     {
       name: language === "ja" ? "アーソボカレンダー" : "AaasoBo! Calendar",
-      href: `/customers/${userId}/business-calendar`,
+      href: "/customers/business-calendar",
       icon: CalendarDaysIcon,
     },
   ];
@@ -58,57 +57,57 @@ export function getLinks(
   const adminLinks: LinkType[] = [
     {
       name: "Dashboard",
-      href: `/admins/${userId}/dashboard`,
+      href: "/admins/dashboard",
       icon: HomeModernIcon,
     },
     {
       name: "Class Calendar",
-      href: `/admins/${userId}/calendar`,
+      href: "/admins/calendar",
       icon: CalendarDaysIcon,
     },
     {
       name: "Class List",
-      href: `/admins/${userId}/class-list`,
+      href: "/admins/class-list",
       icon: ClipboardDocumentListIcon,
     },
     {
       name: "Customer List",
-      href: `/admins/${userId}/customer-list`,
+      href: "/admins/customer-list",
       icon: UsersIcon,
     },
     {
       name: "Instructor List",
-      href: `/admins/${userId}/instructor-list`,
+      href: "/admins/instructor-list",
       icon: UsersIcon,
     },
     {
       name: "Plan List",
-      href: `/admins/${userId}/plan-list`,
+      href: "/admins/plan-list",
       icon: AcademicCapIcon,
     },
     {
       name: "Event List",
-      href: `/admins/${userId}/event-list`,
+      href: "/admins/event-list",
       icon: BellIcon,
     },
     {
       name: "Admin List",
-      href: `/admins/${userId}/admin-list`,
+      href: "/admins/admin-list",
       icon: UserIcon,
     },
     {
       name: "Instructor Profiles",
-      href: `/admins/${userId}/instructor-profiles`,
+      href: "/admins/instructor-profiles",
       icon: UsersIcon,
     },
     {
       name: "AaasoBo! Calendar",
-      href: `/admins/${userId}/business-calendar`,
+      href: "/admins/business-calendar",
       icon: CalendarDaysIcon,
     },
     {
       name: "Data Import",
-      href: `/admins/${userId}/data-import`,
+      href: "/admins/data-import",
       icon: ArrowUpOnSquareIcon,
     },
     // Not in use for now
@@ -127,22 +126,22 @@ export function getLinks(
   const instructorLinks: LinkType[] = [
     {
       name: "Class Schedule",
-      href: `/instructors/${userId}/class-schedule`,
+      href: "/instructors/class-schedule",
       icon: CalendarIcon,
     },
     {
       name: "Profile",
-      href: `/instructors/${userId}/profile`,
+      href: "/instructors/profile",
       icon: UserIcon,
     },
     {
       name: "Availability Schedule",
-      href: `/instructors/${userId}/availability`,
+      href: "/instructors/availability",
       icon: ClockIcon,
     },
     {
       name: "AaasoBo! Calendar",
-      href: `/instructors/${userId}/business-calendar`,
+      href: "/instructors/business-calendar",
       icon: CalendarDaysIcon,
     },
   ];

@@ -7,13 +7,11 @@ export async function revalidateCustomerCalendar(
   customerId: number,
   userSessionType?: UserType,
 ) {
-  let path = `/customers/${customerId}/classes`;
+  let path = "/customers/classes";
 
   if (userSessionType === "admin") {
-    const session = await getUserSession("admin");
-    const adminId = session?.user.id ? parseInt(session.user.id) : undefined;
-
-    path = `/admins/${adminId}/customer-list/${customerId}`;
+    await getUserSession("admin");
+    path = `/admins/customer-list/${customerId}`;
   }
   revalidatePath(path);
 }

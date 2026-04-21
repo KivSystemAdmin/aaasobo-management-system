@@ -45,8 +45,8 @@ const InstructorCalendarClient = ({
     const classId = clickInfo.event.extendedProps.classId;
     const redirectURL =
       userSessionType === "admin"
-        ? `/admins/${adminId}/calendar/${instructorId}/class-schedule/${classId}`
-        : `/instructors/${instructorId}/class-schedule/${classId}`;
+        ? `/admins/calendar/${instructorId}/class-schedule/${classId}`
+        : `/instructors/class-schedule/${classId}`;
 
     router.push(redirectURL);
   };

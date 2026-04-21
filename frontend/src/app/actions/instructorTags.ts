@@ -5,7 +5,7 @@ import {
   deleteInstructorTag,
   saveInstructorTags,
 } from "@/lib/api/instructorsApi";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 import { revalidateInstructorList } from "./revalidate";
 import type { TagCatalogResponse } from "@shared/schemas/instructors";
 

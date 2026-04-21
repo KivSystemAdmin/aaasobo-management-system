@@ -55,19 +55,19 @@ export default function InstructorTabs({
       case "instructor-list":
         return [
           "Instructor List",
-          `/admins/${adminId}/instructor-list`,
+          "/admins/instructor-list",
           `Instructor Page (${nickname || "Unknown"})`,
         ];
       case "class-list":
         return [
           "Class List",
-          `/admins/${adminId}/class-list`,
+          "/admins/class-list",
           `Instructor Page (${nickname || "Unknown"})`,
         ];
       default:
         return [];
     }
-  }, [adminId, nickname, previousListPage]);
+  }, [nickname, previousListPage]);
   const activeTabName = "activeInstructorTab";
 
   // Get the active tab from the local storage.

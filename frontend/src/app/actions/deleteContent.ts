@@ -8,7 +8,7 @@ import {
   revalidatePlanList,
   revalidateSubscriptionList,
 } from "./revalidate";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 import { deleteSubscription } from "@/lib/api/subscriptionsApi";
 
 export async function deleteEventAction(

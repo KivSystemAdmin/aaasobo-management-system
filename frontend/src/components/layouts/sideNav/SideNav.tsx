@@ -52,7 +52,7 @@ export default async function SideNav({
           />
         </div>
         <UserName userType={userType} userName={userName} />
-        <NavLinks userId={userId} userType={userType} />
+        <NavLinks userType={userType} />
         {userType === "customer" && <LanguageSwitcher />}
         <LogOut userType={userType} />
       </div>
