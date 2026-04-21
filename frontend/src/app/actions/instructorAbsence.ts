@@ -1,6 +1,6 @@
 "use server";
 
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 import { revalidatePath } from "next/cache";
 import {
   addInstructorAbsence,
@@ -72,7 +72,7 @@ export async function batchUpdateInstructorAbsences(
     }
 
     // Revalidate the instructor schedule page to refresh data
-    revalidatePath(`/admins/[adminId]/instructor-list/[instructorId]`, "page");
+    revalidatePath(`/admins/instructor-list/${instructorId}`, "page");
 
     const totalSuccesses = successCount.add + successCount.remove;
     const totalAttempts = changes.length;

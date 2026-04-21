@@ -10,7 +10,7 @@ import {
   adminRegisterSchema,
 } from "@/schemas/authSchema";
 import { revalidateInstructorList, revalidateAdminList } from "./revalidate";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 
 export async function registerUser(
   prevState: RegisterFormState | undefined,

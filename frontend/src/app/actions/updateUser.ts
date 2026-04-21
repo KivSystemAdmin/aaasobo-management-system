@@ -17,7 +17,7 @@ import {
   revalidateCustomerList,
   revalidateInstructorList,
 } from "./revalidate";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 import {
   childProfileSchema,
   customerProfileSchema,
@@ -238,8 +238,8 @@ export async function updateCustomerProfileAction(
   );
 
   const path = id
-    ? `/admins/${adminId}/customer-list/${customerId}`
-    : `/customers/${customerId}/profile`;
+    ? `/admins/customer-list/${customerId}`
+    : "/customers/profile";
 
   revalidatePath(path);
 
@@ -297,8 +297,8 @@ export async function updateChildProfileAction(
 
   const path =
     loggedInUserType === "admin"
-      ? `/admins/${loggedInUserId}/customer-list/${customerId}`
-      : `/customers/${loggedInUserId}/children-profiles`;
+      ? `/admins/customer-list/${customerId}`
+      : "/customers/children-profiles";
 
   revalidatePath(path);
 
@@ -354,8 +354,8 @@ export async function addChildProfileAction(
 
   const path =
     loggedInUserType === "admin"
-      ? `/admins/${loggedInUserId}/customer-list/${customerId}`
-      : `/customers/${loggedInUserId}/children-profiles`;
+      ? `/admins/customer-list/${customerId}`
+      : "/customers/children-profiles";
 
   revalidatePath(path);
 

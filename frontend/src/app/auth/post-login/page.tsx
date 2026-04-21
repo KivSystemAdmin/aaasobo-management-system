@@ -3,20 +3,19 @@ import { auth } from "../../../../auth.config";
 
 export default async function PostLoginPage() {
   const session = await auth();
-  const userId = session?.user?.id;
   const userType = session?.user?.userType;
 
-  if (!userId || !userType) {
+  if (!userType) {
     redirect("/");
   }
 
   switch (userType) {
     case "admin":
-      redirect(`/admins/${userId}/dashboard`);
+      redirect("/admins/dashboard");
     case "customer":
-      redirect(`/customers/${userId}/classes`);
+      redirect("/customers/classes");
     case "instructor":
-      redirect(`/instructors/${userId}/class-schedule`);
+      redirect("/instructors/class-schedule");
     default:
       redirect("/");
   }

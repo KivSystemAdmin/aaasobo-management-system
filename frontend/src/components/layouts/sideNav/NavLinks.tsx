@@ -8,15 +8,13 @@ import { getLinks } from "@/lib/data/navLinks";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function NavLinks({
-  userId,
   userType,
 }: {
-  userId: number;
   userType: "admin" | "customer" | "instructor";
 }) {
   const { language } = useLanguage();
   const pathname = usePathname();
-  const links = getLinks(userId, userType, language);
+  const links = getLinks(userType, language);
 
   return (
     <>

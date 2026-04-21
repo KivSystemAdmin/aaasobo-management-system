@@ -7,7 +7,7 @@ import {
   resetPasswordFormSchema,
   resetPasswordFormSchemaJa,
 } from "@/schemas/authSchema";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 
 export async function resetPassword(
   prevState: StringMessages | undefined,

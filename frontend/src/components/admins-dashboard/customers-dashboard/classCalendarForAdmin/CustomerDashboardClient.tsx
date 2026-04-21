@@ -35,25 +35,25 @@ function CustomerDashboardClient({
       case "class-list":
         return [
           "Class List",
-          `/admins/${adminId}/class-list`,
+          "/admins/class-list",
           `Customer Page (${customerProfile.name})`,
         ];
       case "customer-list":
         return [
           "Customer List",
-          `/admins/${adminId}/customer-list`,
+          "/admins/customer-list",
           `Customer Page (${customerProfile.name})`,
         ];
       case "child-list":
         return [
           "Child List",
-          `/admins/${adminId}/child-list`,
+          "/admins/child-list",
           `Customer Page (${customerProfile.name})`,
         ];
       case "subscription-list":
         return [
           "Subscription List",
-          `/admins/${adminId}/subscription-list`,
+          "/admins/subscription-list",
           `Customer Page (${customerProfile.name})`,
         ];
       default:

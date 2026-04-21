@@ -32,27 +32,27 @@ function ClassDetails({
   let label2: string = "";
   switch (previousPage) {
     case "instructor-calendar": // Instructor dashboard calendar page
-      breadcrumbHref = `/instructors/${instructorId}/class-schedule`;
+      breadcrumbHref = "/instructors/class-schedule";
       label1 = "Class Schedule";
       label2 = "Class Details";
       break;
     case "class-calendar": // Admin dashboard calendar page
       if (userSessionType === "admin" && adminId) {
-        breadcrumbHref = `/admins/${adminId}/calendar`;
+        breadcrumbHref = "/admins/calendar";
         label1 = "Class Calendar";
         label2 = `Class Details Page (Instructor: ${classDetails.instructorName})`;
       }
       break;
     case "class-list": // Admin dashboard class list page
       if (userSessionType === "admin" && adminId) {
-        breadcrumbHref = `/admins/${adminId}/class-list`;
+        breadcrumbHref = "/admins/class-list";
         label1 = "Class List";
         label2 = `Class Details Page (Instructor: ${classDetails.instructorName})`;
       }
       break;
     case "instructor-list": // Admin dashboard instructor list page
       if (userSessionType === "admin" && adminId) {
-        breadcrumbHref = `/admins/${adminId}/instructor-list`;
+        breadcrumbHref = "/admins/instructor-list";
         label1 = "Instructor List";
         label2 = `Class Details Page (Instructor: ${classDetails.instructorName})`;
         // Set the active tab to the instructor calendar tab.

@@ -1,7 +1,7 @@
 "use server";
 
 import { createMessageBoardPost } from "@/lib/api/adminsApi";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 import type {
   CreateMessageBoardPostRequest,
   CreateMessageBoardPostResponse,

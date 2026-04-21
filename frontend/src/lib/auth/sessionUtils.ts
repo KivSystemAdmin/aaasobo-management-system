@@ -17,39 +17,44 @@ export async function getUserSession(userType?: UserType) {
   return session;
 }
 
-async function getUserSessionType(userType: UserType, id: string) {
-  const userSession = await getUserSession(userType);
-
-  if (!userSession) {
-    return null;
+function throwInvalidUserError(userType: UserType) {
+  switch (userType) {
+    case "customer":
+      throw new Error(INVALID_CUSTOMER_ID);
+    case "instructor":
+      throw new Error(INVALID_INSTRUCTOR_ID);
+    case "admin":
+      throw new Error(INVALID_ADMIN_ID);
+    default:
+      throw new Error("Invalid user type");
   }
-  if (
-    userType &&
-    (userSession.user.userType !== userType || userSession.user.id !== id)
-  ) {
-    return null;
-  }
-
-  return userSession.user.userType;
 }
 
-export async function authenticateUserSession(userType: UserType, id: string) {
-  const userSessionType = await getUserSessionType(userType, id);
-  if (!userSessionType || userSessionType !== userType) {
-    switch (userType) {
-      case "customer":
-        console.error(`Invalid customer ID: ID = ${id}`);
-        throw new Error(INVALID_CUSTOMER_ID);
-      case "instructor":
-        console.error(`Invalid instructor ID: ID = ${id}`);
-        throw new Error(INVALID_INSTRUCTOR_ID);
-      case "admin":
-        console.error(`Invalid admin ID: ID = ${id}`);
-        throw new Error(INVALID_ADMIN_ID);
-      default:
-        throw new Error("Invalid user type");
-    }
+export async function authenticateUserSession(userType: UserType) {
+  const userSession = await getUserSession(userType);
+
+  if (!userSession || userSession.user.userType !== userType) {
+    console.error(`Invalid ${userType} session`);
+    throwInvalidUserError(userType);
   }
 
-  return userSessionType;
+  return userType;
+}
+
+export async function getAuthenticatedUserId(userType: UserType) {
+  const userSession = await getUserSession(userType);
+  const sessionUserId = userSession?.user.id;
+
+  if (!sessionUserId) {
+    console.error(`Missing authenticated ${userType} ID in session`);
+    throwInvalidUserError(userType);
+  }
+
+  const userId = parseInt(sessionUserId!);
+  if (Number.isNaN(userId)) {
+    console.error(`Invalid authenticated ${userType} ID in session`);
+    throwInvalidUserError(userType);
+  }
+
+  return userId;
 }

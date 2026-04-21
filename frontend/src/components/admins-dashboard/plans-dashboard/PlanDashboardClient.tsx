@@ -21,7 +21,7 @@ export default function PlanTabs({
     typeof plan !== "string" ? getLocalizedText(plan.name, "en") : "Unknown";
   const breadcrumb = [
     "Plan List",
-    `/admins/${userId}/plan-list`,
+    "/admins/plan-list",
     `Plan Page (${planName})`,
   ];
   const activeTabName = "activePlanTab";
