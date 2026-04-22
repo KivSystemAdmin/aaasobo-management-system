@@ -41,6 +41,17 @@ interface StepState {
   confirmation: StepStatus;
 }
 
+const formatSelectedDateTime = (dateTime: string, language: LanguageType) =>
+  new Intl.DateTimeFormat(language === "ja" ? "ja-JP" : "en-US", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: language !== "ja",
+  }).format(new Date(dateTime));
+
 export default function ProgressiveBookingFlow({
   classId,
   isFreeTrial,
@@ -424,9 +435,7 @@ export default function ProgressiveBookingFlow({
               {stepStatus.datetime === "completed" && selectedDateTime && (
                 <>
                   <span className={styles.selectedValue}>
-                    {new Date(selectedDateTime).toLocaleString(
-                      language === "ja" ? "ja-JP" : "en-US",
-                    )}
+                    {formatSelectedDateTime(selectedDateTime, language)}
                   </span>
                   <button
                     onClick={handleChangeDateTime}
@@ -460,9 +469,7 @@ export default function ProgressiveBookingFlow({
               {stepStatus.datetime === "completed" && selectedDateTime && (
                 <>
                   <span className={styles.selectedValue}>
-                    {new Date(selectedDateTime).toLocaleString(
-                      language === "ja" ? "ja-JP" : "en-US",
-                    )}
+                    {formatSelectedDateTime(selectedDateTime, language)}
                   </span>
                   <button
                     onClick={handleChangeDateTime}

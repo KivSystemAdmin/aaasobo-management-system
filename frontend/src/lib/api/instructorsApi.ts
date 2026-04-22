@@ -869,17 +869,13 @@ export const getInstructorAvailableSlots = async (
         cache: "no-store",
       });
     } else {
-      // From client component (via proxy)
-      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
-      const backendEndpoint = `/instructors/${instructorId}/available-slots?${params}`;
-      headers = {
-        "Content-Type": "application/json",
-        "backend-endpoint": backendEndpoint,
-        "no-cache": "no-cache",
-      };
+      // From client component use the backend directly so instructor-first
+      // availability is not blocked by the proxy request lifecycle.
+      apiURL = `${BASE_URL}/${instructorId}/available-slots?${params}`;
       response = await fetch(apiURL, {
         method,
-        headers,
+        credentials: "include",
+        cache: "no-store",
       });
     }
 
@@ -925,17 +921,13 @@ export const getAllInstructorAvailableSlots = async (
         cache: "no-store",
       });
     } else {
-      // From client component (via proxy)
-      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
-      const backendEndpoint = `/instructors/available-slots?${params}`;
-      headers = {
-        "Content-Type": "application/json",
-        "backend-endpoint": backendEndpoint,
-        "no-cache": "no-cache",
-      };
+      // From client component use the backend directly so date-first
+      // availability is not blocked by the proxy request lifecycle.
+      apiURL = `${BASE_URL}/available-slots?${params}`;
       response = await fetch(apiURL, {
         method,
-        headers,
+        credentials: "include",
+        cache: "no-store",
       });
     }
 
@@ -979,17 +971,13 @@ export const getInstructorAvailableSlotsByType = async (
         cache: "no-store",
       });
     } else {
-      // From client component (via proxy)
-      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
-      const backendEndpoint = `/instructors/available-slots/by-type?${params}&englishBackground=${englishBackground}`;
-      headers = {
-        "Content-Type": "application/json",
-        "backend-endpoint": backendEndpoint,
-        "no-cache": "no-cache",
-      };
+      // From client component use the backend directly so date-first
+      // booking availability behaves the same as instructor-first.
+      apiURL = `${BASE_URL}/available-slots/by-type?${params}&englishBackground=${englishBackground}`;
       response = await fetch(apiURL, {
         method,
-        headers,
+        credentials: "include",
+        cache: "no-store",
       });
     }
 
