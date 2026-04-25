@@ -29,6 +29,7 @@ import {
   InstructorAvailableSlotsQuery,
   AvailableSlotsResponse,
   InstructorAvailableSlotsResponse,
+  InstructorCalendarSlotsResponse,
   InstructorCalendarClassesResponse,
   InstructorClassParams,
   ActiveScheduleQuery,
@@ -56,6 +57,7 @@ import {
   getInstructorScheduleController,
   createInstructorScheduleController,
   getInstructorAvailableSlotsController,
+  getInstructorCalendarSlotsController,
   getAllAvailableSlotsController,
   getActiveInstructorScheduleController,
   getAvailableSlotsByTypeController,
@@ -364,6 +366,36 @@ const calendarClassesConfig = {
       },
       400: {
         description: "Invalid instructor ID",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+      },
+    },
+  },
+} as const;
+
+const calendarSlotsConfig = {
+  method: "get" as const,
+  paramsSchema: InstructorIdParams,
+  querySchema: InstructorAvailableSlotsQuery,
+  middleware: [
+    verifyAuthentication(AUTH_ROLES.AI, {
+      requireIdCheck: AUTH_ROLES.I,
+    }),
+  ] as RequestHandler[],
+  handler: getInstructorCalendarSlotsController,
+  openapi: {
+    summary: "Get instructor calendar slots",
+    description:
+      "Get instructor calendar slots including open availability, classes, and absences",
+    responses: {
+      200: {
+        description: "Successfully retrieved instructor calendar slots",
+        schema: InstructorCalendarSlotsResponse,
+      },
+      400: {
+        description: "Invalid instructor ID or query parameters",
         schema: MessageErrorResponse,
       },
       500: {
@@ -688,6 +720,7 @@ const validatedRouteConfigs = {
   "/:id/absences": [instructorAbsencesConfig, createAbsenceConfig],
   "/:id/absences/:absentAt": [deleteAbsenceConfig],
   "/:id/available-slots": [instructorAvailableSlotsConfig],
+  "/:id/calendar-slots": [calendarSlotsConfig],
   "/:id/calendar-classes": [calendarClassesConfig],
   "/:id/classes/:classId/same-date": [sameDateClassesConfig],
   "/:id/profile": [instructorProfileConfig],

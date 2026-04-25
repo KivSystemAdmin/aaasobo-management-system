@@ -23,6 +23,8 @@ import type {
   ScheduleUpdateImpactSummary,
   AvailableSlotsQuery,
   AvailableSlotsResponse,
+  InstructorCalendarSlot,
+  InstructorCalendarSlotsResponse,
   InstructorAbsence,
   InstructorAbsencesResponse,
   CreateAbsenceResponse,
@@ -888,6 +890,59 @@ export const getInstructorAvailableSlots = async (
     return { data: result.data };
   } catch (error) {
     console.error("Failed to fetch instructor available slots:", error);
+    throw error;
+  }
+};
+
+export const getInstructorCalendarSlots = async (
+  instructorId: number,
+  startDate: string,
+  endDate: string,
+  cookie?: string,
+) => {
+  try {
+    const params = new URLSearchParams({
+      start: startDate,
+      end: endDate,
+      timezone: "Asia/Tokyo",
+    });
+
+    let apiURL;
+    let headers;
+    let response;
+    const method = "GET";
+
+    if (cookie) {
+      apiURL = `${BASE_URL}/${instructorId}/calendar-slots?${params}`;
+      headers = { "Content-Type": "application/json", Cookie: cookie };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+        cache: "no-store",
+      });
+    } else {
+      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+      const backendEndpoint = `/instructors/${instructorId}/calendar-slots?${params}`;
+      headers = {
+        "Content-Type": "application/json",
+        "backend-endpoint": backendEndpoint,
+        "no-cache": "no-cache",
+      };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+      });
+    }
+
+    if (response.status !== 200) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = (await response.json()) as InstructorCalendarSlotsResponse;
+
+    return { data: result.data as InstructorCalendarSlot[] };
+  } catch (error) {
+    console.error("Failed to fetch instructor calendar slots:", error);
     throw error;
   }
 };

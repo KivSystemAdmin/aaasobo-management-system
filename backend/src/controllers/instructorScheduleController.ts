@@ -4,6 +4,7 @@ import {
   getScheduleWithSlots,
   createInstructorSchedule,
   getInstructorAvailableSlots,
+  getInstructorCalendarSlots,
   getAllAvailableSlots,
   getActiveInstructorSchedule,
   getAvailableSlotsByType,
@@ -127,6 +128,33 @@ export const getInstructorAvailableSlotsController = async (
     console.error("Error fetching available slots:", error);
     res.status(500).json({
       message: "Failed to fetch available slots",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
+export const getInstructorCalendarSlotsController = async (
+  req: RequestWith<InstructorIdParams, {}, InstructorAvailableSlotsQuery>,
+  res: Response,
+) => {
+  try {
+    const { start, end, timezone } = req.query;
+
+    const calendarSlots = await getInstructorCalendarSlots(
+      req.params.id,
+      start,
+      end,
+      timezone,
+    );
+
+    res.status(200).json({
+      message: "Instructor calendar slots retrieved successfully",
+      data: calendarSlots,
+    });
+  } catch (error) {
+    console.error("Error fetching instructor calendar slots:", error);
+    res.status(500).json({
+      message: "Failed to fetch instructor calendar slots",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

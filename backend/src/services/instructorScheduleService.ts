@@ -1,7 +1,14 @@
 import { prisma } from "../../prisma/prismaClient";
-import { Prisma } from "../../generated/prisma";
+import { Prisma, Status } from "../../generated/prisma";
 import { JAPAN_TIME_DIFF, nDaysLater, nHoursLater } from "../utils/dateUtils";
 import { EnglishBackground } from "../types";
+import {
+  CANCELED_CLASS_COLOR,
+  COMPLETED_CLASS_COLOR,
+  FREE_TRIAL_CLASS_COLOR,
+  REBOOKED_CLASS_COLOR,
+  REGULAR_CLASS_COLOR,
+} from "../utils/colors";
 
 function findFirstSlotOccurrenceOnOrAfter(
   effectiveFrom: Date,
@@ -363,6 +370,144 @@ export const getInstructorAvailableSlots = async (
   }
 };
 
+export const getInstructorCalendarSlots = async (
+  instructorId: number,
+  startDate: string,
+  endDate: string,
+  timezone: string,
+): Promise<InstructorCalendarSlot[]> => {
+  try {
+    if (timezone !== "Asia/Tokyo") {
+      throw new Error("Only Asia/Tokyo timezone is supported");
+    }
+
+    const [schedules, absences, classes] = await Promise.all([
+      prisma.instructorSchedule.findMany({
+        where: {
+          instructorId,
+          timezone: "Asia/Tokyo",
+          effectiveFrom: { lt: new Date(endDate) },
+          OR: [
+            { effectiveTo: null },
+            { effectiveTo: { gt: new Date(startDate) } },
+          ],
+        },
+        include: {
+          slots: { orderBy: [{ weekday: "asc" }, { startTime: "asc" }] },
+        },
+        orderBy: { effectiveFrom: "asc" },
+      }),
+      prisma.instructorAbsence.findMany({
+        where: {
+          instructorId,
+          absentAt: { gte: jst(startDate), lt: jst(endDate) },
+        },
+      }),
+      prisma.class.findMany({
+        where: {
+          instructorId,
+          dateTime: {
+            gte: jst(startDate),
+            lt: jst(endDate),
+          },
+          status: {
+            in: ["booked", "rebooked", "completed"],
+          },
+        },
+        include: {
+          classAttendance: {
+            include: {
+              children: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    const occupiedDateTimes = new Set<string>();
+    for (const absence of absences) {
+      occupiedDateTimes.add(absence.absentAt.toISOString());
+    }
+    for (const classItem of classes) {
+      if (classItem.dateTime) {
+        occupiedDateTimes.add(classItem.dateTime.toISOString());
+      }
+    }
+
+    const openSlots = generateInstructorSlots(
+      instructorId,
+      schedules,
+      new Date(startDate),
+      new Date(endDate),
+      new Set(
+        Array.from(occupiedDateTimes).map(
+          (dateTime) => `${instructorId}-${dateTime}`,
+        ),
+      ),
+    ).map((slot) => ({
+      start: slot.dateTime,
+      end: new Date(
+        new Date(slot.dateTime).getTime() + 25 * 60000,
+      ).toISOString(),
+      title: "Open",
+      color: "#A2B098",
+      slotType: "open" as const,
+    }));
+
+    const absenceSlots = absences.map((absence) => ({
+      start: absence.absentAt.toISOString(),
+      end: new Date(absence.absentAt.getTime() + 25 * 60000).toISOString(),
+      title: "Absent",
+      color: "#DC2626",
+      slotType: "absence" as const,
+    }));
+
+    const statusColorMap: Record<
+      Extract<Status, "booked" | "rebooked" | "completed">,
+      string
+    > = {
+      booked: REGULAR_CLASS_COLOR,
+      rebooked: REBOOKED_CLASS_COLOR,
+      completed: COMPLETED_CLASS_COLOR,
+    };
+
+    const classSlots = classes
+      .filter((classItem) => classItem.dateTime !== null)
+      .map((classItem) => {
+        const isBookedOrRebooked =
+          classItem.status === "booked" || classItem.status === "rebooked";
+
+        return {
+          start: classItem.dateTime!.toISOString(),
+          end: new Date(
+            classItem.dateTime!.getTime() + 25 * 60000,
+          ).toISOString(),
+          title:
+            classItem.classAttendance
+              .map((attendance) => attendance.children.name)
+              .join(", ") || "Class",
+          color:
+            classItem.isFreeTrial && isBookedOrRebooked
+              ? FREE_TRIAL_CLASS_COLOR
+              : statusColorMap[classItem.status as keyof typeof statusColorMap],
+          slotType: classItem.status as "booked" | "rebooked" | "completed",
+          classId: classItem.id,
+        };
+      });
+
+    return [...openSlots, ...classSlots, ...absenceSlots].sort((a, b) =>
+      a.start.localeCompare(b.start),
+    );
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch instructor calendar slots.");
+  }
+};
+
 interface AvailableSlotWithInstructors {
   dateTime: string;
   availableInstructors: number[];
@@ -479,6 +624,21 @@ type InstructorSchedule = Prisma.InstructorScheduleGetPayload<{
 
 interface AvailableSlot {
   dateTime: string;
+}
+
+interface InstructorCalendarSlot {
+  start: string;
+  end: string;
+  title: string;
+  color: string;
+  slotType:
+    | "open"
+    | "booked"
+    | "rebooked"
+    | "completed"
+    | "canceledByInstructor"
+    | "absence";
+  classId?: number;
 }
 
 // Extract time string (HH:MM) from DateTime

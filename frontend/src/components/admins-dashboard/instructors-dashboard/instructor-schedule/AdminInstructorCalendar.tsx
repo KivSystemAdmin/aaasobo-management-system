@@ -1,29 +1,49 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
+import type {
+  EventClickArg,
+  EventContentArg,
+  EventSourceFuncArg,
+} from "@fullcalendar/core";
+import Calendar from "@/components/features/calendar/Calendar";
+import Modal from "@/components/elements/modal/Modal";
+import ActionButton from "@/components/elements/buttons/actionButton/ActionButton";
 import {
-  getInstructorAvailableSlots,
   getInstructorAbsences,
+  getInstructorAvailableSlots,
+  getInstructorCalendarSlots,
 } from "@/lib/api/instructorsApi";
 import {
   batchUpdateInstructorAbsences,
   type AbsenceChange,
 } from "@/app/actions/instructorAbsence";
+import { errorAlert } from "@/lib/utils/alertUtils";
+import { formatYearDateTime } from "@/lib/utils/dateUtils";
 import type {
   AbsenceCanceledClassSummary,
   InstructorAbsence,
+  InstructorCalendarSlot,
+  InstructorCalendarSlotType,
 } from "@shared/schemas/instructors";
-import Calendar from "@/components/features/calendar/Calendar";
-import Modal from "@/components/elements/modal/Modal";
-import ActionButton from "@/components/elements/buttons/actionButton/ActionButton";
-import { EventSourceFuncArg, EventClickArg } from "@fullcalendar/core";
 import { toast } from "react-toastify";
-import styles from "./AvailabilityCalendar.module.scss";
-import { errorAlert } from "@/lib/utils/alertUtils";
-import { formatYearDateTime } from "@/lib/utils/dateUtils";
+import styles from "./AdminInstructorCalendar.module.scss";
 
-// Define proper event type for FullCalendar events
-interface CalendarEvent {
+type MainCalendarEvent = {
+  id: string;
+  start: string;
+  end: string;
+  title: string;
+  color: string;
+  textColor: string;
+  extendedProps: {
+    slotType: InstructorCalendarSlotType;
+    classId?: number;
+  };
+};
+
+type EditCalendarEvent = {
   id: string;
   start: string;
   end: string;
@@ -35,16 +55,35 @@ interface CalendarEvent {
     hasPendingChange: boolean;
     changeType: "toRemove";
   };
-}
+};
 
-export default function AvailabilityCalendar({
+const SLOT_LABELS: Record<InstructorCalendarSlotType, string> = {
+  open: "Open",
+  booked: "Booked",
+  rebooked: "Booked",
+  completed: "Done",
+  absence: "Absent",
+  canceledByInstructor: "Canceled",
+};
+
+const SLOT_SYMBOLS: Record<InstructorCalendarSlotType, string> = {
+  open: "○",
+  booked: "●",
+  rebooked: "●",
+  completed: "✓",
+  absence: "−",
+  canceledByInstructor: "×",
+};
+
+export default function AdminInstructorCalendar({
   instructorId,
 }: {
   instructorId: number;
 }) {
+  const router = useRouter();
   const [refreshKey, setRefreshKey] = useState(0);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalRefreshKey, setModalRefreshKey] = useState(0);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [pendingChanges, setPendingChanges] = useState<
     Map<string, AbsenceChange>
   >(new Map());
@@ -65,6 +104,19 @@ export default function AvailabilityCalendar({
     setModalRefreshKey((prev) => prev + 1);
   };
 
+  const buildMainEvent = (slot: InstructorCalendarSlot): MainCalendarEvent => ({
+    id: `${slot.slotType}-${slot.classId ?? slot.start}`,
+    start: slot.start,
+    end: slot.end,
+    title: slot.title,
+    color: "#FFFFFF",
+    textColor: "#111827",
+    extendedProps: {
+      slotType: slot.slotType,
+      classId: slot.classId,
+    },
+  });
+
   const fetchCalendarEvents = useCallback(
     async (info: EventSourceFuncArg) => {
       const startStr = formatJSTDate(info.start);
@@ -73,30 +125,46 @@ export default function AvailabilityCalendar({
       const endStr = formatJSTDate(endDate);
 
       try {
-        // Fetch both available slots and absences in parallel
+        const response = await getInstructorCalendarSlots(
+          instructorId,
+          startStr,
+          endStr,
+        );
+        return response.data.map(buildMainEvent);
+      } catch (error) {
+        console.error("Failed to fetch instructor calendar slots:", error);
+        return [];
+      }
+    },
+    [instructorId],
+  );
+
+  const fetchEditCalendarEvents = useCallback(
+    async (info: EventSourceFuncArg) => {
+      const startStr = formatJSTDate(info.start);
+      const endDate = new Date(info.end);
+      endDate.setDate(endDate.getDate() + 1);
+      const endStr = formatJSTDate(endDate);
+
+      try {
         const [slotsResponse, absencesResponse] = await Promise.all([
           getInstructorAvailableSlots(instructorId, startStr, endStr, false),
           getInstructorAbsences(instructorId),
         ]);
 
-        const events: CalendarEvent[] = [];
+        const events: EditCalendarEvent[] = [];
 
-        // Add available slots (green)
         if ("data" in slotsResponse) {
-          const availableEvents = slotsResponse.data.map(
-            (slot): CalendarEvent => {
-              const start = slot.dateTime;
-              const end = new Date(
-                new Date(start).getTime() + 25 * 60000,
-              ).toISOString();
-
-              // Check if this slot has pending changes
-              const pendingChange = pendingChanges.get(start);
+          events.push(
+            ...slotsResponse.data.map((slot) => {
+              const pendingChange = pendingChanges.get(slot.dateTime);
 
               return {
-                id: `available-${start}`,
-                start,
-                end,
+                id: `available-${slot.dateTime}`,
+                start: slot.dateTime,
+                end: new Date(
+                  new Date(slot.dateTime).getTime() + 25 * 60000,
+                ).toISOString(),
                 title: "Available",
                 color: "#A2B098",
                 textColor: "#FFF",
@@ -106,71 +174,112 @@ export default function AvailabilityCalendar({
                   changeType: "toRemove" as const,
                 },
               };
-            },
+            }),
           );
-          events.push(...availableEvents);
         }
 
-        // Add absences (red) - filter to current view range
         if ("absences" in absencesResponse) {
-          const absenceEvents = absencesResponse.absences
-            .filter((absence: InstructorAbsence) => {
-              const absenceDate = new Date(absence.absentAt);
-              return absenceDate >= info.start && absenceDate < info.end;
-            })
-            .map((absence: InstructorAbsence): CalendarEvent => {
-              const start = absence.absentAt;
-              const end = new Date(
-                new Date(start).getTime() + 25 * 60000,
-              ).toISOString();
+          events.push(
+            ...absencesResponse.absences
+              .filter((absence: InstructorAbsence) => {
+                const absenceDate = new Date(absence.absentAt);
+                return absenceDate >= info.start && absenceDate < info.end;
+              })
+              .map((absence: InstructorAbsence) => {
+                const pendingChange = pendingChanges.get(absence.absentAt);
 
-              // Check if this absence has pending changes
-              const pendingChange = pendingChanges.get(start);
-
-              return {
-                id: `absence-${start}`,
-                start,
-                end,
-                title: "Absent",
-                color: "#DC2626",
-                textColor: "#FFF",
-                extendedProps: {
-                  type: "absence" as const,
-                  hasPendingChange: pendingChange?.action === "remove",
-                  changeType: "toRemove" as const,
-                },
-              };
-            });
-          events.push(...absenceEvents);
+                return {
+                  id: `absence-${absence.absentAt}`,
+                  start: absence.absentAt,
+                  end: new Date(
+                    new Date(absence.absentAt).getTime() + 25 * 60000,
+                  ).toISOString(),
+                  title: "Absent",
+                  color: "#DC2626",
+                  textColor: "#FFF",
+                  extendedProps: {
+                    type: "absence" as const,
+                    hasPendingChange: pendingChange?.action === "remove",
+                    changeType: "toRemove" as const,
+                  },
+                };
+              }),
+          );
         }
 
         return events;
       } catch (error) {
-        console.error("Failed to fetch calendar data:", error);
+        console.error("Failed to fetch absence editor data:", error);
         return [];
       }
     },
     [instructorId, pendingChanges],
   );
 
+  const handleMainEventClick = useCallback(
+    (clickInfo: EventClickArg) => {
+      const { slotType, classId } = clickInfo.event.extendedProps as {
+        slotType: InstructorCalendarSlotType;
+        classId?: number;
+      };
+
+      if (
+        ["booked", "rebooked", "completed", "canceledByInstructor"].includes(
+          slotType,
+        ) &&
+        classId
+      ) {
+        router.push(
+          `/admins/instructor-list/${instructorId}/class-schedule/${classId}`,
+        );
+      }
+    },
+    [instructorId, router],
+  );
+
+  const handleSlotToggle = useCallback((clickInfo: EventClickArg) => {
+    const eventType = clickInfo.event.extendedProps.type;
+    const dateTime = clickInfo.event.start!.toISOString();
+
+    setPendingChanges((prev) => {
+      const newChanges = new Map(prev);
+
+      if (newChanges.has(dateTime)) {
+        newChanges.delete(dateTime);
+      } else if (eventType === "absence") {
+        newChanges.set(dateTime, {
+          dateTime,
+          action: "remove",
+          originalType: "absence",
+        });
+      } else if (eventType === "available") {
+        newChanges.set(dateTime, {
+          dateTime,
+          action: "add",
+          originalType: "available",
+        });
+      }
+
+      return newChanges;
+    });
+  }, []);
+
   const handleBatchSubmit = async () => {
-    if (pendingChanges.size === 0) return;
+    if (pendingChanges.size === 0) {
+      return;
+    }
 
     setIsSubmitting(true);
 
     try {
-      // Convert pending changes to array format
-      const changes: AbsenceChange[] = Array.from(pendingChanges.values());
-
+      const changes = Array.from(pendingChanges.values());
       const result = await batchUpdateInstructorAbsences(instructorId, changes);
 
       if (result.success) {
-        // All changes successful
         setPendingChanges(new Map());
         setCanceledClasses(result.canceledClasses);
         refreshCalendars();
         setIsEditModalOpen(false);
-        // Show success message only if there were actual changes
         if (result.message) {
           toast.success(result.message);
         }
@@ -178,7 +287,6 @@ export default function AvailabilityCalendar({
         result.successCount.add > 0 ||
         result.successCount.remove > 0
       ) {
-        // Partial success
         setPendingChanges(new Map());
         setCanceledClasses(result.canceledClasses);
         refreshCalendars();
@@ -187,15 +295,12 @@ export default function AvailabilityCalendar({
         await errorAlert(
           `${result.message}\n\nErrors:\n${result.errors.join("\n")}`,
         );
+      } else if (result.errors.length > 0) {
+        await errorAlert(
+          `${result.message}\n\nErrors:\n${result.errors.join("\n")}`,
+        );
       } else {
-        // All failed - only show alert for actual errors
-        if (result.errors.length > 0) {
-          await errorAlert(
-            `${result.message}\n\nErrors:\n${result.errors.join("\n")}`,
-          );
-        } else {
-          toast.info(result.message || "No changes were made.");
-        }
+        toast.info(result.message || "No changes were made.");
       }
     } catch (error) {
       console.error("Batch submission failed:", error);
@@ -207,44 +312,61 @@ export default function AvailabilityCalendar({
     }
   };
 
-  const handleSlotToggle = useCallback((clickInfo: EventClickArg) => {
-    const eventType = clickInfo.event.extendedProps.type;
-    const dateTime = clickInfo.event.start!.toISOString();
+  const renderMainEventContent = useCallback((eventInfo: EventContentArg) => {
+    const slotType = eventInfo.event.extendedProps
+      .slotType as InstructorCalendarSlotType;
+    const isClickable = slotType !== "open" && slotType !== "absence";
+    const titleText =
+      eventInfo.event.title &&
+      !["open", "absence"].includes(slotType) &&
+      eventInfo.event.title !== SLOT_LABELS[slotType] &&
+      eventInfo.event.title !== "Class"
+        ? eventInfo.event.title
+        : "";
+    const compactLabel = titleText
+      ? `${SLOT_LABELS[slotType]} - ${titleText}`
+      : SLOT_LABELS[slotType];
 
-    setPendingChanges((prev) => {
-      const newChanges = new Map(prev);
-
-      if (newChanges.has(dateTime)) {
-        // Remove the pending change (revert to original state)
-        newChanges.delete(dateTime);
-      } else {
-        // Add new pending change
-        if (eventType === "absence") {
-          newChanges.set(dateTime, {
-            dateTime,
-            action: "remove",
-            originalType: "absence",
-          });
-        } else if (eventType === "available") {
-          newChanges.set(dateTime, {
-            dateTime,
-            action: "add",
-            originalType: "available",
-          });
-        }
-      }
-
-      return newChanges;
-    });
+    return (
+      <div
+        className={`${styles.eventBlock} ${isClickable ? styles.clickable : ""}`}
+      >
+        <div className={styles.eventHeader}>
+          <span className={styles.statusBadge}>
+            <span className={styles.statusSymbol}>
+              {SLOT_SYMBOLS[slotType]}
+            </span>
+            {compactLabel}
+          </span>
+        </div>
+      </div>
+    );
   }, []);
 
   return (
     <div className={styles.container}>
       <Calendar
+        key={refreshKey}
         height="auto"
         contentHeight="auto"
-        key={refreshKey} // Force refresh when key changes
         events={fetchCalendarEvents}
+        eventClick={handleMainEventClick}
+        eventContent={renderMainEventContent}
+        eventClassNames={(arg) => {
+          const slotType = arg.event.extendedProps
+            .slotType as InstructorCalendarSlotType;
+
+          const classMap: Record<InstructorCalendarSlotType, string> = {
+            open: styles.slotOpen,
+            booked: styles.slotBooked,
+            rebooked: styles.slotBooked,
+            completed: styles.slotCompleted,
+            canceledByInstructor: styles.slotOpen,
+            absence: styles.slotAbsent,
+          };
+
+          return [styles.calendarEvent, classMap[slotType]];
+        }}
         selectable={false}
         headerRight={
           <ActionButton
@@ -271,24 +393,24 @@ export default function AvailabilityCalendar({
             </p>
           </div>
 
-          <div className={styles.legend}>
-            <div className={styles.legendItem}>
-              <div className={`${styles.legendBox} ${styles.available}`} />
+          <div className={styles.editLegend}>
+            <div className={styles.editLegendItem}>
+              <div className={`${styles.editLegendBox} ${styles.available}`} />
               <span>Available</span>
             </div>
-            <div className={styles.legendItem}>
-              <div className={`${styles.legendBox} ${styles.absence}`} />
+            <div className={styles.editLegendItem}>
+              <div className={`${styles.editLegendBox} ${styles.absence}`} />
               <span>Absence</span>
             </div>
-            <div className={styles.legendItem}>
+            <div className={styles.editLegendItem}>
               <div
-                className={`${styles.legendBox} ${styles.available} ${styles.withBadge} ${styles.willBeAbsent}`}
+                className={`${styles.editLegendBox} ${styles.available} ${styles.withBadge} ${styles.willBeAbsent}`}
               />
               <span>Will be Absent</span>
             </div>
-            <div className={styles.legendItem}>
+            <div className={styles.editLegendItem}>
               <div
-                className={`${styles.legendBox} ${styles.absence} ${styles.withBadge} ${styles.willBeAvailable}`}
+                className={`${styles.editLegendBox} ${styles.absence} ${styles.withBadge} ${styles.willBeAvailable}`}
               />
               <span>Will be Available</span>
             </div>
@@ -296,10 +418,10 @@ export default function AvailabilityCalendar({
 
           <div className={styles.calendarContainer}>
             <Calendar
+              key={modalRefreshKey}
               height="100%"
               contentHeight="auto"
-              key={modalRefreshKey}
-              events={fetchCalendarEvents}
+              events={fetchEditCalendarEvents}
               eventClick={handleSlotToggle}
               selectable={false}
               eventDidMount={(info) => {
@@ -309,16 +431,13 @@ export default function AvailabilityCalendar({
                   const element = info.el;
                   element.style.position = "relative";
 
-                  // Create badge element
                   const badge = document.createElement("div");
                   badge.className = styles.eventBadge;
 
                   if (type === "available") {
-                    // Available to remove - red badge
                     badge.classList.add(styles.willBeAbsent);
                     badge.title = "Will be marked absent";
                   } else if (type === "absence") {
-                    // Absence to remove - green badge
                     badge.classList.add(styles.willBeAvailable);
                     badge.title = "Will be removed";
                   }

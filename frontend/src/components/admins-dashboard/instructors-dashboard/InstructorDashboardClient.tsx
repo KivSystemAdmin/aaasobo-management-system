@@ -6,7 +6,6 @@ import TabFunction from "@/components/admins-dashboard/TabFunction";
 import InstructorProfile from "@/components/instructors-dashboard/instructor-profile/InstructorProfile";
 import { useTabSelect } from "@/hooks/useTabSelect";
 import InstructorSchedule from "./instructor-schedule/InstructorSchedule";
-import AvailabilityCalendar from "./instructor-schedule/AvailabilityCalendar";
 import Loading from "@/components/elements/loading/Loading";
 import InstructorPayroll from "./InstructorPayroll";
 import InstructorTagsTab from "./InstructorTags";
@@ -78,7 +77,7 @@ export default function InstructorTabs({
   // Tabs with labels and content
   const tabs = [
     {
-      label: "Class Schedule",
+      label: "Calendar",
       content: classScheduleComponent,
     },
     {
@@ -90,10 +89,6 @@ export default function InstructorTabs({
           userSessionType={userSessionType}
         />
       ),
-    },
-    {
-      label: "Availability",
-      content: <AvailabilityCalendar instructorId={instructorId} />,
     },
     {
       label: "Schedule",
