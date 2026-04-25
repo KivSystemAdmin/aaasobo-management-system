@@ -942,8 +942,7 @@ export const getInstructorCalendarSlots = async (
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const result =
-      (await response.json()) as InstructorCalendarSlotsResponse;
+    const result = (await response.json()) as InstructorCalendarSlotsResponse;
 
     return { data: result.data as InstructorCalendarSlot[] };
   } catch (error) {

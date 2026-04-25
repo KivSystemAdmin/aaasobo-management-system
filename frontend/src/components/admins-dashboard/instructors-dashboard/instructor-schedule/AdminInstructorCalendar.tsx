@@ -2,7 +2,11 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { EventClickArg, EventContentArg, EventSourceFuncArg } from "@fullcalendar/core";
+import type {
+  EventClickArg,
+  EventContentArg,
+  EventSourceFuncArg,
+} from "@fullcalendar/core";
 import Calendar from "@/components/features/calendar/Calendar";
 import Modal from "@/components/elements/modal/Modal";
 import ActionButton from "@/components/elements/buttons/actionButton/ActionButton";
@@ -16,9 +20,7 @@ import {
   type AbsenceChange,
 } from "@/app/actions/instructorAbsence";
 import { errorAlert } from "@/lib/utils/alertUtils";
-import {
-  formatYearDateTime,
-} from "@/lib/utils/dateUtils";
+import { formatYearDateTime } from "@/lib/utils/dateUtils";
 import type {
   AbsenceCanceledClassSummary,
   InstructorAbsence,
@@ -311,25 +313,32 @@ export default function AdminInstructorCalendar({
   };
 
   const renderMainEventContent = useCallback((eventInfo: EventContentArg) => {
-    const slotType = eventInfo.event.extendedProps.slotType as InstructorCalendarSlotType;
+    const slotType = eventInfo.event.extendedProps
+      .slotType as InstructorCalendarSlotType;
     const isClickable = slotType !== "open" && slotType !== "absence";
-    const showTitle =
+    const titleText =
       eventInfo.event.title &&
-      !["open", "absence", "booked", "rebooked"].includes(slotType) &&
+      !["open", "absence"].includes(slotType) &&
       eventInfo.event.title !== SLOT_LABELS[slotType] &&
-      eventInfo.event.title !== "Class";
+      eventInfo.event.title !== "Class"
+        ? eventInfo.event.title
+        : "";
+    const compactLabel = titleText
+      ? `${SLOT_LABELS[slotType]} - ${titleText}`
+      : SLOT_LABELS[slotType];
 
     return (
-      <div className={`${styles.eventBlock} ${isClickable ? styles.clickable : ""}`}>
+      <div
+        className={`${styles.eventBlock} ${isClickable ? styles.clickable : ""}`}
+      >
         <div className={styles.eventHeader}>
           <span className={styles.statusBadge}>
-            <span className={styles.statusSymbol}>{SLOT_SYMBOLS[slotType]}</span>
-            {SLOT_LABELS[slotType]}
+            <span className={styles.statusSymbol}>
+              {SLOT_SYMBOLS[slotType]}
+            </span>
+            {compactLabel}
           </span>
         </div>
-        {showTitle && (
-          <div className={styles.eventTitle}>{eventInfo.event.title}</div>
-        )}
       </div>
     );
   }, []);
