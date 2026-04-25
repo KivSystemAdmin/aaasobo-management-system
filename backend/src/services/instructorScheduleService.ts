@@ -387,7 +387,10 @@ export const getInstructorCalendarSlots = async (
           instructorId,
           timezone: "Asia/Tokyo",
           effectiveFrom: { lt: new Date(endDate) },
-          OR: [{ effectiveTo: null }, { effectiveTo: { gt: new Date(startDate) } }],
+          OR: [
+            { effectiveTo: null },
+            { effectiveTo: { gt: new Date(startDate) } },
+          ],
         },
         include: {
           slots: { orderBy: [{ weekday: "asc" }, { startTime: "asc" }] },
@@ -464,10 +467,7 @@ export const getInstructorCalendarSlots = async (
     }));
 
     const statusColorMap: Record<
-      Extract<
-        Status,
-        "booked" | "rebooked" | "completed"
-      >,
+      Extract<Status, "booked" | "rebooked" | "completed">,
       string
     > = {
       booked: REGULAR_CLASS_COLOR,
@@ -494,10 +494,7 @@ export const getInstructorCalendarSlots = async (
             classItem.isFreeTrial && isBookedOrRebooked
               ? FREE_TRIAL_CLASS_COLOR
               : statusColorMap[classItem.status as keyof typeof statusColorMap],
-          slotType: classItem.status as
-            | "booked"
-            | "rebooked"
-            | "completed",
+          slotType: classItem.status as "booked" | "rebooked" | "completed",
           classId: classItem.id,
         };
       });

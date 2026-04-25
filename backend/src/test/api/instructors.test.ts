@@ -111,10 +111,26 @@ describe("GET /instructors/:id/calendar-slots", () => {
       timezone: "Asia/Tokyo",
     });
 
-    await createInstructorSlot(schedule.id, 1, new Date("1970-01-01T09:00:00.000Z"));
-    await createInstructorSlot(schedule.id, 1, new Date("1970-01-01T10:00:00.000Z"));
-    await createInstructorSlot(schedule.id, 1, new Date("1970-01-01T11:00:00.000Z"));
-    await createInstructorSlot(schedule.id, 1, new Date("1970-01-01T12:00:00.000Z"));
+    await createInstructorSlot(
+      schedule.id,
+      1,
+      new Date("1970-01-01T09:00:00.000Z"),
+    );
+    await createInstructorSlot(
+      schedule.id,
+      1,
+      new Date("1970-01-01T10:00:00.000Z"),
+    );
+    await createInstructorSlot(
+      schedule.id,
+      1,
+      new Date("1970-01-01T11:00:00.000Z"),
+    );
+    await createInstructorSlot(
+      schedule.id,
+      1,
+      new Date("1970-01-01T12:00:00.000Z"),
+    );
 
     const bookedClass = await createClass(
       customer.id,
