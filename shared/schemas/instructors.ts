@@ -317,6 +317,31 @@ export const InstructorCalendarClassesResponse = z
   .array(InstructorCalendarClass)
   .describe("Array of instructor calendar classes");
 
+export const InstructorCalendarSlotType = z.enum([
+  "open",
+  "booked",
+  "rebooked",
+  "completed",
+  "canceledByInstructor",
+  "absence",
+]);
+
+export const InstructorCalendarSlot = z.object({
+  start: z.iso.datetime().describe("Slot start time"),
+  end: z.iso.datetime().describe("Slot end time"),
+  title: z.string().describe("Slot title"),
+  color: z.string().describe("Slot color code"),
+  slotType: InstructorCalendarSlotType.describe("Slot status"),
+  classId: z.number().int().positive().optional().describe("Class ID"),
+});
+
+export const InstructorCalendarSlotsResponse = z.object({
+  message: z.string().describe("Success message"),
+  data: z
+    .array(InstructorCalendarSlot)
+    .describe("Instructor calendar slots with availability and class states"),
+});
+
 // Dual parameter schemas for complex routes
 export const InstructorClassParams = z.object({
   id: z
@@ -489,6 +514,13 @@ export type AvailableSlotsResponse = z.infer<typeof AvailableSlotsResponse>;
 export type InstructorCalendarClass = z.infer<typeof InstructorCalendarClass>;
 export type InstructorCalendarClassesResponse = z.infer<
   typeof InstructorCalendarClassesResponse
+>;
+export type InstructorCalendarSlotType = z.infer<
+  typeof InstructorCalendarSlotType
+>;
+export type InstructorCalendarSlot = z.infer<typeof InstructorCalendarSlot>;
+export type InstructorCalendarSlotsResponse = z.infer<
+  typeof InstructorCalendarSlotsResponse
 >;
 export type InstructorClassParams = z.infer<typeof InstructorClassParams>;
 export type InstructorScheduleParams = z.infer<typeof InstructorScheduleParams>;
