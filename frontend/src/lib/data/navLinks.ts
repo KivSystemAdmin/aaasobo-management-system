@@ -125,7 +125,7 @@ export function getLinks(
 
   const instructorLinks: LinkType[] = [
     {
-      name: "Class Schedule",
+      name: "Calendar",
       href: "/instructors/class-schedule",
       icon: CalendarIcon,
     },
@@ -135,7 +135,7 @@ export function getLinks(
       icon: UserIcon,
     },
     {
-      name: "Availability Schedule",
+      name: "Schedule",
       href: "/instructors/availability",
       icon: ClockIcon,
     },
