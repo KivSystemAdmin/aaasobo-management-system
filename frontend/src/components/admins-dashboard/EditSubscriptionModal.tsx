@@ -63,16 +63,19 @@ function EditSubscriptionModal({
           plansData.find((p) => p.id === subscription?.planId) ?? null;
         setPlans(plansData);
         setSelectedPlan(initial);
-        const filteredPlans = plansData.filter(
-          (p) => p.englishBackground === currentEnglishBG,
-        );
-        setCurrentBGPlans(filteredPlans);
       } catch (e) {
         console.error("Failed to fetch plans:", e);
       }
     };
     fetchPlans();
   }, [subscription?.planId]);
+
+  useEffect(() => {
+    const filteredPlans = plans.filter(
+      (p) => p.englishBackground === currentEnglishBG,
+    );
+    setCurrentBGPlans(filteredPlans);
+  }, [plans, currentEnglishBG]);
 
   useEffect(() => {
     if (subscription) {
