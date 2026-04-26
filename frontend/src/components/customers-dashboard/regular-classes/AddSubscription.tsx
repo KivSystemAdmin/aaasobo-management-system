@@ -22,7 +22,6 @@ function AddSubscription({
 }) {
   const [isOpenForm, setIsOpenForm] = useState(isOpen);
   const [plansData, setPlansData] = useState<Plans>([]);
-  const [filterColumn, setFilterColumn] = useState<string>("0");
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectTypeValue, setSelectTypeValue] = useState<string>("");
@@ -30,6 +29,7 @@ function AddSubscription({
     null,
   );
   const englishBGs = [...new Set(plansData.map((p) => p.englishBackground))];
+  const [selectedPlanId, setSelectedPlanId] = useState<string>("");
 
   // Selecting a plan from the dropdown.
   const handleSelectingPlan = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -46,17 +46,21 @@ function AddSubscription({
     }
   };
 
-  // Handle the filter change
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    handleSelectingPlan(event);
-    setFilterColumn(event.target.value);
-    changeOptionColor(event.target);
-  };
-
   const handleEnglishBGChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = Number(e.target.value);
     setSelectedEnglishBG(value);
     setSelectedPlan(null);
+    setSelectedPlanId("");
+  };
+
+  const handlePlanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    setSelectedPlanId(id);
+
+    const matchedPlan =
+      plansData.find((plan) => plan.id === Number(id)) || null;
+
+    setSelectedPlan(matchedPlan);
   };
 
   // Change the input color based on the date input value
@@ -128,16 +132,16 @@ function AddSubscription({
                     className={styles.selectField}
                   >
                     <option>Select a category</option>
-                    {englishBGs.map((id) => {
+                    {englishBGs.map((bg) => {
                       const label =
-                        id === 1
+                        bg === 1
                           ? "Native A"
-                          : id === 2
+                          : bg === 2
                             ? "Native B"
                             : "Non Native";
 
                       return (
-                        <option key={id} value={id}>
+                        <option key={bg} value={bg}>
                           {label}
                         </option>
                       );
@@ -147,22 +151,20 @@ function AddSubscription({
                 <div className={styles.fieldGroup}>
                   <h4 className={styles.fieldLabel}>Plan</h4>
                   <select
-                    value={filterColumn}
-                    onChange={handleChange}
+                    value={selectedPlanId}
+                    onChange={handlePlanChange}
                     className={styles.selectField}
                   >
-                    <option disabled value="0">
-                      Select a plan
-                    </option>
-                    {plansData.map((plan) => {
-                      const { id, name, description, englishBackground } = plan;
-                      if (englishBackground !== selectedEnglishBG) return;
-                      return (
-                        <option key={id} value={id}>
-                          {name} ({description})
+                    <option value="">Select a plan</option>
+                    {plansData
+                      .filter(
+                        (plan) => plan.englishBackground === selectedEnglishBG,
+                      )
+                      .map((plan) => (
+                        <option key={plan.id} value={plan.id}>
+                          {plan.name} ({plan.description})
                         </option>
-                      );
-                    })}
+                      ))}
                   </select>
                 </div>
                 <div className={styles.fieldGroup}>

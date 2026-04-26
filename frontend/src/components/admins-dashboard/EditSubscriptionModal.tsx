@@ -52,6 +52,8 @@ function EditSubscriptionModal({
   const currentWeeklyTimes = subscription?.plan?.weeklyClassTimes ?? 0;
   const selectedWeeklyTimes = selectedPlan?.weeklyClassTimes ?? 0;
   const [selectTypeValue, setSelectTypeValue] = useState<string>("");
+  const currentEnglishBG = subscription?.plan.englishBackground;
+  const [currentEGPlans, setCurrentBGPlans] = useState<Plan[]>();
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -61,6 +63,10 @@ function EditSubscriptionModal({
           plansData.find((p) => p.id === subscription?.planId) ?? null;
         setPlans(plansData);
         setSelectedPlan(initial);
+        const filteredPlans = plansData.filter(
+          (p) => p.englishBackground === currentEnglishBG,
+        );
+        setCurrentBGPlans(filteredPlans);
       } catch (e) {
         console.error("Failed to fetch plans:", e);
       }
@@ -205,13 +211,14 @@ function EditSubscriptionModal({
                 onChange={handleSelectPlan}
                 required
               >
-                {plans.map((plan) => {
-                  return (
-                    <option key={plan.id} value={plan.id}>
-                      {plan.name}
-                    </option>
-                  );
-                })}
+                {currentEGPlans &&
+                  currentEGPlans.map((plan) => {
+                    return (
+                      <option key={plan.id} value={plan.id}>
+                        {plan.name}
+                      </option>
+                    );
+                  })}
               </select>
             </div>
           </div>
