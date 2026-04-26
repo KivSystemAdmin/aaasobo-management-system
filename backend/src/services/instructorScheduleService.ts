@@ -1,7 +1,51 @@
 import { prisma } from "../../prisma/prismaClient";
-import { Prisma } from "../../generated/prisma";
-import { nDaysLater, nHoursLater } from "../utils/dateUtils";
+import { Prisma, Status } from "../../generated/prisma";
+import { JAPAN_TIME_DIFF, nDaysLater, nHoursLater } from "../utils/dateUtils";
 import { EnglishBackground } from "../types";
+import {
+  CANCELED_CLASS_COLOR,
+  COMPLETED_CLASS_COLOR,
+  FREE_TRIAL_CLASS_COLOR,
+  REBOOKED_CLASS_COLOR,
+  REGULAR_CLASS_COLOR,
+} from "../utils/colors";
+
+function findFirstSlotOccurrenceOnOrAfter(
+  effectiveFrom: Date,
+  weekday: number,
+  startTime: Date,
+): Date {
+  const slotHours = startTime.getUTCHours();
+  const slotMinutes = startTime.getUTCMinutes();
+  const currentWeekday = effectiveFrom.getUTCDay();
+  const daysUntilSlot = (weekday - currentWeekday + 7) % 7;
+
+  const occurrence = new Date(effectiveFrom);
+  occurrence.setUTCDate(occurrence.getUTCDate() + daysUntilSlot);
+  occurrence.setUTCHours(slotHours - JAPAN_TIME_DIFF, slotMinutes, 0, 0);
+
+  return occurrence;
+}
+
+function matchesRecurringSlotInJst(
+  startAt: Date | null,
+  weekday: number,
+  startTime: Date,
+): boolean {
+  if (!startAt) {
+    return false;
+  }
+
+  const jstStartAt = new Date(
+    startAt.getTime() + JAPAN_TIME_DIFF * 60 * 60 * 1000,
+  );
+
+  return (
+    jstStartAt.getUTCDay() === weekday &&
+    jstStartAt.getUTCHours() === startTime.getUTCHours() &&
+    jstStartAt.getUTCMinutes() === startTime.getUTCMinutes()
+  );
+}
 
 export const getInstructorSchedules = async (instructorId: number) => {
   try {
@@ -87,6 +131,8 @@ export const createInstructorSchedule = async (data: {
     const { instructorId, effectiveFrom, timezone, slots } = data;
 
     return await prisma.$transaction(async (tx) => {
+      let canceledClassCount = 0;
+      const terminatedRecurringClassIds = new Set<number>();
       const existingSchedules = await tx.instructorSchedule.findMany({
         where: { instructorId: instructorId },
         select: {
@@ -136,18 +182,15 @@ export const createInstructorSchedule = async (data: {
             ),
         );
 
-        const effectiveWeekday = effectiveFrom.getUTCDay();
-        const datePrefix = effectiveFrom.toISOString().slice(0, 10);
         const lockedSlotDateTimes = Array.from(
           new Set(
-            removedSlots
-              .filter((removedSlot) => removedSlot.weekday === effectiveWeekday)
-              .map((removedSlot) => {
-                const slotTime = removedSlot.startTime
-                  .toISOString()
-                  .slice(11, 19);
-                return new Date(`${datePrefix}T${slotTime}.000Z`).toISOString();
-              }),
+            removedSlots.map((removedSlot) =>
+              findFirstSlotOccurrenceOnOrAfter(
+                effectiveFrom,
+                removedSlot.weekday,
+                removedSlot.startTime,
+              ).toISOString(),
+            ),
           ),
         );
 
@@ -157,7 +200,7 @@ export const createInstructorSchedule = async (data: {
           const lockKey = `instructor:${instructorId}:${lockedSlotDateTime.toISOString()}`;
           await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
 
-          await tx.class.updateMany({
+          const canceledClasses = await tx.class.updateMany({
             where: {
               instructorId,
               dateTime: lockedSlotDateTime,
@@ -172,6 +215,55 @@ export const createInstructorSchedule = async (data: {
               updatedAt: now,
             },
           });
+          canceledClassCount += canceledClasses.count;
+        }
+
+        if (removedSlots.length > 0) {
+          const recurringClasses = await tx.recurringClass.findMany({
+            where: {
+              instructorId,
+              OR: [{ endAt: null }, { endAt: { gte: effectiveFrom } }],
+            },
+            select: {
+              id: true,
+              startAt: true,
+              endAt: true,
+            },
+          });
+
+          for (const removedSlot of removedSlots) {
+            const removedSlotDateTime = findFirstSlotOccurrenceOnOrAfter(
+              effectiveFrom,
+              removedSlot.weekday,
+              removedSlot.startTime,
+            );
+
+            const matchingRecurringClasses = recurringClasses.filter(
+              (recurringClass) =>
+                matchesRecurringSlotInJst(
+                  recurringClass.startAt,
+                  removedSlot.weekday,
+                  removedSlot.startTime,
+                ) &&
+                (!recurringClass.endAt ||
+                  recurringClass.endAt >= removedSlotDateTime),
+            );
+
+            for (const recurringClass of matchingRecurringClasses) {
+              await tx.recurringClass.update({
+                where: { id: recurringClass.id },
+                data: { endAt: removedSlotDateTime },
+              });
+              terminatedRecurringClassIds.add(recurringClass.id);
+
+              await tx.class.deleteMany({
+                where: {
+                  recurringClassId: recurringClass.id,
+                  dateTime: { gt: removedSlotDateTime },
+                },
+              });
+            }
+          }
         }
       }
 
@@ -225,11 +317,17 @@ export const createInstructorSchedule = async (data: {
       }
 
       return {
-        ...createdSchedule,
-        slots: createdSchedule.slots.map((slot) => ({
-          ...slot,
-          startTime: extractTime(slot.startTime),
-        })),
+        schedule: {
+          ...createdSchedule,
+          slots: createdSchedule.slots.map((slot) => ({
+            ...slot,
+            startTime: extractTime(slot.startTime),
+          })),
+        },
+        impactSummary: {
+          canceledClassCount,
+          terminatedRecurringClassCount: terminatedRecurringClassIds.size,
+        },
       };
     });
   } catch (error) {
@@ -269,6 +367,144 @@ export const getInstructorAvailableSlots = async (
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch instructor available slots.");
+  }
+};
+
+export const getInstructorCalendarSlots = async (
+  instructorId: number,
+  startDate: string,
+  endDate: string,
+  timezone: string,
+): Promise<InstructorCalendarSlot[]> => {
+  try {
+    if (timezone !== "Asia/Tokyo") {
+      throw new Error("Only Asia/Tokyo timezone is supported");
+    }
+
+    const [schedules, absences, classes] = await Promise.all([
+      prisma.instructorSchedule.findMany({
+        where: {
+          instructorId,
+          timezone: "Asia/Tokyo",
+          effectiveFrom: { lt: new Date(endDate) },
+          OR: [
+            { effectiveTo: null },
+            { effectiveTo: { gt: new Date(startDate) } },
+          ],
+        },
+        include: {
+          slots: { orderBy: [{ weekday: "asc" }, { startTime: "asc" }] },
+        },
+        orderBy: { effectiveFrom: "asc" },
+      }),
+      prisma.instructorAbsence.findMany({
+        where: {
+          instructorId,
+          absentAt: { gte: jst(startDate), lt: jst(endDate) },
+        },
+      }),
+      prisma.class.findMany({
+        where: {
+          instructorId,
+          dateTime: {
+            gte: jst(startDate),
+            lt: jst(endDate),
+          },
+          status: {
+            in: ["booked", "rebooked", "completed"],
+          },
+        },
+        include: {
+          classAttendance: {
+            include: {
+              children: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    const occupiedDateTimes = new Set<string>();
+    for (const absence of absences) {
+      occupiedDateTimes.add(absence.absentAt.toISOString());
+    }
+    for (const classItem of classes) {
+      if (classItem.dateTime) {
+        occupiedDateTimes.add(classItem.dateTime.toISOString());
+      }
+    }
+
+    const openSlots = generateInstructorSlots(
+      instructorId,
+      schedules,
+      new Date(startDate),
+      new Date(endDate),
+      new Set(
+        Array.from(occupiedDateTimes).map(
+          (dateTime) => `${instructorId}-${dateTime}`,
+        ),
+      ),
+    ).map((slot) => ({
+      start: slot.dateTime,
+      end: new Date(
+        new Date(slot.dateTime).getTime() + 25 * 60000,
+      ).toISOString(),
+      title: "Open",
+      color: "#A2B098",
+      slotType: "open" as const,
+    }));
+
+    const absenceSlots = absences.map((absence) => ({
+      start: absence.absentAt.toISOString(),
+      end: new Date(absence.absentAt.getTime() + 25 * 60000).toISOString(),
+      title: "Absent",
+      color: "#DC2626",
+      slotType: "absence" as const,
+    }));
+
+    const statusColorMap: Record<
+      Extract<Status, "booked" | "rebooked" | "completed">,
+      string
+    > = {
+      booked: REGULAR_CLASS_COLOR,
+      rebooked: REBOOKED_CLASS_COLOR,
+      completed: COMPLETED_CLASS_COLOR,
+    };
+
+    const classSlots = classes
+      .filter((classItem) => classItem.dateTime !== null)
+      .map((classItem) => {
+        const isBookedOrRebooked =
+          classItem.status === "booked" || classItem.status === "rebooked";
+
+        return {
+          start: classItem.dateTime!.toISOString(),
+          end: new Date(
+            classItem.dateTime!.getTime() + 25 * 60000,
+          ).toISOString(),
+          title:
+            classItem.classAttendance
+              .map((attendance) => attendance.children.name)
+              .join(", ") || "Class",
+          color:
+            classItem.isFreeTrial && isBookedOrRebooked
+              ? FREE_TRIAL_CLASS_COLOR
+              : statusColorMap[classItem.status as keyof typeof statusColorMap],
+          slotType: classItem.status as "booked" | "rebooked" | "completed",
+          classId: classItem.id,
+        };
+      });
+
+    return [...openSlots, ...classSlots, ...absenceSlots].sort((a, b) =>
+      a.start.localeCompare(b.start),
+    );
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch instructor calendar slots.");
   }
 };
 
@@ -390,6 +626,21 @@ interface AvailableSlot {
   dateTime: string;
 }
 
+interface InstructorCalendarSlot {
+  start: string;
+  end: string;
+  title: string;
+  color: string;
+  slotType:
+    | "open"
+    | "booked"
+    | "rebooked"
+    | "completed"
+    | "canceledByInstructor"
+    | "absence";
+  classId?: number;
+}
+
 // Extract time string (HH:MM) from DateTime
 const extractTime = (dateTime: Date): string => {
   return dateTime.toISOString().substring(11, 16);
@@ -419,7 +670,7 @@ const getSlotConstraints = async (
   const start = new Date(startDate);
   const end = new Date(endDate);
 
-  const [schedules, absences] = await Promise.all([
+  const [schedules, absences, completedClasses] = await Promise.all([
     prisma.instructorSchedule.findMany({
       where: {
         instructorId,
@@ -441,6 +692,17 @@ const getSlotConstraints = async (
         instructorId,
         absentAt: { gte: jst(startDate), lt: jst(endDate) },
       },
+    }),
+    prisma.class.findMany({
+      where: {
+        instructorId,
+        dateTime: {
+          gte: jst(startDate),
+          lt: jst(endDate),
+        },
+        status: "completed",
+      },
+      select: { instructorId: true, dateTime: true },
     }),
   ]);
 
@@ -464,13 +726,25 @@ const getSlotConstraints = async (
     ),
   );
 
+  const completedClassSet = new Set(
+    completedClasses
+      .filter((classItem) => classItem.dateTime !== null)
+      .map(
+        (classItem) => `${instructorId}-${classItem.dateTime!.toISOString()}`,
+      ),
+  );
+
   const bookingSet = new Set(
     bookings
       .filter((booking) => booking.dateTime !== null)
       .map((booking) => `${instructorId}-${booking.dateTime!.toISOString()}`),
   );
 
-  const excludeSlots = new Set([...absenceSet, ...bookingSet]);
+  const excludeSlots = new Set([
+    ...absenceSet,
+    ...completedClassSet,
+    ...bookingSet,
+  ]);
   return { schedules, excludeSlots };
 };
 

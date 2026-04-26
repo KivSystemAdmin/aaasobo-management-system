@@ -3,7 +3,6 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { SignJWT, jwtVerify } from "jose";
 import { z } from "zod";
-import { convertToSingular } from "@/lib/utils/stringUtils";
 
 const credentialSchema = z.object({
   email: z.string().email(),
@@ -73,25 +72,20 @@ export const authConfig: NextAuthConfig = {
     async authorized({ auth, request: { nextUrl } }): Promise<boolean> {
       const isLoggedIn = !!auth?.user;
       const userType = auth?.user?.userType;
-      const userId = auth?.user?.id;
 
-      // Check if the user is on customer dashboard (/customers/[id]/...), instructor dashboard (/instructors/[id]/...), or admin dashboard (/admin/[id]/...).
-      const matchPath = nextUrl.pathname.match(
-        /^\/(customers|instructors|admins)\/(\d+)(\/.*)?$/,
-      );
-
-      if (!matchPath) {
-        return true; // Allow access to other pages
+      if (nextUrl.pathname.startsWith("/admins")) {
+        return isLoggedIn && userType === "admin";
       }
 
-      const [_, pluralRole, pathId] = matchPath;
-      const role = convertToSingular(pluralRole);
-
-      if (isLoggedIn && userType === role && userId === pathId) {
-        return true; // Authorized
+      if (nextUrl.pathname.startsWith("/customers")) {
+        return isLoggedIn && userType === "customer";
       }
 
-      return false; // Unauthorized
+      if (nextUrl.pathname.startsWith("/instructors")) {
+        return isLoggedIn && userType === "instructor";
+      }
+
+      return true;
     },
   },
 

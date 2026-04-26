@@ -20,8 +20,11 @@ import type {
   SimpleInstructorProfile,
   CreateScheduleRequest,
   ActiveInstructorSchedule,
+  ScheduleUpdateImpactSummary,
   AvailableSlotsQuery,
   AvailableSlotsResponse,
+  InstructorCalendarSlot,
+  InstructorCalendarSlotsResponse,
   InstructorAbsence,
   InstructorAbsencesResponse,
   CreateAbsenceResponse,
@@ -825,10 +828,13 @@ export const createInstructorSchedule = async (
     }
 
     const result = (await response.json()) as {
-      data: ActiveInstructorSchedule;
+      data: {
+        schedule: ActiveInstructorSchedule;
+        impactSummary: ScheduleUpdateImpactSummary;
+      };
     };
 
-    return { schedule: result.data };
+    return result.data;
   } catch (error) {
     console.error("Failed to create instructor schedule:", error);
     throw error;
@@ -865,9 +871,58 @@ export const getInstructorAvailableSlots = async (
         cache: "no-store",
       });
     } else {
-      // From client component (via proxy)
+      // From client component use the backend directly so instructor-first
+      // availability is not blocked by the proxy request lifecycle.
+      apiURL = `${BASE_URL}/${instructorId}/available-slots?${params}`;
+      response = await fetch(apiURL, {
+        method,
+        credentials: "include",
+        cache: "no-store",
+      });
+    }
+
+    if (response.status !== 200) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = (await response.json()) as { data: AvailableSlot[] };
+
+    return { data: result.data };
+  } catch (error) {
+    console.error("Failed to fetch instructor available slots:", error);
+    throw error;
+  }
+};
+
+export const getInstructorCalendarSlots = async (
+  instructorId: number,
+  startDate: string,
+  endDate: string,
+  cookie?: string,
+) => {
+  try {
+    const params = new URLSearchParams({
+      start: startDate,
+      end: endDate,
+      timezone: "Asia/Tokyo",
+    });
+
+    let apiURL;
+    let headers;
+    let response;
+    const method = "GET";
+
+    if (cookie) {
+      apiURL = `${BASE_URL}/${instructorId}/calendar-slots?${params}`;
+      headers = { "Content-Type": "application/json", Cookie: cookie };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+        cache: "no-store",
+      });
+    } else {
       apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
-      const backendEndpoint = `/instructors/${instructorId}/available-slots?${params}`;
+      const backendEndpoint = `/instructors/${instructorId}/calendar-slots?${params}`;
       headers = {
         "Content-Type": "application/json",
         "backend-endpoint": backendEndpoint,
@@ -883,11 +938,11 @@ export const getInstructorAvailableSlots = async (
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const result = (await response.json()) as { data: AvailableSlot[] };
+    const result = (await response.json()) as InstructorCalendarSlotsResponse;
 
-    return { data: result.data };
+    return { data: result.data as InstructorCalendarSlot[] };
   } catch (error) {
-    console.error("Failed to fetch instructor available slots:", error);
+    console.error("Failed to fetch instructor calendar slots:", error);
     throw error;
   }
 };
@@ -921,17 +976,13 @@ export const getAllInstructorAvailableSlots = async (
         cache: "no-store",
       });
     } else {
-      // From client component (via proxy)
-      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
-      const backendEndpoint = `/instructors/available-slots?${params}`;
-      headers = {
-        "Content-Type": "application/json",
-        "backend-endpoint": backendEndpoint,
-        "no-cache": "no-cache",
-      };
+      // From client component use the backend directly so date-first
+      // availability is not blocked by the proxy request lifecycle.
+      apiURL = `${BASE_URL}/available-slots?${params}`;
       response = await fetch(apiURL, {
         method,
-        headers,
+        credentials: "include",
+        cache: "no-store",
       });
     }
 
@@ -975,17 +1026,13 @@ export const getInstructorAvailableSlotsByType = async (
         cache: "no-store",
       });
     } else {
-      // From client component (via proxy)
-      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
-      const backendEndpoint = `/instructors/available-slots/by-type?${params}&englishBackground=${englishBackground}`;
-      headers = {
-        "Content-Type": "application/json",
-        "backend-endpoint": backendEndpoint,
-        "no-cache": "no-cache",
-      };
+      // From client component use the backend directly so date-first
+      // booking availability behaves the same as instructor-first.
+      apiURL = `${BASE_URL}/available-slots/by-type?${params}&englishBackground=${englishBackground}`;
       response = await fetch(apiURL, {
         method,
-        headers,
+        credentials: "include",
+        cache: "no-store",
       });
     }
 
@@ -1074,12 +1121,23 @@ export const addInstructorAbsence = async (
     });
 
     if (response.status !== 201) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      let errorMessage = `HTTP error! status: ${response.status}`;
+
+      try {
+        const errorBody = (await response.json()) as { message?: string };
+        if (errorBody.message) {
+          errorMessage = errorBody.message;
+        }
+      } catch {
+        // Keep the default message when the response body is not JSON.
+      }
+
+      throw new Error(errorMessage);
     }
 
     const result: CreateAbsenceResponse = await response.json();
 
-    return { absence: result.data };
+    return result.data;
   } catch (error) {
     console.error("Failed to add instructor absence:", error);
     throw error;

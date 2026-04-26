@@ -21,7 +21,7 @@ export default function EventTabs({
     typeof event !== "string" ? getLocalizedText(event.name, "en") : "Unknown";
   const breadcrumb = [
     "Event List",
-    `/admins/${userId}/event-list`,
+    "/admins/event-list",
     `Event Page (${eventName})`,
   ];
   const activeTabName = "activeEventTab";

@@ -39,12 +39,16 @@ export default function InstructorSelection({
         return;
       }
 
-      // Otherwise fetch native or non native instructors according to the plan (instructor-first flow)
+      // Mirror the date-first fallback so free-trial bookings without plan data
+      // still show a valid instructor list instead of an empty state.
+      const englishBackground =
+        plan?.englishBackground ?? EnglishBackground.NonNative;
+
       try {
         setLoading(true);
         setError(null);
 
-        switch (plan?.englishBackground) {
+        switch (englishBackground) {
           case EnglishBackground.NonNative:
             const nonNativeInstructorProfiles =
               await getInstructorProfilesByEnglishBackground(

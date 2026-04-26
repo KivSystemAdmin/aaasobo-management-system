@@ -135,7 +135,7 @@ const RegisterForm = ({
                 placeholder="e.g., John"
                 icon={<UserCircleIcon className={styles.icon} />}
                 inputRequired
-                error={localMessages.name}
+                error={localMessages.nickname}
                 onChange={() => clearErrorMessage("nickname")}
               />
 
@@ -222,6 +222,7 @@ const RegisterForm = ({
                 placeholder="e.g., https://zoom.us/j/..."
                 icon={<LinkIcon className={styles.icon} />}
                 inputRequired
+                error={localMessages.classURL}
                 onChange={() => clearErrorMessage("classURL")}
               />
 
@@ -235,6 +236,7 @@ const RegisterForm = ({
                 placeholder="e.g., 123 456 7890"
                 icon={<IdentificationIcon className={styles.icon} />}
                 inputRequired
+                error={localMessages.meetingId}
                 onChange={() => clearErrorMessage("meetingId")}
               />
 
@@ -248,6 +250,7 @@ const RegisterForm = ({
                 placeholder="e.g., 123456"
                 icon={<KeyIcon className={styles.icon} />}
                 inputRequired
+                error={localMessages.passcode}
                 onChange={() => clearErrorMessage("passcode")}
               />
 

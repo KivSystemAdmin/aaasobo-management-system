@@ -18,7 +18,7 @@ import {
   revalidatePlanList,
   revalidateSubscriptionList,
 } from "./revalidate";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 import { validateSession } from "./validateSession";
 import {
   generateClasses,
@@ -210,8 +210,8 @@ export async function updateAttendanceAction(
 
   const path =
     userType === "admin"
-      ? `/admins/${userId}/instructor-list/${instructorId}/class-schedule`
-      : `/instructors/${userId}/class-schedule`;
+      ? `/admins/instructor-list/${instructorId}/class-schedule`
+      : "/instructors/class-schedule";
 
   revalidatePath(path);
 
@@ -251,8 +251,8 @@ export async function updateClassStatusAction(
 
   const path =
     userType === "admin"
-      ? `/admins/${userId}/instructor-list/${instructorId}/class-schedule`
-      : `/instructors/${userId}/class-schedule`;
+      ? `/admins/instructor-list/${instructorId}/class-schedule`
+      : "/instructors/class-schedule";
 
   revalidatePath(path);
 

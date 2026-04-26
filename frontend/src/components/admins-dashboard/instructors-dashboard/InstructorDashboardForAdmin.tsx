@@ -11,8 +11,8 @@ import type {
   InstructorTagsResponse,
   TagCatalogResponse,
 } from "@shared/schemas/instructors";
-import InstructorCalendar from "../../instructors-dashboard/class-schedule/instructorCalendar/InstructorCalendar";
 import InstructorDashboardClient from "@/components/admins-dashboard/instructors-dashboard/InstructorDashboardClient";
+import AdminInstructorCalendar from "./instructor-schedule/AdminInstructorCalendar";
 import { getCookie } from "../../../proxy";
 
 export default async function InstructorDashboardForAdmin({
@@ -123,11 +123,7 @@ export default async function InstructorDashboardForAdmin({
       initialInstructorTags={initialInstructorTags}
       initialTagCatalog={initialTagCatalog}
       classScheduleComponent={
-        <InstructorCalendar
-          adminId={adminId}
-          instructorId={instructorId}
-          userSessionType={userSessionType}
-        />
+        <AdminInstructorCalendar instructorId={instructorId} />
       }
     />
   );

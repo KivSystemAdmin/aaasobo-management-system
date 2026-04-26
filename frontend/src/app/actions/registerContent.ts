@@ -6,7 +6,7 @@ import { GENERAL_ERROR_MESSAGE } from "@/lib/messages/formValidation";
 import { extractRegisterValidationErrors } from "@/lib/utils/validationErrorUtils";
 import { planRegisterSchema, eventRegisterSchema } from "@/schemas/authSchema";
 import { revalidatePlanList, revalidateEventList } from "./revalidate";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 
 export async function registerContent(
   prevState: RegisterFormState | undefined,

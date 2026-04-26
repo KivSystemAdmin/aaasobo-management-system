@@ -209,6 +209,19 @@ export const ActiveInstructorSchedule = z.object({
   slots: z.array(InstructorSlot).describe("Array of instructor time slots"),
 });
 
+export const ScheduleUpdateImpactSummary = z.object({
+  canceledClassCount: z
+    .number()
+    .int()
+    .nonnegative()
+    .describe("Number of booked or rebooked classes canceled by the update"),
+  terminatedRecurringClassCount: z
+    .number()
+    .int()
+    .nonnegative()
+    .describe("Number of recurring classes terminated by the update"),
+});
+
 export const ActiveScheduleResponse = z.object({
   message: z.string().describe("Success message"),
   data: ActiveInstructorSchedule.describe(
@@ -304,6 +317,31 @@ export const InstructorCalendarClassesResponse = z
   .array(InstructorCalendarClass)
   .describe("Array of instructor calendar classes");
 
+export const InstructorCalendarSlotType = z.enum([
+  "open",
+  "booked",
+  "rebooked",
+  "completed",
+  "canceledByInstructor",
+  "absence",
+]);
+
+export const InstructorCalendarSlot = z.object({
+  start: z.iso.datetime().describe("Slot start time"),
+  end: z.iso.datetime().describe("Slot end time"),
+  title: z.string().describe("Slot title"),
+  color: z.string().describe("Slot color code"),
+  slotType: InstructorCalendarSlotType.describe("Slot status"),
+  classId: z.number().int().positive().optional().describe("Class ID"),
+});
+
+export const InstructorCalendarSlotsResponse = z.object({
+  message: z.string().describe("Success message"),
+  data: z
+    .array(InstructorCalendarSlot)
+    .describe("Instructor calendar slots with availability and class states"),
+});
+
 // Dual parameter schemas for complex routes
 export const InstructorClassParams = z.object({
   id: z
@@ -355,9 +393,16 @@ export const CreateScheduleRequest = z.object({
 
 export const CreateScheduleResponse = z.object({
   message: z.string().describe("Success message"),
-  data: ActiveInstructorSchedule.describe(
-    "Created instructor schedule with slots",
-  ),
+  data: z
+    .object({
+      schedule: ActiveInstructorSchedule.describe(
+        "Created instructor schedule with slots",
+      ),
+      impactSummary: ScheduleUpdateImpactSummary.describe(
+        "Summary of regular classes and classes affected by the schedule update",
+      ),
+    })
+    .describe("Created schedule result"),
 });
 
 // Instructor absence schemas
@@ -378,6 +423,19 @@ export const InstructorAbsence = z.object({
   absentAt: z.string().describe("Absence date in ISO format"),
 });
 
+export const AbsenceCanceledClassSummary = z.object({
+  id: z.number().int().positive().describe("Canceled class ID"),
+  classCode: z.string().describe("Class code"),
+  dateTime: z.string().describe("Canceled class date/time in ISO format"),
+  rebookableUntil: z
+    .string()
+    .describe("Rebookable until date/time in ISO format"),
+  customer: z.object({
+    id: z.number().int().positive().describe("Customer ID"),
+    name: z.string().describe("Customer name"),
+  }),
+});
+
 export const InstructorAbsencesResponse = z.object({
   message: z.string().describe("Success message"),
   data: z.array(InstructorAbsence).describe("Array of instructor absences"),
@@ -385,7 +443,14 @@ export const InstructorAbsencesResponse = z.object({
 
 export const CreateAbsenceResponse = z.object({
   message: z.string().describe("Success message"),
-  data: InstructorAbsence.describe("Created instructor absence"),
+  data: z.object({
+    absence: InstructorAbsence.describe("Created instructor absence"),
+    canceledClasses: z
+      .array(AbsenceCanceledClassSummary)
+      .describe(
+        "Classes canceled because they matched the instructor absence slot",
+      ),
+  }),
 });
 
 export const DeleteAbsenceResponse = z.object({
@@ -432,6 +497,9 @@ export type ClassInstructorResponse = z.infer<typeof ClassInstructorResponse>;
 export type ActiveScheduleQuery = z.infer<typeof ActiveScheduleQuery>;
 export type InstructorSlot = z.infer<typeof InstructorSlot>;
 export type ActiveInstructorSchedule = z.infer<typeof ActiveInstructorSchedule>;
+export type ScheduleUpdateImpactSummary = z.infer<
+  typeof ScheduleUpdateImpactSummary
+>;
 export type ActiveScheduleResponse = z.infer<typeof ActiveScheduleResponse>;
 export type AvailableSlotsQuery = z.infer<typeof AvailableSlotsQuery>;
 export type InstructorAvailableSlotsQuery = z.infer<
@@ -447,6 +515,13 @@ export type InstructorCalendarClass = z.infer<typeof InstructorCalendarClass>;
 export type InstructorCalendarClassesResponse = z.infer<
   typeof InstructorCalendarClassesResponse
 >;
+export type InstructorCalendarSlotType = z.infer<
+  typeof InstructorCalendarSlotType
+>;
+export type InstructorCalendarSlot = z.infer<typeof InstructorCalendarSlot>;
+export type InstructorCalendarSlotsResponse = z.infer<
+  typeof InstructorCalendarSlotsResponse
+>;
 export type InstructorClassParams = z.infer<typeof InstructorClassParams>;
 export type InstructorScheduleParams = z.infer<typeof InstructorScheduleParams>;
 export type CreateSlotRequest = z.infer<typeof CreateSlotRequest>;
@@ -455,6 +530,9 @@ export type CreateScheduleResponse = z.infer<typeof CreateScheduleResponse>;
 export type InstructorAbsenceParams = z.infer<typeof InstructorAbsenceParams>;
 export type CreateAbsenceRequest = z.infer<typeof CreateAbsenceRequest>;
 export type InstructorAbsence = z.infer<typeof InstructorAbsence>;
+export type AbsenceCanceledClassSummary = z.infer<
+  typeof AbsenceCanceledClassSummary
+>;
 export type InstructorAbsencesResponse = z.infer<
   typeof InstructorAbsencesResponse
 >;

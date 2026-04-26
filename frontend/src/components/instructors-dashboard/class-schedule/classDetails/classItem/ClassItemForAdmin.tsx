@@ -73,13 +73,13 @@ const ClassItemForAdmin = ({
         let redirectPath: string;
         switch (previousPage) {
           case "class-list":
-            redirectPath = `/admins/${adminId}/class-list/${classItem.id}`;
+            redirectPath = `/admins/class-list/${classItem.id}`;
             break;
           case "class-calendar":
-            redirectPath = `/admins/${adminId}/calendar/${instructorId}/class-schedule/${classItem.id}`;
+            redirectPath = `/admins/calendar/${instructorId}/class-schedule/${classItem.id}`;
             break;
           case "instructor-list":
-            redirectPath = `/admins/${adminId}/instructor-list/${instructorId}/class-schedule/${classItem.id}`;
+            redirectPath = `/admins/instructor-list/${instructorId}/class-schedule/${classItem.id}`;
             break;
           default:
             redirectPath = "/admins/login"; // Redirect login page if no previous page is specified

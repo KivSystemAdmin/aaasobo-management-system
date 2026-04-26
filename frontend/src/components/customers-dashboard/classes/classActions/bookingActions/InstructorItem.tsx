@@ -24,8 +24,8 @@ export default function InstructorItem({
 }: InstructorItemProps) {
   const [imageError, setImageError] = useState(false);
   const instructorProfileUrl = adminId
-    ? `/admins/${adminId}/customer-list/instructor-profiles?customerId=${customerId}&instructorId=${instructor.id}`
-    : `/customers/${customerId}/instructor-profiles?instructorId=${instructor.id}`;
+    ? `/admins/customer-list/instructor-profiles?customerId=${customerId}&instructorId=${instructor.id}`
+    : `/customers/instructor-profiles?instructorId=${instructor.id}`;
 
   const handleCardClick = () => {
     if (isAvailable) {

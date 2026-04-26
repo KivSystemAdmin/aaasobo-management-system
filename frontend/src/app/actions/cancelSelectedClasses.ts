@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cancelClass, cancelClasses } from "@/lib/api/classesApi";
 import { getUserSession } from "@/lib/auth/sessionUtils";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 import { revalidateClassList } from "./revalidate";
 
 export const cancelSelectedClasses = async (
@@ -35,8 +35,8 @@ export const cancelSelectedClasses = async (
   // Determine the path to revalidate based on whether the action is admin authenticated
   const path =
     userSessionType === "admin"
-      ? `/admins/${adminId}/customer-list/${customerId}`
-      : `/customers/${customerId}/classes`;
+      ? `/admins/customer-list/${customerId}`
+      : "/customers/classes";
 
   // Get the cookies from the request headers
   const cookie = await getCookie();
@@ -80,8 +80,8 @@ export const cancelClassAction = async (
   // Determine the path to revalidate based on whether the action is admin authenticated
   const path =
     userSessionType === "admin"
-      ? `/admins/${adminId}/customer-list/${customerId}`
-      : `/customers/${customerId}/classes`;
+      ? `/admins/customer-list/${customerId}`
+      : "/customers/classes";
 
   // Get the cookies from the request headers
   const cookie = await getCookie();

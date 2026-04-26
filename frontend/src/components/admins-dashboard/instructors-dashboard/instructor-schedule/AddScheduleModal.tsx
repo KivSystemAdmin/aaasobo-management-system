@@ -11,7 +11,7 @@ interface AddScheduleModalProps {
   onSubmit: (
     effectiveFrom: string,
     slots: Omit<InstructorSlot, "scheduleId">[],
-  ) => void;
+  ) => Promise<boolean>;
   initialSlots?: InstructorSlot[];
 }
 
@@ -49,6 +49,7 @@ export default function AddScheduleModal({
   const [editedSlots, setEditedSlots] = useState<Set<string>>(() =>
     slotsToKeys(initialSlots),
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggleSlot = (weekday: number, time: string) => {
     const key = slotToKey(weekday, time);
@@ -63,12 +64,21 @@ export default function AddScheduleModal({
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (effectiveFrom) {
-      const slots = keysToSlots(editedSlots);
-      onSubmit(effectiveFrom, slots);
-      onClose();
+    if (!effectiveFrom || isSubmitting) {
+      return;
+    }
+
+    const slots = keysToSlots(editedSlots);
+    setIsSubmitting(true);
+    try {
+      const succeeded = await onSubmit(effectiveFrom, slots);
+      if (succeeded) {
+        onClose();
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -149,9 +159,9 @@ export default function AddScheduleModal({
             <button
               type="submit"
               className={styles.submitButton}
-              disabled={!effectiveFrom}
+              disabled={!effectiveFrom || isSubmitting}
             >
-              Create Schedule
+              {isSubmitting ? "Creating..." : "Create Schedule"}
             </button>
           </div>
         </form>

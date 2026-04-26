@@ -24,7 +24,7 @@ export default function AdminTabs({
       : "Unknown";
   const breadcrumb = [
     "Admin List",
-    `/admins/${userId}/admin-list`,
+    "/admins/admin-list",
     `Admin Page (${adminName})`,
   ];
   const activeTabName = "activeAdminTab";

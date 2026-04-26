@@ -1,12 +1,13 @@
 "use server";
 
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 import { revalidatePath } from "next/cache";
 import {
   addInstructorAbsence,
   deleteInstructorAbsence,
 } from "@/lib/api/instructorsApi";
 import { formatYearDateTime } from "@/lib/utils/dateUtils";
+import type { AbsenceCanceledClassSummary } from "@shared/schemas/instructors";
 
 export type AbsenceChange = {
   dateTime: string;
@@ -17,6 +18,7 @@ export type AbsenceChange = {
 type BatchAbsenceResult = {
   success: boolean;
   successCount: { add: number; remove: number };
+  canceledClasses: AbsenceCanceledClassSummary[];
   errors: string[];
   message?: string;
 };
@@ -29,13 +31,19 @@ export async function batchUpdateInstructorAbsences(
     const cookie = await getCookie();
     const errors: string[] = [];
     const successCount = { add: 0, remove: 0 };
+    const canceledClasses: AbsenceCanceledClassSummary[] = [];
 
     // Process all pending changes
     for (const change of changes) {
       try {
         switch (change.action) {
           case "add": {
-            await addInstructorAbsence(instructorId, change.dateTime, cookie);
+            const result = await addInstructorAbsence(
+              instructorId,
+              change.dateTime,
+              cookie,
+            );
+            canceledClasses.push(...result.canceledClasses);
             successCount.add++;
             break;
           }
@@ -64,7 +72,7 @@ export async function batchUpdateInstructorAbsences(
     }
 
     // Revalidate the instructor schedule page to refresh data
-    revalidatePath(`/admins/[adminId]/instructor-list/[instructorId]`, "page");
+    revalidatePath(`/admins/instructor-list/${instructorId}`, "page");
 
     const totalSuccesses = successCount.add + successCount.remove;
     const totalAttempts = changes.length;
@@ -97,6 +105,7 @@ export async function batchUpdateInstructorAbsences(
     return {
       success: errors.length === 0,
       successCount,
+      canceledClasses,
       errors,
       message,
     };
@@ -105,6 +114,7 @@ export async function batchUpdateInstructorAbsences(
     return {
       success: false,
       successCount: { add: 0, remove: 0 },
+      canceledClasses: [],
       errors: [
         `Failed to process changes: ${error instanceof Error ? error.message : String(error)}`,
       ],

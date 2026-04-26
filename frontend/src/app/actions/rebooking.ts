@@ -3,7 +3,7 @@
 import { rebookClass } from "@/lib/api/classesApi";
 import { revalidateClassList, revalidateCustomerCalendar } from "./revalidate";
 import { validateSession } from "./validateSession";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 
 export async function rebookClassWithValidation({
   customerId,

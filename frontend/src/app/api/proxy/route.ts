@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getCookie } from "../../../proxy";
+import { getCookie } from "@/proxy";
 
 const BACKEND_ORIGIN = process.env.BACKEND_ORIGIN;
 const RESPONSE_HEADERS_TO_REMOVE = ["content-encoding", "content-length"];

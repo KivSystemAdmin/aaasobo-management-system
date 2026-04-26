@@ -228,9 +228,13 @@ type ForgotPasswordFormState = {
 type RegisterFormState = {
   password?: string;
   name?: string;
+  nickname?: string;
   englishBackground?: EnglishBackground;
   email?: string;
   passConfirmation?: string;
+  classURL?: string;
+  meetingId?: string;
+  passcode?: string;
   prefecture?: string;
   isAgreed?: string;
   weeklyClassTimes?: string;
