@@ -39,7 +39,7 @@ type PlanDef = {
   name: string;
   description: string;
   weekly_class_times: string;
-  is_native: string;
+  english_background: string;
   termination_at: string;
 };
 
@@ -87,7 +87,7 @@ type InstructorDef = {
   message_for_children: string;
   skill: string;
   working_time: string;
-  is_native: string;
+  english_background: string;
   termination_at: string;
 };
 
@@ -199,6 +199,18 @@ type Args = {
   completedUntil: string;
   to: string;
   outDir: string;
+};
+
+export type GenerateNormalizedImportFixtureOptions = {
+  from: string;
+  completedUntil: string;
+  to: string;
+};
+
+export type GeneratedNormalizedImportFixture = {
+  files: Record<NormalizedFileName, string>;
+  rows: RowMap;
+  zipFileName: string;
 };
 
 function usageAndExit(message?: string): never {
@@ -370,7 +382,7 @@ function planRows(): PlanDef[] {
       name: "月3,180円プラン / 3,180 yen/month Plan",
       description: "1 classes per week",
       weekly_class_times: "1",
-      is_native: "false",
+      english_background: "0",
       termination_at: "",
     },
     {
@@ -378,7 +390,7 @@ function planRows(): PlanDef[] {
       name: "月5,980円プラン / 5,980 yen/month Plan",
       description: "2 classes per week",
       weekly_class_times: "2",
-      is_native: "true",
+      english_background: "1",
       termination_at: "",
     },
   ];
@@ -449,7 +461,7 @@ function instructorRows(fakerEn: FakerLike): InstructorDef[] {
       message_for_children: "Let's enjoy learning English!",
       skill: "Conversation",
       working_time: "Weekday evenings and Saturday mornings",
-      is_native: i % 2 === 0 ? "true" : "false",
+      english_background: i % 2 === 0 ? "1" : "0",
       termination_at: "",
     });
   }
@@ -762,7 +774,9 @@ async function writeDeterministicZip(
   await fs.writeFile(zipPath, buffer);
 }
 
-async function main(): Promise<void> {
+export async function generateNormalizedImportFixture(
+  options: GenerateNormalizedImportFixtureOptions,
+): Promise<GeneratedNormalizedImportFixture> {
   const { fakerEN_US, fakerJA } = (await import("@faker-js/faker")) as {
     fakerEN_US: FakerLike;
     fakerJA: FakerLike;
@@ -770,21 +784,20 @@ async function main(): Promise<void> {
   fakerEN_US.seed(FAKER_SEED);
   fakerJA.seed(FAKER_SEED);
 
-  const args = parseArgs(process.argv.slice(2));
   const plans = planRows();
   const instructors = instructorRows(fakerEN_US);
   const customers = customerRows(fakerJA);
   const children = childRows(fakerEN_US);
-  const subscriptions = subscriptionRows(args.from);
+  const subscriptions = subscriptionRows(options.from);
   const childRefsByCustomer = buildCustomerChildMap(children);
   const recurring = assignRecurringClasses(
     recurringCandidates(subscriptions, childRefsByCustomer),
-    args.from,
+    options.from,
   );
   const { classes, classAttendance } = classRowsAndAttendance(
     recurring,
-    args.completedUntil,
-    args.to,
+    options.completedUntil,
+    options.to,
   );
 
   const rows: RowMap = {
@@ -793,11 +806,11 @@ async function main(): Promise<void> {
     "children.csv": children,
     "subscriptions.csv": subscriptions,
     "instructors.csv": instructors,
-    "instructor_fees.csv": instructorFeeRows(args.from),
-    "instructor_schedules.csv": instructorScheduleRows(args.from),
+    "instructor_fees.csv": instructorFeeRows(options.from),
+    "instructor_schedules.csv": instructorScheduleRows(options.from),
     "instructor_absences.csv": [],
     "events.csv": eventRows(),
-    "schedules.csv": scheduleRows(args.from, args.to),
+    "schedules.csv": scheduleRows(options.from, options.to),
     "system_status.csv": [{ status: "Running" }],
     "recurring_classes.csv": recurringRows(recurring),
     "recurring_class_attendance.csv": recurringAttendanceRows(recurring),
@@ -806,9 +819,18 @@ async function main(): Promise<void> {
   };
 
   const files = rowsToFileMap(rows);
+  const zipFileName = `normalized-import-${options.from}_to_${options.to}.zip`;
+
+  return { files, rows, zipFileName };
+}
+
+async function main(): Promise<void> {
+  const args = parseArgs(process.argv.slice(2));
+  const generated = await generateNormalizedImportFixture(args);
+  const { files, rows, zipFileName } = generated;
+
   await writeCsvFiles(args.outDir, files);
 
-  const zipFileName = `normalized-import-${args.from}_to_${args.to}.zip`;
   await writeDeterministicZip(path.join(args.outDir, zipFileName), files);
 
   console.log("Generated deterministic normalized import fixture");
@@ -820,7 +842,9 @@ async function main(): Promise<void> {
   console.log(`zip: ${zipFileName}`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

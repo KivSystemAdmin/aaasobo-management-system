@@ -60,6 +60,11 @@ Mapping rule:
 - customer with 1 child -> `Weekly 1`
 - customer with 2 children -> `Weekly 2`
 
+English background values:
+
+- `Weekly 1` uses `english_background = 0`
+- `Weekly 2` uses `english_background = 1`
+
 Child naming rule:
 
 - Child `name` is always a single first name token.
@@ -70,6 +75,11 @@ Name style rule:
 - Customer names: Japanese-style names.
 - Instructor names: English-style names.
 - Instructor nicknames: realistic English-style nicknames, deterministic and unique.
+
+Instructor `english_background` alternates by index:
+
+- odd instructor index -> `0`
+- even instructor index -> `1`
 
 ## Instructor Schedule Patterns
 
@@ -127,6 +137,7 @@ For each subscription:
 ## Attendance Rules
 
 - `recurring_class_attendance.csv`:
+
   - customer with 1 child -> that child attends all recurring classes
   - customer with 2 children -> both children attend all recurring classes
 
