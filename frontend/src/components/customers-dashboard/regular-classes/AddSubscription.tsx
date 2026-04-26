@@ -31,14 +31,6 @@ function AddSubscription({
   const englishBGs = [...new Set(plansData.map((p) => p.englishBackground))];
   const [selectedPlanId, setSelectedPlanId] = useState<string>("");
 
-  // Selecting a plan from the dropdown.
-  const handleSelectingPlan = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedId = parseInt(event.target.value);
-    const matchedPlan =
-      plansData.find((plan) => plan.id === selectedId) || null;
-    setSelectedPlan(matchedPlan);
-  };
-
   // Change the option color when selected
   const changeOptionColor = (optionTag: HTMLSelectElement) => {
     if (parseInt(optionTag.value) !== 0) {
@@ -51,6 +43,7 @@ function AddSubscription({
     setSelectedEnglishBG(value);
     setSelectedPlan(null);
     setSelectedPlanId("");
+    changeOptionColor(e.target);
   };
 
   const handlePlanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -61,6 +54,7 @@ function AddSubscription({
       plansData.find((plan) => plan.id === Number(id)) || null;
 
     setSelectedPlan(matchedPlan);
+    changeOptionColor(e.target);
   };
 
   // Change the input color based on the date input value
