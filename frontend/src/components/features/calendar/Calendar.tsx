@@ -21,7 +21,6 @@ function Calendar({ events, headerRight, ...options }: CalendarProp) {
   return (
     <div style={{ position: "relative" }}>
       <FullCalendar
-        {...options}
         plugins={[timeGridPlugin, momentTimezonePlugin, interactionPlugin]}
         initialView="timeGridWeek"
         headerToolbar={{
@@ -34,6 +33,7 @@ function Calendar({ events, headerRight, ...options }: CalendarProp) {
         slotMaxTime="22:00:00"
         allDaySlot={false}
         timeZone="Asia/Tokyo"
+        {...options}
       />
       {headerRight && (
         <div

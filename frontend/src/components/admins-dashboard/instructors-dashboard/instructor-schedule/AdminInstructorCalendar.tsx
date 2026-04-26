@@ -1,19 +1,14 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
-import type {
-  EventClickArg,
-  EventContentArg,
-  EventSourceFuncArg,
-} from "@fullcalendar/core";
+import type { EventClickArg, EventSourceFuncArg } from "@fullcalendar/core";
 import Calendar from "@/components/features/calendar/Calendar";
+import InstructorSlotCalendar from "@/components/features/instructorSlotCalendar/InstructorSlotCalendar";
 import Modal from "@/components/elements/modal/Modal";
 import ActionButton from "@/components/elements/buttons/actionButton/ActionButton";
 import {
   getInstructorAbsences,
   getInstructorAvailableSlots,
-  getInstructorCalendarSlots,
 } from "@/lib/api/instructorsApi";
 import {
   batchUpdateInstructorAbsences,
@@ -24,24 +19,9 @@ import { formatYearDateTime } from "@/lib/utils/dateUtils";
 import type {
   AbsenceCanceledClassSummary,
   InstructorAbsence,
-  InstructorCalendarSlot,
-  InstructorCalendarSlotType,
 } from "@shared/schemas/instructors";
 import { toast } from "react-toastify";
 import styles from "./AdminInstructorCalendar.module.scss";
-
-type MainCalendarEvent = {
-  id: string;
-  start: string;
-  end: string;
-  title: string;
-  color: string;
-  textColor: string;
-  extendedProps: {
-    slotType: InstructorCalendarSlotType;
-    classId?: number;
-  };
-};
 
 type EditCalendarEvent = {
   id: string;
@@ -57,30 +37,11 @@ type EditCalendarEvent = {
   };
 };
 
-const SLOT_LABELS: Record<InstructorCalendarSlotType, string> = {
-  open: "Open",
-  booked: "Booked",
-  rebooked: "Booked",
-  completed: "Done",
-  absence: "Absent",
-  canceledByInstructor: "Canceled",
-};
-
-const SLOT_SYMBOLS: Record<InstructorCalendarSlotType, string> = {
-  open: "○",
-  booked: "●",
-  rebooked: "●",
-  completed: "✓",
-  absence: "−",
-  canceledByInstructor: "×",
-};
-
 export default function AdminInstructorCalendar({
   instructorId,
 }: {
   instructorId: number;
 }) {
-  const router = useRouter();
   const [refreshKey, setRefreshKey] = useState(0);
   const [modalRefreshKey, setModalRefreshKey] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -103,41 +64,6 @@ export default function AdminInstructorCalendar({
     setRefreshKey((prev) => prev + 1);
     setModalRefreshKey((prev) => prev + 1);
   };
-
-  const buildMainEvent = (slot: InstructorCalendarSlot): MainCalendarEvent => ({
-    id: `${slot.slotType}-${slot.classId ?? slot.start}`,
-    start: slot.start,
-    end: slot.end,
-    title: slot.title,
-    color: "#FFFFFF",
-    textColor: "#111827",
-    extendedProps: {
-      slotType: slot.slotType,
-      classId: slot.classId,
-    },
-  });
-
-  const fetchCalendarEvents = useCallback(
-    async (info: EventSourceFuncArg) => {
-      const startStr = formatJSTDate(info.start);
-      const endDate = new Date(info.end);
-      endDate.setDate(endDate.getDate() + 1);
-      const endStr = formatJSTDate(endDate);
-
-      try {
-        const response = await getInstructorCalendarSlots(
-          instructorId,
-          startStr,
-          endStr,
-        );
-        return response.data.map(buildMainEvent);
-      } catch (error) {
-        console.error("Failed to fetch instructor calendar slots:", error);
-        return [];
-      }
-    },
-    [instructorId],
-  );
 
   const fetchEditCalendarEvents = useCallback(
     async (info: EventSourceFuncArg) => {
@@ -216,27 +142,6 @@ export default function AdminInstructorCalendar({
     [instructorId, pendingChanges],
   );
 
-  const handleMainEventClick = useCallback(
-    (clickInfo: EventClickArg) => {
-      const { slotType, classId } = clickInfo.event.extendedProps as {
-        slotType: InstructorCalendarSlotType;
-        classId?: number;
-      };
-
-      if (
-        ["booked", "rebooked", "completed", "canceledByInstructor"].includes(
-          slotType,
-        ) &&
-        classId
-      ) {
-        router.push(
-          `/admins/instructor-list/${instructorId}/class-schedule/${classId}`,
-        );
-      }
-    },
-    [instructorId, router],
-  );
-
   const handleSlotToggle = useCallback((clickInfo: EventClickArg) => {
     const eventType = clickInfo.event.extendedProps.type;
     const dateTime = clickInfo.event.start!.toISOString();
@@ -312,62 +217,14 @@ export default function AdminInstructorCalendar({
     }
   };
 
-  const renderMainEventContent = useCallback((eventInfo: EventContentArg) => {
-    const slotType = eventInfo.event.extendedProps
-      .slotType as InstructorCalendarSlotType;
-    const isClickable = slotType !== "open" && slotType !== "absence";
-    const titleText =
-      eventInfo.event.title &&
-      !["open", "absence"].includes(slotType) &&
-      eventInfo.event.title !== SLOT_LABELS[slotType] &&
-      eventInfo.event.title !== "Class"
-        ? eventInfo.event.title
-        : "";
-    const compactLabel = titleText
-      ? `${SLOT_LABELS[slotType]} - ${titleText}`
-      : SLOT_LABELS[slotType];
-
-    return (
-      <div
-        className={`${styles.eventBlock} ${isClickable ? styles.clickable : ""}`}
-      >
-        <div className={styles.eventHeader}>
-          <span className={styles.statusBadge}>
-            <span className={styles.statusSymbol}>
-              {SLOT_SYMBOLS[slotType]}
-            </span>
-            {compactLabel}
-          </span>
-        </div>
-      </div>
-    );
-  }, []);
-
   return (
     <div className={styles.container}>
-      <Calendar
-        key={refreshKey}
-        height="auto"
-        contentHeight="auto"
-        events={fetchCalendarEvents}
-        eventClick={handleMainEventClick}
-        eventContent={renderMainEventContent}
-        eventClassNames={(arg) => {
-          const slotType = arg.event.extendedProps
-            .slotType as InstructorCalendarSlotType;
-
-          const classMap: Record<InstructorCalendarSlotType, string> = {
-            open: styles.slotOpen,
-            booked: styles.slotBooked,
-            rebooked: styles.slotBooked,
-            completed: styles.slotCompleted,
-            canceledByInstructor: styles.slotOpen,
-            absence: styles.slotAbsent,
-          };
-
-          return [styles.calendarEvent, classMap[slotType]];
-        }}
-        selectable={false}
+      <InstructorSlotCalendar
+        instructorId={instructorId}
+        refreshKey={refreshKey}
+        getClassDetailUrl={(classId) =>
+          `/admins/instructor-list/${instructorId}/class-schedule/${classId}`
+        }
         headerRight={
           <ActionButton
             btnText="Edit Absences"
