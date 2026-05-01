@@ -125,7 +125,9 @@ function AddSubscription({
                     onChange={handleEnglishBGChange}
                     className={styles.selectField}
                   >
-                    <option>Select a category</option>
+                    <option disabled value="">
+                      Select a category
+                    </option>
                     {englishBGs.map((bg) => {
                       const label =
                         bg === 1

@@ -52,8 +52,8 @@ function EditSubscriptionModal({
   const currentWeeklyTimes = subscription?.plan?.weeklyClassTimes ?? 0;
   const selectedWeeklyTimes = selectedPlan?.weeklyClassTimes ?? 0;
   const [selectTypeValue, setSelectTypeValue] = useState<string>("");
-  const currentEnglishBG = subscription?.plan.englishBackground;
-  const [currentEGPlans, setCurrentBGPlans] = useState<Plan[]>();
+  const currentEnglishBG = subscription?.plan?.englishBackground;
+  const [currentBGPlans, setCurrentBGPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -214,8 +214,8 @@ function EditSubscriptionModal({
                 onChange={handleSelectPlan}
                 required
               >
-                {currentEGPlans &&
-                  currentEGPlans.map((plan) => {
+                {currentBGPlans &&
+                  currentBGPlans.map((plan) => {
                     return (
                       <option key={plan.id} value={plan.id}>
                         {plan.name}
