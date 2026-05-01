@@ -52,6 +52,8 @@ function EditSubscriptionModal({
   const currentWeeklyTimes = subscription?.plan?.weeklyClassTimes ?? 0;
   const selectedWeeklyTimes = selectedPlan?.weeklyClassTimes ?? 0;
   const [selectTypeValue, setSelectTypeValue] = useState<string>("");
+  const currentEnglishBG = subscription?.plan?.englishBackground;
+  const [currentBGPlans, setCurrentBGPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -67,6 +69,13 @@ function EditSubscriptionModal({
     };
     fetchPlans();
   }, [subscription?.planId]);
+
+  useEffect(() => {
+    const filteredPlans = plans.filter(
+      (p) => p.englishBackground === currentEnglishBG,
+    );
+    setCurrentBGPlans(filteredPlans);
+  }, [plans, currentEnglishBG]);
 
   useEffect(() => {
     if (subscription) {
@@ -205,13 +214,14 @@ function EditSubscriptionModal({
                 onChange={handleSelectPlan}
                 required
               >
-                {plans.map((plan) => {
-                  return (
-                    <option key={plan.id} value={plan.id}>
-                      {plan.name}
-                    </option>
-                  );
-                })}
+                {currentBGPlans &&
+                  currentBGPlans.map((plan) => {
+                    return (
+                      <option key={plan.id} value={plan.id}>
+                        {plan.name}
+                      </option>
+                    );
+                  })}
               </select>
             </div>
           </div>

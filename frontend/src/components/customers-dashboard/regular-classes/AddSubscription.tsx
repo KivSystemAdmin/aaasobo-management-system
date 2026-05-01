@@ -22,18 +22,14 @@ function AddSubscription({
 }) {
   const [isOpenForm, setIsOpenForm] = useState(isOpen);
   const [plansData, setPlansData] = useState<Plans>([]);
-  const [filterColumn, setFilterColumn] = useState<string>("0");
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectTypeValue, setSelectTypeValue] = useState<string>("");
-
-  // Selecting a plan from the dropdown.
-  const handleSelectingPlan = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedId = parseInt(event.target.value);
-    const matchedPlan =
-      plansData.find((plan) => plan.id === selectedId) || null;
-    setSelectedPlan(matchedPlan);
-  };
+  const [selectedEnglishBG, setSelectedEnglishBG] = useState<number | null>(
+    null,
+  );
+  const englishBGs = [...new Set(plansData.map((p) => p.englishBackground))];
+  const [selectedPlanId, setSelectedPlanId] = useState<string>("");
 
   // Change the option color when selected
   const changeOptionColor = (optionTag: HTMLSelectElement) => {
@@ -42,11 +38,23 @@ function AddSubscription({
     }
   };
 
-  // Handle the filter change
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    handleSelectingPlan(event);
-    setFilterColumn(event.target.value);
-    changeOptionColor(event.target);
+  const handleEnglishBGChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = Number(e.target.value);
+    setSelectedEnglishBG(value);
+    setSelectedPlan(null);
+    setSelectedPlanId("");
+    changeOptionColor(e.target);
+  };
+
+  const handlePlanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    setSelectedPlanId(id);
+
+    const matchedPlan =
+      plansData.find((plan) => plan.id === Number(id)) || null;
+
+    setSelectedPlan(matchedPlan);
+    changeOptionColor(e.target);
   };
 
   // Change the input color based on the date input value
@@ -111,23 +119,48 @@ function AddSubscription({
               </div>
               <div className={styles.planDate}>
                 <div className={styles.fieldGroup}>
-                  <h4 className={styles.fieldLabel}>Plan</h4>
+                  <h4 className={styles.fieldLabel}>English Background</h4>
                   <select
-                    value={filterColumn}
-                    onChange={handleChange}
+                    value={selectedEnglishBG ?? ""}
+                    onChange={handleEnglishBGChange}
                     className={styles.selectField}
                   >
-                    <option disabled value="0">
-                      Select a plan
+                    <option disabled value="">
+                      Select a category
                     </option>
-                    {plansData.map((plan) => {
-                      const { id, name, description } = plan;
+                    {englishBGs.map((bg) => {
+                      const label =
+                        bg === 1
+                          ? "Native A"
+                          : bg === 2
+                            ? "Native B"
+                            : "Non Native";
+
                       return (
-                        <option key={id} value={id}>
-                          {name} ({description})
+                        <option key={bg} value={bg}>
+                          {label}
                         </option>
                       );
                     })}
+                  </select>
+                </div>
+                <div className={styles.fieldGroup}>
+                  <h4 className={styles.fieldLabel}>Plan</h4>
+                  <select
+                    value={selectedPlanId}
+                    onChange={handlePlanChange}
+                    className={styles.selectField}
+                  >
+                    <option value="">Select a plan</option>
+                    {plansData
+                      .filter(
+                        (plan) => plan.englishBackground === selectedEnglishBG,
+                      )
+                      .map((plan) => (
+                        <option key={plan.id} value={plan.id}>
+                          {plan.name} ({plan.description})
+                        </option>
+                      ))}
                   </select>
                 </div>
                 <div className={styles.fieldGroup}>
