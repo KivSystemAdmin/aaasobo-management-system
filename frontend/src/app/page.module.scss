@@ -1,8 +1,93 @@
+@use "@/styles/variables.module.scss" as *;
+
 .home {
   display: flex;
-  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background-color: $white-background;
 
   &__title {
-    color: red;
+    position: absolute;
+    top: 1.25rem;
+    left: 30px;
+  }
+
+  &__logo {
+    width: 6.25rem;
+    height: auto;
+  }
+
+  &__titleText {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  &__panel {
+    display: flex;
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 88px 30px 30px;
+    border: 1px solid $gray-background;
+    border-radius: 0.5rem;
+    background-color: white;
+    box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  &__links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__link {
+    display: flex;
+    min-height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    background-color: $blue-primary;
+    color: #ffffff;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      background-color 0.3s ease,
+      box-shadow 0.3s ease;
+
+    &:hover,
+    &:focus-visible {
+      background-color: $blue-primary-hover;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.5);
+    }
+  }
+}
+
+@media (max-width: 420px) {
+  .home {
+    padding: 1rem;
+
+    &__panel {
+      padding: 88px 20px 24px;
+    }
+
+    &__title {
+      left: 20px;
+    }
   }
 }
