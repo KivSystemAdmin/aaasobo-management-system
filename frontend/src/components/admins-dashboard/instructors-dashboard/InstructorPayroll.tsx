@@ -188,6 +188,8 @@ function DailyBreakdownTable({
 }
 
 function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
+  const monthlyCancelFee = period.monthlyCancelFee;
+
   return (
     <section className={styles.periodCard}>
       <div className={styles.periodSummary}>
@@ -200,6 +202,34 @@ function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
           </strong>
         </div>
       </div>
+
+      {monthlyCancelFee.timesApplied > 0 && (
+        <div className={styles.monthlyCancelFeeSection}>
+          <h4>Monthly Cancel Fee</h4>
+          <dl className={styles.monthlyCancelFeeGrid}>
+            <div>
+              <dt>Monthly Cancel Count</dt>
+              <dd>{monthlyCancelFee.cancelCount}</dd>
+            </div>
+            <div>
+              <dt>Threshold</dt>
+              <dd>Every {monthlyCancelFee.threshold} cancels</dd>
+            </div>
+            <div>
+              <dt>Unit Fee</dt>
+              <dd>{formatMoney(monthlyCancelFee.unitFee, period.currency)}</dd>
+            </div>
+            <div>
+              <dt>Times Applied</dt>
+              <dd>{monthlyCancelFee.timesApplied}</dd>
+            </div>
+            <div>
+              <dt>Total Deducted</dt>
+              <dd>-{formatMoney(monthlyCancelFee.total, period.currency)}</dd>
+            </div>
+          </dl>
+        </div>
+      )}
 
       <div className={styles.breakdownSection}>
         <h4>

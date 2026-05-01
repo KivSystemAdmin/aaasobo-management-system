@@ -1862,6 +1862,7 @@ async function insertInstructorFees() {
         regularFee: 2000,
         cancelFee: 500,
         cancelWithoutNoticeFee: 250,
+        monthlyCancelFee: 0,
       },
       {
         instructorId: helen.id,
@@ -1872,6 +1873,7 @@ async function insertInstructorFees() {
         regularFee: 2500,
         cancelFee: 600,
         cancelWithoutNoticeFee: 300,
+        monthlyCancelFee: 1000,
       },
     ],
   });

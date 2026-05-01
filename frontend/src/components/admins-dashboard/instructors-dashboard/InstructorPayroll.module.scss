@@ -69,9 +69,34 @@
 }
 
 .breakdownSection,
-.feePeriodsSection {
+.feePeriodsSection,
+.monthlyCancelFeeSection {
   h4 {
     margin: 0 0 0.75rem;
+    color: #0f172a;
+  }
+}
+
+.monthlyCancelFeeSection {
+  border-block: 1px solid #e2e8f0;
+  margin-bottom: 1rem;
+  padding: 0.9rem 0;
+}
+
+.monthlyCancelFeeGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+
+  dt {
+    font-size: 0.85rem;
+    color: #475569;
+  }
+
+  dd {
+    margin: 0.2rem 0 0;
+    font-weight: 600;
     color: #0f172a;
   }
 }
@@ -183,7 +208,8 @@
     justify-items: start;
   }
 
-  .feeGrid {
+  .feeGrid,
+  .monthlyCancelFeeGrid {
     grid-template-columns: 1fr;
   }
 }

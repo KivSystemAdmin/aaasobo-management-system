@@ -71,6 +71,7 @@ describe("POST /admins/instructors/:id/fees", () => {
         regularFee: 2200,
         cancelFee: 600,
         cancelWithoutNoticeFee: 300,
+        monthlyCancelFee: 900,
       })
       .expect(201);
 
@@ -85,6 +86,7 @@ describe("POST /admins/instructors/:id/fees", () => {
         regularFee: 2200,
         cancelFee: 600,
         cancelWithoutNoticeFee: 300,
+        monthlyCancelFee: 900,
       },
     });
 
@@ -116,6 +118,7 @@ describe("POST /admins/instructors/:id/fees", () => {
         regularFee: 1000,
         cancelFee: 500,
         cancelWithoutNoticeFee: 0,
+        monthlyCancelFee: 0,
       })
       .expect(409);
 

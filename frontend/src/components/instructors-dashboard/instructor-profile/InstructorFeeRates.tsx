@@ -48,6 +48,7 @@ const createFormState = (fee?: InstructorFeeRate | null) => ({
   regularFee: String(fee?.regularFee ?? 0),
   cancelFee: String(fee?.cancelFee ?? 0),
   cancelWithoutNoticeFee: String(fee?.cancelWithoutNoticeFee ?? 0),
+  monthlyCancelFee: String(fee?.monthlyCancelFee ?? 0),
 });
 
 function FeeRateCard({
@@ -95,6 +96,10 @@ function FeeRateCard({
         <div>
           <dt>Cancel Without Notice</dt>
           <dd>{formatMoney(fee.cancelWithoutNoticeFee, fee.currency)}</dd>
+        </div>
+        <div>
+          <dt>Monthly Cancel</dt>
+          <dd>{formatMoney(fee.monthlyCancelFee, fee.currency)}</dd>
         </div>
       </dl>
     </article>
@@ -181,12 +186,17 @@ export default function InstructorFeeRates({
     const regularFee = Number(formState.regularFee);
     const cancelFee = Number(formState.cancelFee);
     const cancelWithoutNoticeFee = Number(formState.cancelWithoutNoticeFee);
+    const monthlyCancelFee = Number(formState.monthlyCancelFee);
 
     if (
       !formState.effectiveFrom ||
-      [trialFee, regularFee, cancelFee, cancelWithoutNoticeFee].some(
-        (value) => !Number.isInteger(value) || value < 0,
-      )
+      [
+        trialFee,
+        regularFee,
+        cancelFee,
+        cancelWithoutNoticeFee,
+        monthlyCancelFee,
+      ].some((value) => !Number.isInteger(value) || value < 0)
     ) {
       await errorAlert(
         "Enter an effective date and non-negative integer amounts for all fee fields.",
@@ -202,6 +212,7 @@ export default function InstructorFeeRates({
       regularFee,
       cancelFee,
       cancelWithoutNoticeFee,
+      monthlyCancelFee,
     });
     setIsSubmitting(false);
 
@@ -327,6 +338,17 @@ export default function InstructorFeeRates({
                     min="0"
                     step="1"
                     value={formState.cancelWithoutNoticeFee}
+                    onChange={handleFormChange}
+                  />
+                </label>
+                <label>
+                  Monthly Cancel Fee
+                  <input
+                    type="number"
+                    name="monthlyCancelFee"
+                    min="0"
+                    step="1"
+                    value={formState.monthlyCancelFee}
                     onChange={handleFormChange}
                   />
                 </label>

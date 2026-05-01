@@ -46,6 +46,7 @@ const mapFeeRate = (fee: {
   regularFee: number;
   cancelFee: number;
   cancelWithoutNoticeFee: number;
+  monthlyCancelFee: number;
 }): InstructorFeeRate => ({
   id: fee.id,
   currency: fee.currency,
@@ -55,6 +56,7 @@ const mapFeeRate = (fee: {
   regularFee: fee.regularFee,
   cancelFee: fee.cancelFee,
   cancelWithoutNoticeFee: fee.cancelWithoutNoticeFee,
+  monthlyCancelFee: fee.monthlyCancelFee,
 });
 
 const assertInstructorExists = async (instructorId: number) => {
@@ -130,6 +132,7 @@ export const createInstructorFee = async (
         regularFee: data.regularFee,
         cancelFee: data.cancelFee,
         cancelWithoutNoticeFee: data.cancelWithoutNoticeFee,
+        monthlyCancelFee: data.monthlyCancelFee,
       },
     });
 
