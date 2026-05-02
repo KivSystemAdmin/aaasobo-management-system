@@ -12,8 +12,8 @@ import { deleteSubscriptionAction } from "@/app/actions/deleteContent";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { confirmAlert } from "@/lib/utils/alertUtils";
 import EditSubscriptionModal from "../../admins-dashboard/EditSubscriptionModal";
+import Modal from "@/components/elements/modal/Modal";
 
 function CurrentSubscription({
   subscriptionsData,
@@ -39,20 +39,23 @@ function CurrentSubscription({
   const [selectedSubscription, setSelectedSubscription] =
     useState<Subscription | null>(null);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [targetSubscriptionId, setTargetSubscriptionId] = useState<
+    number | null
+  >(null);
 
-  const handleDeleteSubscription = async (id: number) => {
-    const confirmed = await confirmAlert(
-      "Are you sure you want to delete this subscription?",
-    );
+  const handleOpenCancelModal = (id: number) => {
+    setTargetSubscriptionId(id);
+    setIsCancelModalOpen(true);
+  };
 
-    if (!confirmed) return;
-
+  const handleDeleteSubscription = async (id: number, date: string) => {
     // prevent duplicate clicks
     if (deletingId !== null) return;
 
     try {
       setDeletingId(id);
-      const result = await deleteSubscriptionAction(id);
+      const result = await deleteSubscriptionAction(id, date);
       setDeleteResultState(result);
 
       const success = result && !result.errorMessage;
@@ -148,8 +151,8 @@ function CurrentSubscription({
                         className="editBtn"
                       />
                       <ActionButton
-                        onClick={() => handleDeleteSubscription(id)}
-                        btnText={deletingId === id ? "DELETING..." : "Delete"}
+                        onClick={() => handleOpenCancelModal(id)}
+                        btnText={deletingId === id ? "DELETING..." : "Cancel"}
                         className="deleteBtn"
                         disabled={deletingId === id}
                       />
@@ -196,8 +199,90 @@ function CurrentSubscription({
         plan={selectedSubscription?.plan}
         language={language}
       />
+
+      {/* Cancel Subscription Modal */}
+      <CancelModal
+        isOpen={isCancelModalOpen}
+        isLoading={deletingId !== null}
+        onClose={() => {
+          setIsCancelModalOpen(false);
+          setTargetSubscriptionId(null);
+        }}
+        onConfirm={(date) => {
+          if (targetSubscriptionId) {
+            handleDeleteSubscription(targetSubscriptionId, date);
+          }
+          setIsCancelModalOpen(false);
+        }}
+      />
     </div>
   );
 }
 
 export default CurrentSubscription;
+
+const CancelModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  isLoading,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (date: string) => void;
+  isLoading: boolean;
+}) => {
+  const [date, setDate] = useState("");
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const minDate = tomorrow.toISOString().split("T")[0];
+
+  const handleClose = () => {
+    setDate("");
+    onClose();
+  };
+
+  const handleConfirm = () => {
+    if (!date) return;
+    onConfirm(date);
+    setDate("");
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={handleClose} overlayClosable={true}>
+      <div className={styles.progressiveFlow}>
+        <div className={styles.modalHeader}>
+          <h2>Cancel Subscription</h2>
+        </div>
+
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h3>Select Cancellation Date</h3>
+          </div>
+          <div className={styles.sectionContent}>
+            <input
+              type="date"
+              className={styles.dateInput}
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              min={minDate}
+            />
+          </div>
+        </div>
+
+        <div className={styles.confirmationActions}>
+          <button className={styles.cancelButton} onClick={handleClose}>
+            Close
+          </button>
+          <button
+            className={styles.confirmButton}
+            onClick={handleConfirm}
+            disabled={!date || isLoading}
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
