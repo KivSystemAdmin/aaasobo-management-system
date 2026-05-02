@@ -107,19 +107,22 @@ export const registerSubscription = async (
   }
 };
 
-// Delete a subscription
+// Cancel a subscription
 export const deleteSubscription = async (
   subscriptionId: number,
+  cancellationDate: string,
   cookie: string,
 ): Promise<DeleteResponse | { errorMessage: string }> => {
   try {
     // From server component
     const apiURL = `${BACKEND_ORIGIN}/subscriptions/${subscriptionId}`;
     const method = "DELETE";
+    const body = JSON.stringify(cancellationDate);
     const headers = { "Content-Type": "application/json", Cookie: cookie };
     const response = await fetch(apiURL, {
       method,
       headers,
+      body,
     });
 
     if (response.status !== 200) {

@@ -65,10 +65,15 @@ export async function deletePlanAction(
 
 export async function deleteSubscriptionAction(
   subscriptionId: number,
+  cancellationDate: string,
 ): Promise<DeleteFormState> {
   try {
     const cookie = await getCookie();
-    const response = await deleteSubscription(subscriptionId, cookie);
+    const response = await deleteSubscription(
+      subscriptionId,
+      cancellationDate,
+      cookie,
+    );
 
     // Refresh cached subscription data for the subscription list page
     revalidateSubscriptionList();
