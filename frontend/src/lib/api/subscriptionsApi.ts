@@ -117,7 +117,7 @@ export const deleteSubscription = async (
     // From server component
     const apiURL = `${BACKEND_ORIGIN}/subscriptions/${subscriptionId}`;
     const method = "DELETE";
-    const body = JSON.stringify(cancellationDate);
+    const body = JSON.stringify({ cancellationDate });
     const headers = { "Content-Type": "application/json", Cookie: cookie };
     const response = await fetch(apiURL, {
       method,

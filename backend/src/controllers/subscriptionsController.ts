@@ -51,17 +51,22 @@ export const deleteSubscriptionController = async (
       return res.status(404).json({ error: "Recurring Class not found." });
     }
 
-    const date = new Date();
+    const { cancellationDate } = req.body;
+    const cancellationDateObj = new Date(cancellationDate);
 
     await prisma.$transaction(async (tx) => {
       for (const recurringClass of recurringClasses) {
-        await terminateRecurringClass(tx, recurringClass.id, date);
+        await terminateRecurringClass(
+          tx,
+          recurringClass.id,
+          cancellationDateObj,
+        );
       }
 
       const terminatedSubscription = await terminateSubscription(
         tx,
         req.params.id,
-        date,
+        cancellationDateObj,
       );
 
       res.status(200).json({

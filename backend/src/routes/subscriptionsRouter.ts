@@ -8,6 +8,7 @@ import {
   updateSubscriptionToTerminateClassController,
 } from "../../src/controllers/subscriptionsController";
 import {
+  CancelSubscriptionBody,
   DeleteSubscriptionResponse,
   SubscriptionIdParams,
   SubscriptionResponse,
@@ -56,6 +57,7 @@ const deleteSubscription = {
   middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
   handler: deleteSubscriptionController,
   paramsSchema: SubscriptionIdParams,
+  bodySchema: CancelSubscriptionBody,
   openapi: {
     summary: "Delete a subscription",
     description:
