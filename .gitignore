@@ -1,5 +1,7 @@
 .vercel
 .env*.local
+.codex
+.playwright-cli/
 
 # Temporary development files
 TEMP-*.md
