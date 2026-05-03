@@ -264,6 +264,7 @@ model InstructorFee {
   regularFee             Int
   cancelFee              Int
   cancelWithoutNoticeFee Int
+  monthlyCancelFee       Int        @default(0)
   instructor             Instructor @relation(fields: [instructorId], references: [id])
 
   @@index([instructorId, effectiveFrom])

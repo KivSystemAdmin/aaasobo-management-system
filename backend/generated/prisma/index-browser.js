@@ -281,7 +281,8 @@ exports.Prisma.InstructorFeeScalarFieldEnum = {
   trialFee: 'trialFee',
   regularFee: 'regularFee',
   cancelFee: 'cancelFee',
-  cancelWithoutNoticeFee: 'cancelWithoutNoticeFee'
+  cancelWithoutNoticeFee: 'cancelWithoutNoticeFee',
+  monthlyCancelFee: 'monthlyCancelFee'
 };
 
 exports.Prisma.SystemStatusScalarFieldEnum = {

@@ -12,6 +12,26 @@ import {
 
 const jstDateTime = (value: string) => new Date(value);
 
+const createInstructorCanceledClasses = async (
+  customerId: number,
+  instructorId: number,
+  dates: string[],
+) => {
+  await Promise.all(
+    dates.map((date, index) =>
+      createClass(customerId, instructorId, jstDateTime(date), {
+        status: "canceledByInstructor",
+        canceledAt: jstDateTime(date).getTime()
+          ? new Date(jstDateTime(date).getTime() - 24 * 60 * 60 * 1000)
+          : undefined,
+        updatedAt: jstDateTime(
+          `2026-03-28T00:${String(index).padStart(2, "0")}:00.000Z`,
+        ),
+      }),
+    ),
+  );
+};
+
 describe("GET /admins/instructors/:id/payroll", () => {
   it("returns both payroll periods for the requested month", async () => {
     const admin = await createAdmin();
@@ -165,8 +185,16 @@ describe("GET /admins/instructors/:id/payroll", () => {
               regularFee: 2000,
               cancelFee: 500,
               cancelWithoutNoticeFee: 250,
+              monthlyCancelFee: 0,
             },
           ],
+          monthlyCancelFee: {
+            cancelCount: 2,
+            threshold: 10,
+            unitFee: 0,
+            timesApplied: 0,
+            total: 0,
+          },
         },
         {
           from: "2026-03-16",
@@ -217,8 +245,16 @@ describe("GET /admins/instructors/:id/payroll", () => {
               regularFee: 2500,
               cancelFee: 600,
               cancelWithoutNoticeFee: 300,
+              monthlyCancelFee: 0,
             },
           ],
+          monthlyCancelFee: {
+            cancelCount: 2,
+            threshold: 10,
+            unitFee: 0,
+            timesApplied: 0,
+            total: 0,
+          },
         },
       ],
     });
@@ -343,6 +379,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
           regularFee: 2000,
           cancelFee: 500,
           cancelWithoutNoticeFee: 250,
+          monthlyCancelFee: 0,
         },
         {
           currency: "JPY",
@@ -352,8 +389,16 @@ describe("GET /admins/instructors/:id/payroll", () => {
           regularFee: 2200,
           cancelFee: 600,
           cancelWithoutNoticeFee: 300,
+          monthlyCancelFee: 0,
         },
       ],
+      monthlyCancelFee: {
+        cancelCount: 0,
+        threshold: 10,
+        unitFee: 0,
+        timesApplied: 0,
+        total: 0,
+      },
     });
     expect(response.body.periods[1].dailyBreakdown).toEqual([]);
     expect(response.body.periods[1].appliedFeePeriods).toEqual([]);
@@ -407,6 +452,260 @@ describe("GET /admins/instructors/:id/payroll", () => {
         ],
       }),
     );
+  });
+
+  it("does not apply a monthly cancel fee for 9 instructor cancellations", async () => {
+    const admin = await createAdmin();
+    const instructor = await createInstructor();
+    const customer = await createCustomer();
+
+    await createInstructorFee(instructor.id, {
+      effectiveFrom: new Date("2026-03-01T00:00:00.000Z"),
+      effectiveTo: null,
+      cancelFee: 0,
+      monthlyCancelFee: 700,
+    });
+    await createInstructorCanceledClasses(customer.id, instructor.id, [
+      "2026-03-01T10:00:00+09:00",
+      "2026-03-02T10:00:00+09:00",
+      "2026-03-03T10:00:00+09:00",
+      "2026-03-04T10:00:00+09:00",
+      "2026-03-05T10:00:00+09:00",
+      "2026-03-16T10:00:00+09:00",
+      "2026-03-17T10:00:00+09:00",
+      "2026-03-18T10:00:00+09:00",
+      "2026-03-19T10:00:00+09:00",
+    ]);
+
+    const response = await request(server)
+      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .query({ month: "2026-03" })
+      .set("Cookie", await generateAuthCookie(admin.id, "admin"))
+      .expect(200);
+
+    expect(response.body.periods[0].monthlyCancelFee).toEqual({
+      cancelCount: 9,
+      threshold: 10,
+      unitFee: 0,
+      timesApplied: 0,
+      total: 0,
+    });
+    expect(response.body.periods[1].monthlyCancelFee).toEqual({
+      cancelCount: 9,
+      threshold: 10,
+      unitFee: 0,
+      timesApplied: 0,
+      total: 0,
+    });
+    expect(response.body.periods[1].total).toBe(0);
+  });
+
+  it("counts cancellations across both halves and deducts one monthly cancel fee only from 16-last", async () => {
+    const admin = await createAdmin();
+    const instructor = await createInstructor();
+    const customer = await createCustomer();
+
+    await createInstructorFee(instructor.id, {
+      effectiveFrom: new Date("2026-03-01T00:00:00.000Z"),
+      effectiveTo: null,
+      cancelFee: 0,
+      monthlyCancelFee: 700,
+    });
+    await createInstructorCanceledClasses(customer.id, instructor.id, [
+      "2026-03-01T10:00:00+09:00",
+      "2026-03-02T10:00:00+09:00",
+      "2026-03-03T10:00:00+09:00",
+      "2026-03-04T10:00:00+09:00",
+      "2026-03-05T10:00:00+09:00",
+      "2026-03-16T10:00:00+09:00",
+      "2026-03-17T10:00:00+09:00",
+      "2026-03-18T10:00:00+09:00",
+      "2026-03-19T10:00:00+09:00",
+      "2026-03-20T10:00:00+09:00",
+    ]);
+    await createClass(
+      customer.id,
+      instructor.id,
+      jstDateTime("2026-03-21T10:00:00+09:00"),
+      {
+        status: "canceledByCustomer",
+        canceledAt: jstDateTime("2026-03-20T10:00:00+09:00"),
+      },
+    );
+
+    const response = await request(server)
+      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .query({ month: "2026-03" })
+      .set("Cookie", await generateAuthCookie(admin.id, "admin"))
+      .expect(200);
+
+    expect(response.body.periods[0].monthlyCancelFee.total).toBe(0);
+    expect(response.body.periods[0].total).toBe(0);
+    expect(response.body.periods[1].monthlyCancelFee).toEqual({
+      cancelCount: 10,
+      threshold: 10,
+      unitFee: 700,
+      timesApplied: 1,
+      total: 700,
+    });
+    expect(response.body.periods[1].total).toBe(-700);
+    expect(response.body.periods[1].dailyBreakdown).toHaveLength(5);
+  });
+
+  it("deducts two monthly cancel fees for 20 instructor cancellations", async () => {
+    const admin = await createAdmin();
+    const instructor = await createInstructor();
+    const customer = await createCustomer();
+
+    await createInstructorFee(instructor.id, {
+      effectiveFrom: new Date("2026-03-01T00:00:00.000Z"),
+      effectiveTo: null,
+      cancelFee: 0,
+      monthlyCancelFee: 700,
+    });
+    await createInstructorCanceledClasses(
+      customer.id,
+      instructor.id,
+      Array.from(
+        { length: 20 },
+        (_, index) =>
+          `2026-03-${String(index < 15 ? index + 1 : 16).padStart(2, "0")}T10:${String(index).padStart(2, "0")}:00+09:00`,
+      ),
+    );
+
+    const response = await request(server)
+      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .query({ month: "2026-03" })
+      .set("Cookie", await generateAuthCookie(admin.id, "admin"))
+      .expect(200);
+
+    expect(response.body.periods[1].monthlyCancelFee).toEqual({
+      cancelCount: 20,
+      threshold: 10,
+      unitFee: 700,
+      timesApplied: 2,
+      total: 1400,
+    });
+    expect(response.body.periods[1].total).toBe(-1400);
+  });
+
+  it("uses the month-end fee rate for the monthly cancel fee", async () => {
+    const admin = await createAdmin();
+    const instructor = await createInstructor();
+    const customer = await createCustomer();
+
+    await createInstructorFee(instructor.id, {
+      effectiveFrom: new Date("2026-03-01T00:00:00.000Z"),
+      effectiveTo: new Date("2026-03-16T00:00:00.000Z"),
+      cancelFee: 0,
+      monthlyCancelFee: 500,
+    });
+    await createInstructorFee(instructor.id, {
+      effectiveFrom: new Date("2026-03-16T00:00:00.000Z"),
+      effectiveTo: null,
+      cancelFee: 0,
+      monthlyCancelFee: 900,
+    });
+    await createInstructorCanceledClasses(
+      customer.id,
+      instructor.id,
+      Array.from(
+        { length: 10 },
+        (_, index) =>
+          `2026-03-${String(index + 1).padStart(2, "0")}T10:00:00+09:00`,
+      ),
+    );
+
+    const response = await request(server)
+      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .query({ month: "2026-03" })
+      .set("Cookie", await generateAuthCookie(admin.id, "admin"))
+      .expect(200);
+
+    expect(response.body.periods[1].monthlyCancelFee).toEqual({
+      cancelCount: 10,
+      threshold: 10,
+      unitFee: 900,
+      timesApplied: 1,
+      total: 900,
+    });
+    expect(response.body.periods[1].currency).toBe("JPY");
+    expect(response.body.periods[1].total).toBe(-900);
+  });
+
+  it("returns 422 when a monthly cancel fee is needed but no month-end fee exists", async () => {
+    const admin = await createAdmin();
+    const instructor = await createInstructor();
+    const customer = await createCustomer();
+
+    await createInstructorFee(instructor.id, {
+      effectiveFrom: new Date("2026-03-01T00:00:00.000Z"),
+      effectiveTo: new Date("2026-03-30T00:00:00.000Z"),
+      cancelFee: 0,
+      monthlyCancelFee: 700,
+    });
+    await createInstructorCanceledClasses(
+      customer.id,
+      instructor.id,
+      Array.from(
+        { length: 10 },
+        (_, index) =>
+          `2026-03-${String(index + 1).padStart(2, "0")}T10:00:00+09:00`,
+      ),
+    );
+
+    const response = await request(server)
+      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .query({ month: "2026-03" })
+      .set("Cookie", await generateAuthCookie(admin.id, "admin"))
+      .expect(422);
+
+    expect(response.body.code).toBe("MISSING_FEE_RATE");
+  });
+
+  it("returns 422 when monthly cancel fee currency conflicts with second-half class currency", async () => {
+    const admin = await createAdmin();
+    const instructor = await createInstructor();
+    const customer = await createCustomer();
+
+    await createInstructorFee(instructor.id, {
+      currency: "JPY",
+      effectiveFrom: new Date("2026-03-01T00:00:00.000Z"),
+      effectiveTo: new Date("2026-03-30T00:00:00.000Z"),
+      cancelFee: 0,
+      monthlyCancelFee: 700,
+    });
+    await createInstructorFee(instructor.id, {
+      currency: "USD",
+      effectiveFrom: new Date("2026-03-30T00:00:00.000Z"),
+      effectiveTo: null,
+      regularFee: 100,
+      cancelFee: 0,
+      monthlyCancelFee: 10,
+    });
+    await createInstructorCanceledClasses(
+      customer.id,
+      instructor.id,
+      Array.from(
+        { length: 10 },
+        (_, index) =>
+          `2026-03-${String(index + 1).padStart(2, "0")}T10:00:00+09:00`,
+      ),
+    );
+    await createClass(
+      customer.id,
+      instructor.id,
+      jstDateTime("2026-03-20T10:00:00+09:00"),
+      { status: "completed", isFreeTrial: false },
+    );
+
+    const response = await request(server)
+      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .query({ month: "2026-03" })
+      .set("Cookie", await generateAuthCookie(admin.id, "admin"))
+      .expect(422);
+
+    expect(response.body.code).toBe("MULTIPLE_CURRENCIES");
   });
 
   it("returns 404 when instructor does not exist", async () => {

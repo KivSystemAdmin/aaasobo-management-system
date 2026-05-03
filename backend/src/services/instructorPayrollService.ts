@@ -41,7 +41,12 @@ type PayrollFeeRecord = {
   regularFee: number;
   cancelFee: number;
   cancelWithoutNoticeFee: number;
+  monthlyCancelFee: number;
 };
+
+type MonthlyCancelFeeSummary = InstructorPayrollPeriod["monthlyCancelFee"];
+
+const MONTHLY_CANCEL_FEE_THRESHOLD = 10;
 
 export class InstructorPayrollError extends Error {
   constructor(
@@ -130,6 +135,7 @@ const formatFeeRecord = (fee: {
   regularFee: number;
   cancelFee: number;
   cancelWithoutNoticeFee: number;
+  monthlyCancelFee: number;
 }): PayrollFeeRecord => ({
   currency: fee.currency,
   effectiveFrom: fee.effectiveFrom.toISOString().slice(0, 10),
@@ -140,6 +146,7 @@ const formatFeeRecord = (fee: {
   regularFee: fee.regularFee,
   cancelFee: fee.cancelFee,
   cancelWithoutNoticeFee: fee.cancelWithoutNoticeFee,
+  monthlyCancelFee: fee.monthlyCancelFee,
 });
 
 const resolveApplicableFee = (
@@ -199,6 +206,9 @@ const summarizePeriod = (
   to: string,
   classes: PayrollClassWithDateTime[],
   feeRecords: PayrollFeeRecord[],
+  monthlyCancelFee: MonthlyCancelFeeSummary,
+  monthlyCancelFeeCurrency: string | null,
+  monthlyCancelFeeRecord: PayrollFeeRecord | null,
 ): PayrollPeriodSummary => {
   const counts = emptyPeriodTotals();
   const subtotals = emptyPeriodTotals();
@@ -250,6 +260,27 @@ const summarizePeriod = (
     );
   }
 
+  if (monthlyCancelFee.total > 0) {
+    if (monthlyCancelFeeCurrency) {
+      currencies.add(monthlyCancelFeeCurrency);
+    }
+    if (monthlyCancelFeeRecord) {
+      appliedFeePeriods.set(
+        `${monthlyCancelFeeRecord.currency}:${monthlyCancelFeeRecord.effectiveFrom}:${monthlyCancelFeeRecord.effectiveTo ?? "open"}`,
+        monthlyCancelFeeRecord,
+      );
+    }
+    total -= monthlyCancelFee.total;
+  }
+
+  if (currencies.size > 1) {
+    throw new InstructorPayrollError(
+      422,
+      "MULTIPLE_CURRENCIES",
+      `Payroll period ${periodName} mixes multiple currencies`,
+    );
+  }
+
   return {
     from,
     to,
@@ -258,6 +289,7 @@ const summarizePeriod = (
     counts,
     subtotals,
     total,
+    monthlyCancelFee,
     dailyBreakdown: Array.from(dailyBreakdown.entries())
       .sort(([left], [right]) => left.localeCompare(right))
       .map(([date, day]) => ({
@@ -318,6 +350,7 @@ export const getInstructorPayroll = async (
         regularFee: true,
         cancelFee: true,
         cancelWithoutNoticeFee: true,
+        monthlyCancelFee: true,
       },
       orderBy: { effectiveFrom: "asc" },
     }),
@@ -347,6 +380,32 @@ export const getInstructorPayroll = async (
     (payrollClass) =>
       formatDateInJst(payrollClass.dateTime) >= bounds.secondHalfStart,
   );
+  const monthlyCancelCount = payableClasses.filter(
+    (payrollClass) => payrollClass.status === "canceledByInstructor",
+  ).length;
+  const monthlyCancelTimesApplied = Math.floor(
+    monthlyCancelCount / MONTHLY_CANCEL_FEE_THRESHOLD,
+  );
+  const monthEndFee =
+    monthlyCancelTimesApplied > 0
+      ? resolveApplicableFee(bounds.lastDay, feeRecords)
+      : null;
+  const emptyMonthlyCancelFee: MonthlyCancelFeeSummary = {
+    cancelCount: monthlyCancelCount,
+    threshold: MONTHLY_CANCEL_FEE_THRESHOLD,
+    unitFee: 0,
+    timesApplied: 0,
+    total: 0,
+  };
+  const secondHalfMonthlyCancelFee: MonthlyCancelFeeSummary = monthEndFee
+    ? {
+        cancelCount: monthlyCancelCount,
+        threshold: MONTHLY_CANCEL_FEE_THRESHOLD,
+        unitFee: monthEndFee.monthlyCancelFee,
+        timesApplied: monthlyCancelTimesApplied,
+        total: monthlyCancelTimesApplied * monthEndFee.monthlyCancelFee,
+      }
+    : emptyMonthlyCancelFee;
 
   return {
     instructorId,
@@ -359,6 +418,9 @@ export const getInstructorPayroll = async (
         bounds.firstHalfEnd,
         firstHalfClasses,
         feeRecords,
+        emptyMonthlyCancelFee,
+        null,
+        null,
       ),
       summarizePeriod(
         "16-last",
@@ -366,6 +428,9 @@ export const getInstructorPayroll = async (
         bounds.lastDay,
         secondHalfClasses,
         feeRecords,
+        secondHalfMonthlyCancelFee,
+        monthEndFee?.currency ?? null,
+        monthEndFee,
       ),
     ],
   };

@@ -54,6 +54,7 @@ export const CreateInstructorFeeRequest = z.object({
   regularFee: z.number().int().nonnegative(),
   cancelFee: z.number().int().nonnegative(),
   cancelWithoutNoticeFee: z.number().int().nonnegative(),
+  monthlyCancelFee: z.number().int().nonnegative().default(0),
 });
 
 export const PlanIdParams = z.object({
@@ -231,6 +232,15 @@ export const InstructorPayrollFeePeriod = z.object({
   regularFee: z.number().int(),
   cancelFee: z.number().int(),
   cancelWithoutNoticeFee: z.number().int(),
+  monthlyCancelFee: z.number().int(),
+});
+
+export const InstructorPayrollMonthlyCancelFee = z.object({
+  cancelCount: z.number().int().nonnegative(),
+  threshold: z.literal(10),
+  unitFee: z.number().int().nonnegative(),
+  timesApplied: z.number().int().nonnegative(),
+  total: z.number().int().nonnegative(),
 });
 
 export const InstructorPayrollDailyBreakdown = z.object({
@@ -265,6 +275,7 @@ export const InstructorPayrollPeriod = z.object({
     cancelWithoutNotice: z.number().int().nonnegative(),
   }),
   total: z.number().int(),
+  monthlyCancelFee: InstructorPayrollMonthlyCancelFee,
   dailyBreakdown: z.array(InstructorPayrollDailyBreakdown),
   appliedFeePeriods: z.array(InstructorPayrollFeePeriod),
 });
@@ -293,6 +304,7 @@ export const InstructorFeeRate = z.object({
   regularFee: z.number().int().nonnegative(),
   cancelFee: z.number().int().nonnegative(),
   cancelWithoutNoticeFee: z.number().int().nonnegative(),
+  monthlyCancelFee: z.number().int().nonnegative(),
 });
 
 export const InstructorFeeRatesResponse = z.object({
@@ -621,6 +633,9 @@ export type AdminsListResponse = z.infer<typeof AdminsListResponse>;
 export type InstructorsListResponse = z.infer<typeof InstructorsListResponse>;
 export type InstructorPayrollFeePeriod = z.infer<
   typeof InstructorPayrollFeePeriod
+>;
+export type InstructorPayrollMonthlyCancelFee = z.infer<
+  typeof InstructorPayrollMonthlyCancelFee
 >;
 export type InstructorPayrollDailyBreakdown = z.infer<
   typeof InstructorPayrollDailyBreakdown

@@ -263,6 +263,7 @@ export async function createInstructorFee(
     regularFee: number;
     cancelFee: number;
     cancelWithoutNoticeFee: number;
+    monthlyCancelFee: number;
   }>,
 ) {
   return await prisma.instructorFee.create({
@@ -276,6 +277,7 @@ export async function createInstructorFee(
       regularFee: data?.regularFee ?? 1000,
       cancelFee: data?.cancelFee ?? 500,
       cancelWithoutNoticeFee: data?.cancelWithoutNoticeFee ?? 0,
+      monthlyCancelFee: data?.monthlyCancelFee ?? 0,
     },
   });
 }

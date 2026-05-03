@@ -56,6 +56,7 @@ Each instructor has fee history records with:
 - `regularFee`
 - `cancelFee`
 - `cancelWithoutNoticeFee`
+- `monthlyCancelFee`
 - `effectiveFrom`
 - `effectiveTo` nullable
 
@@ -101,6 +102,22 @@ Example:
 - Instructor cancels on March 16
 - Use the fee record covering March 14
 
+The monthly cancel fee uses the fee record active on the target month's last JST date. This is independent of which fee records applied to individual canceled classes earlier in the month.
+
+### Monthly cancel fee
+
+Instructor cancellations are counted across the full selected JST month:
+
+- Count only classes with `status = canceledByInstructor`.
+- Do not count `canceledByCustomer`.
+- Apply the fixed threshold once per 10 instructor cancellations.
+- `timesApplied = Math.floor(cancelCount / 10)`.
+- `total = timesApplied * monthlyCancelFee`.
+
+The monthly cancel fee is deducted only from the `16-last` payroll period. The `1-15` period still returns the monthly cancel fee response object for a stable API shape, but its `total` is always `0`.
+
+The deduction is period-level, not day-level. It must not create daily breakdown rows. The admin UI may show it as a footer adjustment row above the table total so the table total reconciles with the period total.
+
 ### Cancellation deadline rule
 
 The current system rule is not rolling 24 hours. It is based on the JST calendar day:
@@ -132,6 +149,7 @@ Proposed fields:
 - `regularFee`
 - `cancelFee`
 - `cancelWithoutNoticeFee`
+- `monthlyCancelFee`
 
 Proposed constraints:
 
@@ -155,6 +173,7 @@ Currency behavior:
 - each applied fee record must carry its currency
 - the UI must show currency alongside unit fees, subtotals, and total
 - v1 should reject a single payroll period if it mixes multiple currencies across applied fee records
+- if the `16-last` period has a monthly cancel fee deduction, its month-end fee currency must match any class fee currency already used in that period
 
 ### Schema change: `Class.canceledAt`
 
@@ -248,6 +267,13 @@ Query params:
         "cancelWithoutNotice": 0
       },
       "total": 19500,
+      "monthlyCancelFee": {
+        "cancelCount": 10,
+        "threshold": 10,
+        "unitFee": 0,
+        "timesApplied": 0,
+        "total": 0
+      },
       "appliedFeePeriods": [
         {
           "currency": "JPY",
@@ -256,7 +282,8 @@ Query params:
           "trialFee": 1000,
           "regularFee": 1000,
           "cancelFee": 500,
-          "cancelWithoutNoticeFee": 0
+          "cancelWithoutNoticeFee": 0,
+          "monthlyCancelFee": 1000
         }
       ]
     },
@@ -278,7 +305,14 @@ Query params:
         "cancel": 0,
         "cancelWithoutNotice": 0
       },
-      "total": 21000,
+      "total": 20000,
+      "monthlyCancelFee": {
+        "cancelCount": 10,
+        "threshold": 10,
+        "unitFee": 1000,
+        "timesApplied": 1,
+        "total": 1000
+      },
       "appliedFeePeriods": [
         {
           "currency": "JPY",
@@ -287,7 +321,8 @@ Query params:
           "trialFee": 1000,
           "regularFee": 1000,
           "cancelFee": 500,
-          "cancelWithoutNoticeFee": 0
+          "cancelWithoutNoticeFee": 0,
+          "monthlyCancelFee": 1000
         }
       ]
     }
@@ -300,6 +335,7 @@ Query params:
 - `400`: invalid `month` format
 - `404`: instructor not found
 - `422`: payable class has no matching fee record
+- `422`: monthly cancel fee is needed but no fee record is active on the target month's last day
 - `422`: payroll period resolves to multiple currencies
 - `500`: unexpected server error
 
@@ -335,8 +371,9 @@ Current tab container:
   - net of cancel fees
 - `sourceLastUpdatedAt`
 - applied fee period summary
+  - include `monthlyCancelFee` as `Monthly Cancel / 10` with the other unit fees
 
-The initial UI shows summary only. A session list is out of scope for v1.
+The daily breakdown table shows class-day rows only and its total is the daily subtotal. Period-level adjustments, such as the monthly cancel fee, are shown below the `16-last` daily breakdown table; the monthly cancel fee section is labeled `Monthly Cancel`, shows the expression `{count} total cancels / 10 = {timesApplied} x {monthlyCancelFee}`, and displays the deducted amount. A session list is out of scope for v1.
 
 ## Implementation Plan
 

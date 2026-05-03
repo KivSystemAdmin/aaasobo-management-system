@@ -22466,6 +22466,7 @@ export namespace Prisma {
     regularFee: number | null
     cancelFee: number | null
     cancelWithoutNoticeFee: number | null
+    monthlyCancelFee: number | null
   }
 
   export type InstructorFeeSumAggregateOutputType = {
@@ -22475,6 +22476,7 @@ export namespace Prisma {
     regularFee: number | null
     cancelFee: number | null
     cancelWithoutNoticeFee: number | null
+    monthlyCancelFee: number | null
   }
 
   export type InstructorFeeMinAggregateOutputType = {
@@ -22487,6 +22489,7 @@ export namespace Prisma {
     regularFee: number | null
     cancelFee: number | null
     cancelWithoutNoticeFee: number | null
+    monthlyCancelFee: number | null
   }
 
   export type InstructorFeeMaxAggregateOutputType = {
@@ -22499,6 +22502,7 @@ export namespace Prisma {
     regularFee: number | null
     cancelFee: number | null
     cancelWithoutNoticeFee: number | null
+    monthlyCancelFee: number | null
   }
 
   export type InstructorFeeCountAggregateOutputType = {
@@ -22511,6 +22515,7 @@ export namespace Prisma {
     regularFee: number
     cancelFee: number
     cancelWithoutNoticeFee: number
+    monthlyCancelFee: number
     _all: number
   }
 
@@ -22522,6 +22527,7 @@ export namespace Prisma {
     regularFee?: true
     cancelFee?: true
     cancelWithoutNoticeFee?: true
+    monthlyCancelFee?: true
   }
 
   export type InstructorFeeSumAggregateInputType = {
@@ -22531,6 +22537,7 @@ export namespace Prisma {
     regularFee?: true
     cancelFee?: true
     cancelWithoutNoticeFee?: true
+    monthlyCancelFee?: true
   }
 
   export type InstructorFeeMinAggregateInputType = {
@@ -22543,6 +22550,7 @@ export namespace Prisma {
     regularFee?: true
     cancelFee?: true
     cancelWithoutNoticeFee?: true
+    monthlyCancelFee?: true
   }
 
   export type InstructorFeeMaxAggregateInputType = {
@@ -22555,6 +22563,7 @@ export namespace Prisma {
     regularFee?: true
     cancelFee?: true
     cancelWithoutNoticeFee?: true
+    monthlyCancelFee?: true
   }
 
   export type InstructorFeeCountAggregateInputType = {
@@ -22567,6 +22576,7 @@ export namespace Prisma {
     regularFee?: true
     cancelFee?: true
     cancelWithoutNoticeFee?: true
+    monthlyCancelFee?: true
     _all?: true
   }
 
@@ -22666,6 +22676,7 @@ export namespace Prisma {
     regularFee: number
     cancelFee: number
     cancelWithoutNoticeFee: number
+    monthlyCancelFee: number
     _count: InstructorFeeCountAggregateOutputType | null
     _avg: InstructorFeeAvgAggregateOutputType | null
     _sum: InstructorFeeSumAggregateOutputType | null
@@ -22697,6 +22708,7 @@ export namespace Prisma {
     regularFee?: boolean
     cancelFee?: boolean
     cancelWithoutNoticeFee?: boolean
+    monthlyCancelFee?: boolean
     instructor?: boolean | InstructorDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["instructorFee"]>
 
@@ -22710,6 +22722,7 @@ export namespace Prisma {
     regularFee?: boolean
     cancelFee?: boolean
     cancelWithoutNoticeFee?: boolean
+    monthlyCancelFee?: boolean
     instructor?: boolean | InstructorDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["instructorFee"]>
 
@@ -22723,6 +22736,7 @@ export namespace Prisma {
     regularFee?: boolean
     cancelFee?: boolean
     cancelWithoutNoticeFee?: boolean
+    monthlyCancelFee?: boolean
     instructor?: boolean | InstructorDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["instructorFee"]>
 
@@ -22736,9 +22750,10 @@ export namespace Prisma {
     regularFee?: boolean
     cancelFee?: boolean
     cancelWithoutNoticeFee?: boolean
+    monthlyCancelFee?: boolean
   }
 
-  export type InstructorFeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "instructorId" | "currency" | "effectiveFrom" | "effectiveTo" | "trialFee" | "regularFee" | "cancelFee" | "cancelWithoutNoticeFee", ExtArgs["result"]["instructorFee"]>
+  export type InstructorFeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "instructorId" | "currency" | "effectiveFrom" | "effectiveTo" | "trialFee" | "regularFee" | "cancelFee" | "cancelWithoutNoticeFee" | "monthlyCancelFee", ExtArgs["result"]["instructorFee"]>
   export type InstructorFeeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     instructor?: boolean | InstructorDefaultArgs<ExtArgs>
   }
@@ -22764,6 +22779,7 @@ export namespace Prisma {
       regularFee: number
       cancelFee: number
       cancelWithoutNoticeFee: number
+      monthlyCancelFee: number
     }, ExtArgs["result"]["instructorFee"]>
     composites: {}
   }
@@ -23197,6 +23213,7 @@ export namespace Prisma {
     readonly regularFee: FieldRef<"InstructorFee", 'Int'>
     readonly cancelFee: FieldRef<"InstructorFee", 'Int'>
     readonly cancelWithoutNoticeFee: FieldRef<"InstructorFee", 'Int'>
+    readonly monthlyCancelFee: FieldRef<"InstructorFee", 'Int'>
   }
     
 
@@ -28121,7 +28138,8 @@ export namespace Prisma {
     trialFee: 'trialFee',
     regularFee: 'regularFee',
     cancelFee: 'cancelFee',
-    cancelWithoutNoticeFee: 'cancelWithoutNoticeFee'
+    cancelWithoutNoticeFee: 'cancelWithoutNoticeFee',
+    monthlyCancelFee: 'monthlyCancelFee'
   };
 
   export type InstructorFeeScalarFieldEnum = (typeof InstructorFeeScalarFieldEnum)[keyof typeof InstructorFeeScalarFieldEnum]
@@ -29406,6 +29424,7 @@ export namespace Prisma {
     regularFee?: IntFilter<"InstructorFee"> | number
     cancelFee?: IntFilter<"InstructorFee"> | number
     cancelWithoutNoticeFee?: IntFilter<"InstructorFee"> | number
+    monthlyCancelFee?: IntFilter<"InstructorFee"> | number
     instructor?: XOR<InstructorScalarRelationFilter, InstructorWhereInput>
   }
 
@@ -29419,6 +29438,7 @@ export namespace Prisma {
     regularFee?: SortOrder
     cancelFee?: SortOrder
     cancelWithoutNoticeFee?: SortOrder
+    monthlyCancelFee?: SortOrder
     instructor?: InstructorOrderByWithRelationInput
   }
 
@@ -29435,6 +29455,7 @@ export namespace Prisma {
     regularFee?: IntFilter<"InstructorFee"> | number
     cancelFee?: IntFilter<"InstructorFee"> | number
     cancelWithoutNoticeFee?: IntFilter<"InstructorFee"> | number
+    monthlyCancelFee?: IntFilter<"InstructorFee"> | number
     instructor?: XOR<InstructorScalarRelationFilter, InstructorWhereInput>
   }, "id">
 
@@ -29448,6 +29469,7 @@ export namespace Prisma {
     regularFee?: SortOrder
     cancelFee?: SortOrder
     cancelWithoutNoticeFee?: SortOrder
+    monthlyCancelFee?: SortOrder
     _count?: InstructorFeeCountOrderByAggregateInput
     _avg?: InstructorFeeAvgOrderByAggregateInput
     _max?: InstructorFeeMaxOrderByAggregateInput
@@ -29468,6 +29490,7 @@ export namespace Prisma {
     regularFee?: IntWithAggregatesFilter<"InstructorFee"> | number
     cancelFee?: IntWithAggregatesFilter<"InstructorFee"> | number
     cancelWithoutNoticeFee?: IntWithAggregatesFilter<"InstructorFee"> | number
+    monthlyCancelFee?: IntWithAggregatesFilter<"InstructorFee"> | number
   }
 
   export type SystemStatusWhereInput = {
@@ -30808,6 +30831,7 @@ export namespace Prisma {
     regularFee: number
     cancelFee: number
     cancelWithoutNoticeFee: number
+    monthlyCancelFee?: number
     instructor: InstructorCreateNestedOneWithoutInstructorFeesInput
   }
 
@@ -30821,6 +30845,7 @@ export namespace Prisma {
     regularFee: number
     cancelFee: number
     cancelWithoutNoticeFee: number
+    monthlyCancelFee?: number
   }
 
   export type InstructorFeeUpdateInput = {
@@ -30831,6 +30856,7 @@ export namespace Prisma {
     regularFee?: IntFieldUpdateOperationsInput | number
     cancelFee?: IntFieldUpdateOperationsInput | number
     cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+    monthlyCancelFee?: IntFieldUpdateOperationsInput | number
     instructor?: InstructorUpdateOneRequiredWithoutInstructorFeesNestedInput
   }
 
@@ -30844,6 +30870,7 @@ export namespace Prisma {
     regularFee?: IntFieldUpdateOperationsInput | number
     cancelFee?: IntFieldUpdateOperationsInput | number
     cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+    monthlyCancelFee?: IntFieldUpdateOperationsInput | number
   }
 
   export type InstructorFeeCreateManyInput = {
@@ -30856,6 +30883,7 @@ export namespace Prisma {
     regularFee: number
     cancelFee: number
     cancelWithoutNoticeFee: number
+    monthlyCancelFee?: number
   }
 
   export type InstructorFeeUpdateManyMutationInput = {
@@ -30866,6 +30894,7 @@ export namespace Prisma {
     regularFee?: IntFieldUpdateOperationsInput | number
     cancelFee?: IntFieldUpdateOperationsInput | number
     cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+    monthlyCancelFee?: IntFieldUpdateOperationsInput | number
   }
 
   export type InstructorFeeUncheckedUpdateManyInput = {
@@ -30878,6 +30907,7 @@ export namespace Prisma {
     regularFee?: IntFieldUpdateOperationsInput | number
     cancelFee?: IntFieldUpdateOperationsInput | number
     cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+    monthlyCancelFee?: IntFieldUpdateOperationsInput | number
   }
 
   export type SystemStatusCreateInput = {
@@ -32141,6 +32171,7 @@ export namespace Prisma {
     regularFee?: SortOrder
     cancelFee?: SortOrder
     cancelWithoutNoticeFee?: SortOrder
+    monthlyCancelFee?: SortOrder
   }
 
   export type InstructorFeeAvgOrderByAggregateInput = {
@@ -32150,6 +32181,7 @@ export namespace Prisma {
     regularFee?: SortOrder
     cancelFee?: SortOrder
     cancelWithoutNoticeFee?: SortOrder
+    monthlyCancelFee?: SortOrder
   }
 
   export type InstructorFeeMaxOrderByAggregateInput = {
@@ -32162,6 +32194,7 @@ export namespace Prisma {
     regularFee?: SortOrder
     cancelFee?: SortOrder
     cancelWithoutNoticeFee?: SortOrder
+    monthlyCancelFee?: SortOrder
   }
 
   export type InstructorFeeMinOrderByAggregateInput = {
@@ -32174,6 +32207,7 @@ export namespace Prisma {
     regularFee?: SortOrder
     cancelFee?: SortOrder
     cancelWithoutNoticeFee?: SortOrder
+    monthlyCancelFee?: SortOrder
   }
 
   export type InstructorFeeSumOrderByAggregateInput = {
@@ -32183,6 +32217,7 @@ export namespace Prisma {
     regularFee?: SortOrder
     cancelFee?: SortOrder
     cancelWithoutNoticeFee?: SortOrder
+    monthlyCancelFee?: SortOrder
   }
 
   export type SystemStatusCountOrderByAggregateInput = {
@@ -33814,6 +33849,7 @@ export namespace Prisma {
     regularFee: number
     cancelFee: number
     cancelWithoutNoticeFee: number
+    monthlyCancelFee?: number
   }
 
   export type InstructorFeeUncheckedCreateWithoutInstructorInput = {
@@ -33825,6 +33861,7 @@ export namespace Prisma {
     regularFee: number
     cancelFee: number
     cancelWithoutNoticeFee: number
+    monthlyCancelFee?: number
   }
 
   export type InstructorFeeCreateOrConnectWithoutInstructorInput = {
@@ -33999,6 +34036,7 @@ export namespace Prisma {
     regularFee?: IntFilter<"InstructorFee"> | number
     cancelFee?: IntFilter<"InstructorFee"> | number
     cancelWithoutNoticeFee?: IntFilter<"InstructorFee"> | number
+    monthlyCancelFee?: IntFilter<"InstructorFee"> | number
   }
 
   export type InstructorScheduleUpsertWithWhereUniqueWithoutInstructorInput = {
@@ -36340,6 +36378,7 @@ export namespace Prisma {
     regularFee: number
     cancelFee: number
     cancelWithoutNoticeFee: number
+    monthlyCancelFee?: number
   }
 
   export type InstructorScheduleCreateManyInstructorInput = {
@@ -36428,6 +36467,7 @@ export namespace Prisma {
     regularFee?: IntFieldUpdateOperationsInput | number
     cancelFee?: IntFieldUpdateOperationsInput | number
     cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+    monthlyCancelFee?: IntFieldUpdateOperationsInput | number
   }
 
   export type InstructorFeeUncheckedUpdateWithoutInstructorInput = {
@@ -36439,6 +36479,7 @@ export namespace Prisma {
     regularFee?: IntFieldUpdateOperationsInput | number
     cancelFee?: IntFieldUpdateOperationsInput | number
     cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+    monthlyCancelFee?: IntFieldUpdateOperationsInput | number
   }
 
   export type InstructorFeeUncheckedUpdateManyWithoutInstructorInput = {
@@ -36450,6 +36491,7 @@ export namespace Prisma {
     regularFee?: IntFieldUpdateOperationsInput | number
     cancelFee?: IntFieldUpdateOperationsInput | number
     cancelWithoutNoticeFee?: IntFieldUpdateOperationsInput | number
+    monthlyCancelFee?: IntFieldUpdateOperationsInput | number
   }
 
   export type InstructorScheduleUpdateWithoutInstructorInput = {
