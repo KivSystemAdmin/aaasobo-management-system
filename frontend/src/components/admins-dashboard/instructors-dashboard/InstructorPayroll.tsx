@@ -110,6 +110,9 @@ const formatFeeCoverageEnd = (value: string | null) => {
   return date.toISOString().slice(0, 10);
 };
 
+const isSecondHalfPeriod = (period: InstructorPayrollPeriod) =>
+  Number(period.from.slice(8, 10)) >= 16;
+
 function DailyBreakdownTable({
   rows,
   currency,
@@ -144,6 +147,14 @@ function DailyBreakdownTable({
   return (
     <div className={styles.tableWrap}>
       <table className={styles.dailyBreakdownTable}>
+        <colgroup>
+          <col className={styles.dateColumn} />
+          <col className={styles.trialColumn} />
+          <col className={styles.regularColumn} />
+          <col className={styles.cancelColumn} />
+          <col className={styles.cancelWithoutNoticeColumn} />
+          <col className={styles.dayTotalColumn} />
+        </colgroup>
         <thead>
           <tr>
             <th>Date</th>
@@ -187,8 +198,33 @@ function DailyBreakdownTable({
   );
 }
 
+function MonthlyCancelAdjustment({
+  currency,
+  monthlyCancelFee,
+}: {
+  currency: string | null;
+  monthlyCancelFee: InstructorPayrollPeriod["monthlyCancelFee"];
+}) {
+  return (
+    <div className={styles.monthlyCancelAdjustment}>
+      <div className={styles.monthlyCancelLabel}>
+        <h5>Monthly Cancel</h5>
+      </div>
+      <p className={styles.monthlyCancelFormula}>
+        {monthlyCancelFee.cancelCount} total cancels /{" "}
+        {monthlyCancelFee.threshold} = {monthlyCancelFee.timesApplied} x{" "}
+        {formatMoney(monthlyCancelFee.unitFee, currency)}
+      </p>
+      <strong>
+        {monthlyCancelFee.total > 0 ? "-" : ""}
+        {formatMoney(monthlyCancelFee.total, currency)}
+      </strong>
+    </div>
+  );
+}
+
 function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
-  const monthlyCancelFee = period.monthlyCancelFee;
+  const showMonthlyCancelAdjustment = isSecondHalfPeriod(period);
 
   return (
     <section className={styles.periodCard}>
@@ -203,34 +239,6 @@ function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
         </div>
       </div>
 
-      {monthlyCancelFee.timesApplied > 0 && (
-        <div className={styles.monthlyCancelFeeSection}>
-          <h4>Monthly Cancel Fee</h4>
-          <dl className={styles.monthlyCancelFeeGrid}>
-            <div>
-              <dt>Monthly Cancel Count</dt>
-              <dd>{monthlyCancelFee.cancelCount}</dd>
-            </div>
-            <div>
-              <dt>Threshold</dt>
-              <dd>Every {monthlyCancelFee.threshold} cancels</dd>
-            </div>
-            <div>
-              <dt>Unit Fee</dt>
-              <dd>{formatMoney(monthlyCancelFee.unitFee, period.currency)}</dd>
-            </div>
-            <div>
-              <dt>Times Applied</dt>
-              <dd>{monthlyCancelFee.timesApplied}</dd>
-            </div>
-            <div>
-              <dt>Total Deducted</dt>
-              <dd>-{formatMoney(monthlyCancelFee.total, period.currency)}</dd>
-            </div>
-          </dl>
-        </div>
-      )}
-
       <div className={styles.breakdownSection}>
         <h4>
           Daily Breakdown (Last Update at{" "}
@@ -240,6 +248,12 @@ function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
           rows={period.dailyBreakdown}
           currency={period.currency}
         />
+        {showMonthlyCancelAdjustment && (
+          <MonthlyCancelAdjustment
+            currency={period.currency}
+            monthlyCancelFee={period.monthlyCancelFee}
+          />
+        )}
       </div>
 
       <div className={styles.feePeriodsSection}>
@@ -277,6 +291,10 @@ function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
                     <dd>
                       {formatMoney(fee.cancelWithoutNoticeFee, fee.currency)}
                     </dd>
+                  </div>
+                  <div>
+                    <dt>Monthly Cancel / 10</dt>
+                    <dd>{formatMoney(fee.monthlyCancelFee, fee.currency)}</dd>
                   </div>
                 </dl>
               </article>

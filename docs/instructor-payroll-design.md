@@ -116,7 +116,7 @@ Instructor cancellations are counted across the full selected JST month:
 
 The monthly cancel fee is deducted only from the `16-last` payroll period. The `1-15` period still returns the monthly cancel fee response object for a stable API shape, but its `total` is always `0`.
 
-The deduction is period-level, not day-level. It must not create daily breakdown rows.
+The deduction is period-level, not day-level. It must not create daily breakdown rows. The admin UI may show it as a footer adjustment row above the table total so the table total reconciles with the period total.
 
 ### Cancellation deadline rule
 
@@ -371,8 +371,9 @@ Current tab container:
   - net of cancel fees
 - `sourceLastUpdatedAt`
 - applied fee period summary
+  - include `monthlyCancelFee` as `Monthly Cancel / 10` with the other unit fees
 
-The initial UI shows summary only. A session list is out of scope for v1.
+The daily breakdown table shows class-day rows only and its total is the daily subtotal. Period-level adjustments, such as the monthly cancel fee, are shown below the `16-last` daily breakdown table; the monthly cancel fee section is labeled `Monthly Cancel`, shows the expression `{count} total cancels / 10 = {timesApplied} x {monthlyCancelFee}`, and displays the deducted amount. A session list is out of scope for v1.
 
 ## Implementation Plan
 
