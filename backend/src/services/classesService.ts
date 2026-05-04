@@ -334,7 +334,7 @@ export const createClassesUsingRecurringClassId = async (
   dateTimes: Date[],
 ) => {
   try {
-    const createdClasses = await tx.class.createManyAndReturn({
+    await tx.class.createManyAndReturn({
       data: dateTimes.map((dateTime, index) => {
         return {
           recurringClassId,
@@ -347,6 +347,14 @@ export const createClassesUsingRecurringClassId = async (
           classCode: `${recurringClassId}-${index}`,
         };
       }),
+      skipDuplicates: true,
+    });
+
+    const createdClasses = await tx.class.findMany({
+      where: {
+        recurringClassId,
+        dateTime: { in: dateTimes },
+      },
     });
 
     await tx.classAttendance.createMany({
