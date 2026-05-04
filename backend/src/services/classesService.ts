@@ -347,7 +347,6 @@ export const createClassesUsingRecurringClassId = async (
           classCode: `${recurringClassId}-${index}`,
         };
       }),
-      skipDuplicates: true,
     });
 
     const createdClasses = await tx.class.findMany({
@@ -379,12 +378,13 @@ export const getExcludedClasses = async (
   tx: Prisma.TransactionClient,
   recurringClassIds: number[],
   date: Date,
+  until: Date,
 ) => {
   try {
     const excludedClassData = await tx.class.findMany({
       where: {
         recurringClassId: { in: recurringClassIds },
-        dateTime: { gte: date },
+        dateTime: { gte: date, lte: until },
       },
     });
 
