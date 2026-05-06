@@ -80,3 +80,31 @@ export const deleteOldBusinessCalendar = async () => {
     },
   });
 };
+
+// Fetch schedules by id
+export const getSchedulesByEventIdAndDate = async (
+  eventId: number,
+  start: Date,
+  end: Date,
+) => {
+  try {
+    return await prisma.schedule.findMany({
+      where: {
+        eventId,
+        date: {
+          gte: start,
+          lt: end,
+        },
+      },
+      orderBy: {
+        date: "asc",
+      },
+      include: {
+        event: true,
+      },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch schedules.");
+  }
+};

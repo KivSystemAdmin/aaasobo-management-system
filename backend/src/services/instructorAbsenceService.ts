@@ -130,3 +130,27 @@ export const removeInstructorAbsence = async (
     throw new Error("Failed to remove instructor absence.");
   }
 };
+
+export const getInstructorAbsencesByMonth = async (
+  instructorIds: number[],
+  start: Date,
+  end: Date,
+  tx?: Prisma.TransactionClient,
+) => {
+  const client = tx ?? prisma;
+  try {
+    return await client.instructorAbsence.findMany({
+      where: {
+        instructorId: { in: instructorIds },
+        absentAt: {
+          gte: start,
+          lt: end,
+        },
+      },
+      orderBy: { absentAt: "asc" },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch instructor absences.");
+  }
+};

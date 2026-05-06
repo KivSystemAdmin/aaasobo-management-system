@@ -45,6 +45,7 @@ import {
   getMonthNumber,
   isSameLocalDate,
   nHoursBefore,
+  toDateKey,
 } from "../utils/dateUtils";
 import { getInstructorContactById } from "../services/instructorsService";
 import { getCustomerContactById } from "../services/customersService";
@@ -61,6 +62,8 @@ import {
   createAttendances,
   deleteAttendancesByClassId,
 } from "../services/classAttendancesService";
+import { getInstructorAbsencesByMonth } from "../services/instructorAbsenceService";
+import { getSchedulesByEventIdAndDate } from "../services/scheduleService";
 
 // GET all classes along with related instructors and customers data
 export const getAllClassesController = async (_: Request, res: Response) => {
@@ -519,10 +522,14 @@ export const createClassesForMonthController = async (
   try {
     const result = await prisma.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        // First date of a giving month.
+        // First date of the given month
         const monthNum = getMonthNumber(month);
         if (monthNum === -1) throw new Error("Invalid month");
         const firstDateOfMonth = new Date(Date.UTC(year, monthNum, 1));
+
+        // Define until when schedule should be created
+        const until = getFirstDateInMonths(firstDateOfMonth, 1);
+        until.setUTCDate(until.getUTCDate() - 1);
 
         // Get valid recurring classes.
         const recurringClasses = await getValidRecurringClasses(
@@ -530,11 +537,7 @@ export const createClassesForMonthController = async (
           firstDateOfMonth,
         );
 
-        // Define until when schedule should be created.
-        const until = getFirstDateInMonths(firstDateOfMonth, 1);
-        until.setUTCDate(until.getUTCDate() - 1);
-
-        // Get excluded classes.
+        // Get already existing classes
         const recurringClassIds = recurringClasses.map(
           (recurringClass) => recurringClass.id,
         );
@@ -545,10 +548,62 @@ export const createClassesForMonthController = async (
           until,
         );
 
-        // TODO: Get the instructors' unavailability and exclude it.
-        // TODO: Get the holiday and exclude it.
+        // Extract instructor ids
+        const instructorIds = recurringClasses
+          .map((r) => r.instructorId)
+          .filter(Boolean) as number[];
 
-        // Repeat the number of recurring classes.
+        // Get instructors' unavailability
+        const instructorAbsences = await getInstructorAbsencesByMonth(
+          instructorIds,
+          firstDateOfMonth,
+          until,
+          tx,
+        );
+
+        // Get no classes
+        const noClasses = await getSchedulesByEventIdAndDate(
+          2,
+          firstDateOfMonth,
+          until,
+        );
+
+        // Get rebookable no classes
+        const rebookableNoClasses = await getSchedulesByEventIdAndDate(
+          3,
+          firstDateOfMonth,
+          until,
+        );
+
+        // Prepare sets
+        const existingSet = new Set(
+          excludedClasses.map(
+            (cls) =>
+              `${cls.instructorId}-${new Date(cls.dateTime!).toISOString()}`,
+          ),
+        );
+
+        // TEMP: Adjust timezone. Remove once timezone handling is fixed.
+        const absenceSet = new Set(
+          instructorAbsences.map(
+            (absence) =>
+              `${absence.instructorId}-${new Date(
+                absence.absentAt.getTime() + 9 * 60 * 60 * 1000,
+              ).toISOString()}`,
+          ),
+        );
+
+        const noClassSet = new Set(
+          noClasses.map((schedule) => toDateKey(new Date(schedule.date!))),
+        );
+
+        const rebookableSet = new Set(
+          rebookableNoClasses.map((schedule) =>
+            toDateKey(new Date(schedule.date!)),
+          ),
+        );
+
+        // Generate classes for each recurring class
         await Promise.all(
           recurringClasses.map(async (recurringClass) => {
             const {
@@ -572,14 +627,18 @@ export const createClassesForMonthController = async (
             }
 
             // If startAt is earlier than the end of the current month, skip it.
-            if (startAt && startAt > until) {
+            if (startAt > until) {
               return;
             }
 
             // Extract time from startAt
-            const hours = startAt.getHours().toString().padStart(2, "0");
-            const minutes = startAt.getMinutes().toString().padStart(2, "0");
-            const time = `${hours}:${minutes}`;
+            const time = `${startAt
+              .getHours()
+              .toString()
+              .padStart(2, "0")}:${startAt
+              .getMinutes()
+              .toString()
+              .padStart(2, "0")}`;
 
             // Get the first date of the class of the month
             const firstDate = calculateFirstDate(
@@ -594,16 +653,32 @@ export const createClassesForMonthController = async (
               endAt && endAt < until ? endAt : until,
             );
 
-            // Filter only the dateTimes that already exist.
-            const filteredDateTimes = dateTimes.filter((date) => {
-              return !excludedClasses.some((excluded) => {
-                return (
-                  new Date(excluded.dateTime!).toISOString() ===
-                    date.toISOString() && excluded.instructorId === instructorId
-                );
-              });
-            });
-            if (filteredDateTimes.length === 0) return;
+            // filter part
+            let filtered = dateTimes;
+
+            // Exclude the dateTimes that already exist.
+            filtered = filtered.filter(
+              (date) =>
+                !existingSet.has(`${instructorId}-${date.toISOString()}`),
+            );
+
+            // Exclude the instructors' unavailability.
+            filtered = filtered.filter(
+              (date) =>
+                !absenceSet.has(`${instructorId}-${date.toISOString()}`),
+            );
+
+            // Exclude the no class.
+            filtered = filtered.filter(
+              (date) => !noClassSet.has(toDateKey(date)),
+            );
+
+            // Exclude the rebokkable no class.
+            filtered = filtered.filter(
+              (date) => !rebookableSet.has(toDateKey(date)),
+            );
+
+            if (filtered.length === 0) return;
 
             const childrenIds = recurringClassAttendance.map(
               (attendee) => attendee.childrenId,
@@ -617,7 +692,7 @@ export const createClassesForMonthController = async (
               subscription.customerId,
               subscriptionId,
               childrenIds,
-              filteredDateTimes,
+              filtered,
             );
           }),
         );
