@@ -343,6 +343,7 @@ export const createClassesUsingRecurringClassId = async (
           subscriptionId,
           status: "booked",
           dateTime,
+          rebookableUntil: nDaysLater(180, dateTime),
           updatedAt: new Date(),
           classCode: `${recurringClassId}-${index}`,
         };
