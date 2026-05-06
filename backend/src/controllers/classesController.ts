@@ -529,7 +529,6 @@ export const createClassesForMonthController = async (
 
         // Define until when schedule should be created
         const until = getFirstDateInMonths(firstDateOfMonth, 1);
-        until.setUTCDate(until.getUTCDate() - 1);
 
         // Get valid recurring classes.
         const recurringClasses = await getValidRecurringClasses(

@@ -384,7 +384,7 @@ export const getExcludedClasses = async (
     const excludedClassData = await tx.class.findMany({
       where: {
         recurringClassId: { in: recurringClassIds },
-        dateTime: { gte: date, lte: until },
+        dateTime: { gte: date, lt: until },
       },
     });
 
