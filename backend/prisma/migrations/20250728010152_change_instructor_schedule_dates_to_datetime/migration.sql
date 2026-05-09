@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "InstructorSchedule" ALTER COLUMN "effectiveFrom" SET DATA TYPE TIMESTAMP(3),
-ALTER COLUMN "effectiveTo" SET DATA TYPE TIMESTAMP(3);
