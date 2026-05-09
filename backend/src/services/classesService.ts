@@ -323,6 +323,27 @@ export const cancelClassById = async (classId: number) => {
   });
 };
 
+// Cancel classes by instructor
+export const cancelClassByInstructor = async (
+  tx: Prisma.TransactionClient,
+  classId: number,
+) => {
+  const now = new Date();
+
+  await tx.classAttendance.deleteMany({
+    where: { classId },
+  });
+
+  await tx.class.update({
+    where: { id: classId },
+    data: {
+      status: "canceledByInstructor",
+      canceledAt: now,
+      updatedAt: now,
+    },
+  });
+};
+
 // Create classes based on the recurring class id
 export const createClassesUsingRecurringClassId = async (
   tx: Prisma.TransactionClient,
@@ -368,7 +389,7 @@ export const createClassesUsingRecurringClassId = async (
         .flat(),
     });
 
-    return { createdClasses };
+    return createdClasses;
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to add classes.");

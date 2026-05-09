@@ -15,6 +15,7 @@ import {
   InstructorUnavailableError,
   rebookClass,
   updateClass,
+  cancelClassByInstructor,
 } from "../services/classesService";
 import {
   RequestWithParams,
@@ -552,7 +553,7 @@ export const createClassesForMonthController = async (
           .map((r) => r.instructorId)
           .filter(Boolean) as number[];
 
-        // Get instructors' unavailability
+        // Get instructor absences
         const instructorAbsences = await getInstructorAbsencesByMonth(
           instructorIds,
           firstDateOfMonth,
@@ -661,20 +662,9 @@ export const createClassesForMonthController = async (
                 !existingSet.has(`${instructorId}-${date.toISOString()}`),
             );
 
-            // Exclude the instructors' unavailability.
-            filtered = filtered.filter(
-              (date) =>
-                !absenceSet.has(`${instructorId}-${date.toISOString()}`),
-            );
-
             // Exclude the no class.
             filtered = filtered.filter(
               (date) => !noClassSet.has(toDateKey(date)),
-            );
-
-            // Exclude the rebokkable no class.
-            filtered = filtered.filter(
-              (date) => !rebookableSet.has(toDateKey(date)),
             );
 
             if (filtered.length === 0) return;
@@ -684,7 +674,7 @@ export const createClassesForMonthController = async (
             );
 
             // Create the classes and its attendance based on the recurring id.
-            await createClassesUsingRecurringClassId(
+            const createdClasses = await createClassesUsingRecurringClassId(
               tx,
               id,
               instructorId,
@@ -692,6 +682,25 @@ export const createClassesForMonthController = async (
               subscriptionId,
               childrenIds,
               filtered,
+            );
+
+            // Cancel class due to instructor absence or rebookable no class
+            await Promise.all(
+              createdClasses.map(async (createdClass) => {
+                if (!createdClass.dateTime) return;
+
+                const isInstructorAbsent = absenceSet.has(
+                  `${instructorId}-${createdClass.dateTime.toISOString()}`,
+                );
+
+                const isRebookableNoClass = rebookableSet.has(
+                  toDateKey(createdClass.dateTime),
+                );
+
+                if (isInstructorAbsent || isRebookableNoClass) {
+                  await cancelClassByInstructor(tx, createdClass.id);
+                }
+              }),
             );
           }),
         );
