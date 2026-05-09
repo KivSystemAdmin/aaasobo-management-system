@@ -50,6 +50,10 @@ export const DeleteSubscriptionResponse = z.object({
   id: z.number(),
 });
 
+export const CancelSubscriptionBody = z.object({
+  cancellationDate: z.string(),
+});
+
 // Update response schemas
 export const UpdateSubscriptionResponse = z.object({
   message: z.string(),
@@ -62,6 +66,7 @@ export type SubscriptionResponse = z.infer<typeof SubscriptionResponse>;
 export type DeleteSubscriptionResponse = z.infer<
   typeof DeleteSubscriptionResponse
 >;
+export type CancelSubscriptionBody = z.infer<typeof CancelSubscriptionBody>;
 export type UpdateSubscriptionResponse = z.infer<
   typeof UpdateSubscriptionResponse
 >;

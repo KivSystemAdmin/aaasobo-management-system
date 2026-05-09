@@ -100,3 +100,113 @@
     padding: 0 0.5rem;
   }
 }
+
+.progressiveFlow {
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  min-width: 400px;
+  background: white;
+}
+
+.modalHeader {
+  padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+  border-bottom: 1px solid $border-light;
+  background: white;
+
+  h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: $text-dark;
+    text-align: center;
+  }
+}
+
+.section {
+  border: 1px solid $border-light;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 1rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: $background-light;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: $text-dark;
+    flex: 1;
+  }
+}
+
+.sectionContent {
+  padding: 1rem;
+  background: white;
+}
+
+.dateInput {
+  padding: 0.75rem;
+  border: 1px solid $border-light;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  width: 100%;
+  max-width: 200px;
+
+  &:focus {
+    outline: none;
+    border-color: $blue_primary;
+    box-shadow: 0 0 0 3px rgba(65, 66, 152, 0.1);
+  }
+}
+
+.confirmationActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 1rem;
+  border-top: 1px solid $border-light;
+}
+
+.cancelButton {
+  background: transparent;
+  border: 1px solid $border-medium;
+  color: $text-medium;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: $background-light;
+    border-color: $text-light;
+  }
+}
+
+.confirmButton {
+  background: $green-success;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: $green-success-hover;
+  }
+
+  &:disabled {
+    background: $text-light;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
