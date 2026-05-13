@@ -218,3 +218,6 @@ export function convertToUTCDate(date: Date, timezoneFrom: string): Date {
       return date;
   }
 }
+
+// Extract only the date (e.g., "2026-05-21")
+export const toDateKey = (d: Date) => d.toISOString().split("T")[0];

@@ -323,6 +323,27 @@ export const cancelClassById = async (classId: number) => {
   });
 };
 
+// Cancel classes by instructor
+export const cancelClassByInstructor = async (
+  tx: Prisma.TransactionClient,
+  classId: number,
+) => {
+  const now = new Date();
+
+  await tx.classAttendance.deleteMany({
+    where: { classId },
+  });
+
+  await tx.class.update({
+    where: { id: classId },
+    data: {
+      status: "canceledByInstructor",
+      canceledAt: now,
+      updatedAt: now,
+    },
+  });
+};
+
 // Create classes based on the recurring class id
 export const createClassesUsingRecurringClassId = async (
   tx: Prisma.TransactionClient,
@@ -334,7 +355,7 @@ export const createClassesUsingRecurringClassId = async (
   dateTimes: Date[],
 ) => {
   try {
-    const createdClasses = await tx.class.createManyAndReturn({
+    await tx.class.createManyAndReturn({
       data: dateTimes.map((dateTime, index) => {
         return {
           recurringClassId,
@@ -343,10 +364,18 @@ export const createClassesUsingRecurringClassId = async (
           subscriptionId,
           status: "booked",
           dateTime,
+          rebookableUntil: nDaysLater(180, dateTime),
           updatedAt: new Date(),
           classCode: `${recurringClassId}-${index}`,
         };
       }),
+    });
+
+    const createdClasses = await tx.class.findMany({
+      where: {
+        recurringClassId,
+        dateTime: { in: dateTimes },
+      },
     });
 
     await tx.classAttendance.createMany({
@@ -360,7 +389,7 @@ export const createClassesUsingRecurringClassId = async (
         .flat(),
     });
 
-    return { createdClasses };
+    return createdClasses;
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to add classes.");
@@ -371,12 +400,13 @@ export const getExcludedClasses = async (
   tx: Prisma.TransactionClient,
   recurringClassIds: number[],
   date: Date,
+  until: Date,
 ) => {
   try {
     const excludedClassData = await tx.class.findMany({
       where: {
         recurringClassId: { in: recurringClassIds },
-        dateTime: { gte: date },
+        dateTime: { gte: date, lt: until },
       },
     });
 
