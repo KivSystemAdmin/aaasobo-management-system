@@ -42,6 +42,9 @@ KEY2="<generate_with_openssl_rand_hex_32>"
 RESEND_API_KEY="Dummy Resend API Key"
 AUTH_SECRET="<generate_with_openssl_rand_hex_32>"
 AUTH_SALT="next-auth.session-token"
+BOOTSTRAP_ADMIN_EMAIL="admin@example.com"
+BOOTSTRAP_ADMIN_NAME="Local Admin"
+BOOTSTRAP_ADMIN_PASSWORD="<local_admin_password>"
 ```
 
 Note that the following variables should be changed to match your local setup:
@@ -51,6 +54,7 @@ Note that the following variables should be changed to match your local setup:
 - `RESEND_API_KEY` is shared in the development team.
 - `AUTH_SECRET` must match the frontend `AUTH_SECRET` (same value).
 - `AUTH_SALT` must be `next-auth.session-token` (the session cookie name used by the frontend in this repo).
+- `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_NAME`, and `BOOTSTRAP_ADMIN_PASSWORD` are used by `npm run db:bootstrap` to create the first admin only when it does not already exist. Do not commit real production credentials.
 
 `KEY1` and `KEY2` are used for security purposes. They should be changed to a random string, for example, by running either of the following command:
 
@@ -74,9 +78,25 @@ npm run db:start
 
 #### Prisma
 
+Reset the local database, run migrations, and bootstrap required data:
+
 ```sh
 npm run prisma:init
 ```
+
+Run only the idempotent bootstrap seed for required production-safe data:
+
+```sh
+npm run db:bootstrap
+```
+
+Insert local dummy data explicitly when needed:
+
+```sh
+npm run seed:dummy
+```
+
+Vercel deploys run `npm run build`, which generates Prisma, applies migrations with `prisma migrate deploy`, and then runs the idempotent bootstrap seed.
 
 #### Tests
 

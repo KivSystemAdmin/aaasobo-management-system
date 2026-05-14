@@ -24,11 +24,14 @@ AaasoBo! is an online English conversation service run by a Japanese NPO that ta
 - **Development**: `npm run dev` (starts with nodemon and ts-node)
 - **Database**:
   - Start PostgreSQL: `npm run db:start` (Docker container)
-  - Initialize/Reset DB: `npm run prisma:init` (runs migrations + seed)
+  - Initialize/Reset DB: `npm run prisma:init` (runs migrations + bootstrap)
+  - Apply migrations: `npm run db:migrate` (production-safe migration deploy)
+  - Bootstrap required data: `npm run db:bootstrap` (idempotent, production-safe seed)
+  - Insert dummy data: `npm run seed:dummy` (manual local/demo seed)
 - **Testing**: `npm run test` (Vitest)
 - **Unused Code Check**: `npm run lint:unused`
 - **Formatting**: `npm run format` (Prettier + Prisma format)
-- **Build**: `npm run build` (generates Prisma client, resets DB, runs dummy seed)
+- **Build**: `npm run build` (installs shared dependencies, generates Prisma client, applies migrations, and bootstraps required data)
 
 ### Frontend
 - **Setup**: `cd frontend && npm install`
