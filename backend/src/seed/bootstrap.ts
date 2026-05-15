@@ -8,33 +8,6 @@ const adapter = new PrismaPg({
 });
 const prisma = new PrismaClient({ adapter });
 
-const defaultPlans = [
-  {
-    name: "月3,180円プラン / 3,180 yen/month Plan",
-    description: "2 classes per week",
-    weeklyClassTimes: 2,
-    englishBackground: 0,
-  },
-  {
-    name: "月7,980円プラン / 7,980 yen/month Plan",
-    description: "5 classes per week",
-    weeklyClassTimes: 5,
-    englishBackground: 0,
-  },
-  {
-    name: "月5,980円プラン / 5,980 yen/month Plan",
-    description: "1 classes per week",
-    weeklyClassTimes: 1,
-    englishBackground: 1,
-  },
-  {
-    name: "月10,800円プラン / 10,800 yen/month Plan",
-    description: "2 classes per week",
-    weeklyClassTimes: 2,
-    englishBackground: 2,
-  },
-];
-
 async function ensureSystemStatus() {
   const existing = await prisma.systemStatus.findFirst({
     select: { id: true },
@@ -87,30 +60,9 @@ async function ensureBootstrapAdmin() {
   console.log(`Created bootstrap admin ${email}.`);
 }
 
-async function ensureDefaultPlans() {
-  for (const plan of defaultPlans) {
-    const existing = await prisma.plan.findFirst({
-      where: {
-        name: plan.name,
-        terminationAt: null,
-      },
-      select: { id: true },
-    });
-
-    if (existing) {
-      console.log(`Plan already exists: ${plan.name}. Skipping.`);
-      continue;
-    }
-
-    await prisma.plan.create({ data: plan });
-    console.log(`Created plan: ${plan.name}.`);
-  }
-}
-
 async function main() {
   await ensureSystemStatus();
   await ensureBootstrapAdmin();
-  await ensureDefaultPlans();
 }
 
 main()
