@@ -50,13 +50,14 @@ const sendPasswordResetConfig = {
     summary: "Send password reset email",
     description: "Send password reset email",
     responses: {
-      201: { description: "Password reset email sent successfully" },
+      202: {
+        description:
+          "Password reset request accepted if the account can receive email",
+      },
       400: {
         description: "Bad request - validation failed",
         schema: ErrorResponse,
       },
-      404: { description: "User not found" },
-      503: { description: "Service unavailable - failed to send email" },
     },
   },
 } as const;

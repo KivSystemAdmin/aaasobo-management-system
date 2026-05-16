@@ -139,7 +139,7 @@ export const sendUserResetEmailController = async (
     const user = await getUserByEmail(userType, normalizedEmail);
 
     if (!user) {
-      return res.sendStatus(404);
+      return res.sendStatus(202);
     }
 
     const passwordResetToken = await generatePasswordResetToken(user.email);
@@ -153,10 +153,17 @@ export const sendUserResetEmailController = async (
 
     if (!sendResult.success) {
       await deletePasswordResetToken(passwordResetToken.email);
-      return res.sendStatus(503); // Failed to send password reset email. 503 Service Unavailable
+      console.error("Failed to send password reset email", {
+        context: {
+          email: normalizedEmail,
+          userType,
+          time: new Date().toISOString(),
+        },
+      });
+      return res.sendStatus(202);
     }
 
-    return res.sendStatus(201);
+    return res.sendStatus(202);
   } catch (error) {
     console.error("Error sending password reset email", {
       error,
@@ -166,7 +173,7 @@ export const sendUserResetEmailController = async (
         time: new Date().toISOString(),
       },
     });
-    res.sendStatus(500);
+    res.sendStatus(202);
   }
 };
 
