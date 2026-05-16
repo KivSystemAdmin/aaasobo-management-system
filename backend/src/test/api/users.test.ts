@@ -131,6 +131,24 @@ describe("POST /users/authenticate", () => {
   });
 });
 
+describe("CORS error handling", () => {
+  it("returns a generic forbidden response for disallowed origins", async () => {
+    const response = await request(server)
+      .post("/users/authenticate")
+      .set("Origin", "https://evil.example")
+      .send({
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+        userType: "admin",
+      })
+      .expect(403);
+
+    expect(response.body).toEqual({ message: "Forbidden origin" });
+    expect(response.text).not.toContain("src/server.ts");
+    expect(response.text).not.toContain("node_modules");
+  });
+});
+
 describe("POST /users/send-password-reset", () => {
   it("succeed for existing admin", async () => {
     const adminData = generateTestAdmin();
@@ -142,7 +160,7 @@ describe("POST /users/send-password-reset", () => {
         email: adminData.email,
         userType: "admin",
       })
-      .expect(201);
+      .expect(202);
 
     // Verify token was created in database
     const token = await prisma.passwordResetToken.findFirst({
@@ -162,7 +180,7 @@ describe("POST /users/send-password-reset", () => {
         email: customerData.email,
         userType: "customer",
       })
-      .expect(201);
+      .expect(202);
 
     const token = await prisma.passwordResetToken.findFirst({
       where: { email: customerData.email },
@@ -180,7 +198,7 @@ describe("POST /users/send-password-reset", () => {
         email: instructorData.email,
         userType: "instructor",
       })
-      .expect(201);
+      .expect(202);
 
     const token = await prisma.passwordResetToken.findFirst({
       where: { email: instructorData.email },
@@ -188,14 +206,14 @@ describe("POST /users/send-password-reset", () => {
     expect(token).toBeTruthy();
   });
 
-  it("fail with non-existent user", async () => {
+  it("returns the same accepted response for non-existent user", async () => {
     await request(server)
       .post("/users/send-password-reset")
       .send({
         email: faker.internet.email(),
         userType: "admin",
       })
-      .expect(404);
+      .expect(202);
   });
 });
 

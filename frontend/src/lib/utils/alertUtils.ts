@@ -1,18 +1,10 @@
 import Swal from "sweetalert2";
 
-const buildAlertHtml = (text: string): string => `
-  <div style="text-align:center;">
-    <div style="display:inline-block; text-align:left; margin:0 auto; max-width: 100%; width: fit-content; white-space: normal; overflow-wrap: break-word;">
-      ${text}
-    </div>
-  </div>
-`;
-
 export const confirmAlert: (text: string) => Promise<boolean> = (
   text: string,
 ) => {
   const result = Swal.fire({
-    html: buildAlertHtml(text),
+    text,
     icon: "warning",
     confirmButtonText: "OK",
     cancelButtonText: "Cancel",
@@ -36,7 +28,7 @@ export const successAlert: (text: string) => Promise<void> = async (
   text: string,
 ) => {
   Swal.fire({
-    html: buildAlertHtml(text),
+    text,
     icon: "success",
     confirmButtonText: "OK",
     showConfirmButton: true,
@@ -51,7 +43,7 @@ export const errorAlert: (text: string) => Promise<void> = async (
   text: string,
 ) => {
   Swal.fire({
-    html: buildAlertHtml(text),
+    text,
     icon: "error",
     confirmButtonText: "OK",
     showConfirmButton: true,
@@ -66,7 +58,7 @@ export const warningAlert: (text: string) => Promise<void> = async (
   text: string,
 ) => {
   Swal.fire({
-    html: buildAlertHtml(text),
+    text,
     icon: "warning",
     confirmButtonText: "OK",
     showConfirmButton: true,
