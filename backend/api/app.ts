@@ -5,4 +5,8 @@ dotenv.config();
 
 const PORT = process.env.PORT;
 
-server.listen(PORT, () => console.log(`[Server]: http://localhost:${PORT}`));
+if (!process.env.VERCEL) {
+  server.listen(PORT, () => console.log(`[Server]: http://localhost:${PORT}`));
+}
+
+export default server;
