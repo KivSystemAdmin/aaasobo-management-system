@@ -1,7 +1,7 @@
 const isProduction = process.env.NODE_ENV === "production";
 
 const scriptSrc = isProduction
-  ? "script-src 'self'"
+  ? "script-src 'self' 'unsafe-inline'"
   : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
 
 const connectSrc = isProduction
