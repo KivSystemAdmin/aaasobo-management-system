@@ -53,6 +53,7 @@ import {
   registerEvent,
   updateEvent,
   deleteEvent,
+  isProtectedDefaultEvent,
 } from "../services/eventsService";
 import { getAllSubscriptions } from "../services/subscriptionsService";
 import {
@@ -1051,6 +1052,12 @@ export const updateEventProfileController = async (
   const normalizedColorCode = color.toLowerCase().replace(/\s/g, "");
 
   try {
+    if (await isProtectedDefaultEvent(eventId)) {
+      return res.status(403).json({
+        error: "Default events cannot be updated.",
+      });
+    }
+
     // Check if the event with the same name and color already exists
     const existingEvents = await getAllEvents();
 
@@ -1105,6 +1112,12 @@ export const deleteEventController = async (
   const eventId = req.params.id;
 
   try {
+    if (await isProtectedDefaultEvent(eventId)) {
+      return res.status(403).json({
+        error: "Default events cannot be deleted.",
+      });
+    }
+
     const deletedEvent = await deleteEvent(eventId);
 
     res.status(200).json({
@@ -1205,6 +1218,9 @@ export const getClassesWithinPeriodController = async (
           break;
         case "canceledByInstructor":
           statusText = "Canceled(Instructor)";
+          break;
+        case "canceledByAdmin":
+          statusText = "Canceled(Admin)";
           break;
         case "rebooked":
           statusText = "Rebooked";

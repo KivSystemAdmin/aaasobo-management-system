@@ -88,3 +88,11 @@
     color: inherit !important;
   }
 }
+
+.businessEvent {
+  opacity: 0.22 !important;
+
+  :global(.fc-event-main) {
+    color: inherit !important;
+  }
+}

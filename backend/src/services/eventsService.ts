@@ -1,4 +1,5 @@
 import { prisma } from "../../prisma/prismaClient";
+import { PROTECTED_DEFAULT_EVENT_NAMES } from "../utils/commonUtils";
 
 // Register a new event in the DB
 export const registerEvent = async (data: { name: string; color: string }) => {
@@ -31,6 +32,14 @@ export async function getEventById(id: number) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch event.");
   }
+}
+
+export async function isProtectedDefaultEvent(id: number) {
+  const event = await getEventById(id);
+  return (
+    !!event &&
+    PROTECTED_DEFAULT_EVENT_NAMES.some((eventName) => eventName === event.name)
+  );
 }
 
 // Update the selected event

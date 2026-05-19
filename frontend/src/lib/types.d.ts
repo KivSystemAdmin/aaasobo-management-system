@@ -23,6 +23,7 @@ type ClassStatus =
   | "completed"
   | "canceledByCustomer"
   | "canceledByInstructor"
+  | "canceledByAdmin"
   | "pending"
   | "rebooked"
   | "freeTrial";

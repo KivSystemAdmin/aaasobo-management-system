@@ -321,6 +321,7 @@ enum Status {
   completed
   canceledByCustomer
   canceledByInstructor
+  canceledByAdmin
   pending
   rebooked
   declined

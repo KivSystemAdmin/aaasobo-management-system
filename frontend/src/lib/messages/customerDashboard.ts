@@ -115,6 +115,11 @@ export const CANCELED_BY_INSTRUCTOR_NOTICE = {
   en: "Classes canceled by the instructor count toward your rebookable class total and are valid for 180 days.",
 };
 
+export const CANCELED_BY_ADMIN_NOTICE = {
+  ja: "事務局の都合でキャンセルとなったクラスは、振替可能クラスとしてカウントされ、180日間有効です。",
+  en: "Classes canceled by AaasoBo! count toward your rebookable class total and are valid for 180 days.",
+};
+
 export const CANCELED_BY_CUSTOMER_NOTICE = {
   ja: "前日まで（日本時間基準）にキャンセルされたクラスは、180日間振替可能です。当日キャンセルは振替できませんのでご了承ください。",
   en: "Cancellations made by the day before (Japan time) are rebookable within 180 days. For multiple cancellations, the period starts from the original booking. Same-day cancellations aren't rebookable.",

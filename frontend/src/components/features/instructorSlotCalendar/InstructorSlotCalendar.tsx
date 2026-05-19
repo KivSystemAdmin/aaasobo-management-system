@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import type {
@@ -10,7 +10,9 @@ import type {
   EventSourceFuncArg,
 } from "@fullcalendar/core";
 import Calendar from "@/components/features/calendar/Calendar";
+import CalendarLegend from "@/components/features/calendarLegend/CalendarLegend";
 import { getInstructorCalendarSlots } from "@/lib/api/instructorsApi";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type {
   InstructorCalendarSlot,
   InstructorCalendarSlotType,
@@ -23,7 +25,17 @@ type SlotCalendarEvent = {
   end: string;
   title: string;
   color: string;
+  backgroundColor?: string;
+  borderColor?: string;
   textColor: string;
+  allDay?: boolean;
+  display?:
+    | "auto"
+    | "block"
+    | "list-item"
+    | "background"
+    | "inverse-background"
+    | "none";
   extendedProps: {
     slotType: InstructorCalendarSlotType;
     classId?: number;
@@ -38,7 +50,10 @@ type InstructorSlotCalendarProps = {
   calendarOptions?: Partial<CalendarOptions>;
 };
 
+type TimedSlotType = Exclude<InstructorCalendarSlotType, "businessEvent">;
+
 const SLOT_LABELS: Record<InstructorCalendarSlotType, string> = {
+  businessEvent: "Event",
   open: "Open",
   booked: "Booked",
   rebooked: "Booked",
@@ -48,6 +63,7 @@ const SLOT_LABELS: Record<InstructorCalendarSlotType, string> = {
 };
 
 const SLOT_SYMBOLS: Record<InstructorCalendarSlotType, string> = {
+  businessEvent: "◆",
   open: "○",
   booked: "●",
   rebooked: "●",
@@ -75,9 +91,13 @@ const buildSlotEvent = (slot: InstructorCalendarSlot): SlotCalendarEvent => ({
   id: `${slot.slotType}-${slot.classId ?? slot.start}`,
   start: slot.start,
   end: slot.end,
-  title: slot.title,
-  color: "#FFFFFF",
+  title: slot.slotType === "businessEvent" ? "" : slot.title,
+  color: slot.slotType === "businessEvent" ? slot.color : "#FFFFFF",
+  backgroundColor: slot.slotType === "businessEvent" ? slot.color : "#FFFFFF",
+  borderColor: slot.slotType === "businessEvent" ? slot.color : "#FFFFFF",
   textColor: "#111827",
+  allDay: slot.allDay,
+  display: slot.slotType === "businessEvent" ? "background" : "auto",
   extendedProps: {
     slotType: slot.slotType,
     classId: slot.classId,
@@ -92,6 +112,10 @@ export default function InstructorSlotCalendar({
   calendarOptions,
 }: InstructorSlotCalendarProps) {
   const router = useRouter();
+  const { language } = useLanguage();
+  const [businessEventLegend, setBusinessEventLegend] = useState<
+    { event: string; color: string }[]
+  >([]);
 
   const fetchCalendarEvents = useCallback(
     async (info: EventSourceFuncArg) => {
@@ -107,9 +131,24 @@ export default function InstructorSlotCalendar({
           endStr,
         );
 
+        const seenEvents = new Set<string>();
+        setBusinessEventLegend(
+          response.data
+            .filter((slot) => slot.slotType === "businessEvent")
+            .flatMap((slot) => {
+              const key = `${slot.title}-${slot.color}`;
+              if (seenEvents.has(key)) {
+                return [];
+              }
+              seenEvents.add(key);
+              return [{ event: slot.title, color: slot.color }];
+            }),
+        );
+
         return response.data.map(buildSlotEvent);
       } catch (error) {
         console.error("Failed to fetch instructor calendar slots:", error);
+        setBusinessEventLegend([]);
         return [];
       }
     },
@@ -133,6 +172,11 @@ export default function InstructorSlotCalendar({
   const renderEventContent = useCallback((eventInfo: EventContentArg) => {
     const slotType = eventInfo.event.extendedProps
       .slotType as InstructorCalendarSlotType;
+
+    if (slotType === "businessEvent") {
+      return null;
+    }
+
     const isClickable = CLICKABLE_SLOT_TYPES.includes(slotType);
     const titleText =
       eventInfo.event.title &&
@@ -162,31 +206,43 @@ export default function InstructorSlotCalendar({
   }, []);
 
   return (
-    <Calendar
-      key={refreshKey}
-      height="auto"
-      contentHeight="auto"
-      events={fetchCalendarEvents}
-      eventClick={handleEventClick}
-      eventContent={renderEventContent}
-      eventClassNames={(arg) => {
-        const slotType = arg.event.extendedProps
-          .slotType as InstructorCalendarSlotType;
+    <>
+      <Calendar
+        key={refreshKey}
+        height="auto"
+        contentHeight="auto"
+        events={fetchCalendarEvents}
+        eventClick={handleEventClick}
+        eventContent={renderEventContent}
+        eventClassNames={(arg) => {
+          const slotType = arg.event.extendedProps
+            .slotType as InstructorCalendarSlotType;
 
-        const classMap: Record<InstructorCalendarSlotType, string> = {
-          open: styles.slotOpen,
-          booked: styles.slotBooked,
-          rebooked: styles.slotBooked,
-          completed: styles.slotCompleted,
-          canceledByInstructor: styles.slotCanceled,
-          absence: styles.slotAbsent,
-        };
+          if (slotType === "businessEvent") {
+            return [styles.businessEvent];
+          }
 
-        return [styles.calendarEvent, classMap[slotType]];
-      }}
-      selectable={false}
-      headerRight={headerRight}
-      {...calendarOptions}
-    />
+          const classMap: Record<TimedSlotType, string> = {
+            open: styles.slotOpen,
+            booked: styles.slotBooked,
+            rebooked: styles.slotBooked,
+            completed: styles.slotCompleted,
+            canceledByInstructor: styles.slotCanceled,
+            absence: styles.slotAbsent,
+          };
+
+          return [styles.calendarEvent, classMap[slotType as TimedSlotType]];
+        }}
+        selectable={false}
+        headerRight={headerRight}
+        {...calendarOptions}
+      />
+      {businessEventLegend.length > 0 && (
+        <CalendarLegend
+          colorsForEvents={businessEventLegend}
+          language={language}
+        />
+      )}
+    </>
   );
 }

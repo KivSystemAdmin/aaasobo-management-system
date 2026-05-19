@@ -273,7 +273,7 @@ export const updateClass = async (
 ) => {
   const now = new Date();
 
-  if (status === "canceledByInstructor") {
+  if (status === "canceledByInstructor" || status === "canceledByAdmin") {
     await prisma.$transaction(async (tx) => {
       await tx.class.update({
         where: { id },
@@ -340,6 +340,24 @@ export const cancelClassByInstructor = async (
       status: "canceledByInstructor",
       canceledAt: now,
       updatedAt: now,
+    },
+  });
+};
+
+export const cancelClassByAdmin = async (
+  tx: Prisma.TransactionClient,
+  classId: number,
+  classDateTime: Date,
+) => {
+  const now = new Date();
+
+  await tx.class.update({
+    where: { id: classId },
+    data: {
+      status: "canceledByAdmin",
+      canceledAt: now,
+      updatedAt: now,
+      rebookableUntil: nDaysLater(180, classDateTime),
     },
   });
 };
@@ -488,7 +506,14 @@ export const getRebookableClasses = async (customerId: number) => {
     where: {
       customerId,
       isFreeTrial: false,
-      status: { in: ["canceledByCustomer", "canceledByInstructor", "pending"] },
+      status: {
+        in: [
+          "canceledByCustomer",
+          "canceledByInstructor",
+          "canceledByAdmin",
+          "pending",
+        ],
+      },
       rebookableUntil: {
         gte: rebookableFrom,
       },
@@ -508,7 +533,14 @@ export const getRebookableClasses = async (customerId: number) => {
     where: {
       customerId,
       isFreeTrial: true,
-      status: { in: ["canceledByCustomer", "canceledByInstructor", "pending"] },
+      status: {
+        in: [
+          "canceledByCustomer",
+          "canceledByInstructor",
+          "canceledByAdmin",
+          "pending",
+        ],
+      },
       rebookableUntil: {
         gte: freeTrialBookableFrom,
       },
@@ -648,6 +680,7 @@ export const getCustomerClasses = async (customerId: number) => {
       rebooked: REBOOKED_CLASS_COLOR,
       canceledByCustomer: CANCELED_CLASS_COLOR,
       canceledByInstructor: CANCELED_CLASS_COLOR,
+      canceledByAdmin: CANCELED_CLASS_COLOR,
       completed: COMPLETED_CLASS_COLOR,
     };
 
@@ -690,7 +723,13 @@ export const getCalendarClasses = async (instructorId: number) => {
     where: {
       instructorId: instructorId,
       status: {
-        in: ["booked", "rebooked", "completed", "canceledByInstructor"],
+        in: [
+          "booked",
+          "rebooked",
+          "completed",
+          "canceledByInstructor",
+          "canceledByAdmin",
+        ],
       },
     },
     orderBy: {
@@ -716,6 +755,7 @@ export const getCalendarClasses = async (instructorId: number) => {
       booked: REGULAR_CLASS_COLOR,
       rebooked: REBOOKED_CLASS_COLOR,
       canceledByInstructor: CANCELED_CLASS_COLOR,
+      canceledByAdmin: CANCELED_CLASS_COLOR,
       completed: COMPLETED_CLASS_COLOR,
     };
 
@@ -771,7 +811,8 @@ export const rebookClass = async (
     // If the old class status is "canceled", update the rebookableUntil field to null to prevent further rebooking.
     if (
       oldClass.status === "canceledByCustomer" ||
-      oldClass.status === "canceledByInstructor"
+      oldClass.status === "canceledByInstructor" ||
+      oldClass.status === "canceledByAdmin"
     ) {
       await tx.class.update({
         where: { id: oldClass.id },
@@ -959,7 +1000,13 @@ export const getSameDateClasses = async (
     where: {
       instructorId,
       status: {
-        in: ["booked", "rebooked", "canceledByInstructor", "completed"],
+        in: [
+          "booked",
+          "rebooked",
+          "canceledByInstructor",
+          "canceledByAdmin",
+          "completed",
+        ],
       },
       dateTime: {
         gte: startOfDay,

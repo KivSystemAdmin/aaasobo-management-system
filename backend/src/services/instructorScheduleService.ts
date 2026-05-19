@@ -9,6 +9,10 @@ import {
   REBOOKED_CLASS_COLOR,
   REGULAR_CLASS_COLOR,
 } from "../utils/colors";
+import {
+  NO_CLASS_EVENT_NAME,
+  REBOOKABLE_NO_CLASS_EVENT_NAME,
+} from "../utils/commonUtils";
 
 function findFirstSlotOccurrenceOnOrAfter(
   effectiveFrom: Date,
@@ -381,52 +385,78 @@ export const getInstructorCalendarSlots = async (
       throw new Error("Only Asia/Tokyo timezone is supported");
     }
 
-    const [schedules, absences, classes] = await Promise.all([
-      prisma.instructorSchedule.findMany({
-        where: {
-          instructorId,
-          timezone: "Asia/Tokyo",
-          effectiveFrom: { lt: new Date(endDate) },
-          OR: [
-            { effectiveTo: null },
-            { effectiveTo: { gt: new Date(startDate) } },
-          ],
-        },
-        include: {
-          slots: { orderBy: [{ weekday: "asc" }, { startTime: "asc" }] },
-        },
-        orderBy: { effectiveFrom: "asc" },
-      }),
-      prisma.instructorAbsence.findMany({
-        where: {
-          instructorId,
-          absentAt: { gte: jst(startDate), lt: jst(endDate) },
-        },
-      }),
-      prisma.class.findMany({
-        where: {
-          instructorId,
-          dateTime: {
-            gte: jst(startDate),
-            lt: jst(endDate),
+    const [schedules, absences, classes, businessSchedules] = await Promise.all(
+      [
+        prisma.instructorSchedule.findMany({
+          where: {
+            instructorId,
+            timezone: "Asia/Tokyo",
+            effectiveFrom: { lt: new Date(endDate) },
+            OR: [
+              { effectiveTo: null },
+              { effectiveTo: { gt: new Date(startDate) } },
+            ],
           },
-          status: {
-            in: ["booked", "rebooked", "completed"],
+          include: {
+            slots: { orderBy: [{ weekday: "asc" }, { startTime: "asc" }] },
           },
-        },
-        include: {
-          classAttendance: {
-            include: {
-              children: {
-                select: {
-                  name: true,
+          orderBy: { effectiveFrom: "asc" },
+        }),
+        prisma.instructorAbsence.findMany({
+          where: {
+            instructorId,
+            absentAt: { gte: jst(startDate), lt: jst(endDate) },
+          },
+        }),
+        prisma.class.findMany({
+          where: {
+            instructorId,
+            dateTime: {
+              gte: jst(startDate),
+              lt: jst(endDate),
+            },
+            status: {
+              in: ["booked", "rebooked", "completed"],
+            },
+          },
+          include: {
+            classAttendance: {
+              include: {
+                children: {
+                  select: {
+                    name: true,
+                  },
                 },
               },
             },
           },
-        },
-      }),
-    ]);
+        }),
+        prisma.schedule.findMany({
+          where: {
+            date: {
+              gte: new Date(startDate),
+              lt: new Date(endDate),
+            },
+          },
+          include: {
+            event: true,
+          },
+          orderBy: {
+            date: "asc",
+          },
+        }),
+      ],
+    );
+
+    const noClassBusinessDateKeys = new Set(
+      businessSchedules
+        .filter((schedule) =>
+          [NO_CLASS_EVENT_NAME, REBOOKABLE_NO_CLASS_EVENT_NAME].includes(
+            schedule.event.name,
+          ),
+        )
+        .map((schedule) => extractDate(schedule.date)),
+    );
 
     const occupiedDateTimes = new Set<string>();
     for (const absence of absences) {
@@ -448,15 +478,33 @@ export const getInstructorCalendarSlots = async (
           (dateTime) => `${instructorId}-${dateTime}`,
         ),
       ),
-    ).map((slot) => ({
-      start: slot.dateTime,
-      end: new Date(
-        new Date(slot.dateTime).getTime() + 25 * 60000,
-      ).toISOString(),
-      title: "Open",
-      color: "#A2B098",
-      slotType: "open" as const,
-    }));
+    )
+      .filter(
+        (slot) =>
+          !noClassBusinessDateKeys.has(toJstDateKey(new Date(slot.dateTime))),
+      )
+      .map((slot) => ({
+        start: slot.dateTime,
+        end: new Date(
+          new Date(slot.dateTime).getTime() + 25 * 60000,
+        ).toISOString(),
+        title: "Open",
+        color: "#A2B098",
+        slotType: "open" as const,
+      }));
+
+    const businessEventSlots = businessSchedules.map((schedule) => {
+      const dateKey = extractDate(schedule.date);
+
+      return {
+        start: dateKey,
+        end: addDaysToDateKey(dateKey, 1),
+        title: schedule.event.name,
+        color: schedule.event.color,
+        slotType: "businessEvent" as const,
+        allDay: true,
+      };
+    });
 
     const absenceSlots = absences.map((absence) => ({
       start: absence.absentAt.toISOString(),
@@ -499,9 +547,12 @@ export const getInstructorCalendarSlots = async (
         };
       });
 
-    return [...openSlots, ...classSlots, ...absenceSlots].sort((a, b) =>
-      a.start.localeCompare(b.start),
-    );
+    return [
+      ...businessEventSlots,
+      ...openSlots,
+      ...classSlots,
+      ...absenceSlots,
+    ].sort((a, b) => a.start.localeCompare(b.start));
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch instructor calendar slots.");
@@ -632,6 +683,7 @@ interface InstructorCalendarSlot {
   title: string;
   color: string;
   slotType:
+    | "businessEvent"
     | "open"
     | "booked"
     | "rebooked"
@@ -639,6 +691,7 @@ interface InstructorCalendarSlot {
     | "canceledByInstructor"
     | "absence";
   classId?: number;
+  allDay?: boolean;
 }
 
 // Extract time string (HH:MM) from DateTime
@@ -649,6 +702,18 @@ const extractTime = (dateTime: Date): string => {
 // Extract date string (YYYY-MM-DD) from DateTime
 const extractDate = (dateTime: Date): string => {
   return dateTime.toISOString().split("T")[0];
+};
+
+const addDaysToDateKey = (dateKey: string, days: number): string => {
+  const date = new Date(`${dateKey}T00:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return extractDate(date);
+};
+
+const toJstDateKey = (dateTime: Date): string => {
+  return extractDate(
+    new Date(dateTime.getTime() + JAPAN_TIME_DIFF * 60 * 60 * 1000),
+  );
 };
 
 // Create a Date object in JST (Japan Standard Time) from a date string

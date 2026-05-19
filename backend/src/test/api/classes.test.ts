@@ -8,11 +8,13 @@ import {
   createClass,
   createClassAttendance,
   createCustomer,
+  createEvent,
   createInstructor,
   createInstructorAbsence,
   createInstructorSchedule,
   createInstructorSlot,
   createPlan,
+  createSchedule,
   createSubscription,
   generateAuthCookie,
 } from "../testUtils";
@@ -211,6 +213,42 @@ describe("POST /classes/:id/rebook", () => {
         where: { classId: rebookedClass!.id },
       }),
     ).toEqual([expect.objectContaining({ childrenId: child.id })]);
+  });
+
+  it("succeed rebooking an admin-canceled class and clears original rebookable deadline", async () => {
+    const admin = await createAdmin();
+    const customer = await createCustomer();
+    const instructor = await createInstructor();
+    const child = await createChild(customer.id);
+    const originalClass = await createClass(
+      customer.id,
+      instructor.id,
+      daysFromNow(2),
+      {
+        status: "canceledByAdmin",
+        canceledAt: new Date(),
+        isFreeTrial: true,
+        rebookableUntil: daysFromNow(30),
+      },
+    );
+
+    const newClassDate = utcDateAtMidnight(daysFromNow(7));
+    await ensureInstructorSlotAt(instructor.id, newClassDate);
+    await request(server)
+      .post(`/classes/${originalClass.id}/rebook`)
+      .set("Cookie", await generateAuthCookie(admin.id, "admin"))
+      .send({
+        dateTime: newClassDate.toISOString(),
+        instructorId: instructor.id,
+        customerId: customer.id,
+        childrenIds: [child.id],
+      })
+      .expect(201);
+
+    const updatedOriginalClass = await prisma.class.findUnique({
+      where: { id: originalClass.id },
+    });
+    expect(updatedOriginalClass?.rebookableUntil).toBeNull();
   });
 
   it("failed when slot is already booked by instructor", async () => {
@@ -461,7 +499,7 @@ describe("POST /classes/create-classes", () => {
       data: {
         instructorId: instructor.id,
         subscriptionId: subscription.id,
-        startAt: new Date("2023-01-01T00:00:00.000Z"),
+        startAt: new Date("2023-01-01T09:00:00.000Z"),
         recurringClassAttendance: {
           create: {
             childrenId: child.id,
@@ -484,6 +522,80 @@ describe("POST /classes/create-classes", () => {
       where: { recurringClassId: recurringClass.id },
     });
     expect(created.length).toBeGreaterThan(0);
+  });
+
+  it("uses no-class event names when generating classes for month", async () => {
+    const admin = await createAdmin();
+    const customer = await createCustomer();
+    const instructor = await createInstructor();
+    const child = await createChild(customer.id);
+    const plan = await createPlan();
+    const subscription = await createSubscription(plan.id, customer.id, {
+      startAt: new Date("2023-01-01T00:00:00.000Z"),
+      endAt: new Date("2025-12-31T00:00:00.000Z"),
+    });
+    const recurringClass = await prisma.recurringClass.create({
+      data: {
+        instructorId: instructor.id,
+        subscriptionId: subscription.id,
+        startAt: new Date("2023-01-01T12:00:00.000Z"),
+        recurringClassAttendance: {
+          create: {
+            childrenId: child.id,
+          },
+        },
+      },
+    });
+    const noClassEvent = await createEvent({
+      name: "お休み / No Class",
+      color: "#111111",
+    });
+    const rebookableEvent = await createEvent({
+      name: "お休み振替対象日 / No Class (Rebookable)",
+      color: "#222222",
+    });
+    await createSchedule(noClassEvent.id, new Date("2024-01-07T00:00:00.000Z"));
+    await createSchedule(
+      rebookableEvent.id,
+      new Date("2024-01-14T00:00:00.000Z"),
+    );
+
+    await request(server)
+      .post("/classes/create-classes")
+      .set("Cookie", await generateAuthCookie(admin.id, "admin"))
+      .send({
+        year: 2024,
+        month: "January",
+      })
+      .expect(201);
+
+    const noClassDate = await prisma.class.findFirst({
+      where: {
+        recurringClassId: recurringClass.id,
+        dateTime: {
+          gte: new Date("2024-01-07T00:00:00.000Z"),
+          lt: new Date("2024-01-08T00:00:00.000Z"),
+        },
+      },
+    });
+    const rebookableClass = await prisma.class.findFirst({
+      where: {
+        recurringClassId: recurringClass.id,
+        dateTime: {
+          gte: new Date("2024-01-14T00:00:00.000Z"),
+          lt: new Date("2024-01-15T00:00:00.000Z"),
+        },
+      },
+    });
+
+    expect(noClassDate).toBeNull();
+    expect(rebookableClass?.status).toBe("canceledByAdmin");
+    expect(rebookableClass?.canceledAt).toBeTruthy();
+    expect(rebookableClass?.rebookableUntil?.toISOString()).toBe(
+      new Date(
+        rebookableClass!.dateTime!.getTime() + 180 * 24 * 60 * 60 * 1000,
+      ).toISOString(),
+    );
   });
 
   it("fail without authentication", async () => {

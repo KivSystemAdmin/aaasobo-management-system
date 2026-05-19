@@ -13,7 +13,8 @@
   &.completed {
     border-top: 17px solid $completed-background-color;
   }
-  &.canceledByInstructor {
+  &.canceledByInstructor,
+  &.canceledByAdmin {
     border-top: 17px solid $gray-canceled-by-instructor;
   }
   &.canceledByCustomer {
