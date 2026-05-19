@@ -33,7 +33,8 @@
   &.completed {
     border-left: 8px solid $completed-background-color;
   }
-  &.canceledByInstructor {
+  &.canceledByInstructor,
+  &.canceledByAdmin {
     border-left: 8px solid $gray-canceled-by-instructor;
   }
   &.freeTrial {

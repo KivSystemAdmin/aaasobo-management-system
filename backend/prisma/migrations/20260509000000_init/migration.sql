@@ -2,7 +2,7 @@
 CREATE SCHEMA IF NOT EXISTS "public";
 
 -- CreateEnum
-CREATE TYPE "Status" AS ENUM ('booked', 'completed', 'canceledByCustomer', 'canceledByInstructor', 'pending', 'rebooked', 'declined');
+CREATE TYPE "Status" AS ENUM ('booked', 'completed', 'canceledByCustomer', 'canceledByInstructor', 'canceledByAdmin', 'pending', 'rebooked', 'declined');
 
 -- CreateTable
 CREATE TABLE "Instructor" (

@@ -7,6 +7,7 @@ import styles from "./ClassNotification.module.scss";
 import {
   CANCELED_BY_CUSTOMER_NOTICE,
   CANCELED_BY_INSTRUCTOR_NOTICE,
+  CANCELED_BY_ADMIN_NOTICE,
 } from "@/lib/messages/customerDashboard";
 import SameDayCancellationNotice from "../sameDayCancellationNotice/SameDayCancellationNotice";
 import InfoBanner from "@/components/elements/infoBanner/InfoBanner";
@@ -65,6 +66,9 @@ const ClassNotification = ({
 
       case classStatus === "canceledByInstructor":
         return CANCELED_BY_INSTRUCTOR_NOTICE[language];
+
+      case classStatus === "canceledByAdmin":
+        return CANCELED_BY_ADMIN_NOTICE[language];
 
       case classStatus === "canceledByCustomer":
         return CANCELED_BY_CUSTOMER_NOTICE[language];

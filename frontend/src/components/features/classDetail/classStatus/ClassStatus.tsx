@@ -23,6 +23,7 @@ const ClassStatus = ({
     rebooked: CheckCircleIcon,
     completed: CheckCircleIcon,
     canceledByInstructor: ExclamationTriangleIcon,
+    canceledByAdmin: ExclamationTriangleIcon,
     canceledByCustomer: XCircleIcon,
   };
 
@@ -36,6 +37,7 @@ const ClassStatus = ({
     completed: { ja: "終了", en: "Completed" },
     canceledByCustomer: { ja: "キャンセル", en: "Canceled" },
     canceledByInstructor: { ja: "キャンセル", en: "Canceled by Instructor" },
+    canceledByAdmin: { ja: "キャンセル", en: "Admin Canceled" },
     freeTrial: { ja: "無料トライアルクラス", en: "Free Trial Class" },
   };
 
@@ -58,6 +60,9 @@ const ClassStatus = ({
         {renderStatusLabel()}
         {status === "canceledByInstructor" && language === "ja" && (
           <span>（インストラクター都合）</span>
+        )}
+        {status === "canceledByAdmin" && language === "ja" && (
+          <span>（事務局都合）</span>
         )}
       </div>
     </div>

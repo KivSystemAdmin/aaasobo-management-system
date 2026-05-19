@@ -318,6 +318,7 @@ export const InstructorCalendarClassesResponse = z
   .describe("Array of instructor calendar classes");
 
 export const InstructorCalendarSlotType = z.enum([
+  "businessEvent",
   "open",
   "booked",
   "rebooked",
@@ -327,12 +328,13 @@ export const InstructorCalendarSlotType = z.enum([
 ]);
 
 export const InstructorCalendarSlot = z.object({
-  start: z.iso.datetime().describe("Slot start time"),
-  end: z.iso.datetime().describe("Slot end time"),
+  start: z.string().describe("Slot start time or all-day event start date"),
+  end: z.string().describe("Slot end time or all-day event end date"),
   title: z.string().describe("Slot title"),
   color: z.string().describe("Slot color code"),
   slotType: InstructorCalendarSlotType.describe("Slot status"),
   classId: z.number().int().positive().optional().describe("Class ID"),
+  allDay: z.boolean().optional().describe("Whether this is an all-day event"),
 });
 
 export const InstructorCalendarSlotsResponse = z.object({

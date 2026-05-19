@@ -18,7 +18,8 @@
     &.completed {
       color: $completed-background-color;
     }
-    &.canceledByInstructor {
+    &.canceledByInstructor,
+    &.canceledByAdmin {
       color: $gray-canceled-by-instructor;
     }
     &.canceledByCustomer {

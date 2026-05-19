@@ -164,6 +164,7 @@ const STATUS_VALUES = new Set([
   "completed",
   "canceledByCustomer",
   "canceledByInstructor",
+  "canceledByAdmin",
   "pending",
   "rebooked",
   "declined",

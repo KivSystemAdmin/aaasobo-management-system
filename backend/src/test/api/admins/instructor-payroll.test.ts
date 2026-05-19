@@ -476,6 +476,15 @@ describe("GET /admins/instructors/:id/payroll", () => {
       "2026-03-18T10:00:00+09:00",
       "2026-03-19T10:00:00+09:00",
     ]);
+    await createClass(
+      customer.id,
+      instructor.id,
+      jstDateTime("2026-03-20T10:00:00+09:00"),
+      {
+        status: "canceledByAdmin",
+        canceledAt: jstDateTime("2026-03-10T10:00:00+09:00"),
+      },
+    );
 
     const response = await request(server)
       .get(`/admins/instructors/${instructor.id}/payroll`)
@@ -498,6 +507,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
       total: 0,
     });
     expect(response.body.periods[1].total).toBe(0);
+    expect(response.body.periods[1].dailyBreakdown).toHaveLength(4);
   });
 
   it("counts cancellations across both halves and deducts one monthly cancel fee only from 16-last", async () => {

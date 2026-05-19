@@ -51,7 +51,8 @@ export const createRenderEventContent = (userType: UserType) => {
           <div className={styles.classStatusIcon}>
             <XCircleIcon className={styles.classStatusIcon__canceled} />
           </div>
-        ) : classStatus === "canceledByInstructor" ? (
+        ) : classStatus === "canceledByInstructor" ||
+          classStatus === "canceledByAdmin" ? (
           <div className={styles.classStatusIcon}>
             <ExclamationTriangleIcon
               className={styles.classStatusIcon__canceled}
@@ -68,7 +69,8 @@ export const createRenderEventContent = (userType: UserType) => {
                 : classStatus === "completed"
                   ? styles.completed
                   : classStatus === "canceledByCustomer" ||
-                      classStatus === "canceledByInstructor"
+                      classStatus === "canceledByInstructor" ||
+                      classStatus === "canceledByAdmin"
                     ? styles.canceled
                     : ""
           }`}

@@ -1,5 +1,4 @@
 export const holidayEventId = 2;
-export const defaultEventIds = [1, 2, 3, 4];
 export const defaultUserImageUrl = "/images/default-user-icon.jpg";
 export const defaultColor = "#000000";
 export const MASKED_HEAD_LETTERS = "Masked";

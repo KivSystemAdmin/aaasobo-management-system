@@ -15,6 +15,7 @@ import {
   InstructorUnavailableError,
   rebookClass,
   updateClass,
+  cancelClassByAdmin,
   cancelClassByInstructor,
 } from "../services/classesService";
 import {
@@ -57,6 +58,8 @@ import {
 } from "../lib/email/mail";
 import {
   FREE_TRIAL_BOOKING_HOURS,
+  NO_CLASS_EVENT_NAME,
+  REBOOKABLE_NO_CLASS_EVENT_NAME,
   REGULAR_REBOOKING_HOURS,
 } from "../utils/commonUtils";
 import {
@@ -64,7 +67,7 @@ import {
   deleteAttendancesByClassId,
 } from "../services/classAttendancesService";
 import { getInstructorAbsencesByMonth } from "../services/instructorAbsenceService";
-import { getSchedulesByEventIdAndDate } from "../services/scheduleService";
+import { getSchedulesByEventNameAndDate } from "../services/scheduleService";
 
 // GET all classes along with related instructors and customers data
 export const getAllClassesController = async (_: Request, res: Response) => {
@@ -562,17 +565,19 @@ export const createClassesForMonthController = async (
         );
 
         // Get no classes
-        const noClasses = await getSchedulesByEventIdAndDate(
-          2,
+        const noClasses = await getSchedulesByEventNameAndDate(
+          NO_CLASS_EVENT_NAME,
           firstDateOfMonth,
           until,
+          tx,
         );
 
         // Get rebookable no classes
-        const rebookableNoClasses = await getSchedulesByEventIdAndDate(
-          3,
+        const rebookableNoClasses = await getSchedulesByEventNameAndDate(
+          REBOOKABLE_NO_CLASS_EVENT_NAME,
           firstDateOfMonth,
           until,
+          tx,
         );
 
         // Prepare sets
@@ -697,8 +702,14 @@ export const createClassesForMonthController = async (
                   toDateKey(createdClass.dateTime),
                 );
 
-                if (isInstructorAbsent || isRebookableNoClass) {
+                if (isInstructorAbsent) {
                   await cancelClassByInstructor(tx, createdClass.id);
+                } else if (isRebookableNoClass) {
+                  await cancelClassByAdmin(
+                    tx,
+                    createdClass.id,
+                    createdClass.dateTime,
+                  );
                 }
               }),
             );

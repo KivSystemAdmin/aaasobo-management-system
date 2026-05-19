@@ -81,16 +81,18 @@ export const deleteOldBusinessCalendar = async () => {
   });
 };
 
-// Fetch schedules by id
-export const getSchedulesByEventIdAndDate = async (
-  eventId: number,
+export const getSchedulesByEventNameAndDate = async (
+  eventName: string,
   start: Date,
   end: Date,
+  tx: Prisma.TransactionClient = prisma,
 ) => {
   try {
-    return await prisma.schedule.findMany({
+    return await tx.schedule.findMany({
       where: {
-        eventId,
+        event: {
+          name: eventName,
+        },
         date: {
           gte: start,
           lt: end,

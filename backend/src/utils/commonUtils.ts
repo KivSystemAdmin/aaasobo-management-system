@@ -34,6 +34,14 @@ export const maskedSuffix = randomUUID().split("-")[0]; // Generate a short rand
 export const maskedBirthdate = new Date("1900-01-01");
 
 // Event registration and update static values
+export const NO_CLASS_EVENT_NAME = "お休み / No Class";
+export const REBOOKABLE_NO_CLASS_EVENT_NAME =
+  "お休み振替対象日 / No Class (Rebookable)";
+export const PROTECTED_DEFAULT_EVENT_NAMES = [
+  NO_CLASS_EVENT_NAME,
+  REBOOKABLE_NO_CLASS_EVENT_NAME,
+] as const;
+
 export const EVENT_CONFLICT_ITEMS = [
   "Japanese event name",
   "English event name",
