@@ -14,7 +14,13 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { updateScheduleAction } from "@/app/actions/updateContent";
 import { CONTENT_UPDATE_SUCCESS_MESSAGE } from "@/lib/messages/formValidation";
 import { getAllBusinessSchedules } from "@/lib/api/adminsApi";
-import { getDayCellColorHandler } from "@/lib/utils/calendarUtils";
+import {
+  BUSINESS_CALENDAR_TIME_ZONE,
+  formatDateForScheduleUpdate,
+  formatDateKeyInTimeZone,
+  getDayCellColorHandler,
+  getDayNumberInTimeZone,
+} from "@/lib/utils/calendarUtils";
 import CalendarLegend from "@/components/features/calendarLegend/CalendarLegend";
 import { warningAlert } from "@/lib/utils/alertUtils";
 
@@ -75,16 +81,10 @@ const BusinessCalendarClient = ({
   }, []);
 
   // Set color for each date in the calendar
-  const dayCellColors = getDayCellColorHandler(businessSchedule);
-
-  // Convert date to string in the format "MM/DD/YYYY"
-  const dateToString = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-  };
+  const dayCellColors = getDayCellColorHandler(
+    businessSchedule,
+    BUSINESS_CALENDAR_TIME_ZONE,
+  );
 
   // Register or delete event on selected date
   const handleDateSelect = (arg: DateSelectArg) => {
@@ -95,8 +95,8 @@ const BusinessCalendarClient = ({
 
     const startDate = new Date(arg.start);
     const endDate = new Date(arg.end.getTime() - 24 * 60 * 60 * 1000);
-    const startDateStr = dateToString(startDate);
-    const endDateStr = dateToString(endDate);
+    const startDateStr = formatDateForScheduleUpdate(startDate);
+    const endDateStr = formatDateForScheduleUpdate(endDate);
 
     // If the start date is the current date or before, do not allow selection
     if (startDate < new Date()) {
@@ -112,15 +112,17 @@ const BusinessCalendarClient = ({
     setIsModalOpen(true);
 
     // Set selected dates for updating the schedule
-    if (startDate.getDate() === endDate.getDate()) {
+    if (
+      formatDateKeyInTimeZone(startDate) === formatDateKeyInTimeZone(endDate)
+    ) {
       setSelectedDates([startDateStr]);
     } else {
       setSelectedDates([startDateStr, endDateStr]);
     }
 
     // Save the selected calendar position to localStorage
-    const currentYear = new Date().getFullYear();
-    const selectedYear = startDate.getFullYear();
+    const currentYear = Number(formatDateKeyInTimeZone(new Date()).slice(0, 4));
+    const selectedYear = Number(formatDateKeyInTimeZone(startDate).slice(0, 4));
 
     if (selectedYear < currentYear) {
       localStorage.setItem("calendarPosition", "prev");
@@ -214,7 +216,7 @@ const BusinessCalendarClient = ({
           timeZone="Asia/Tokyo"
           locale={language === "ja" ? "ja" : "en"}
           dayCellContent={(arg) => {
-            return { html: String(arg.date.getDate()) };
+            return { html: getDayNumberInTimeZone(arg.date) };
           }}
           contentHeight="auto"
           selectable={userSessionType === "admin"}
