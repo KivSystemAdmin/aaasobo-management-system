@@ -1,8 +1,4 @@
-import {
-  DayCellContentArg,
-  DayCellMountArg,
-  EventContentArg,
-} from "@fullcalendar/core";
+import { DayCellMountArg, EventContentArg } from "@fullcalendar/core";
 import styles from "../../components/features/calendarView/CalendarView.module.scss";
 import Image from "next/image";
 import {
@@ -11,6 +7,42 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { formatTime24Hour } from "./dateUtils";
+
+export const BUSINESS_CALENDAR_TIME_ZONE = "Asia/Tokyo";
+
+export const formatDateKeyInTimeZone = (
+  date: Date,
+  timeZone: string = BUSINESS_CALENDAR_TIME_ZONE,
+) => {
+  return new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone,
+  }).format(date);
+};
+
+export const formatDateForScheduleUpdate = (
+  date: Date,
+  timeZone: string = BUSINESS_CALENDAR_TIME_ZONE,
+) => {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone,
+  }).format(date);
+};
+
+export const getDayNumberInTimeZone = (
+  date: Date,
+  timeZone: string = BUSINESS_CALENDAR_TIME_ZONE,
+) => {
+  return new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    timeZone,
+  }).format(date);
+};
 
 export const createRenderEventContent = (userType: UserType) => {
   const RenderEventContent = (eventInfo: EventContentArg) => {
@@ -136,6 +168,7 @@ export const getClassSlotTimesForCalendar = () => {
 
 export function getDayCellColorHandler(
   businessSchedule: { date: string; color: string }[],
+  timeZone?: string,
 ): (arg: DayCellMountArg) => void {
   const dateToColorMap = new Map<string, string>(
     businessSchedule.map((item) => [item.date, item.color]),
@@ -144,12 +177,13 @@ export function getDayCellColorHandler(
   return (arg: DayCellMountArg) => {
     if (arg.isOther) return;
 
-    // Get offset in minutes from UTC
-    const offset = new Date().getTimezoneOffset();
-
-    // Adjust the date to the local timezone by subtracting the offset
-    const localDate = new Date(arg.date.getTime() - offset * 60 * 1000);
-    const dateStr = localDate.toISOString().split("T")[0];
+    const dateStr = timeZone
+      ? formatDateKeyInTimeZone(arg.date, timeZone)
+      : new Intl.DateTimeFormat("en-CA", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(arg.date);
     const color = dateToColorMap.get(dateStr);
 
     if (color) {
