@@ -69,7 +69,7 @@ const proxyRequest = async (req: NextRequest, method: string) => {
 
   const contentType = req.headers.get("content-type") || "";
   const isJson = contentType.includes("application/json");
-  const hasBody = method !== "GET" && method !== "DELETE";
+  const hasBody = method !== "GET" && method !== "DELETE" && req.body !== null;
 
   let body: BodyInit | undefined;
   if (hasBody) {
