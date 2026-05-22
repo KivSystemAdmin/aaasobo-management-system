@@ -32,7 +32,7 @@ function buildMinimalNormalizedFiles() {
     "instructors.csv":
       "instructor_ref,name,email,temp_password,class_url,icon,nickname,meeting_id,passcode,birthdate,favorite_food,hobby,life_history,message_for_children,skill,working_time,english_background,termination_at\nIN0001,Instructor One,instructor.one@example.com,TempPass456!,https://import.local/class/in0001,https://import.local/icon/in0001.png,instructor_in0001,11111111111,PASS0001,1990-01-01,Sushi,Reading,Life history,Message,Skill,Weekdays,0,\n",
     "instructor_fees.csv":
-      "instructor_ref,currency,effective_from,effective_to,trial_fee,regular_fee,cancel_fee,cancel_without_notice_fee\nIN0001,PHP,2025-01-01,,75,100,50,100\n",
+      "instructor_ref,currency,effective_from,effective_to,trial_fee,regular_fee,cancel_fee,cancel_without_notice_fee,monthly_cancel_fee\nIN0001,PHP,2025-01-01,,75,100,50,100,200\n",
     "instructor_schedules.csv":
       "instructor_ref,effective_from,effective_to,timezone,weekday,start_time\nIN0001,2025-01-01,2025-12-31,Asia/Tokyo,1,09:00\n",
     "instructor_absences.csv": "instructor_ref,absent_at\n",
@@ -205,9 +205,9 @@ describe("POST /admins/import/normalize", () => {
       "instructor_fees.csv"
     ] as string;
     expect(instructorFeesCsv).toContain(
-      "instructor_ref,currency,effective_from,effective_to,trial_fee,regular_fee,cancel_fee,cancel_without_notice_fee",
+      "instructor_ref,currency,effective_from,effective_to,trial_fee,regular_fee,cancel_fee,cancel_without_notice_fee,monthly_cancel_fee",
     );
-    expect(instructorFeesCsv).toContain("PHP,2020-01-01,,75,100,50,100");
+    expect(instructorFeesCsv).toContain("PHP,2020-01-01,,75,100,50,100,200");
   });
 
   it("downloads normalized files as a zip bundle by jobId", async () => {
@@ -637,30 +637,29 @@ describe("POST /admins/import/execute", () => {
     expect(slotCount).toBe(2);
   });
 
-  it("preserves only seed admins during full reset import", async () => {
-    const seedAdmin1 = await createAdmin({
+  it("preserves all admins during full reset import", async () => {
+    const admin1 = await createAdmin({
       name: "Seed Admin 1",
       email: "admin@example.com",
       password: "SeedAdminPass1!",
     });
-    const seedAdmin2 = await createAdmin({
+    const admin2 = await createAdmin({
       name: "Seed Admin 2",
       email: "admin2@example.com",
       password: "SeedAdminPass2!",
     });
-    const removableAdmin = await createAdmin({
+    const admin3 = await createAdmin({
       name: "Temporary Admin",
       email: "temporary-admin@example.com",
       password: "TemporaryPass1!",
     });
-    const authCookie = await generateAuthCookie(removableAdmin.id, "admin");
+    const authCookie = await generateAuthCookie(admin3.id, "admin");
 
-    const seedBefore = await prisma.admin.findMany({
-      where: { email: { in: ["admin@example.com", "admin2@example.com"] } },
+    const adminsBefore = await prisma.admin.findMany({
       orderBy: { email: "asc" },
     });
-    const seedBeforeByEmail = new Map(
-      seedBefore.map((item) => [item.email, item.password]),
+    const passwordsBeforeByEmail = new Map(
+      adminsBefore.map((item) => [item.email, item.password]),
     );
 
     const zipBuffer = await buildZipBuffer(buildMinimalNormalizedFiles());
@@ -679,20 +678,21 @@ describe("POST /admins/import/execute", () => {
     });
     const emailsAfter = adminsAfter.map((item) => item.email);
 
-    expect(emailsAfter).toEqual(["admin2@example.com", "admin@example.com"]);
-    expect(emailsAfter).not.toContain("temporary-admin@example.com");
+    expect(emailsAfter).toEqual([
+      "admin2@example.com",
+      "admin@example.com",
+      "temporary-admin@example.com",
+    ]);
 
-    const seedAfterByEmail = new Map(
+    const passwordsAfterByEmail = new Map(
       adminsAfter.map((item) => [item.email, item.password]),
     );
-    expect(seedAfterByEmail.get("admin@example.com")).toBe(
-      seedBeforeByEmail.get("admin@example.com"),
-    );
-    expect(seedAfterByEmail.get("admin2@example.com")).toBe(
-      seedBeforeByEmail.get("admin2@example.com"),
-    );
-    expect(seedAdmin1.email).toBe("admin@example.com");
-    expect(seedAdmin2.email).toBe("admin2@example.com");
+    for (const [email, password] of passwordsBeforeByEmail) {
+      expect(passwordsAfterByEmail.get(email)).toBe(password);
+    }
+    expect(admin1.email).toBe("admin@example.com");
+    expect(admin2.email).toBe("admin2@example.com");
+    expect(admin3.email).toBe("temporary-admin@example.com");
   });
 
   it("rolls back reset and inserts when import fails mid-transaction", async () => {

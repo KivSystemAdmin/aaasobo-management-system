@@ -69,6 +69,16 @@ import {
 import { getInstructorAbsencesByMonth } from "../services/instructorAbsenceService";
 import { getSchedulesByEventNameAndDate } from "../services/scheduleService";
 
+function getJstRecurringParts(date: Date): { weekday: number; time: string } {
+  const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+  const hour = String(jstDate.getUTCHours()).padStart(2, "0");
+  const minute = String(jstDate.getUTCMinutes()).padStart(2, "0");
+  return {
+    weekday: jstDate.getUTCDay(),
+    time: `${hour}:${minute}`,
+  };
+}
+
 // GET all classes along with related instructors and customers data
 export const getAllClassesController = async (_: Request, res: Response) => {
   try {
@@ -636,19 +646,12 @@ export const createClassesForMonthController = async (
               return;
             }
 
-            // Extract time from startAt
-            const time = `${startAt
-              .getHours()
-              .toString()
-              .padStart(2, "0")}:${startAt
-              .getMinutes()
-              .toString()
-              .padStart(2, "0")}`;
+            const { weekday, time } = getJstRecurringParts(startAt);
 
             // Get the first date of the class of the month
             const firstDate = calculateFirstDate(
               firstDateOfMonth < startAt ? startAt : firstDateOfMonth,
-              days[startAt.getDay()],
+              days[weekday],
               time,
             );
 

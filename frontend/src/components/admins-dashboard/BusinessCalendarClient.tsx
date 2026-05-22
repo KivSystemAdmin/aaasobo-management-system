@@ -187,7 +187,7 @@ const BusinessCalendarClient = ({
   };
 
   // Display the failure message if the schedule is not loaded
-  if (!businessSchedule || businessSchedule.length === 0 || !events) {
+  if (!businessSchedule || !events) {
     return <div>Failed to load AaasoBo! schedule.</div>;
   }
 
