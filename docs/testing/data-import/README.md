@@ -49,7 +49,8 @@ Run from `backend/`:
 npm run fixture:generate:normalized-import -- \
   --from 2025-01-01 \
   --completed-until 2025-01-20 \
-  --to 2025-02-28
+  --to 2025-02-28 \
+  --instructors 10
 ```
 
 - Required arguments:
@@ -57,6 +58,7 @@ npm run fixture:generate:normalized-import -- \
   - `--completed-until`
   - `--to`
 - Optional:
+  - `--instructors` (default: `10`; customers are generated at a `1:10` instructor-to-customer ratio)
   - `--out-dir` (default: `../docs/testing/data-import/generated`)
 
 The generator creates all mandatory normalized CSV files and one deterministic zip file in the output directory.
