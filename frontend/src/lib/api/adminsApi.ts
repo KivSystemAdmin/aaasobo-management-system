@@ -7,6 +7,13 @@ import { ERROR_PAGE_MESSAGE_EN } from "../messages/generalMessages";
 import {
   type AdminResponse,
   type AdminsListResponse,
+  type CreateInstructorFeeRequest,
+  type CreateInstructorFeeResponse,
+  type DeleteLatestInstructorFeeResponse,
+  type InstructorFeeErrorResponse,
+  type InstructorFeeRatesResponse,
+  type InstructorPayrollErrorResponse,
+  type InstructorPayrollResponse,
   type InstructorsListResponse,
   type PastInstructorsListResponse,
   type CustomersListResponse,
@@ -21,6 +28,9 @@ import {
   type DeleteResponse,
   type RegisterAdminRequest,
   type UpdateAdminRequest,
+  type MessageBoardPostsResponse,
+  type CreateMessageBoardPostRequest,
+  type CreateMessageBoardPostResponse,
 } from "@shared/schemas/admins";
 
 const BACKEND_ORIGIN =
@@ -28,6 +38,12 @@ const BACKEND_ORIGIN =
 const BASE_URL = `${BACKEND_ORIGIN}/admins`;
 
 type Response<T> = T | { message: string };
+export type InstructorPayrollApiError = InstructorPayrollErrorResponse & {
+  status: number;
+};
+type InstructorFeeApiError = InstructorFeeErrorResponse & {
+  status: number;
+};
 
 export const getAdminById = async (
   id: number,
@@ -489,6 +505,7 @@ export const getAllEvents = async (
 
 // GET all class data
 export const getAllClasses = async (
+  todayOnly: boolean = false,
   cookie?: string,
 ): Promise<ClassesListResponse["data"]> => {
   try {
@@ -499,7 +516,7 @@ export const getAllClasses = async (
 
     if (cookie) {
       // From server component
-      apiURL = `${BASE_URL}/class-list`;
+      apiURL = `${BASE_URL}/class-list${todayOnly ? "?today=true" : ""}`;
       headers = { "Content-Type": "application/json", Cookie: cookie };
       response = await fetch(apiURL, {
         method,
@@ -508,7 +525,7 @@ export const getAllClasses = async (
       });
     } else {
       // From client component (via proxy)
-      const backendEndpoint = `/admins/class-list`;
+      const backendEndpoint = `/admins/class-list${todayOnly ? "?today=true" : ""}`;
       apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
       headers = {
         "Content-Type": "application/json",
@@ -579,6 +596,284 @@ export const getAllBusinessSchedules = async (
   }
 };
 
+export const getMessageBoardPosts = async (
+  cookie?: string,
+): Promise<MessageBoardPostsResponse["data"]> => {
+  try {
+    let apiURL;
+    let headers;
+    let response;
+    const method = "GET";
+
+    if (cookie) {
+      apiURL = `${BASE_URL}/message-board`;
+      headers = { "Content-Type": "application/json", Cookie: cookie };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+        cache: "no-store",
+      });
+    } else {
+      const backendEndpoint = "/admins/message-board";
+      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+      headers = {
+        "Content-Type": "application/json",
+        "backend-endpoint": backendEndpoint,
+        "no-cache": "no-cache",
+      };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+      });
+    }
+
+    if (response.status !== 200) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result: MessageBoardPostsResponse = await response.json();
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch message board posts:", error);
+    throw error;
+  }
+};
+
+export const createMessageBoardPost = async (
+  payload: CreateMessageBoardPostRequest,
+  cookie?: string,
+): Promise<CreateMessageBoardPostResponse> => {
+  let apiURL;
+  let headers;
+  let response;
+
+  if (cookie) {
+    apiURL = `${BASE_URL}/message-board`;
+    headers = { "Content-Type": "application/json", Cookie: cookie };
+    response = await fetch(apiURL, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+  } else {
+    const backendEndpoint = "/admins/message-board";
+    apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+    headers = {
+      "Content-Type": "application/json",
+      "backend-endpoint": backendEndpoint,
+    };
+    response = await fetch(apiURL, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+  }
+
+  if (response.status !== 201) {
+    const data = await response.json();
+    throw new Error(data?.message || `HTTP error! status: ${response.status}`);
+  }
+
+  return response.json();
+};
+
+export const getInstructorPayroll = async (
+  instructorId: number,
+  month: string,
+  cookie?: string,
+): Promise<InstructorPayrollResponse | InstructorPayrollApiError> => {
+  try {
+    let apiURL;
+    let headers;
+    let response;
+    const method = "GET";
+    const backendEndpoint = `/admins/instructors/${instructorId}/payroll?month=${month}`;
+
+    if (cookie) {
+      apiURL = `${BACKEND_ORIGIN}${backendEndpoint}`;
+      headers = { "Content-Type": "application/json", Cookie: cookie };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+        cache: "no-store",
+      });
+    } else {
+      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+      headers = {
+        "Content-Type": "application/json",
+        "backend-endpoint": backendEndpoint,
+        "no-cache": "true",
+      };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+      });
+    }
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return {
+        status: response.status,
+        code:
+          typeof data?.code === "string"
+            ? data.code
+            : "INSTRUCTOR_PAYROLL_ERROR",
+        message:
+          typeof data?.message === "string"
+            ? data.message
+            : `HTTP error! status: ${response.status}`,
+      };
+    }
+
+    return data as InstructorPayrollResponse;
+  } catch (error) {
+    console.error("Failed to fetch instructor payroll:", error);
+    return {
+      status: 500,
+      code: "INSTRUCTOR_PAYROLL_ERROR",
+      message: GENERAL_ERROR_MESSAGE,
+    };
+  }
+};
+
+export const getInstructorFees = async (
+  instructorId: number,
+  cookie?: string,
+): Promise<InstructorFeeRatesResponse | InstructorFeeApiError> => {
+  try {
+    let apiURL;
+    let headers;
+    let response;
+    const method = "GET";
+    const backendEndpoint = `/admins/instructors/${instructorId}/fees`;
+
+    if (cookie) {
+      apiURL = `${BACKEND_ORIGIN}${backendEndpoint}`;
+      headers = { "Content-Type": "application/json", Cookie: cookie };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+        cache: "no-store",
+      });
+    } else {
+      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+      headers = {
+        "Content-Type": "application/json",
+        "backend-endpoint": backendEndpoint,
+        "no-cache": "true",
+      };
+      response = await fetch(apiURL, {
+        method,
+        headers,
+      });
+    }
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return {
+        status: response.status,
+        code:
+          typeof data?.code === "string" ? data.code : "INSTRUCTOR_FEE_ERROR",
+        message:
+          typeof data?.message === "string"
+            ? data.message
+            : `HTTP error! status: ${response.status}`,
+      };
+    }
+
+    return data as InstructorFeeRatesResponse;
+  } catch (error) {
+    console.error("Failed to fetch instructor fees:", error);
+    return {
+      status: 500,
+      code: "INSTRUCTOR_FEE_ERROR",
+      message: GENERAL_ERROR_MESSAGE,
+    };
+  }
+};
+
+export const createInstructorFee = async (
+  instructorId: number,
+  feeData: CreateInstructorFeeRequest,
+): Promise<CreateInstructorFeeResponse | InstructorFeeApiError> => {
+  try {
+    const backendEndpoint = `/admins/instructors/${instructorId}/fees`;
+    const apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+    const response = await fetch(apiURL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "backend-endpoint": backendEndpoint,
+      },
+      body: JSON.stringify(feeData),
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 201) {
+      return {
+        status: response.status,
+        code:
+          typeof data?.code === "string" ? data.code : "INSTRUCTOR_FEE_ERROR",
+        message:
+          typeof data?.message === "string"
+            ? data.message
+            : `HTTP error! status: ${response.status}`,
+      };
+    }
+
+    return data as CreateInstructorFeeResponse;
+  } catch (error) {
+    console.error("Failed to create instructor fee:", error);
+    return {
+      status: 500,
+      code: "INSTRUCTOR_FEE_ERROR",
+      message: GENERAL_ERROR_MESSAGE,
+    };
+  }
+};
+
+export const deleteLatestInstructorFee = async (
+  instructorId: number,
+): Promise<DeleteLatestInstructorFeeResponse | InstructorFeeApiError> => {
+  try {
+    const backendEndpoint = `/admins/instructors/${instructorId}/fees/latest`;
+    const apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+    const response = await fetch(apiURL, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "backend-endpoint": backendEndpoint,
+      },
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return {
+        status: response.status,
+        code:
+          typeof data?.code === "string" ? data.code : "INSTRUCTOR_FEE_ERROR",
+        message:
+          typeof data?.message === "string"
+            ? data.message
+            : `HTTP error! status: ${response.status}`,
+      };
+    }
+
+    return data as DeleteLatestInstructorFeeResponse;
+  } catch (error) {
+    console.error("Failed to delete latest instructor fee:", error);
+    return {
+      status: 500,
+      code: "INSTRUCTOR_FEE_ERROR",
+      message: GENERAL_ERROR_MESSAGE,
+    };
+  }
+};
+
 export const registerAdmin = async (
   userData: RegisterAdminRequest & {
     cookie: string;
@@ -598,7 +893,7 @@ export const registerAdmin = async (
       return { email: EMAIL_ALREADY_REGISTERED_ERROR.en };
     }
 
-    if (response.status !== 200) {
+    if (response.status !== 201) {
       throw new Error(`HTTP Status: ${response.status} ${response.statusText}`);
     }
 
@@ -677,5 +972,57 @@ export const deleteAdmin = async (
     return {
       errorMessage: GENERAL_ERROR_MESSAGE,
     };
+  }
+};
+
+// Delete admins who have left the service more than 3 years ago (Only for Vercel Cron Job)
+export const deletePastAdmins = async (authorization: string) => {
+  try {
+    // From server component
+    const apiUrl = `${BACKEND_ORIGIN}/jobs/delete/past-admins`;
+    const method = "DELETE";
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: authorization,
+    };
+    const response = await fetch(apiUrl, {
+      method,
+      headers,
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return data.error;
+    }
+  } catch (error) {
+    console.error("API error while deleting past admins:", error);
+    throw error;
+  }
+};
+
+// Delete message board posts that are older than the threshold (Only for Vercel Cron Job)
+export const deletePastMessageBoardPosts = async (authorization: string) => {
+  try {
+    // From server component
+    const apiUrl = `${BACKEND_ORIGIN}/jobs/delete/past-message-board-posts`;
+    const method = "DELETE";
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: authorization,
+    };
+    const response = await fetch(apiUrl, {
+      method,
+      headers,
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return data.error;
+    }
+  } catch (error) {
+    console.error("API error while deleting past message board posts:", error);
+    throw error;
   }
 };

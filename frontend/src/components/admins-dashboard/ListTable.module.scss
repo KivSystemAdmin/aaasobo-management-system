@@ -10,7 +10,7 @@ $font_size: 0.9rem;
 .container {
   display: inline-block;
   box-sizing: border-box;
-  background-color: $gray-background;
+  background-color: $white-background;
   padding: 1rem;
   border-radius: $border_radius;
   width: 100%;
@@ -20,6 +20,7 @@ $font_size: 0.9rem;
 .topContainer {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   margin: 0 0 1rem 0;
   flex-wrap: wrap;
   gap: 1rem;
@@ -27,6 +28,7 @@ $font_size: 0.9rem;
   select,
   input {
     width: 180px;
+    max-width: 100%;
     padding: 0.5rem;
     border: 1px solid #e5e7eb;
     border-radius: $border_radius;
@@ -45,7 +47,32 @@ $font_size: 0.9rem;
 
 .filterContainer {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
+
+  @media (max-width: 730px) {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+
+    select,
+    input {
+      width: 100%;
+      max-width: 320px;
+    }
+  }
+}
+
+.buttonsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-end;
+
+  @media (max-width: 800px) {
+    justify-content: flex-start;
+    width: 100%;
+  }
 
   @media (max-width: 730px) {
     flex-direction: column;
@@ -53,13 +80,31 @@ $font_size: 0.9rem;
   }
 }
 
-.buttonsContainer {
-  display: flex;
-  gap: 1rem;
+.filterButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid $blue_primary;
+  border-radius: $border_radius;
+  background-color: #ffffff;
+  color: $blue_primary;
+  font-size: $font_size;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
 
-  @media (max-width: 730px) {
-    flex-direction: column;
-    align-items: flex-start;
+  &:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+}
+
+.filterButtonInactive {
+  background-color: $blue_primary;
+  color: #ffffff;
+
+  &:hover {
+    background-color: $blue_primary_hover;
   }
 }
 
@@ -98,6 +143,7 @@ $font_size: 0.9rem;
     font-weight: 500;
     text-align: justify;
     cursor: pointer;
+    white-space: nowrap;
   }
 
   tr:first-child th:first-child {

@@ -4,6 +4,7 @@ import {
   CONTENT_REGISTRATION_SUCCESS_MESSAGE,
 } from "../messages/formValidation";
 import type { PlanResponse, PlansListResponse } from "@shared/schemas/plans";
+import { EnglishBackground } from "@/types";
 
 const BACKEND_ORIGIN =
   process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
@@ -107,7 +108,7 @@ export const registerPlan = async (userData: {
   planNameJpn: string;
   weeklyClassTimes: number;
   description: string;
-  isNative: string;
+  englishBackground: EnglishBackground;
   cookie: string;
 }): Promise<RegisterFormState> => {
   try {
@@ -147,7 +148,7 @@ export const updatePlan = async (
   planNameEng: string | null,
   planNameJpn: string | null,
   planDescription: string | null,
-  isNative: string | null,
+  englishBackground: EnglishBackground,
   cookie: string,
 ): Promise<UpdateFormState> => {
   try {
@@ -160,7 +161,7 @@ export const updatePlan = async (
       planNameEng,
       planNameJpn,
       description: planDescription,
-      isNative,
+      englishBackground,
     });
 
     const response = await fetch(apiURL, {
@@ -213,5 +214,31 @@ export const deletePlan = async (planId: number, cookie: string) => {
     return {
       errorMessage: GENERAL_ERROR_MESSAGE,
     };
+  }
+};
+
+// Delete plans that are no longer necessary
+export const deleteUnnecessaryPlans = async (authorization: string) => {
+  try {
+    // From server component
+    const apiUrl = `${BACKEND_ORIGIN}/jobs/delete/unnecessary-plans`;
+    const method = "DELETE";
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: authorization,
+    };
+    const response = await fetch(apiUrl, {
+      method,
+      headers,
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return data.error;
+    }
+  } catch (error) {
+    console.error("API error while deleting unnecessary plans:", error);
+    throw error;
   }
 };

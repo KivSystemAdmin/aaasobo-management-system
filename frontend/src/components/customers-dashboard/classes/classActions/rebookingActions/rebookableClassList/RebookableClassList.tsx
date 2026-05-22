@@ -22,8 +22,8 @@ import { errorAlert } from "@/lib/utils/alertUtils";
 
 export default function RebookableClassList({
   customerId,
+  adminId,
   rebookableClasses,
-  onRebookableClassSelect,
   language,
   userSessionType,
   childProfiles,
@@ -53,12 +53,6 @@ export default function RebookableClassList({
       );
     }
 
-    if (!isFreeTrial) {
-      onRebookableClassSelect(id);
-      return;
-    }
-
-    // Use booking modal for the new flow
     setSelectedClassId(id);
     setSelectedIsFreeTrial(isFreeTrial);
     setSelectedClassCode(classCode || "");
@@ -172,6 +166,7 @@ export default function RebookableClassList({
           classCode={selectedClassCode}
           childProfiles={childProfiles}
           customerId={customerId}
+          adminId={adminId}
           plan={plan}
         />
       )}

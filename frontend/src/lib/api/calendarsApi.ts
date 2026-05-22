@@ -78,3 +78,29 @@ export const updateSundayColor = async (
     return GENERAL_ERROR_MESSAGE;
   }
 };
+
+// Delete business calendar older than 1 year (13 months to be safe) (Only for Vercel cron job)
+export const deleteOldBusinessCalendar = async (authorization: string) => {
+  try {
+    // From server component
+    const apiUrl = `${BACKEND_ORIGIN}/jobs/delete/old-business-calendar`;
+    const method = "DELETE";
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: authorization,
+    };
+    const response = await fetch(apiUrl, {
+      method,
+      headers,
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return data.error;
+    }
+  } catch (error) {
+    console.error("API error while deleting old business calendar:", error);
+    throw error;
+  }
+};

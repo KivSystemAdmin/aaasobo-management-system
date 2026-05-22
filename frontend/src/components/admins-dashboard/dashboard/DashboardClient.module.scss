@@ -1,0 +1,632 @@
+@use "@/styles/variables.module.scss" as *;
+
+.dashboardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.headerArea {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.kpiCard {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 4px 14px rgba(18, 16, 65, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+
+  p {
+    margin: 0;
+    font-weight: 600;
+    color: #34325f;
+  }
+
+  strong {
+    display: block;
+    font-size: 2rem;
+    line-height: 1.2;
+    color: #17153d;
+  }
+
+  small {
+    color: #666385;
+  }
+}
+
+.instructorBreakdownGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+
+  article {
+    background: linear-gradient(180deg, #f9f9ff 0%, #f2f4ff 100%);
+    border: 1px solid #e3e5fb;
+    border-radius: 10px;
+    padding: 0.5rem 0.55rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    justify-content: space-between;
+    min-height: 4rem;
+  }
+
+  span {
+    color: #666385;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  strong {
+    font-size: 1.25rem;
+    line-height: 1.1;
+  }
+}
+
+.kpiIcon {
+  width: 2.25rem;
+  height: 2.25rem;
+  color: #4f46e5;
+}
+
+.twoColumnCharts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.chartCard {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(18, 16, 65, 0.08);
+  padding: 1rem;
+
+  h3 {
+    margin: 0 0 1rem 0;
+    color: #2b295a;
+    font-size: 1.35rem;
+  }
+}
+
+.barChart {
+  height: 220px;
+  display: flex;
+  align-items: end;
+  gap: 0.45rem;
+}
+
+.barItem {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  text-align: center;
+
+  span {
+    margin-top: 0.45rem;
+    display: block;
+    font-size: 0.8rem;
+    color: #666385;
+  }
+}
+
+.bar {
+  width: 100%;
+  border-radius: 8px 8px 3px 3px;
+}
+
+.barValue {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4a4870;
+  margin-bottom: 0.25rem;
+}
+
+.barBlue {
+  background: linear-gradient(180deg, #95c6ff 0%, #5788f8 100%);
+}
+
+.barPink {
+  background: linear-gradient(180deg, #ff9cb0 0%, #f0528c 100%);
+}
+
+.axisLine {
+  stroke: #d9d8eb;
+  stroke-width: 1;
+}
+
+.tickLabel {
+  fill: #8e8ca7;
+  font-size: 10px;
+}
+
+.attendanceDescription {
+  margin: 0 0 0.8rem;
+  color: #6c6a8c;
+}
+
+.instructorFilters {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.instructorSearchInput {
+  width: 250px;
+  flex: 2 1 520px;
+  min-width: min(100%, 420px);
+  border: 1px solid #d9d8eb;
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  font-size: 1rem;
+  color: #2b295a;
+
+  &::placeholder {
+    color: #8a88a7;
+  }
+}
+
+.englishBackgroundFilterGroup {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.englishBackgroundRadio {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2b295a;
+  background: #f8fafc;
+  border: 1px solid #dce1f0;
+  border-radius: 999px;
+  padding: 0.35rem 0.6rem;
+
+  input {
+    accent-color: $blue_primary;
+  }
+}
+
+.instructorPickerScrollableArea {
+  height: 300px;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
+.instructorPickerGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.instructorPickerItem {
+  border: 1px solid #dfdff0;
+  background: #f9f9ff;
+  border-radius: 10px;
+  padding: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 600;
+  color: #2b295a;
+}
+
+.instructorAvatar {
+  border-radius: 999px;
+  object-fit: cover;
+
+  &.non-native {
+    border: 3px solid $green-success;
+  }
+
+  &.native-a {
+    border: 4px solid $blue_primary;
+  }
+
+  &.native-b {
+    border: 4px solid $purple-accent-hover;
+  }
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 44, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modalCard {
+  background: #fff;
+  width: min(1100px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(17, 15, 65, 0.22);
+  padding: 1rem;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+
+  h3 {
+    margin: 0;
+    color: #2b295a;
+  }
+}
+
+.attendanceTableWrapper {
+  overflow-x: auto;
+}
+
+.attendanceTable {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    border-bottom: 1px solid #ecebfa;
+    padding: 0.55rem;
+    text-align: left;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  th {
+    color: #4f4d75;
+    background: #f8f8fe;
+  }
+}
+
+.closeButton {
+  border: none;
+  border-radius: 16px;
+  min-height: 52px;
+  min-width: 96px;
+  padding: 12px 20px;
+  color: #fff;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, #6f63ff 0%, #5046e5 100%);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(1.04);
+  }
+}
+
+.messageBoardCard {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(18, 16, 65, 0.08);
+  padding: 1rem;
+}
+
+.messageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.8rem;
+
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    color: #2b295a;
+    font-size: 1.4rem;
+  }
+}
+
+.toggleButton {
+  border: 1px solid #d9d8eb;
+  background: #fff;
+  color: $blue_primary;
+  border-radius: 10px;
+  min-width: 2rem;
+  min-height: 2rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.messageIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.messageBoardContent {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+}
+
+.messageForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.messageTextAreaField {
+  width: 100%;
+}
+
+.messageTextAreaWrapper {
+  width: 100%;
+}
+
+.messageTextAreaInput {
+  width: 100%;
+  min-height: 120px;
+  max-height: 120px;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  resize: none;
+}
+
+.segmentedControl {
+  display: inline-flex;
+  border: 1px solid #d9d8eb;
+  border-radius: 10px;
+  overflow: hidden;
+  width: fit-content;
+
+  button {
+    border: none;
+    background: #fff;
+    font-weight: 600;
+    color: $blue_primary;
+    padding: 0.45rem 0.75rem;
+    cursor: pointer;
+  }
+}
+
+.activeTarget {
+  background: $blue_primary !important;
+  color: white !important;
+}
+
+.messageActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  p {
+    margin: 0;
+    color: #4f46e5;
+  }
+
+  button {
+    border: none;
+    background: $blue_primary;
+    color: white;
+    border-radius: 10px;
+    padding: 0.55rem 1.25rem;
+    cursor: pointer;
+    font-weight: 600;
+  }
+}
+
+.messageHistory {
+  border-left: 1px solid #ecebfa;
+  padding-left: 1rem;
+
+  h3 {
+    margin-top: 0;
+    color: #2b295a;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  li {
+    background: #f8f8fe;
+    border-radius: 10px;
+    padding: 0.65rem;
+
+    strong {
+      text-transform: capitalize;
+      color: #4f46e5;
+    }
+
+    p {
+      margin: 0.3rem 0;
+      color: #2a294f;
+      overflow-wrap: anywhere;
+    }
+
+    time {
+      font-size: 0.75rem;
+      color: #7f7d9d;
+    }
+  }
+}
+
+.messagePreview article {
+  background: #f8f8fe;
+  border-radius: 10px;
+  padding: 0.65rem;
+
+  p {
+    margin: 0.3rem 0;
+    color: #2a294f;
+    max-height: 3.2rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+  }
+}
+
+.historyButton {
+  border: 1px solid #d9d8eb;
+  background: #fff;
+  color: $blue_primary;
+  border-radius: 10px;
+  padding: 0.45rem 0.7rem;
+  margin-top: 0.65rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.recentMessagesModal {
+  width: min(860px, 95vw);
+  max-height: min(80vh, 760px);
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+}
+
+.recentMessagesModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+
+  h3 {
+    margin: 0;
+    color: #2b295a;
+  }
+}
+
+.recentMessagesCount {
+  border-radius: 999px;
+  background: #eef1ff;
+  color: #4f46e5;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.32rem 0.62rem;
+  white-space: nowrap;
+}
+
+.recentMessagesList {
+  list-style: none;
+  margin: 0;
+  padding: 0 0.2rem 0 0;
+  max-height: min(70vh, 620px);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.72rem;
+}
+
+.recentMessageItem {
+  border: 1px solid #e8eafd;
+  background: linear-gradient(180deg, #fcfcff 0%, #f6f7ff 100%);
+  border-radius: 12px;
+  padding: 0.85rem 0.9rem;
+  box-shadow: 0 1px 2px rgba(27, 24, 79, 0.05);
+
+  p {
+    margin: 0;
+    color: #2a294f;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+.recentMessageMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+
+  time {
+    font-size: 0.8rem;
+    color: #7f7d9d;
+  }
+}
+
+.recentMessageTarget {
+  text-transform: capitalize;
+  color: #4338ca;
+  background: #ecefff;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+}
+
+.emptyText {
+  color: #7f7d9d;
+}
+
+@media (max-width: 1024px) {
+  .kpiGrid,
+  .twoColumnCharts,
+  .messageBoardContent {
+    grid-template-columns: 1fr;
+  }
+
+  .instructorPickerGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .messageHistory {
+    border-left: none;
+    border-top: 1px solid #ecebfa;
+    padding-left: 0;
+    padding-top: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .instructorPickerGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .headerArea {
+    flex-direction: column;
+    align-items: flex-start;
+
+    h1 {
+      font-size: 1.7rem;
+    }
+  }
+}

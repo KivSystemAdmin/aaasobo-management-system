@@ -8,8 +8,7 @@ import {
   getCalendarClassesController,
   getInstructorProfilesController,
   getSameDateClassesController,
-  getNativeInstructorProfilesController,
-  getNonNativeInstructorProfilesController,
+  getInstructorProfilesByEnglishBackgroundController,
 } from "../../src/controllers/instructorsController";
 import { registerRoutes } from "../middlewares/validationMiddleware";
 import {
@@ -25,10 +24,13 @@ import {
   InstructorSchedulesResponse,
   ClassIdParams,
   ClassInstructorResponse,
+  EnglishBackgroundParams,
   AvailableSlotsQuery,
   InstructorAvailableSlotsQuery,
   AvailableSlotsResponse,
   InstructorAvailableSlotsResponse,
+  InstructorCalendarSlotsResponse,
+  InstructorCalendarClassesResponse,
   InstructorClassParams,
   ActiveScheduleQuery,
   ActiveScheduleResponse,
@@ -40,6 +42,10 @@ import {
   InstructorAbsencesResponse,
   CreateAbsenceResponse,
   DeleteAbsenceResponse,
+  TagCatalogResponse,
+  InstructorTagsResponse,
+  TagIdParams,
+  UpdateInstructorTagsRequest,
 } from "../../../shared/schemas/instructors";
 import {
   type RequestWithId,
@@ -51,6 +57,7 @@ import {
   getInstructorScheduleController,
   createInstructorScheduleController,
   getInstructorAvailableSlotsController,
+  getInstructorCalendarSlotsController,
   getAllAvailableSlotsController,
   getActiveInstructorScheduleController,
   getAvailableSlotsByTypeController,
@@ -61,6 +68,13 @@ import {
   removeInstructorAbsenceController,
 } from "../../src/controllers/instructorAbsenceController";
 import { AUTH_ROLES } from "../utils/commonUtils";
+import {
+  createTagController,
+  deleteTagController,
+  getInstructorTagsController,
+  getTagCatalogController,
+  updateInstructorTagsController,
+} from "../controllers/instructorTagsController";
 
 const profilesConfig = {
   method: "get" as const,
@@ -82,36 +96,19 @@ const profilesConfig = {
   },
 } as const;
 
-const nativeProfilesConfig = {
+const englishBackgroundProfilesConfig = {
   method: "get" as const,
+  paramsSchema: EnglishBackgroundParams,
   middleware: [verifyAuthentication(AUTH_ROLES.ACI)] as RequestHandler[],
-  handler: getNativeInstructorProfilesController,
+  handler: getInstructorProfilesByEnglishBackgroundController,
   openapi: {
-    summary: "Get Native instructor profiles",
-    description: "Get public instructor profiles for customer dashboard",
+    summary: "Get instructor profiles by English background",
+    description:
+      "Get public instructor profiles for customer dashboard filtered by English background",
     responses: {
       200: {
-        description: "Successfully retrieved native instructor profiles",
-        schema: InstructorProfilesResponse,
-      },
-      500: {
-        description: "Internal server error",
-        schema: MessageErrorResponse,
-      },
-    },
-  },
-} as const;
-
-const nonNativeProfilesConfig = {
-  method: "get" as const,
-  middleware: [verifyAuthentication(AUTH_ROLES.ACI)] as RequestHandler[],
-  handler: getNonNativeInstructorProfilesController,
-  openapi: {
-    summary: "Get Non Native instructor profiles",
-    description: "Get public instructor profiles for customer dashboard",
-    responses: {
-      200: {
-        description: "Successfully retrieved non native instructor profiles",
+        description:
+          "Successfully retrieved instructor profiles filtered by English background",
         schema: InstructorProfilesResponse,
       },
       500: {
@@ -124,7 +121,7 @@ const nonNativeProfilesConfig = {
 
 const allProfilesConfig = {
   method: "get" as const,
-  middleware: [verifyAuthentication(AUTH_ROLES.C)] as RequestHandler[],
+  middleware: [verifyAuthentication(AUTH_ROLES.AC)] as RequestHandler[],
   handler: getAllInstructorProfilesController,
   openapi: {
     summary: "Get all instructor profiles",
@@ -365,10 +362,40 @@ const calendarClassesConfig = {
     responses: {
       200: {
         description: "Successfully retrieved calendar classes",
-        // Using any schema for now since the response is complex class data
+        schema: InstructorCalendarClassesResponse,
       },
       400: {
         description: "Invalid instructor ID",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+      },
+    },
+  },
+} as const;
+
+const calendarSlotsConfig = {
+  method: "get" as const,
+  paramsSchema: InstructorIdParams,
+  querySchema: InstructorAvailableSlotsQuery,
+  middleware: [
+    verifyAuthentication(AUTH_ROLES.AI, {
+      requireIdCheck: AUTH_ROLES.I,
+    }),
+  ] as RequestHandler[],
+  handler: getInstructorCalendarSlotsController,
+  openapi: {
+    summary: "Get instructor calendar slots",
+    description:
+      "Get instructor calendar slots including open availability, classes, and absences",
+    responses: {
+      200: {
+        description: "Successfully retrieved instructor calendar slots",
+        schema: InstructorCalendarSlotsResponse,
+      },
+      400: {
+        description: "Invalid instructor ID or query parameters",
         schema: MessageErrorResponse,
       },
       500: {
@@ -545,6 +572,10 @@ const createAbsenceConfig = {
         description: "Unauthorized - authentication required",
         schema: MessageErrorResponse,
       },
+      409: {
+        description: "Conflict with completed class at the target slot",
+        schema: MessageErrorResponse,
+      },
       500: {
         description: "Internal server error",
         schema: MessageErrorResponse,
@@ -582,18 +613,114 @@ const deleteAbsenceConfig = {
   },
 } as const;
 
+const tagCatalogConfig = {
+  method: "get" as const,
+  middleware: [verifyAuthentication(AUTH_ROLES.ACI)] as RequestHandler[],
+  handler: getTagCatalogController,
+  openapi: {
+    summary: "Get instructor tag catalog",
+    description: "Get active instructor tags and usage counts",
+    responses: {
+      200: { description: "Tag catalog", schema: TagCatalogResponse },
+      500: {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const createTagConfig = {
+  method: "post" as const,
+  bodySchema: z.object({ label: z.string().min(1).max(80) }),
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: createTagController,
+  openapi: {
+    summary: "Create instructor tag",
+    description: "Create a shared instructor tag (admin only)",
+    responses: {
+      201: { description: "Created" },
+      400: { description: "Bad request", schema: MessageErrorResponse },
+      500: {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const deleteTagConfig = {
+  method: "delete" as const,
+  paramsSchema: TagIdParams,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: deleteTagController,
+  openapi: {
+    summary: "Delete instructor tag",
+    description: "Soft-delete an instructor tag (admin only)",
+    responses: {
+      200: { description: "Deleted" },
+      500: {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const instructorTagsConfig = {
+  method: "get" as const,
+  paramsSchema: InstructorIdParams,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: getInstructorTagsController,
+  openapi: {
+    summary: "Get instructor tags",
+    description: "Get shared tag catalog and selected tags for an instructor",
+    responses: {
+      200: { description: "Instructor tags", schema: InstructorTagsResponse },
+      500: {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const updateInstructorTagsConfig = {
+  method: "put" as const,
+  paramsSchema: InstructorIdParams,
+  bodySchema: UpdateInstructorTagsRequest,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: updateInstructorTagsController,
+  openapi: {
+    summary: "Update instructor tags",
+    description: "Replace selected tags for an instructor",
+    responses: {
+      200: { description: "Updated" },
+      500: {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
+      },
+    },
+  },
+} as const;
+
 const validatedRouteConfigs = {
   "/all-profiles": [allProfilesConfig],
   "/available-slots": [availableSlotsConfig],
   "/available-slots/by-type": [availableSlotsByTypeConfig],
   "/class/:id": [classInstructorConfig],
   "/profiles": [profilesConfig],
-  "/profiles/native": [nativeProfilesConfig],
-  "/profiles/non-native": [nonNativeProfilesConfig],
+  "/profiles/english-background/:englishBackground": [
+    englishBackgroundProfilesConfig,
+  ],
+  "/tags": [tagCatalogConfig, createTagConfig],
+  "/tags/:id": [deleteTagConfig],
   "/:id": [instructorByIdConfig],
+  "/:id/tags": [instructorTagsConfig, updateInstructorTagsConfig],
   "/:id/absences": [instructorAbsencesConfig, createAbsenceConfig],
   "/:id/absences/:absentAt": [deleteAbsenceConfig],
   "/:id/available-slots": [instructorAvailableSlotsConfig],
+  "/:id/calendar-slots": [calendarSlotsConfig],
   "/:id/calendar-classes": [calendarClassesConfig],
   "/:id/classes/:classId/same-date": [sameDateClassesConfig],
   "/:id/profile": [instructorProfileConfig],

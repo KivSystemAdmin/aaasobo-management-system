@@ -1,6 +1,11 @@
 import { prisma } from "../../prisma/prismaClient";
 import { Prisma, RecurringClass, Class } from "../../generated/prisma";
 import { JAPAN_TIME_DIFF, nDaysLater, nHoursBefore } from "../utils/dateUtils";
+import {
+  NO_CLASS_EVENT_NAME,
+  REBOOKABLE_NO_CLASS_EVENT_NAME,
+} from "../utils/commonUtils";
+import { getSchedulesByEventNameAndDate } from "./scheduleService";
 
 interface CreateRegularClassParams {
   instructorId: number;
@@ -25,8 +30,11 @@ export const createRegularClass = async (params: CreateRegularClassParams) => {
 };
 
 // Simple recurring class creation for subscription setup
-export const createNewRecurringClass = async (subscriptionId: number) => {
-  return await prisma.recurringClass.create({
+export const createNewRecurringClass = async (
+  tx: Prisma.TransactionClient,
+  subscriptionId: number,
+) => {
+  return await tx.recurringClass.create({
     data: {
       subscriptionId: subscriptionId,
     },
@@ -257,7 +265,14 @@ async function createClassesUntil(
     throw new Error("RecurringClass instructorId cannot be null");
   }
 
-  const dates = createWeeklyDates(recurringClass.startAt, endDate);
+  const dates = await filterNoClassDates(
+    tx,
+    createWeeklyDates(recurringClass.startAt, endDate),
+  );
+  if (dates.length === 0) {
+    return [];
+  }
+
   const createdClasses = await tx.class.createManyAndReturn({
     data: dates.map((dateTime, index) => ({
       instructorId: recurringClass.instructorId!,
@@ -287,9 +302,33 @@ async function createClassesUntil(
   // Cancel created classes that conflict with existing classes or absences
   await cancelConflictingNewClasses(tx, recurringClass.id);
   await cancelClassesDuringAbsences(tx, recurringClass.id);
+  await cancelClassesDuringRebookableNoClasses(tx, recurringClass.id);
   await markPendingClassesBooked(tx, recurringClass.id);
 
   return createdClasses;
+}
+
+async function filterNoClassDates(
+  tx: Prisma.TransactionClient,
+  dates: Date[],
+): Promise<Date[]> {
+  if (dates.length === 0) {
+    return dates;
+  }
+
+  const noClassDates = await getSchedulesByEventNameAndDate(
+    NO_CLASS_EVENT_NAME,
+    new Date(dates[0].toISOString().slice(0, 10)),
+    new Date(dates[dates.length - 1].getTime() + 24 * 60 * 60 * 1000),
+    tx,
+  );
+  const noClassDateKeys = new Set(
+    noClassDates.map((schedule) => schedule.date.toISOString().slice(0, 10)),
+  );
+
+  return dates.filter(
+    (date) => !noClassDateKeys.has(date.toISOString().slice(0, 10)),
+  );
 }
 
 async function cancelConflictingNewClasses(
@@ -298,7 +337,9 @@ async function cancelConflictingNewClasses(
 ): Promise<void> {
   await tx.$executeRaw`
     UPDATE "Class" 
-    SET status = 'canceledByInstructor' 
+    SET status = 'canceledByInstructor',
+        "canceledAt" = NOW(),
+        "updatedAt" = NOW()
     WHERE id IN (
       SELECT c1.id
       FROM "Class" as c1
@@ -318,7 +359,9 @@ async function cancelClassesDuringAbsences(
 ): Promise<void> {
   await tx.$executeRaw`
     UPDATE "Class" 
-    SET status = 'canceledByInstructor' 
+    SET status = 'canceledByInstructor',
+        "canceledAt" = NOW(),
+        "updatedAt" = NOW()
     WHERE id IN (
       SELECT c.id
       FROM "Class" as c
@@ -326,6 +369,29 @@ async function cancelClassesDuringAbsences(
         ON c."recurringClassId" = ${newRecurringClassId}
         AND absence."instructorId" = c."instructorId"
         AND absence."absentAt" = c."dateTime"
+    )
+  `;
+}
+
+async function cancelClassesDuringRebookableNoClasses(
+  tx: Prisma.TransactionClient,
+  newRecurringClassId: number,
+): Promise<void> {
+  await tx.$executeRaw`
+    UPDATE "Class" 
+    SET status = 'canceledByAdmin',
+        "canceledAt" = NOW(),
+        "updatedAt" = NOW()
+    WHERE id IN (
+      SELECT c.id
+      FROM "Class" as c
+      INNER JOIN "Schedule" as schedule
+        ON c."recurringClassId" = ${newRecurringClassId}
+        AND c.status = 'pending'
+        AND schedule.date = date_trunc('day', c."dateTime")
+      INNER JOIN "Event" as event
+        ON event.id = schedule."eventId"
+        AND event.name = ${REBOOKABLE_NO_CLASS_EVENT_NAME}
     )
   `;
 }
@@ -421,6 +487,17 @@ export const getRegularClassesBySubscriptionId = async (
       recurringClassAttendance,
       endAt: displayEndAt ? displayEndAt : null,
     };
+  });
+};
+
+export const getRecurringClassesHistoryCountBySubscriptionId = async (
+  subscriptionId: number,
+) => {
+  return prisma.recurringClass.count({
+    where: {
+      subscriptionId,
+      endAt: { not: null },
+    },
   });
 };
 

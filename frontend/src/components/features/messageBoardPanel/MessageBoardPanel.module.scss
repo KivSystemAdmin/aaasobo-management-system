@@ -1,0 +1,163 @@
+@use "@/styles/variables.module.scss" as *;
+
+.messageBanner {
+  border: 1px solid #d9d8eb;
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: #f8f8fe;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+
+  .icon {
+    width: 25px;
+    height: 25px;
+    color: $blue_primary;
+    flex-shrink: 0;
+    margin: 3px 5px -6px 0px;
+  }
+
+  h3 {
+    margin: 0;
+    color: #2b295a;
+    font-size: 1rem;
+  }
+}
+
+.toggleButton {
+  border: 1px solid $blue_primary;
+  background: white;
+  color: $blue_primary;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.body {
+  margin-top: 0.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  p {
+    margin: 0;
+    color: #2a294f;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+
+  time {
+    color: #7f7d9d;
+    font-size: 0.8rem;
+  }
+}
+
+.footerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.newMessageNotification {
+  color: #d50000;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.readReactionButton {
+  width: fit-content;
+  background: transparent;
+  border: none;
+  color: $blue_primary;
+  cursor: pointer;
+  transform: translateY(6px);
+  margin: 0 0.1rem 0 0.5rem;
+  line-height: 0;
+
+  svg {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+.markAsRead {
+  font-size: 12px;
+  color: $blue_primary;
+}
+
+.hasRead {
+  font-size: 12px;
+  color: #9998ac;
+}
+
+.pastMessagesButton {
+  align-self: flex-start;
+  border: 1px solid $blue_primary;
+  background: white;
+  color: $blue_primary;
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.messageModalContent {
+  width: min(860px, 95vw);
+  max-height: min(80vh, 760px);
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+
+  h3 {
+    margin: 0;
+    color: #2b295a;
+    margin-bottom: 0.9rem;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 0.2rem 0 0;
+    max-height: min(70vh, 620px);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.72rem;
+  }
+
+  li {
+    border: 1px solid #e8eafd;
+    background: linear-gradient(180deg, #fcfcff 0%, #f6f7ff 100%);
+    border-radius: 12px;
+    padding: 0.85rem 0.9rem;
+    box-shadow: 0 1px 2px rgba(27, 24, 79, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    p {
+      margin: 0;
+      color: #2a294f;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+  }
+
+  time {
+    font-size: 0.8rem;
+    color: #7f7d9d;
+    align-self: flex-end;
+    text-align: right;
+  }
+}

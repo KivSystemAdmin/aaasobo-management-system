@@ -1,3 +1,36 @@
+@use "@/styles/variables.module.scss" as *;
+
+.breadcrumb {
+  margin: -1rem 1rem 1rem 0;
+  font-size: 20px;
+  font-weight: 500;
+
+  &__list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__item {
+    margin-right: 0.5rem;
+
+    a {
+      text-decoration: none;
+      color: $blue-primary;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__separator {
+    margin-right: 0.5rem;
+    color: #555;
+  }
+}
+
 .instructors {
   &__list {
     display: flex;
@@ -6,13 +39,50 @@
     gap: 20px;
     width: 100%;
     overflow-x: auto;
+    overflow-y: hidden;
   }
 }
 
 .instructorSearch {
-  width: 200px;
-  padding: 2px 5px;
+  width: min(360px, 100%);
+  padding: 8px 12px;
   font-size: 16px;
   font-weight: 400;
   border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.filterChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.filterChip {
+  border: 1px solid #4d4caf;
+  color: #4d4caf;
+  background: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.selected {
+  background: #4d4caf;
+  color: #fff;
+}
+
+.clearFilters {
+  border: 1px solid #c5c8d4;
+  background: #f7f8fd;
+  color: #5f6472;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.resultCount {
+  margin-bottom: 10px;
+  color: #33394a;
 }

@@ -9,16 +9,16 @@ datasource db {
 }
 
 model Instructor {
-  id                  Int                  @id @default(autoincrement())
+  id                  Int                       @id @default(autoincrement())
   name                String
-  email               String               @unique
+  email               String                    @unique
   password            String
-  classURL            String               @unique
-  icon                String               @unique
-  nickname            String               @unique
-  meetingId           String               @unique
-  passcode            String               @unique
-  createdAt           DateTime             @default(now())
+  classURL            String                    @unique
+  icon                String                    @unique
+  nickname            String                    @unique
+  meetingId           String                    @unique
+  passcode            String                    @unique
+  createdAt           DateTime                  @default(now())
   birthdate           DateTime
   favoriteFood        String
   hobby               String
@@ -27,14 +27,42 @@ model Instructor {
   skill               String
   workingTime         String
   terminationAt       DateTime?
-  updatedAt           DateTime             @default(now()) @updatedAt
-  isNative            Boolean
+  updatedAt           DateTime                  @default(now()) @updatedAt
+  englishBackground   Int // 0: non-native, 1: native-A, 2: native-B
   classes             Class[]
   instructorAbsences  InstructorAbsence[]
+  instructorFees      InstructorFee[]
   instructorSchedules InstructorSchedule[]
   recurringClasses    RecurringClass[]
+  tagAssignments      InstructorTagAssignment[]
 
   @@index([terminationAt])
+}
+
+model InstructorTagCatalog {
+  id          Int                       @id @default(autoincrement())
+  label       String                    @unique
+  sortOrder   Int                       @default(0)
+  createdBy   Int?
+  createdAt   DateTime                  @default(now())
+  deletedAt   DateTime?
+  deletedBy   Int?
+  assignments InstructorTagAssignment[]
+
+  @@index([deletedAt])
+  @@index([sortOrder])
+}
+
+model InstructorTagAssignment {
+  instructorId Int
+  tagId        Int
+  updatedBy    Int?
+  updatedAt    DateTime             @default(now()) @updatedAt
+  instructor   Instructor           @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  tag          InstructorTagCatalog @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([instructorId, tagId])
+  @@index([tagId])
 }
 
 model Customer {
@@ -62,6 +90,7 @@ model Class {
   recurringClassId Int?
   dateTime         DateTime?
   status           Status
+  canceledAt       DateTime?
   subscriptionId   Int?
   rebookableUntil  DateTime?
   classCode        String
@@ -84,7 +113,9 @@ model Class {
   @@index([customerId, status, dateTime])
   @@index([instructorId, status, dateTime])
   @@index([recurringClassId, dateTime])
+  @@index([subscriptionId])
   @@index([rebookableUntil])
+  @@index([canceledAt])
 }
 
 model ClassAttendance {
@@ -94,26 +125,28 @@ model ClassAttendance {
   class      Class @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   @@id([classId, childrenId])
-  @@index([classId])
   @@index([childrenId])
 }
 
 model Plan {
-  id               Int            @id @default(autoincrement())
-  name             String
-  description      String
-  weeklyClassTimes Int
-  createdAt        DateTime       @default(now())
-  terminationAt    DateTime?
-  updatedAt        DateTime       @default(now()) @updatedAt
-  isNative         Boolean
-  subscription     Subscription[]
+  id                Int            @id @default(autoincrement())
+  name              String
+  description       String
+  weeklyClassTimes  Int
+  createdAt         DateTime       @default(now())
+  terminationAt     DateTime?
+  updatedAt         DateTime       @default(now()) @updatedAt
+  englishBackground Int // 0: non-native, 1: native-A, 2: native-B
+  subscription      Subscription[]
+
+  @@index([terminationAt])
 }
 
 model Subscription {
   id             Int              @id @default(autoincrement())
   planId         Int
   customerId     Int
+  selectType     String           @unique
   startAt        DateTime
   endAt          DateTime?
   class          Class[]
@@ -122,6 +155,8 @@ model Subscription {
   plan           Plan             @relation(fields: [planId], references: [id])
 
   @@index([customerId])
+  @@index([planId])
+  @@index([customerId, planId])
 }
 
 model RecurringClass {
@@ -147,7 +182,6 @@ model RecurringClassAttendance {
   recurringClass   RecurringClass @relation(fields: [recurringClassId], references: [id])
 
   @@id([recurringClassId, childrenId])
-  @@index([recurringClassId])
   @@index([childrenId])
 }
 
@@ -158,6 +192,7 @@ model VerificationToken {
   expires DateTime
 
   @@unique([email, token])
+  @@index([email])
 }
 
 model PasswordResetToken {
@@ -167,6 +202,7 @@ model PasswordResetToken {
   expires DateTime
 
   @@unique([email, token])
+  @@index([email])
 }
 
 model Schedule {
@@ -174,6 +210,8 @@ model Schedule {
   date    DateTime @unique
   eventId Int
   event   Event    @relation(fields: [eventId], references: [id])
+
+  @@index([eventId])
 }
 
 model Event {
@@ -193,7 +231,6 @@ model InstructorSchedule {
   slots         InstructorSlot[]
 
   @@unique([instructorId, effectiveTo])
-  @@index([instructorId, effectiveTo])
   @@index([instructorId, effectiveFrom])
   @@index([instructorId, timezone, effectiveFrom])
 }
@@ -205,6 +242,7 @@ model InstructorSlot {
   schedule   InstructorSchedule @relation(fields: [scheduleId], references: [id])
 
   @@id([scheduleId, weekday, startTime])
+  @@index([weekday, startTime])
 }
 
 model InstructorAbsence {
@@ -213,8 +251,24 @@ model InstructorAbsence {
   instructor   Instructor @relation(fields: [instructorId], references: [id])
 
   @@id([instructorId, absentAt])
-  @@index([instructorId])
   @@index([absentAt])
+}
+
+model InstructorFee {
+  id                     Int        @id @default(autoincrement())
+  instructorId           Int
+  currency               String
+  effectiveFrom          DateTime   @db.Date
+  effectiveTo            DateTime?  @db.Date
+  trialFee               Int
+  regularFee             Int
+  cancelFee              Int
+  cancelWithoutNoticeFee Int
+  monthlyCancelFee       Int        @default(0)
+  instructor             Instructor @relation(fields: [instructorId], references: [id])
+
+  @@index([instructorId, effectiveFrom])
+  @@index([instructorId, effectiveTo])
 }
 
 model SystemStatus {
@@ -225,12 +279,15 @@ model SystemStatus {
 }
 
 model Admin {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  password      String
+  terminationAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now())
+
+  @@index([terminationAt])
 }
 
 model Child {
@@ -248,11 +305,23 @@ model Child {
   @@index([customerId])
 }
 
+model MessageBoardPost {
+  id        Int      @id @default(autoincrement())
+  target    Int
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([target])
+  @@index([createdAt])
+}
+
 enum Status {
   booked
   completed
   canceledByCustomer
   canceledByInstructor
+  canceledByAdmin
   pending
   rebooked
   declined

@@ -59,9 +59,7 @@ const ClassItem = ({
       key={classItem.id}
       className={`${styles.classItem} ${isFreeTrial ? styles.freeTrial : styles[classItem.status]} ${classItem.id === classId ? styles["classItem--selected"] : ""}`}
       onClick={() => {
-        router.replace(
-          `/instructors/${instructorId}/class-schedule/${classItem.id}`,
-        );
+        router.replace(`/instructors/class-schedule/${classItem.id}`);
       }}
     >
       <div className={styles.classItem__head}>

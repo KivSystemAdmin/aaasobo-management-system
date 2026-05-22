@@ -8,9 +8,9 @@ import StatusSwitcher from "@/components/elements/StatusSwitcher/StatusSwitcher"
 import InputField from "../../elements/inputField/InputField";
 import ActionButton from "../../elements/buttons/actionButton/ActionButton";
 import { formatBirthdateToISO, getLongMonth } from "@/lib/utils/dateUtils";
-import { CheckIcon } from "@heroicons/react/24/outline";
 import {
   CakeIcon,
+  CheckIcon,
   CalendarDaysIcon,
   NewspaperIcon,
   PencilSquareIcon,
@@ -22,6 +22,7 @@ import {
   LinkIcon,
   UserCircleIcon,
   VideoCameraIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -31,11 +32,15 @@ import Uploader from "../../features/registerForm/uploadImages/Uploader";
 import { defaultUserImageUrl } from "@/lib/data/data";
 import Image from "next/image";
 import { confirmAlert } from "@/lib/utils/alertUtils";
+import InstructorFeeRates from "./InstructorFeeRates";
+import { EnglishBackground } from "@/types";
+import RadioButton from "../../elements/radioButton/RadioButton";
+import TextAreaInput from "../../elements/textAreaInput/TextAreaInput";
 
 // Define the specific string fields that are editable in this component
 type EditableInstructorFields =
   | "name"
-  | "isNative"
+  | "englishBackground"
   | "nickname"
   | "birthdate"
   | "workingTime"
@@ -53,10 +58,12 @@ function InstructorProfile({
   instructor,
   token,
   userSessionType,
+  isCustomerView = false,
 }: {
   instructor: Instructor | InstructorProfile | string;
   token?: string;
   userSessionType?: UserType;
+  isCustomerView?: boolean;
 }) {
   const [updateResultState, setUpdateResultState] = useState<
     UpdateFormState | undefined
@@ -72,7 +79,6 @@ function InstructorProfile({
     }
     const newMessages: Record<string, string> = {};
     if (result.name) newMessages.name = result.name;
-    if (result.isNative) newMessages.isNative = result.isNative;
     if (result.nickname) newMessages.nickname = result.nickname;
     if (result.email) newMessages.email = result.email;
     if (result.classURL) newMessages.classURL = result.classURL;
@@ -104,11 +110,16 @@ function InstructorProfile({
   >(typeof instructor !== "string" ? instructor : null);
   const [isEditing, setIsEditing] = useState(false);
   const [userStatus, setUserStatus] = useState<string>("Active");
-  const [nativeStatus, setNativeStatus] = useState<string>("Non-native");
   const [leavingDate, setLeavingDate] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { language } = useLanguage();
   const formRef = useRef<HTMLFormElement>(null);
+  const englishBackgroundLabels = [
+    "Non Native",
+    "Native A",
+    "Native B",
+  ] as const;
+  const englishBackgroundClassNames = ["", "nativeA", "nativeB"] as const;
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -131,6 +142,16 @@ function InstructorProfile({
       setLatestInstructor(previousInstructor);
       setIsEditing(false);
       clearErrorMessage("all");
+    }
+  };
+
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (latestInstructor) {
+      const newEnglishBackground = Number(e.target.value);
+      setLatestInstructor({
+        ...latestInstructor,
+        englishBackground: newEnglishBackground,
+      });
     }
   };
 
@@ -258,9 +279,24 @@ function InstructorProfile({
                 <p className={styles.instructorName__text}>
                   {language === "en" ? "Name" : "名前"}
                 </p>
-                {!isEditing && latestInstructor.isNative ? (
-                  <div className={styles.instructorName__isNativeFlag}>
-                    Native
+                {!isEditing &&
+                latestInstructor.englishBackground !==
+                  EnglishBackground.NonNative ? (
+                  <div
+                    className={`${styles.instructorName__nativeFlag} 
+                      ${
+                        styles[
+                          englishBackgroundClassNames[
+                            latestInstructor.englishBackground
+                          ]
+                        ]
+                      }`}
+                  >
+                    {
+                      englishBackgroundLabels[
+                        latestInstructor.englishBackground
+                      ]
+                    }
                   </div>
                 ) : null}
               </div>
@@ -280,19 +316,45 @@ function InstructorProfile({
               )}
             </div>
 
-            {/* Native Type Switcher */}
-            <StatusSwitcher
-              isEditing={isEditing}
-              statusOptions={["Non-native", "Native"]}
-              currentStatus={
-                latestInstructor.isNative ? "Native" : "Non-native"
-              }
-              width="220px"
-              title="Non-native / Native"
-              onStatusChange={(newStatus) => {
-                setNativeStatus(newStatus);
-              }}
-            />
+            {/* English Background Selection (Radio button) */}
+            {isEditing ? (
+              <>
+                <p className={styles.englishBackground}>English Background</p>
+                <RadioButton
+                  name="englishBackground"
+                  value={EnglishBackground.NonNative}
+                  checked={
+                    latestInstructor.englishBackground ===
+                    EnglishBackground.NonNative
+                  }
+                  onChange={handleRadioChange}
+                  label={englishBackgroundLabels[EnglishBackground.NonNative]}
+                  className={styles.englishBackgroundRadio}
+                />
+                <RadioButton
+                  name="englishBackground"
+                  value={EnglishBackground.NativeA}
+                  checked={
+                    latestInstructor.englishBackground ===
+                    EnglishBackground.NativeA
+                  }
+                  onChange={handleRadioChange}
+                  label={englishBackgroundLabels[EnglishBackground.NativeA]}
+                  className={styles.englishBackgroundRadio}
+                />
+                <RadioButton
+                  name="englishBackground"
+                  value={EnglishBackground.NativeB}
+                  checked={
+                    latestInstructor.englishBackground ===
+                    EnglishBackground.NativeB
+                  }
+                  onChange={handleRadioChange}
+                  label={englishBackgroundLabels[EnglishBackground.NativeB]}
+                  className={styles.englishBackgroundRadio}
+                />
+              </>
+            ) : null}
 
             {/* Nickname Hobby, Message For Children, Skill */}
             <div className={styles.insideContainer}>
@@ -354,12 +416,15 @@ function InstructorProfile({
               <div className={styles.userInfo}>
                 <p>{language === "en" ? "Available Class" : "開講クラス"}</p>
                 {isEditing ? (
-                  <textarea
+                  <TextAreaInput
                     id="workingTime"
                     name="workingTime"
                     defaultValue={latestInstructor.workingTime || undefined}
                     onChange={(e) => handleInputChange(e, "workingTime")}
-                    className={`${styles.workingTime__inputField} ${isEditing ? styles.editable : ""}`}
+                    inputClassName={`${styles.workingTime__inputField} ${isEditing ? styles.editable : ""}`}
+                    containerClassName={styles.textareaInputContainer}
+                    unstyled
+                    withLabelWrapper={false}
                     maxLength={500}
                   />
                 ) : (
@@ -376,12 +441,15 @@ function InstructorProfile({
               <div className={styles.userInfo}>
                 <p>{language === "en" ? "Life History" : "経歴"}</p>
                 {isEditing ? (
-                  <textarea
+                  <TextAreaInput
                     id="lifeHistory"
                     name="lifeHistory"
                     defaultValue={latestInstructor.lifeHistory || undefined}
                     onChange={(e) => handleInputChange(e, "lifeHistory")}
-                    className={`${styles.lifeHistory__inputField} ${isEditing ? styles.editable : ""}`}
+                    inputClassName={`${styles.lifeHistory__inputField} ${isEditing ? styles.editable : ""}`}
+                    containerClassName={styles.textareaInputContainer}
+                    unstyled
+                    withLabelWrapper={false}
                     maxLength={500}
                   />
                 ) : (
@@ -398,11 +466,14 @@ function InstructorProfile({
               <div className={styles.userInfo}>
                 <p>{language === "en" ? "Favorite Food" : "好きな食べ物"}</p>
                 {isEditing ? (
-                  <textarea
+                  <TextAreaInput
                     name="favoriteFood"
                     defaultValue={latestInstructor.favoriteFood || undefined}
                     onChange={(e) => handleInputChange(e, "favoriteFood")}
-                    className={`${styles.favoriteFood__inputField} ${isEditing ? styles.editable : ""}`}
+                    inputClassName={`${styles.favoriteFood__inputField} ${isEditing ? styles.editable : ""}`}
+                    containerClassName={styles.textareaInputContainer}
+                    unstyled
+                    withLabelWrapper={false}
                     maxLength={500}
                   />
                 ) : (
@@ -419,11 +490,14 @@ function InstructorProfile({
               <div className={styles.userInfo}>
                 <p>{language === "en" ? "Hobby" : "趣味"}</p>
                 {isEditing ? (
-                  <textarea
+                  <TextAreaInput
                     name="hobby"
                     defaultValue={latestInstructor.hobby || undefined}
                     onChange={(e) => handleInputChange(e, "hobby")}
-                    className={`${styles.hobby__inputField} ${isEditing ? styles.editable : ""}`}
+                    inputClassName={`${styles.hobby__inputField} ${isEditing ? styles.editable : ""}`}
+                    containerClassName={styles.textareaInputContainer}
+                    unstyled
+                    withLabelWrapper={false}
                     maxLength={500}
                   />
                 ) : (
@@ -444,13 +518,16 @@ function InstructorProfile({
                     : "子どもたちへメッセージ"}
                 </p>
                 {isEditing ? (
-                  <textarea
+                  <TextAreaInput
                     name="messageForChildren"
                     defaultValue={
                       latestInstructor.messageForChildren || undefined
                     }
                     onChange={(e) => handleInputChange(e, "messageForChildren")}
-                    className={`${styles.messageForChildren__inputField} ${isEditing ? styles.editable : ""}`}
+                    inputClassName={`${styles.messageForChildren__inputField} ${isEditing ? styles.editable : ""}`}
+                    containerClassName={styles.textareaInputContainer}
+                    unstyled
+                    withLabelWrapper={false}
                     maxLength={500}
                   />
                 ) : (
@@ -467,11 +544,14 @@ function InstructorProfile({
               <div className={styles.userInfo}>
                 <p>{language === "en" ? "Skill" : "スキル"}</p>
                 {isEditing ? (
-                  <textarea
+                  <TextAreaInput
                     name="skill"
                     defaultValue={latestInstructor.skill || undefined}
                     onChange={(e) => handleInputChange(e, "skill")}
-                    className={`${styles.skill__inputField} ${isEditing ? styles.editable : ""}`}
+                    inputClassName={`${styles.skill__inputField} ${isEditing ? styles.editable : ""}`}
+                    containerClassName={styles.textareaInputContainer}
+                    unstyled
+                    withLabelWrapper={false}
                     maxLength={500}
                   />
                 ) : (
@@ -483,11 +563,11 @@ function InstructorProfile({
             </div>
 
             {/* Email */}
-            {userSessionType !== "customer" && (
+            {userSessionType !== "customer" && !isCustomerView && (
               <div className={styles.insideContainer}>
                 <EnvelopeIcon className={styles.icon} />
                 <div className={styles.userInfo}>
-                  <p>Email</p>
+                  <p>{language === "en" ? "Email" : "メール"}</p>
                   {isEditing ? (
                     <InputField
                       name="email"
@@ -515,11 +595,11 @@ function InstructorProfile({
             )}
 
             {/* Class URL, Meeting ID, and Passcode */}
-            {userSessionType !== "customer" && (
+            {userSessionType !== "customer" && !isCustomerView && (
               <div className={styles.insideContainer}>
                 <VideoCameraIcon className={styles.icon} />
                 <div className={styles.userInfo}>
-                  <p>Class URL</p>
+                  <p>{language === "en" ? "Class URL" : "クラスURL"}</p>
                   {isEditing ? (
                     <InputField
                       name="classURL"
@@ -557,7 +637,10 @@ function InstructorProfile({
                   )}
 
                   <div className={styles.urlInfo}>
-                    <p>Meeting ID&nbsp;:&nbsp;</p>
+                    <p>
+                      {language === "en" ? "Meeting ID" : "ミーティングID"}
+                      &nbsp;:&nbsp;
+                    </p>
                     {isEditing ? (
                       <InputField
                         name="meetingId"
@@ -584,7 +667,10 @@ function InstructorProfile({
                     )}
                   </div>
                   <div className={styles.urlInfo}>
-                    <p>Passcode&nbsp;&nbsp;:&nbsp;</p>
+                    <p>
+                      {language === "en" ? "Passcode" : "パスコード"}
+                      &nbsp;&nbsp;:&nbsp;
+                    </p>
                     {isEditing ? (
                       <InputField
                         name="passcode"
@@ -614,8 +700,35 @@ function InstructorProfile({
               </div>
             )}
 
-            {/* Instructor introduction URL */}
-            {userSessionType !== "customer" && (
+            {userSessionType === "admin" &&
+              !isCustomerView &&
+              latestInstructor && (
+                <InstructorFeeRates instructorId={latestInstructor.id} />
+              )}
+
+            {(latestInstructor.tags?.length || 0) > 0 && (
+              <div className={styles.insideContainer}>
+                <SparklesIcon className={styles.icon} />
+                <div className={styles.userInfo}>
+                  <p className={styles.tagSectionTitle}>
+                    {language === "en" ? "Specialties" : "得意分野"}
+                  </p>
+
+                  <div className={styles.tagSection}>
+                    <div className={styles.tagList}>
+                      {latestInstructor.tags.map((tag) => (
+                        <span key={tag.id} className={styles.tagChip}>
+                          {tag.label}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Informational message */}
+            {userSessionType !== "customer" && !isCustomerView && (
               <div className={styles.insideContainer}>
                 <InformationCircleIcon className={styles.icon} />
                 <p className={styles.info}>
@@ -632,10 +745,10 @@ function InstructorProfile({
               name="icon"
               value={latestInstructor.icon.url}
             />
-            <input type="hidden" name="nativeStatus" value={nativeStatus} />
 
             {/* Action buttons for only admin */}
             {userSessionType === "admin" &&
+            !isCustomerView &&
             latestInstructor.name !== MASKED_HEAD_LETTERS ? (
               <>
                 {isEditing ? (

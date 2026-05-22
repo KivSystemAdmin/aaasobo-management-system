@@ -1,11 +1,13 @@
 import { prisma } from "../../prisma/prismaClient";
+import { MONTHS_TO_DELETE_PLANS } from "../utils/commonUtils";
+import { EnglishBackground } from "../types";
 
 // Register a new plan in the DB
 export const registerPlan = async (data: {
   name: string;
   weeklyClassTimes: number;
   description: string;
-  isNative: boolean;
+  englishBackground: EnglishBackground;
 }) => {
   await prisma.plan.create({ data });
 
@@ -62,7 +64,7 @@ export const updatePlan = async (
   id: number,
   name: string,
   description: string,
-  isNative: boolean,
+  englishBackground: EnglishBackground,
 ) => {
   try {
     // Update the plan data.
@@ -73,7 +75,7 @@ export const updatePlan = async (
       data: {
         name,
         description,
-        isNative,
+        englishBackground,
       },
     });
     return plan;
@@ -102,4 +104,18 @@ export const deletePlan = async (id: number) => {
     console.error("Database Error:", error);
     throw new Error("Failed to delete the plan data.");
   }
+};
+
+// Delete unnecessary plans
+export const deleteUnnecessaryPlans = async () => {
+  const thresholdDate = new Date();
+  thresholdDate.setMonth(thresholdDate.getMonth() - MONTHS_TO_DELETE_PLANS);
+
+  return await prisma.plan.deleteMany({
+    where: {
+      terminationAt: {
+        lt: thresholdDate,
+      },
+    },
+  });
 };

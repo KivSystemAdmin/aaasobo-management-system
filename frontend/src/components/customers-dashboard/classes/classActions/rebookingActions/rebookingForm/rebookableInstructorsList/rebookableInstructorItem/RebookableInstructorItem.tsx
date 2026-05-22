@@ -7,6 +7,8 @@ type RebookableInstructorItemProps = {
   instructor: InstructorRebookingProfile;
   isRebookable: boolean;
   language: "ja" | "en";
+  adminId?: number;
+  customerId?: number;
   onSelect: (instructor: InstructorRebookingProfile) => void;
 };
 
@@ -14,8 +16,17 @@ export default function RebookableInstructorItem({
   instructor,
   isRebookable,
   language,
+  adminId,
+  customerId,
   onSelect,
 }: RebookableInstructorItemProps) {
+  const englishBackgroundClass = ["non-native", "native-a", "native-b"][
+    instructor.englishBackground
+  ];
+  const instructorProfileUrl = adminId
+    ? `/admins/customer-list/instructor-profiles?customerId=${customerId}&instructorId=${instructor.id}`
+    : `/customers/instructor-profiles?instructorId=${instructor.id}`;
+
   return (
     <div
       className={`${styles.instructorItem} ${
@@ -23,7 +34,7 @@ export default function RebookableInstructorItem({
       }`}
     >
       <ClassInstructor
-        classStatus={"freeTrial"}
+        classStatus={englishBackgroundClass}
         instructorIcon={instructor.icon}
         instructorNickname={instructor.nickname}
         width={90}
@@ -33,7 +44,7 @@ export default function RebookableInstructorItem({
       <div className={styles.instructorItem__actions}>
         <ExternalLinkComponent
           linkName={language === "ja" ? "プロフィール" : "Profile"}
-          url={`/instructors/${instructor.id}`}
+          url={instructorProfileUrl}
           className="instructorProfileLink"
         />
 

@@ -5,6 +5,7 @@ import { hashPasswordSync } from "../../utils/commonUtils";
 import type { SimulationBootstrapConfig } from "./config";
 import { generateAuthCookie } from "../testUtils";
 const { faker } = require("@faker-js/faker");
+import { EnglishBackground } from "../../types";
 
 type Slot = { weekday: number; startTime: string };
 
@@ -65,7 +66,7 @@ async function registerPlan(authCookie: string, i: number) {
       planNameJpn,
       weeklyClassTimes,
       description,
-      isNative: "false",
+      englishBackground: EnglishBackground.NonNative,
     })
     .expect(201);
 
@@ -96,7 +97,7 @@ async function registerInstructor(authCookie: string, seed: number, i: number) {
     skill: "Conversation",
     meetingId: String(10_000_000_000 + i),
     passcode: `PASS${i}`.padEnd(8, "0"),
-    isNative: "false",
+    englishBackground: EnglishBackground.NonNative,
   };
 
   await request(server)

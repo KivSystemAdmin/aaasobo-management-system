@@ -21,10 +21,21 @@
 .sideNavLogo {
   display: flex;
   flex-direction: column;
-  margin: 0.75rem;
+  width: 100%;
+  margin: 0.75rem 0.5rem;
 
   &__img {
+    display: block;
+    width: 100%;
+    max-width: 183px;
+    height: auto;
     margin: 0.3rem 0.3rem 0.5rem 0.3rem;
+  }
+}
+
+@media (max-width: 1030px) {
+  .sideNavLogo {
+    width: 90%;
   }
 }
 

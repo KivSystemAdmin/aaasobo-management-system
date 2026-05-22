@@ -2,14 +2,17 @@ import { Response } from "express";
 import bcrypt from "bcrypt";
 import { RequestWithBody } from "../middlewares/validationMiddleware";
 import {
+  getAdminAuthByEmail,
   getAdminByEmail,
   updateAdminPassword,
 } from "../services/adminsService";
 import {
+  getCustomerAuthByEmail,
   getCustomerByEmail,
   updateCustomerPassword,
 } from "../services/customersService";
 import {
+  getInstructorAuthByEmail,
   getInstructorByEmail,
   updateInstructorPassword,
 } from "../services/instructorsService";
@@ -28,13 +31,19 @@ import {
   getPasswordResetTokenByToken,
 } from "../services/passwordResetTokensService";
 import { hashPassword } from "../utils/commonUtils";
-import { Customer } from "../../generated/prisma";
 import {
   AuthenticateRequest,
   SendPasswordResetRequest,
   VerifyResetTokenRequest,
   UpdatePasswordRequest,
 } from "../../../shared/schemas/users";
+
+type AuthUser = {
+  id: number;
+  name: string;
+  password: string;
+  emailVerified?: Date | null;
+};
 
 const getUserByEmail = async (userType: UserType, email: string) => {
   switch (userType) {
@@ -44,6 +53,20 @@ const getUserByEmail = async (userType: UserType, email: string) => {
       return getCustomerByEmail(email);
     case "instructor":
       return getInstructorByEmail(email);
+  }
+};
+
+const getAuthUserByEmail = async (
+  userType: UserType,
+  email: string,
+): Promise<AuthUser | null> => {
+  switch (userType) {
+    case "admin":
+      return getAdminAuthByEmail(email);
+    case "customer":
+      return getCustomerAuthByEmail(email);
+    case "instructor":
+      return getInstructorAuthByEmail(email);
   }
 };
 
@@ -57,7 +80,7 @@ export const authenticateUserController = async (
   const normalizedEmail = email.trim().toLowerCase();
 
   try {
-    const user = await getUserByEmail(userType, normalizedEmail);
+    const user = await getAuthUserByEmail(userType, normalizedEmail);
 
     if (!user) {
       return res.sendStatus(401);
@@ -71,11 +94,10 @@ export const authenticateUserController = async (
 
     // Email verification is only required for customers.
     if (userType === "customer") {
-      const customer = user as Customer;
-
       // Resend email to verify the registered email address if it is not verified yet.
-      if (!customer.emailVerified) {
-        const verificationToken = await generateVerificationToken(email);
+      if (!user.emailVerified) {
+        const verificationToken =
+          await generateVerificationToken(normalizedEmail);
 
         const resendResult = await resendVerificationEmail(
           verificationToken.email,
@@ -84,7 +106,7 @@ export const authenticateUserController = async (
         );
 
         if (!resendResult.success) {
-          await deleteVerificationToken(email);
+          await deleteVerificationToken(normalizedEmail);
           return res.sendStatus(503); // Failed to resend verification email. 503 Service Unavailable
         }
 
@@ -117,7 +139,7 @@ export const sendUserResetEmailController = async (
     const user = await getUserByEmail(userType, normalizedEmail);
 
     if (!user) {
-      return res.sendStatus(404);
+      return res.sendStatus(202);
     }
 
     const passwordResetToken = await generatePasswordResetToken(user.email);
@@ -131,10 +153,17 @@ export const sendUserResetEmailController = async (
 
     if (!sendResult.success) {
       await deletePasswordResetToken(passwordResetToken.email);
-      return res.sendStatus(503); // Failed to send password reset email. 503 Service Unavailable
+      console.error("Failed to send password reset email", {
+        context: {
+          email: normalizedEmail,
+          userType,
+          time: new Date().toISOString(),
+        },
+      });
+      return res.sendStatus(202);
     }
 
-    return res.sendStatus(201);
+    return res.sendStatus(202);
   } catch (error) {
     console.error("Error sending password reset email", {
       error,
@@ -144,7 +173,7 @@ export const sendUserResetEmailController = async (
         time: new Date().toISOString(),
       },
     });
-    res.sendStatus(500);
+    res.sendStatus(202);
   }
 };
 
@@ -188,10 +217,10 @@ export const updatePasswordController = async (
     return res.sendStatus(201);
   } catch (error) {
     console.error("Error updating password", {
-      error,
+      error: error instanceof Error ? error.message : "unknown_error",
       context: {
-        token,
         userType,
+        tokenPresent: Boolean(token),
         time: new Date().toISOString(),
       },
     });

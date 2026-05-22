@@ -12,6 +12,8 @@ import {
   createInstructorSlot,
   createInstructorAbsence,
   createClass,
+  createEvent,
+  createSchedule,
   generateAuthCookie,
 } from "../testUtils";
 
@@ -261,6 +263,7 @@ describe("POST /recurring-classes", () => {
     });
 
     expect(conflicted?.status).toBe("canceledByInstructor");
+    expect(conflicted?.canceledAt).toBeTruthy();
   });
 
   it("cancel created classes that fall on instructor absences", async () => {
@@ -300,6 +303,101 @@ describe("POST /recurring-classes", () => {
     });
 
     expect(absentClass?.status).toBe("canceledByInstructor");
+    expect(absentClass?.canceledAt).toBeTruthy();
+  });
+
+  it("does not create classes on no-class business schedule dates", async () => {
+    const { customer, subscription, children, instructor } = await setupCore({
+      slotWeekday: 1,
+      slotStartTime: "10:00",
+      slotEffectiveFrom: new Date("2025-01-01T00:00:00.000Z"),
+    });
+    const firstOccurrence = nextWeekdayOccurrenceUTC("2025-01-15", 1, "10:00");
+    const noClassEvent = await createEvent({
+      name: "お休み / No Class",
+      color: "#111111",
+    });
+    await createSchedule(
+      noClassEvent.id,
+      new Date(`${firstOccurrence.toISOString().slice(0, 10)}T00:00:00.000Z`),
+    );
+
+    await request(server)
+      .post("/recurring-classes")
+      .send({
+        instructorId: instructor.id,
+        weekday: 1,
+        startTime: "10:00",
+        customerId: customer.id,
+        childrenIds: children.map((c) => c.id),
+        subscriptionId: subscription.id,
+        startDate: "2025-01-15",
+        timezone: "Asia/Tokyo",
+      })
+      .expect(201);
+
+    const recurringClass = await prisma.recurringClass.findFirst({
+      where: { subscriptionId: subscription.id },
+      orderBy: { id: "desc" },
+    });
+    const classOnNoClassDate = await prisma.class.findFirst({
+      where: {
+        recurringClassId: recurringClass!.id,
+        dateTime: firstOccurrence,
+      },
+    });
+
+    expect(classOnNoClassDate).toBeNull();
+  });
+
+  it("creates admin-canceled classes on rebookable no-class dates", async () => {
+    const { customer, subscription, children, instructor } = await setupCore({
+      slotWeekday: 1,
+      slotStartTime: "10:00",
+      slotEffectiveFrom: new Date("2025-01-01T00:00:00.000Z"),
+    });
+    const firstOccurrence = nextWeekdayOccurrenceUTC("2025-01-15", 1, "10:00");
+    const rebookableEvent = await createEvent({
+      name: "お休み振替対象日 / No Class (Rebookable)",
+      color: "#222222",
+    });
+    await createSchedule(
+      rebookableEvent.id,
+      new Date(`${firstOccurrence.toISOString().slice(0, 10)}T00:00:00.000Z`),
+    );
+
+    await request(server)
+      .post("/recurring-classes")
+      .send({
+        instructorId: instructor.id,
+        weekday: 1,
+        startTime: "10:00",
+        customerId: customer.id,
+        childrenIds: children.map((c) => c.id),
+        subscriptionId: subscription.id,
+        startDate: "2025-01-15",
+        timezone: "Asia/Tokyo",
+      })
+      .expect(201);
+
+    const recurringClass = await prisma.recurringClass.findFirst({
+      where: { subscriptionId: subscription.id },
+      orderBy: { id: "desc" },
+    });
+    const adminCanceledClass = await prisma.class.findFirst({
+      where: {
+        recurringClassId: recurringClass!.id,
+        dateTime: firstOccurrence,
+      },
+    });
+
+    expect(adminCanceledClass?.status).toBe("canceledByAdmin");
+    expect(adminCanceledClass?.canceledAt).toBeTruthy();
+    expect(adminCanceledClass?.rebookableUntil?.toISOString()).toBe(
+      new Date(
+        firstOccurrence.getTime() + 180 * 24 * 60 * 60 * 1000,
+      ).toISOString(),
+    );
   });
 });
 

@@ -20,7 +20,7 @@ function GenerateClassesModal({ error, success }: GenerateClassesModalProps) {
     const now = new Date();
     const months = [];
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 3; i++) {
       const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
       const value = date.toLocaleString("default", {
         year: "numeric",

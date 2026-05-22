@@ -14,13 +14,53 @@ export const ClassIdParams = z.object({
     .transform((val) => parseInt(val, 10)),
 });
 
+export const EnglishBackgroundParams = z.object({
+  englishBackground: z
+    .string()
+    .regex(/^\d+$/, "English background must be a valid number")
+    .transform((val) => parseInt(val, 10)),
+});
+
+const InstructorTagSchema = z.object({
+  id: z.number().int().positive(),
+  label: z.string().min(1),
+  sortOrder: z.number().int().nonnegative(),
+});
+
+export const InstructorTag = InstructorTagSchema.describe("Instructor tag");
+
+export const InstructorTagsResponse = z.object({
+  tags: z.array(InstructorTag),
+  selectedTagIds: z.array(z.number().int().positive()),
+});
+
+export const TagIdParams = z.object({
+  id: z
+    .string()
+    .regex(/^\d+$/, "Tag ID must be a valid number")
+    .transform((val) => parseInt(val, 10)),
+});
+
+export const UpdateInstructorTagsRequest = z.object({
+  tagIds: z.array(z.number().int().positive()).default([]),
+});
+
+export const InstructorTagWithCount = InstructorTag.extend({
+  assignedCount: z.number().int().nonnegative(),
+});
+
+export const TagCatalogResponse = z.object({
+  tags: z.array(InstructorTagWithCount),
+});
+
 // Instructor profile schema for public profiles endpoint
 export const InstructorProfile = z.object({
   id: z.number().int().positive().describe("Instructor ID"),
   name: z.string().min(1).describe("Instructor full name"),
   nickname: z.string().min(1).describe("Instructor nickname"),
   icon: z.string().describe("Instructor profile icon URL from database"),
-  isNative: z.boolean().describe("If it's native or not"),
+  englishBackground: z.number().describe("English background requirement"),
+  tags: z.array(InstructorTag).optional(),
 });
 
 export const InstructorProfilesResponse = z
@@ -49,7 +89,11 @@ export const DetailedInstructorProfile = z.object({
     .datetime()
     .nullable()
     .describe("Termination timestamp (ISO string)"),
-  isNative: z.boolean().describe("If it's native or not"),
+  englishBackground: z.number().describe("English background requirement"),
+  tags: z
+    .array(InstructorTag)
+    .default([])
+    .describe("Instructor tags for profile search/filtering"),
 });
 
 export const AllInstructorProfilesResponse = z
@@ -80,7 +124,11 @@ export const CompleteInstructor = z.object({
   meetingId: z.string().nullable().describe("Meeting ID"),
   passcode: z.string().nullable().describe("Meeting passcode"),
   terminationAt: z.string().nullable().describe("Termination timestamp (JST)"),
-  isNative: z.boolean().describe("If it's native or not"),
+  englishBackground: z.number().describe("English background requirement"),
+  tags: z
+    .array(InstructorTag)
+    .default([])
+    .describe("Instructor tags for profile search/filtering"),
 });
 
 export const InstructorResponse = z
@@ -161,6 +209,19 @@ export const ActiveInstructorSchedule = z.object({
   slots: z.array(InstructorSlot).describe("Array of instructor time slots"),
 });
 
+export const ScheduleUpdateImpactSummary = z.object({
+  canceledClassCount: z
+    .number()
+    .int()
+    .nonnegative()
+    .describe("Number of booked or rebooked classes canceled by the update"),
+  terminatedRecurringClassCount: z
+    .number()
+    .int()
+    .nonnegative()
+    .describe("Number of recurring classes terminated by the update"),
+});
+
 export const ActiveScheduleResponse = z.object({
   message: z.string().describe("Success message"),
   data: ActiveInstructorSchedule.describe(
@@ -182,7 +243,9 @@ export const AvailableSlotsQuery = z
     timezone: z
       .literal("Asia/Tokyo")
       .describe("Timezone (currently only Asia/Tokyo is supported)"),
-    isNative: z.string("true") || z.string("false"),
+    englishBackground: z
+      .string()
+      .describe("English background requirement for filtering instructors"),
   })
   .refine(
     (data) => new Date(data.start) < new Date(data.end),
@@ -241,6 +304,46 @@ export const AvailableSlotsResponse = z.object({
     .describe("Array of available time slots with instructor availability"),
 });
 
+export const InstructorCalendarClass = z.object({
+  classId: z.number().int().positive().describe("Class ID"),
+  start: z.iso.datetime().describe("Class start time"),
+  end: z.iso.datetime().describe("Class end time"),
+  title: z.string().describe("Class title"),
+  color: z.string().describe("Class color code"),
+  classStatus: z.string().describe("Class status"),
+});
+
+export const InstructorCalendarClassesResponse = z
+  .array(InstructorCalendarClass)
+  .describe("Array of instructor calendar classes");
+
+export const InstructorCalendarSlotType = z.enum([
+  "businessEvent",
+  "open",
+  "booked",
+  "rebooked",
+  "completed",
+  "canceledByInstructor",
+  "absence",
+]);
+
+export const InstructorCalendarSlot = z.object({
+  start: z.string().describe("Slot start time or all-day event start date"),
+  end: z.string().describe("Slot end time or all-day event end date"),
+  title: z.string().describe("Slot title"),
+  color: z.string().describe("Slot color code"),
+  slotType: InstructorCalendarSlotType.describe("Slot status"),
+  classId: z.number().int().positive().optional().describe("Class ID"),
+  allDay: z.boolean().optional().describe("Whether this is an all-day event"),
+});
+
+export const InstructorCalendarSlotsResponse = z.object({
+  message: z.string().describe("Success message"),
+  data: z
+    .array(InstructorCalendarSlot)
+    .describe("Instructor calendar slots with availability and class states"),
+});
+
 // Dual parameter schemas for complex routes
 export const InstructorClassParams = z.object({
   id: z
@@ -292,9 +395,16 @@ export const CreateScheduleRequest = z.object({
 
 export const CreateScheduleResponse = z.object({
   message: z.string().describe("Success message"),
-  data: ActiveInstructorSchedule.describe(
-    "Created instructor schedule with slots",
-  ),
+  data: z
+    .object({
+      schedule: ActiveInstructorSchedule.describe(
+        "Created instructor schedule with slots",
+      ),
+      impactSummary: ScheduleUpdateImpactSummary.describe(
+        "Summary of regular classes and classes affected by the schedule update",
+      ),
+    })
+    .describe("Created schedule result"),
 });
 
 // Instructor absence schemas
@@ -315,6 +425,19 @@ export const InstructorAbsence = z.object({
   absentAt: z.string().describe("Absence date in ISO format"),
 });
 
+export const AbsenceCanceledClassSummary = z.object({
+  id: z.number().int().positive().describe("Canceled class ID"),
+  classCode: z.string().describe("Class code"),
+  dateTime: z.string().describe("Canceled class date/time in ISO format"),
+  rebookableUntil: z
+    .string()
+    .describe("Rebookable until date/time in ISO format"),
+  customer: z.object({
+    id: z.number().int().positive().describe("Customer ID"),
+    name: z.string().describe("Customer name"),
+  }),
+});
+
 export const InstructorAbsencesResponse = z.object({
   message: z.string().describe("Success message"),
   data: z.array(InstructorAbsence).describe("Array of instructor absences"),
@@ -322,7 +445,14 @@ export const InstructorAbsencesResponse = z.object({
 
 export const CreateAbsenceResponse = z.object({
   message: z.string().describe("Success message"),
-  data: InstructorAbsence.describe("Created instructor absence"),
+  data: z.object({
+    absence: InstructorAbsence.describe("Created instructor absence"),
+    canceledClasses: z
+      .array(AbsenceCanceledClassSummary)
+      .describe(
+        "Classes canceled because they matched the instructor absence slot",
+      ),
+  }),
 });
 
 export const DeleteAbsenceResponse = z.object({
@@ -341,6 +471,13 @@ export const PostTerminationScheduleResponse = z.object({
 // Type exports
 export type InstructorIdParams = z.infer<typeof InstructorIdParams>;
 export type ClassIdParams = z.infer<typeof ClassIdParams>;
+export type EnglishBackgroundParams = z.infer<typeof EnglishBackgroundParams>;
+export type InstructorTag = z.infer<typeof InstructorTag>;
+export type InstructorTagsResponse = z.infer<typeof InstructorTagsResponse>;
+export type TagCatalogResponse = z.infer<typeof TagCatalogResponse>;
+export type UpdateInstructorTagsRequest = z.infer<
+  typeof UpdateInstructorTagsRequest
+>;
 export type InstructorProfile = z.infer<typeof InstructorProfile>;
 export type InstructorProfilesResponse = z.infer<
   typeof InstructorProfilesResponse
@@ -362,6 +499,9 @@ export type ClassInstructorResponse = z.infer<typeof ClassInstructorResponse>;
 export type ActiveScheduleQuery = z.infer<typeof ActiveScheduleQuery>;
 export type InstructorSlot = z.infer<typeof InstructorSlot>;
 export type ActiveInstructorSchedule = z.infer<typeof ActiveInstructorSchedule>;
+export type ScheduleUpdateImpactSummary = z.infer<
+  typeof ScheduleUpdateImpactSummary
+>;
 export type ActiveScheduleResponse = z.infer<typeof ActiveScheduleResponse>;
 export type AvailableSlotsQuery = z.infer<typeof AvailableSlotsQuery>;
 export type InstructorAvailableSlotsQuery = z.infer<
@@ -373,6 +513,17 @@ export type InstructorAvailableSlotsResponse = z.infer<
   typeof InstructorAvailableSlotsResponse
 >;
 export type AvailableSlotsResponse = z.infer<typeof AvailableSlotsResponse>;
+export type InstructorCalendarClass = z.infer<typeof InstructorCalendarClass>;
+export type InstructorCalendarClassesResponse = z.infer<
+  typeof InstructorCalendarClassesResponse
+>;
+export type InstructorCalendarSlotType = z.infer<
+  typeof InstructorCalendarSlotType
+>;
+export type InstructorCalendarSlot = z.infer<typeof InstructorCalendarSlot>;
+export type InstructorCalendarSlotsResponse = z.infer<
+  typeof InstructorCalendarSlotsResponse
+>;
 export type InstructorClassParams = z.infer<typeof InstructorClassParams>;
 export type InstructorScheduleParams = z.infer<typeof InstructorScheduleParams>;
 export type CreateSlotRequest = z.infer<typeof CreateSlotRequest>;
@@ -381,6 +532,9 @@ export type CreateScheduleResponse = z.infer<typeof CreateScheduleResponse>;
 export type InstructorAbsenceParams = z.infer<typeof InstructorAbsenceParams>;
 export type CreateAbsenceRequest = z.infer<typeof CreateAbsenceRequest>;
 export type InstructorAbsence = z.infer<typeof InstructorAbsence>;
+export type AbsenceCanceledClassSummary = z.infer<
+  typeof AbsenceCanceledClassSummary
+>;
 export type InstructorAbsencesResponse = z.infer<
   typeof InstructorAbsencesResponse
 >;

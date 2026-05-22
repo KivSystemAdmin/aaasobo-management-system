@@ -58,6 +58,8 @@ describe("GET /admins/class-list", () => {
         CustomerID: customer1.id,
         Status: "Booked",
         "Class Code": class1.classCode,
+        "Is Free Trial": false,
+        "Canceled At": null,
       },
       {
         No: 2,
@@ -71,6 +73,8 @@ describe("GET /admins/class-list", () => {
         CustomerID: customer2.id,
         Status: "Booked",
         "Class Code": class2.classCode,
+        "Is Free Trial": false,
+        "Canceled At": null,
       },
     ]);
   });

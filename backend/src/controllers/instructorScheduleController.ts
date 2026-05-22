@@ -4,6 +4,7 @@ import {
   getScheduleWithSlots,
   createInstructorSchedule,
   getInstructorAvailableSlots,
+  getInstructorCalendarSlots,
   getAllAvailableSlots,
   getActiveInstructorSchedule,
   getAvailableSlotsByType,
@@ -23,6 +24,7 @@ import {
   InstructorScheduleParams,
   ActiveScheduleQuery,
 } from "../../../shared/schemas/instructors";
+import { EnglishBackground } from "../types";
 
 export const getInstructorSchedulesController = async (
   req: RequestWithParams<InstructorIdParams>,
@@ -92,6 +94,7 @@ export const createInstructorScheduleController = async (
     });
   } catch (error) {
     console.error("Error creating schedule version:", error);
+
     res.status(500).json({
       message: "Failed to create schedule version",
       error: error instanceof Error ? error.message : "Unknown error",
@@ -130,6 +133,33 @@ export const getInstructorAvailableSlotsController = async (
   }
 };
 
+export const getInstructorCalendarSlotsController = async (
+  req: RequestWith<InstructorIdParams, {}, InstructorAvailableSlotsQuery>,
+  res: Response,
+) => {
+  try {
+    const { start, end, timezone } = req.query;
+
+    const calendarSlots = await getInstructorCalendarSlots(
+      req.params.id,
+      start,
+      end,
+      timezone,
+    );
+
+    res.status(200).json({
+      message: "Instructor calendar slots retrieved successfully",
+      data: calendarSlots,
+    });
+  } catch (error) {
+    console.error("Error fetching instructor calendar slots:", error);
+    res.status(500).json({
+      message: "Failed to fetch instructor calendar slots",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
 export const getAllAvailableSlotsController = async (
   req: RequestWithQuery<AvailableSlotsQuery>,
   res: Response,
@@ -157,20 +187,24 @@ export const getAvailableSlotsByTypeController = async (
   res: Response,
 ) => {
   try {
-    const { start, end, timezone, isNative: isNativeStr } = req.query;
-    const isNative = isNativeStr === "true";
+    const { start, end, timezone, englishBackground } = req.query;
+    const englishBackgroundInt = parseInt(englishBackground, 10);
 
-    if (isNativeStr === "undefined") {
-      return res.status(404).json({
-        message: "No Native flag found",
-      });
-    }
-
+    // Organize the English backgrounds array depending on the index provided in the request
+    // Ex1: if the index is 2 (NativeB), the array will be [0, 1, 2] (NativeB, NonNative, NativeA)
+    // Ex2: if the index is 1 (NativeA), the array will be [0, 1] (NativeA, NonNative)
+    // Ex3: if the index is 0 (NonNative), the array will be [0] (NonNative)
+    const ordered = [
+      EnglishBackground.NonNative,
+      EnglishBackground.NativeA,
+      EnglishBackground.NativeB,
+    ];
+    const englishBackgroundArray = ordered.slice(0, englishBackgroundInt + 1);
     const availableSlots = await getAvailableSlotsByType(
       start,
       end,
       timezone,
-      isNative,
+      englishBackgroundArray,
     );
 
     res.status(200).json({

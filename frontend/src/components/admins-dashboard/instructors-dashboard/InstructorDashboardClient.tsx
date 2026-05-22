@@ -1,12 +1,19 @@
 "use client";
 
+import { useMemo } from "react";
+
 import TabFunction from "@/components/admins-dashboard/TabFunction";
 import InstructorProfile from "@/components/instructors-dashboard/instructor-profile/InstructorProfile";
 import { useTabSelect } from "@/hooks/useTabSelect";
 import InstructorSchedule from "./instructor-schedule/InstructorSchedule";
-import AvailabilityCalendar from "./instructor-schedule/AvailabilityCalendar";
 import Loading from "@/components/elements/loading/Loading";
-import type { InstructorSchedule as InstructorScheduleType } from "@shared/schemas/instructors";
+import InstructorPayroll from "./InstructorPayroll";
+import InstructorTagsTab from "./InstructorTags";
+import type {
+  InstructorSchedule as InstructorScheduleType,
+  InstructorTagsResponse,
+  TagCatalogResponse,
+} from "@shared/schemas/instructors";
 import type { InstructorScheduleWithSlots } from "@/lib/api/instructorsApi";
 
 export default function InstructorTabs({
@@ -18,6 +25,8 @@ export default function InstructorTabs({
   initialSchedules,
   initialSelectedScheduleId,
   initialSelectedSchedule,
+  initialInstructorTags,
+  initialTagCatalog,
   classScheduleComponent,
 }: {
   adminId: number;
@@ -28,28 +37,36 @@ export default function InstructorTabs({
   initialSchedules: InstructorScheduleType[];
   initialSelectedScheduleId: number | null;
   initialSelectedSchedule: InstructorScheduleWithSlots | null;
+  initialInstructorTags: InstructorTagsResponse | null;
+  initialTagCatalog: TagCatalogResponse["tags"];
   classScheduleComponent: React.ReactNode;
 }) {
   const nickname = typeof instructor !== "string" ? instructor.nickname : null;
-  // Get the previous list page from local storage to set the breadcrumb.
-  const previousListPage = localStorage.getItem("previousListPage");
-  let breadcrumb: string[] = [];
-  switch (previousListPage) {
-    case "instructor-list":
-      breadcrumb = [
-        "Instructor List",
-        `/admins/${adminId}/instructor-list`,
-        `Instructor Page (${nickname || "Unknown"})`,
-      ];
-      break;
-    case "class-list":
-      breadcrumb = [
-        "Class List",
-        `/admins/${adminId}/class-list`,
-        `Instructor Page (${nickname || "Unknown"})`,
-      ];
-      break;
-  }
+  const previousListPage = useMemo(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    return localStorage.getItem("previousListPage");
+  }, []);
+
+  const breadcrumb = useMemo(() => {
+    switch (previousListPage) {
+      case "instructor-list":
+        return [
+          "Instructor List",
+          "/admins/instructor-list",
+          `Instructor Page (${nickname || "Unknown"})`,
+        ];
+      case "class-list":
+        return [
+          "Class List",
+          "/admins/class-list",
+          `Instructor Page (${nickname || "Unknown"})`,
+        ];
+      default:
+        return [];
+    }
+  }, [nickname, previousListPage]);
   const activeTabName = "activeInstructorTab";
 
   // Get the active tab from the local storage.
@@ -60,11 +77,11 @@ export default function InstructorTabs({
   // Tabs with labels and content
   const tabs = [
     {
-      label: "Class Schedule",
+      label: "Calendar",
       content: classScheduleComponent,
     },
     {
-      label: "Instructor's Profile",
+      label: "Profile",
       content: (
         <InstructorProfile
           instructor={instructor}
@@ -74,17 +91,27 @@ export default function InstructorTabs({
       ),
     },
     {
-      label: "Instructor's Availability",
-      content: <AvailabilityCalendar instructorId={instructorId} />,
-    },
-    {
-      label: "Instructor's Schedule",
+      label: "Schedule",
       content: (
         <InstructorSchedule
           instructorId={instructorId}
           initialSchedules={initialSchedules}
           initialSelectedScheduleId={initialSelectedScheduleId}
           initialSelectedSchedule={initialSelectedSchedule}
+        />
+      ),
+    },
+    {
+      label: "Payroll",
+      content: <InstructorPayroll instructorId={instructorId} />,
+    },
+    {
+      label: "Tags",
+      content: (
+        <InstructorTagsTab
+          instructorId={instructorId}
+          initialInstructorTags={initialInstructorTags}
+          initialTagCatalog={initialTagCatalog}
         />
       ),
     },

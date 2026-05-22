@@ -1,6 +1,11 @@
 import { prisma } from "../../prisma/prismaClient";
 import { Admin } from "../../generated/prisma";
-import { hashPassword } from "../utils/commonUtils";
+import {
+  hashPassword,
+  maskedHeadLetters,
+  maskedSuffix,
+  MONTHS_TO_DELETE_ADMINS,
+} from "../utils/commonUtils";
 
 // Register a new admin in the DB
 export const registerAdmin = async (data: {
@@ -50,13 +55,22 @@ export const updateAdminPassword = async (id: number, newPassword: string) => {
 };
 
 // Delete the selected admin
+// Technically, the record is not deleted at this time.
+// Only terminationAt datetime is set and mask email.
 export const deleteAdmin = async (adminId: number) => {
+  const now = new Date();
+  const suffix = maskedSuffix;
   try {
     // Delete the Admin data.
-    const admin = await prisma.admin.delete({
-      where: { id: adminId },
+    const admin = await prisma.admin.update({
+      where: {
+        id: adminId,
+      },
+      data: {
+        email: `${maskedHeadLetters}@${suffix}${adminId}.xxx`,
+        terminationAt: now,
+      },
     });
-
     return admin;
   } catch (error) {
     console.error("Database Error:", error);
@@ -68,6 +82,14 @@ export const deleteAdmin = async (adminId: number) => {
 export const getAllAdmins = async () => {
   try {
     return await prisma.admin.findMany({
+      where: {
+        terminationAt: null,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
       orderBy: {
         id: "asc",
       },
@@ -85,6 +107,17 @@ export const getAdminByEmail = async (email: string): Promise<Admin | null> => {
   });
 };
 
+export const getAdminAuthByEmail = async (email: string) => {
+  return await prisma.admin.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      name: true,
+      password: true,
+    },
+  });
+};
+
 // Fetch the admin using the ID
 export async function getAdminById(id: number) {
   try {
@@ -96,3 +129,17 @@ export async function getAdminById(id: number) {
     throw new Error("Failed to fetch admin.");
   }
 }
+
+// Delete admins who have left the service more than 3 years ago
+export const deletePastAdmins = async () => {
+  const thresholdDate = new Date();
+  thresholdDate.setMonth(thresholdDate.getMonth() - MONTHS_TO_DELETE_ADMINS);
+
+  return await prisma.admin.deleteMany({
+    where: {
+      terminationAt: {
+        lt: thresholdDate,
+      },
+    },
+  });
+};

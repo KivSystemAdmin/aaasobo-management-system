@@ -1,7 +1,11 @@
 node_modules
+generated/prisma/
+
 # Keep environment variables out of version control
 .env
 .vercel
 .env*.local
 .vitest
 .vitest-attachments
+
+logs/

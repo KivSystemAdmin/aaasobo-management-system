@@ -6,13 +6,16 @@ import styles from "./EditSubscriptionModal.module.scss";
 import {
   AcademicCapIcon,
   ClipboardDocumentListIcon,
+  PencilIcon,
 } from "@heroicons/react/24/solid";
 import { getAllPlans } from "@/lib/api/plansApi";
 import RegularClassesTable from "../customers-dashboard/regular-classes/RegularClassesTable";
 import {
+  updateSelectTypeUrlAction,
   updateSubscriptionToAddClassAction,
   updateSubscriptionToTerminateClassAction,
 } from "@/app/actions/updateContent";
+import InputField from "../elements/inputField/InputField";
 
 type EditSubscriptionModalProps = {
   isOpen: boolean;
@@ -23,6 +26,7 @@ type EditSubscriptionModalProps = {
   adminId?: number;
   customerId: number;
   customerTerminationAt: string | null | undefined;
+  plan?: Plan;
   language: LanguageType;
 };
 
@@ -35,6 +39,7 @@ function EditSubscriptionModal({
   adminId,
   customerId,
   customerTerminationAt,
+  plan,
   language,
 }: EditSubscriptionModalProps) {
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -46,6 +51,9 @@ function EditSubscriptionModal({
   const [error, setError] = useState<string>("");
   const currentWeeklyTimes = subscription?.plan?.weeklyClassTimes ?? 0;
   const selectedWeeklyTimes = selectedPlan?.weeklyClassTimes ?? 0;
+  const [selectTypeValue, setSelectTypeValue] = useState<string>("");
+  const currentEnglishBG = subscription?.plan?.englishBackground;
+  const [currentBGPlans, setCurrentBGPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -61,6 +69,22 @@ function EditSubscriptionModal({
     };
     fetchPlans();
   }, [subscription?.planId]);
+
+  useEffect(() => {
+    const filteredPlans = plans.filter(
+      (p) => p.englishBackground === currentEnglishBG,
+    );
+    setCurrentBGPlans(filteredPlans);
+  }, [plans, currentEnglishBG]);
+
+  useEffect(() => {
+    if (subscription) {
+      setSelectTypeValue(subscription.selectType);
+    }
+    if (plan) {
+      setSelectedPlan(plan);
+    }
+  }, [subscription, plan]);
 
   const handleSelectPlan = (e: ChangeEvent<HTMLSelectElement>) => {
     const selectedPlanId = Number(e.target.value);
@@ -80,20 +104,32 @@ function EditSubscriptionModal({
     setSelectedRecurringIds([]);
     setSelectedPlan(null);
     setLoading(false);
+    setSelectTypeValue(subscription?.selectType ?? "");
     onClose();
   };
 
   const handleSubmit = async () => {
     if (!subscription) return;
     if (!subscription.plan.weeklyClassTimes) return;
-    if (subscription?.planId === selectedPlan?.id) {
-      setError("Select a different plan from the current one.");
+    if (
+      subscription?.planId === selectedPlan?.id &&
+      subscription?.selectType === selectTypeValue
+    ) {
+      setError(
+        "Select a different plan from the current one or change a SelectType URL.",
+      );
       setLoading(false);
       return;
     }
 
     if (!selectedPlan) {
       setError("Please select a plan.");
+      setLoading(false);
+      return;
+    }
+
+    if (!selectTypeValue) {
+      setError("Please enter a SelectType URL");
       setLoading(false);
       return;
     }
@@ -106,6 +142,7 @@ function EditSubscriptionModal({
         const updateData = {
           planId: selectedPlan?.id,
           times: selectedWeeklyTimes - currentWeeklyTimes,
+          selectType: selectTypeValue,
         };
 
         await updateSubscriptionToAddClassAction(subscription.id, updateData);
@@ -124,12 +161,19 @@ function EditSubscriptionModal({
         const updateData = {
           planId: selectedPlan?.id,
           recurringClassIds: selectedRecurringIds,
+          selectType: selectTypeValue,
         };
 
         await updateSubscriptionToTerminateClassAction(
           subscription.id,
           updateData,
         );
+      } else if (currentWeeklyTimes === selectedWeeklyTimes) {
+        const updateData = {
+          selectType: selectTypeValue,
+        };
+
+        await updateSelectTypeUrlAction(subscription.id, updateData);
       } else {
         setError("Something went wrong. Please try again later.");
       }
@@ -170,14 +214,34 @@ function EditSubscriptionModal({
                 onChange={handleSelectPlan}
                 required
               >
-                {plans.map((plan) => {
-                  return (
-                    <option key={plan.id} value={plan.id}>
-                      {plan.name}
-                    </option>
-                  );
-                })}
+                {currentBGPlans &&
+                  currentBGPlans.map((plan) => {
+                    return (
+                      <option key={plan.id} value={plan.id}>
+                        {plan.name}
+                      </option>
+                    );
+                  })}
               </select>
+            </div>
+          </div>
+
+          {/* SelectType URL */}
+          <div className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <PencilIcon className={styles.sectionIcon} />
+              <h3>Change a SelectType URL</h3>
+            </div>
+            <div className={styles.sectionContent}>
+              <InputField
+                name="SelectType url"
+                type="text"
+                placeholder="https://dashboard.stripe.com/subscriptions/sub_1234567890abcdef"
+                value={selectTypeValue}
+                maxLength={50}
+                onChange={(e) => setSelectTypeValue(e.target.value)}
+                className={styles.selectTypeInput}
+              />
             </div>
           </div>
 

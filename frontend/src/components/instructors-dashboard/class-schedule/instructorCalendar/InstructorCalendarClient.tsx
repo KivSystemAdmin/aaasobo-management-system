@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -14,7 +14,9 @@ import {
   getDayCellColorHandler,
 } from "@/lib/utils/calendarUtils";
 import CalendarLegend from "@/components/features/calendarLegend/CalendarLegend";
+import MessageBoardPanel from "@/components/features/messageBoardPanel/MessageBoardPanel";
 import styles from "./InstructorCalendarClient.module.scss";
+import { MessageTarget } from "@/types";
 
 const InstructorCalendarClient = ({
   adminId,
@@ -24,13 +26,18 @@ const InstructorCalendarClient = ({
   validRange,
   businessSchedule,
   colorsForEvents,
+  messageBoardPosts = [],
 }: InstructorCalendarClientProps) => {
   const router = useRouter();
-  const cacheBust = useId();
   const [calendarApi, setCalendarApi] = useState<CalendarApi | null>(null);
   const [currentTitle, setCurrentTitle] = useState("");
   const [currentView, setCurrentView] = useState("timeGridWeek");
   const [isTodayInRange, setIsTodayInRange] = useState(false);
+  const visiblePosts = messageBoardPosts.filter(
+    (post) =>
+      post.target === MessageTarget.instructor ||
+      post.target === MessageTarget.both,
+  );
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     if (clickInfo.event.title === "No booked class") return;
@@ -38,16 +45,13 @@ const InstructorCalendarClient = ({
     const classId = clickInfo.event.extendedProps.classId;
     const redirectURL =
       userSessionType === "admin"
-        ? `/admins/${adminId}/calendar/${instructorId}/class-schedule/${classId}`
-        : `/instructors/${instructorId}/class-schedule/${classId}`;
+        ? `/admins/calendar/${instructorId}/class-schedule/${classId}`
+        : `/instructors/class-schedule/${classId}`;
 
     router.push(redirectURL);
   };
 
-  const renderInstructorEventContent = createRenderEventContent(
-    "instructor",
-    cacheBust,
-  );
+  const renderInstructorEventContent = createRenderEventContent("instructor");
 
   const classSlotTimes = getClassSlotTimesForCalendar();
 
@@ -68,6 +72,11 @@ const InstructorCalendarClient = ({
 
   return (
     <div className={styles.calendarContainer}>
+      <MessageBoardPanel
+        posts={visiblePosts}
+        storageKey="instructorClassScheduleMessageBoardOpenState"
+        readMessageStorageKey={"readInstructorMessageNumber"}
+      />
       <div className={styles.mobileToolbar}>
         <div className={styles.navGroup}>
           <button

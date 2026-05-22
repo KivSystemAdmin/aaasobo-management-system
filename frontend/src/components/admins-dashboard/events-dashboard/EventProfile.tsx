@@ -8,7 +8,6 @@ import {
   CONTENT_UPDATE_SUCCESS_MESSAGE,
   CONTENT_DELETE_SUCCESS_MESSAGE,
 } from "@/lib/messages/formValidation";
-import { defaultEventIds } from "@/lib/data/data";
 import InputField from "../../elements/inputField/InputField";
 import ActionButton from "../../elements/buttons/actionButton/ActionButton";
 import { PencilIcon, CheckIcon } from "@heroicons/react/24/outline";
@@ -17,6 +16,11 @@ import { getLocalizedText } from "@/lib/utils/stringUtils";
 import "react-toastify/dist/ReactToastify.css";
 import Loading from "@/components/elements/loading/Loading";
 import { confirmAlert } from "@/lib/utils/alertUtils";
+
+const protectedDefaultEventNames = new Set([
+  "お休み / No Class",
+  "お休み振替対象日 / No Class (Rebookable)",
+]);
 
 function EventProfile({
   event,
@@ -155,8 +159,7 @@ function EventProfile({
     return <p>{event}</p>;
   }
 
-  // Check if the event is one of the default events
-  const isEventDisabled = defaultEventIds.includes(event.id);
+  const isEventDisabled = protectedDefaultEventNames.has(event.name);
 
   return (
     <>

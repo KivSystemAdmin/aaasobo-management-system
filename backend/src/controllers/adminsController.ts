@@ -11,10 +11,11 @@ import {
   getAdminById,
   updateAdmin,
   deleteAdmin,
+  deletePastAdmins,
 } from "../services/adminsService";
 import {
-  getAllInstructors,
-  getAllPastInstructors,
+  getAllInstructorsForAdminList,
+  getAllPastInstructorsForAdminList,
   registerInstructor,
   updateInstructor,
   getInstructorByEmail,
@@ -23,6 +24,17 @@ import {
   getInstructorByMeetingId,
   getInstructorByPasscode,
 } from "../services/instructorsService";
+import {
+  getInstructorPayroll,
+  InstructorPayrollError,
+} from "../services/instructorPayrollService";
+import {
+  createInstructorFee,
+  deleteLatestInstructorFee,
+  getInstructorFees,
+  InstructorFeeError,
+} from "../services/instructorFeeService";
+import { getTagsByInstructorIds } from "../services/instructorTagsService";
 import { getClassesWithinPeriod } from "../services/classesService";
 import {
   getAllCustomers,
@@ -41,18 +53,30 @@ import {
   registerEvent,
   updateEvent,
   deleteEvent,
+  isProtectedDefaultEvent,
 } from "../services/eventsService";
 import { getAllSubscriptions } from "../services/subscriptionsService";
+import {
+  createMessageBoardPost,
+  getMessageBoardPosts,
+  isValidMessageTarget,
+  deletePastMessageBoardPosts,
+} from "../services/messageBoardService";
 import {
   days,
   convertToISOString,
   convertToTimezoneDate,
+  getJstDayRange,
 } from "../utils/dateUtils";
 import { EVENT_CONFLICT_ITEMS } from "../utils/commonUtils";
 import type {
   AdminIdParams,
+  ClassListQuery,
+  CreateMessageBoardPostRequest,
   CustomerIdParams,
   InstructorIdParams,
+  InstructorPayrollQuery,
+  CreateInstructorFeeRequest,
   PlanIdParams,
   EventIdParams,
   RegisterAdminRequest,
@@ -64,6 +88,7 @@ import type {
   RegisterEventRequest,
   UpdateEventRequest,
 } from "../../../shared/schemas/admins";
+import { EnglishBackground } from "../types";
 
 // Register Admin
 export const registerAdminController = async (
@@ -131,7 +156,6 @@ export const deleteAdminController = async (
 
   try {
     const deletedAdmin = await deleteAdmin(adminId);
-
     res.status(200).json({
       message: "The admin profile was deleted successfully",
       id: deletedAdmin.id,
@@ -255,7 +279,7 @@ export const getAllCustomersController = async (_: Request, res: Response) => {
 
     // Transform the data structure.
     const data = customers.map((customer, number) => {
-      let { id, name, email, prefecture, children } = customer;
+      let { id, name, email, prefecture, children, createdAt } = customer;
 
       // Format children names as a comma-separated string
       const childrenNames = children.map((child) => child.name).join(", ");
@@ -267,6 +291,9 @@ export const getAllCustomersController = async (_: Request, res: Response) => {
         Children: childrenNames,
         Email: email,
         Prefecture: prefecture,
+        "Start Date (JST)": convertToTimezoneDate(createdAt, "Asia/Tokyo")
+          .toISOString()
+          .slice(0, 10),
       };
     });
 
@@ -287,7 +314,7 @@ export const getAllPastCustomersController = async (
 
     // Transform the data structure.
     const data = customers.map((customer, number) => {
-      let { id, name, children, terminationAt } = customer;
+      let { id, name, children, terminationAt, createdAt } = customer;
 
       // Format children names as a comma-separated string
       const childrenNames = children.map((child) => child.name).join(", ");
@@ -308,6 +335,9 @@ export const getAllPastCustomersController = async (
         ID: id,
         "Past Customer": name,
         "Past Children": childrenNames,
+        "Start Date (JST)": convertToTimezoneDate(createdAt, "Asia/Tokyo")
+          .toISOString()
+          .slice(0, 10),
         "End Date (JST)": formattedTerminationDate,
       };
     });
@@ -325,17 +355,25 @@ export const getAllInstructorsController = async (
 ) => {
   try {
     // Fetch the instructors data using the email.
-    const instructors = await getAllInstructors();
+    const instructors = await getAllInstructorsForAdminList();
 
     // Transform the data structure.
     const data = instructors.map((instructor, number) => {
       const { id, name, nickname, email } = instructor;
+      const englishBackgroundLabel: Record<EnglishBackground, string> = {
+        [EnglishBackground.NonNative]: "Non Native",
+        [EnglishBackground.NativeA]: "Native A",
+        [EnglishBackground.NativeB]: "Native B",
+      };
 
       return {
         No: number + 1,
         ID: id,
         Instructor: nickname,
-        English: instructor.isNative ? "Native" : "Non-native",
+        English:
+          englishBackgroundLabel[
+            instructor.englishBackground as EnglishBackground
+          ],
         "Full Name": name,
         Email: email,
       };
@@ -347,6 +385,110 @@ export const getAllInstructorsController = async (
   }
 };
 
+export const getInstructorPayrollController = async (
+  req: RequestWith<InstructorIdParams, never, InstructorPayrollQuery>,
+  res: Response,
+) => {
+  try {
+    const payroll = await getInstructorPayroll(req.params.id, req.query.month);
+    return res.status(200).json(payroll);
+  } catch (error) {
+    if (error instanceof InstructorPayrollError) {
+      if (error.statusCode === 404) {
+        return res.status(404).json({ message: error.message });
+      }
+
+      return res.status(error.statusCode).json({
+        code: error.code,
+        message: error.message,
+      });
+    }
+
+    console.error("Failed to fetch instructor payroll", {
+      error,
+      instructorId: req.params.id,
+      month: req.query.month,
+    });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getInstructorFeesController = async (
+  req: RequestWithParams<InstructorIdParams>,
+  res: Response,
+) => {
+  try {
+    const fees = await getInstructorFees(req.params.id);
+    return res.status(200).json(fees);
+  } catch (error) {
+    if (error instanceof InstructorFeeError) {
+      return res.status(error.statusCode).json({
+        code: error.code,
+        message: error.message,
+      });
+    }
+
+    console.error("Failed to fetch instructor fees", {
+      error,
+      instructorId: req.params.id,
+    });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const createInstructorFeeController = async (
+  req: RequestWith<InstructorIdParams, CreateInstructorFeeRequest>,
+  res: Response,
+) => {
+  try {
+    const fee = await createInstructorFee(req.params.id, req.body);
+    return res.status(201).json({
+      message: "Instructor fee rate created successfully",
+      fee,
+    });
+  } catch (error) {
+    if (error instanceof InstructorFeeError) {
+      return res.status(error.statusCode).json({
+        code: error.code,
+        message: error.message,
+      });
+    }
+
+    console.error("Failed to create instructor fee", {
+      error,
+      instructorId: req.params.id,
+      body: req.body,
+    });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteLatestInstructorFeeController = async (
+  req: RequestWithParams<InstructorIdParams>,
+  res: Response,
+) => {
+  try {
+    const result = await deleteLatestInstructorFee(req.params.id);
+    return res.status(200).json({
+      message: "Latest instructor fee rate deleted successfully",
+      ...result,
+    });
+  } catch (error) {
+    if (error instanceof InstructorFeeError) {
+      return res.status(error.statusCode).json({
+        code: error.code,
+        message: error.message,
+      });
+    }
+
+    console.error("Failed to delete latest instructor fee", {
+      error,
+      instructorId: req.params.id,
+    });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 // Displaying past instructors' information for admin dashboard
 export const getAllPastInstructorsController = async (
   _: Request,
@@ -354,7 +496,7 @@ export const getAllPastInstructorsController = async (
 ) => {
   try {
     // Fetch the instructors data using the email.
-    const instructors = await getAllPastInstructors();
+    const instructors = await getAllPastInstructorsForAdminList();
 
     // Transform the data structure.
     const data = instructors.map((instructor, number) => {
@@ -406,13 +548,15 @@ export const registerInstructorController = async (
     classURL,
     meetingId,
     passcode,
-    isNative,
+    englishBackground,
   } = req.body;
 
   // Normalize email
   const normalizedEmail = email.trim().toLowerCase();
   // Normalize birthdate
   const normalizedBirthdate = new Date(convertToISOString(birthdate));
+  // Convert englishBackground to number
+  const englishBackgroundNum = Number(englishBackground);
 
   // Set unique checks list
   const uniqueChecks = [
@@ -423,9 +567,6 @@ export const registerInstructorController = async (
     { fn: getInstructorByPasscode, value: passcode },
   ];
   let errorItems = "";
-
-  // Parse string isNative value into boolean
-  const isNativeBool = isNative === "true";
 
   try {
     const results = await Promise.all(
@@ -473,7 +614,7 @@ export const registerInstructorController = async (
       classURL,
       meetingId,
       passcode,
-      isNative: isNativeBool,
+      englishBackground: englishBackgroundNum,
     });
 
     res.sendStatus(201);
@@ -505,7 +646,7 @@ export const updateInstructorProfileController = async (
     classURL,
     meetingId,
     passcode,
-    isNative,
+    englishBackground,
   } = req.body;
 
   // Normalize email
@@ -516,6 +657,8 @@ export const updateInstructorProfileController = async (
       ? new Date(convertToISOString(leavingDate))
       : null;
   const normalizedBirthdate = new Date(convertToISOString(birthdate));
+  // Convert englishBackground to number
+  const englishBackgroundNum = Number(englishBackground);
 
   // Set unique checks list
   const uniqueChecks = [
@@ -576,8 +719,10 @@ export const updateInstructorProfileController = async (
       classURL,
       meetingId,
       passcode,
-      isNative === "true",
+      englishBackgroundNum,
     );
+    const instructorId = Number(id);
+    const tags = await getTagsByInstructorIds([instructorId]);
 
     // Create a new instructor object with the updated termination date (JST).
     // This is because the termination date needs to be in UTC format on the database.
@@ -585,6 +730,10 @@ export const updateInstructorProfileController = async (
     const updatedInstructor = {
       ...instructor,
       terminationAt: normalizedLeavingDate,
+      tags: tags.map((tag) => ({
+        id: tag.id,
+        label: tag.label,
+      })),
     };
 
     res.status(200).json({
@@ -686,14 +835,21 @@ export const getAllPlansController = async (_: Request, res: Response) => {
 
     // Transform the data structure.
     const data = plans.map((plan, number) => {
-      const { id, name, weeklyClassTimes, description } = plan;
+      const { id, name, weeklyClassTimes, description, englishBackground } =
+        plan;
       const [planNameJpn, planNameEng] = name.split(" / ");
+      const englishBackgroundLabel: Record<EnglishBackground, string> = {
+        [EnglishBackground.NonNative]: "Non Native",
+        [EnglishBackground.NativeA]: "Native A",
+        [EnglishBackground.NativeB]: "Native B",
+      };
 
       return {
         No: number + 1,
         ID: id,
         "Plan (Japanese)": planNameJpn,
         "Plan (English)": planNameEng,
+        English: englishBackgroundLabel[englishBackground as EnglishBackground],
         "Weekly Class Times": weeklyClassTimes,
         Description: description,
       };
@@ -710,21 +866,25 @@ export const registerPlanController = async (
   req: RequestWithBody<RegisterPlanRequest>,
   res: Response,
 ) => {
-  const { planNameEng, planNameJpn, weeklyClassTimes, description, isNative } =
-    req.body;
+  const {
+    planNameEng,
+    planNameJpn,
+    weeklyClassTimes,
+    description,
+    englishBackground,
+  } = req.body;
 
   // Combine Japanese and English names into the required format
   const name = `${planNameJpn} / ${planNameEng}`;
-
-  // Parse string isNative value into boolean
-  const isNativeBool = isNative === "true";
+  // Convert englishBackground to number
+  const englishBackgroundNum = Number(englishBackground);
 
   try {
     await registerPlan({
       name,
       weeklyClassTimes,
       description,
-      isNative: isNativeBool,
+      englishBackground: englishBackgroundNum,
     });
 
     res.sendStatus(201);
@@ -767,25 +927,24 @@ export const updatePlanController = async (
       !body.planNameEng ||
       !body.planNameJpn ||
       !body.description ||
-      !body.isNative
+      typeof body.englishBackground !== "number"
     ) {
       return res
         .status(400)
         .json({ message: "Name and description are required for update" });
     }
-    const { planNameEng, planNameJpn, description, isNative } = body;
+    const { planNameEng, planNameJpn, description, englishBackground } = body;
 
     // Combine Japanese and English names into the required format
     const name = `${planNameJpn} / ${planNameEng}`;
-
-    // Parse string isNative value into boolean
-    const isNativeBool = isNative === "true";
+    // Convert englishBackground to number
+    const englishBackgroundNum = Number(englishBackground);
 
     const updatedPlan = await updatePlan(
       planId,
       name,
       description,
-      isNativeBool,
+      englishBackgroundNum,
     );
     return res.status(200).json({
       message: "Plan is updated successfully",
@@ -893,6 +1052,12 @@ export const updateEventProfileController = async (
   const normalizedColorCode = color.toLowerCase().replace(/\s/g, "");
 
   try {
+    if (await isProtectedDefaultEvent(eventId)) {
+      return res.status(403).json({
+        error: "Default events cannot be updated.",
+      });
+    }
+
     // Check if the event with the same name and color already exists
     const existingEvents = await getAllEvents();
 
@@ -947,6 +1112,12 @@ export const deleteEventController = async (
   const eventId = req.params.id;
 
   try {
+    if (await isProtectedDefaultEvent(eventId)) {
+      return res.status(403).json({
+        error: "Default events cannot be deleted.",
+      });
+    }
+
     const deletedEvent = await deleteEvent(eventId);
 
     res.status(200).json({
@@ -961,21 +1132,31 @@ export const deleteEventController = async (
 
 // Get class information within designated period
 export const getClassesWithinPeriodController = async (
-  _: Request,
+  req: RequestWith<never, never, ClassListQuery>,
   res: Response,
 ) => {
   try {
-    // Fetch class data within designated period (31days).
-    const designatedPeriod = 31;
-    const designatedPeriodBefore = new Date(
-      Date.now() - designatedPeriod * (24 * 60 * 60 * 1000),
-    );
-    const designatedPeriodAfter = new Date(
-      Date.now() + (designatedPeriod + 1) * (24 * 60 * 60 * 1000),
-    );
-    // Set the designated period to 31 days converted to "T00:00:00.000Z".
-    designatedPeriodBefore.setUTCHours(0, 0, 0, 0);
-    designatedPeriodAfter.setUTCHours(0, 0, 0, 0);
+    const shouldFetchTodayOnly = req.query.today;
+    let designatedPeriodBefore: Date;
+    let designatedPeriodAfter: Date;
+
+    if (shouldFetchTodayOnly) {
+      const { startOfDay, endOfDay } = getJstDayRange(new Date());
+      designatedPeriodBefore = startOfDay;
+      designatedPeriodAfter = endOfDay;
+    } else {
+      // Fetch class data within designated period (31days).
+      const designatedPeriod = 31;
+      designatedPeriodBefore = new Date(
+        Date.now() - designatedPeriod * (24 * 60 * 60 * 1000),
+      );
+      designatedPeriodAfter = new Date(
+        Date.now() + (designatedPeriod + 1) * (24 * 60 * 60 * 1000),
+      );
+      // Set the designated period to 31 days converted to "T00:00:00.000Z".
+      designatedPeriodBefore.setUTCHours(0, 0, 0, 0);
+      designatedPeriodAfter.setUTCHours(0, 0, 0, 0);
+    }
 
     const classes = await getClassesWithinPeriod(
       designatedPeriodBefore,
@@ -991,6 +1172,8 @@ export const getClassesWithinPeriodController = async (
         dateTime,
         status,
         classCode,
+        isFreeTrial,
+        canceledAt,
         classAttendance,
       } = classItem;
 
@@ -1036,6 +1219,9 @@ export const getClassesWithinPeriodController = async (
         case "canceledByInstructor":
           statusText = "Canceled(Instructor)";
           break;
+        case "canceledByAdmin":
+          statusText = "Canceled(Admin)";
+          break;
         case "rebooked":
           statusText = "Rebooked";
           break;
@@ -1061,11 +1247,105 @@ export const getClassesWithinPeriodController = async (
         CustomerID: customer.id,
         Status: statusText,
         "Class Code": classCode,
+        "Is Free Trial": isFreeTrial,
+        "Canceled At": canceledAt ? canceledAt.toISOString() : null,
       };
     });
 
     res.json({ data });
   } catch (error) {
     res.status(500).json({ error });
+  }
+};
+
+export const getMessageBoardPostsController = async (
+  _: unknown,
+  res: Response,
+) => {
+  interface MessageBoardPost {
+    id: number;
+    target: number;
+    body: string;
+    createdAt: Date;
+  }
+
+  try {
+    const posts: MessageBoardPost[] = await getMessageBoardPosts();
+    const data = posts.map((post) => ({
+      id: post.id,
+      target: post.target,
+      body: post.body,
+      createdAt: post.createdAt.toISOString(),
+    }));
+
+    res.status(200).json({ data });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+};
+
+export const createMessageBoardPostController = async (
+  req: RequestWithBody<CreateMessageBoardPostRequest>,
+  res: Response,
+) => {
+  const { target, body } = req.body;
+  const normalizedBody = body.trim();
+
+  if (!isValidMessageTarget(target)) {
+    return res.status(400).json({ message: "Invalid target selected." });
+  }
+
+  if (!normalizedBody) {
+    return res.status(400).json({ message: "Message body is required." });
+  }
+
+  try {
+    const created = await createMessageBoardPost(target, normalizedBody);
+    return res.status(201).json({
+      message: "Message posted successfully",
+      data: {
+        id: created.id,
+        target: created.target,
+        body: created.body,
+        createdAt: created.createdAt.toISOString(),
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+// Delete admins who have left the service more than 3 years ago
+export const deletePastAdminsController = async (_: Request, res: Response) => {
+  try {
+    const deletedAdmins = await deletePastAdmins();
+    res.status(200).json({ deletedAdmins });
+  } catch (error) {
+    console.error("Error deleting past admins", {
+      error,
+      context: {
+        time: new Date().toISOString(),
+      },
+    });
+    res.sendStatus(500);
+  }
+};
+
+// Delete message board posts that are older than the threshold
+export const deletePastMessageBoardPostsController = async (
+  _: Request,
+  res: Response,
+) => {
+  try {
+    const deletedPosts = await deletePastMessageBoardPosts();
+    res.status(200).json({ deletedPosts });
+  } catch (error) {
+    console.error("Error deleting past message board posts", {
+      error,
+      context: {
+        time: new Date().toISOString(),
+      },
+    });
+    res.sendStatus(500);
   }
 };

@@ -3,6 +3,7 @@ import request from "supertest";
 import { server } from "../../server";
 import { prisma } from "../setup";
 import {
+  createAdmin,
   createCustomer,
   createInstructor,
   createClass,
@@ -13,6 +14,7 @@ import {
   getFirstDesignatedDayOfYear,
 } from "../../utils/dateUtils";
 import { maskedHeadLetters } from "../../utils/commonUtils";
+import { EnglishBackground } from "../../types";
 
 function cronAuthHeader() {
   process.env.CRON_SECRET = "test-cron-secret";
@@ -140,7 +142,7 @@ describe("/jobs", () => {
         data: {
           terminationAt: new Date("2000-01-01T00:00:00.000Z"),
           classURL: "https://example.com/class",
-          isNative: true,
+          englishBackground: EnglishBackground.NativeA,
         },
       });
 
@@ -150,6 +152,7 @@ describe("/jobs", () => {
         data: {
           terminationAt: null,
           classURL: "https://example.com/active",
+          englishBackground: EnglishBackground.NonNative,
         },
       });
 
@@ -170,17 +173,18 @@ describe("/jobs", () => {
 
       const maskedDb = await prisma.instructor.findUnique({
         where: { id: toMask.id },
-        select: { name: true, classURL: true, isNative: true },
+        select: { name: true, classURL: true, englishBackground: true },
       });
       expect(maskedDb?.name).toBe(maskedHeadLetters);
       expect(maskedDb?.classURL).toContain(maskedHeadLetters);
-      expect(maskedDb?.isNative).toBe(false);
+      expect(maskedDb?.englishBackground).toBe(EnglishBackground.NonNative);
 
       const activeDb = await prisma.instructor.findUnique({
         where: { id: active.id },
-        select: { classURL: true },
+        select: { classURL: true, englishBackground: true },
       });
       expect(activeDb?.classURL).toBe("https://example.com/active");
+      expect(activeDb?.englishBackground).toBe(EnglishBackground.NonNative);
     });
 
     it("return empty list when no instructors need masking", async () => {
@@ -192,6 +196,102 @@ describe("/jobs", () => {
         .expect(200);
 
       expect(response.body).toEqual([]);
+    });
+  });
+
+  describe("DELETE /jobs/delete/past-admins", () => {
+    it("delete admins whose terminationAt is older than 36 months (cron auth)", async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2026-04-02T00:00:00.000Z"));
+
+      const oldTerminatedAdmin = await createAdmin();
+      const recentTerminatedAdmin = await createAdmin();
+      const activeAdmin = await createAdmin();
+
+      await prisma.admin.update({
+        where: { id: oldTerminatedAdmin.id },
+        data: { terminationAt: new Date("2023-03-31T00:00:00.000Z") },
+      });
+
+      await prisma.admin.update({
+        where: { id: recentTerminatedAdmin.id },
+        data: { terminationAt: new Date("2023-04-02T00:00:00.000Z") },
+      });
+
+      const response = await request(server)
+        .delete("/jobs/delete/past-admins")
+        .set("Authorization", cronAuthHeader())
+        .expect(200);
+
+      expect(response.body.deletedAdmins).toEqual({ count: 1 });
+
+      expect(
+        await prisma.admin.findUnique({
+          where: { id: oldTerminatedAdmin.id },
+        }),
+      ).toBeNull();
+
+      expect(
+        await prisma.admin.findUnique({
+          where: { id: recentTerminatedAdmin.id },
+        }),
+      ).not.toBeNull();
+
+      expect(
+        await prisma.admin.findUnique({
+          where: { id: activeAdmin.id },
+        }),
+      ).not.toBeNull();
+    });
+
+    it("return 401 when cron auth is missing", async () => {
+      await request(server).delete("/jobs/delete/past-admins").expect(401);
+    });
+  });
+
+  describe("DELETE /jobs/delete/past-message-board-posts", () => {
+    it("delete message board posts older than 12 months (cron auth)", async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2026-04-02T00:00:00.000Z"));
+
+      const oldPost = await prisma.messageBoardPost.create({
+        data: {
+          target: 2,
+          body: "old post",
+          createdAt: new Date("2025-04-01T00:00:00.000Z"),
+        },
+      });
+
+      const recentPost = await prisma.messageBoardPost.create({
+        data: {
+          target: 2,
+          body: "recent post",
+          createdAt: new Date("2025-04-02T00:00:00.000Z"),
+        },
+      });
+
+      const response = await request(server)
+        .delete("/jobs/delete/past-message-board-posts")
+        .set("Authorization", cronAuthHeader())
+        .expect(200);
+
+      expect(response.body.deletedPosts).toEqual({ count: 1 });
+
+      expect(
+        await prisma.messageBoardPost.findUnique({ where: { id: oldPost.id } }),
+      ).toBeNull();
+
+      expect(
+        await prisma.messageBoardPost.findUnique({
+          where: { id: recentPost.id },
+        }),
+      ).not.toBeNull();
+    });
+
+    it("return 401 when cron auth is missing", async () => {
+      await request(server)
+        .delete("/jobs/delete/past-message-board-posts")
+        .expect(401);
     });
   });
 

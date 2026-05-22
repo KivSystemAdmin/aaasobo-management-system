@@ -5,6 +5,7 @@ import {
   getRegularClassesBySubscriptionId,
   updateRegularClass,
   getValidRecurringClassesByInstructorId,
+  getRecurringClassesHistoryCountBySubscriptionId,
 } from "../services/recurringClassesService";
 import {
   RequestWithParams,
@@ -16,6 +17,7 @@ import type {
   RecurringClassIdParams,
   GetRecurringClassesBySubscriptionQuery,
   GetRecurringClassesByInstructorQuery,
+  GetRecurringClassesHistoryCountQuery,
   CreateRecurringClassRequest,
   UpdateRecurringClassRequest,
 } from "../../../shared/schemas/recurringClasses";
@@ -70,6 +72,22 @@ export const getRegularClassesBySubscriptionIdController = async (
     );
 
     res.json({ recurringClasses });
+  } catch (error) {
+    const err =
+      error instanceof Error ? error : new Error("An unknown error occurred");
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getRecurringClassesHistoryCountController = async (
+  req: RequestWithQuery<GetRecurringClassesHistoryCountQuery>,
+  res: Response,
+) => {
+  try {
+    const count = await getRecurringClassesHistoryCountBySubscriptionId(
+      req.query.subscriptionId,
+    );
+    res.status(200).json({ count });
   } catch (error) {
     const err =
       error instanceof Error ? error : new Error("An unknown error occurred");

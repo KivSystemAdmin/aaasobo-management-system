@@ -6,23 +6,23 @@ import { GENERAL_ERROR_MESSAGE } from "@/lib/messages/formValidation";
 import { extractRegisterValidationErrors } from "@/lib/utils/validationErrorUtils";
 import { planRegisterSchema, eventRegisterSchema } from "@/schemas/authSchema";
 import { revalidatePlanList, revalidateEventList } from "./revalidate";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 
 export async function registerContent(
   prevState: RegisterFormState | undefined,
   formData: FormData,
 ): Promise<RegisterFormState> {
-  try {
-    const planNameEng = formData.get("planNameEng");
-    const planNameJpn = formData.get("planNameJpn");
-    const eventNameEng = formData.get("eventNameEng");
-    const eventNameJpn = formData.get("eventNameJpn");
-    const weeklyClassTimes = Number(formData.get("weeklyClassTimes"));
-    const color = formData.get("color");
-    const description = formData.get("description");
-    const categoryType = formData.get("categoryType");
-    const isNative = formData.get("isNative");
+  const planNameEng = formData.get("planNameEng");
+  const planNameJpn = formData.get("planNameJpn");
+  const eventNameEng = formData.get("eventNameEng");
+  const eventNameJpn = formData.get("eventNameJpn");
+  const weeklyClassTimes = Number(formData.get("weeklyClassTimes"));
+  const color = formData.get("color");
+  const description = formData.get("description");
+  const categoryType = formData.get("categoryType");
+  const englishBackground = Number(formData.get("englishBackground"));
 
+  try {
     // Get the cookies from the request headers
     const cookie = await getCookie();
 
@@ -36,26 +36,26 @@ export async function registerContent(
           planNameJpn,
           weeklyClassTimes,
           description,
-          isNative,
+          englishBackground,
         });
         if (!parsedForm.success) {
           const validationErrors = parsedForm.error.issues;
           return extractRegisterValidationErrors(validationErrors);
         }
 
-        const isNativeStr = parsedForm.data.isNative ? "true" : "false";
-
         response = await registerPlan({
           planNameEng: parsedForm.data.planNameEng,
           planNameJpn: parsedForm.data.planNameJpn,
           weeklyClassTimes: parsedForm.data.weeklyClassTimes,
           description: parsedForm.data.description,
-          isNative: isNativeStr,
+          englishBackground: parsedForm.data.englishBackground,
           cookie,
         });
 
-        // Refresh cached admin data for the admin list page
-        await revalidatePlanList();
+        if (response.successMessage) {
+          // Refresh cached plan data for the plan list page
+          await revalidatePlanList();
+        }
 
         return response;
 
@@ -77,8 +77,10 @@ export async function registerContent(
           cookie,
         });
 
-        // Refresh cached admin data for the admin list page
-        await revalidateEventList();
+        if (response.successMessage) {
+          // Refresh cached event data for the event list page
+          await revalidateEventList();
+        }
 
         return response;
 

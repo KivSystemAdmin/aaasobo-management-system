@@ -7,7 +7,7 @@
   margin-top: 10px;
 
   &__icon {
-    border-radius: 180px;
+    border-radius: 50%;
 
     &.booked {
       border: 3px solid $light-pink-regular-class;
@@ -18,7 +18,8 @@
     &.completed {
       border: 3px solid $completed-background-color;
     }
-    &.canceledByInstructor {
+    &.canceledByInstructor,
+    &.canceledByAdmin {
       border: 3px solid $gray-canceled-by-instructor;
     }
     &.canceledByCustomer {
@@ -27,8 +28,14 @@
     &.freeTrial {
       border: 3px solid $green-success;
     }
-    &.none {
+    &.non-native {
       border: 3px solid $green-success;
+    }
+    &.native-a {
+      border: 4px solid $blue_primary;
+    }
+    &.native-b {
+      border: 4px solid $purple-accent-hover;
     }
   }
 

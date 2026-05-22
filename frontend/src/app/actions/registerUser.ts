@@ -10,36 +10,36 @@ import {
   adminRegisterSchema,
 } from "@/schemas/authSchema";
 import { revalidateInstructorList, revalidateAdminList } from "./revalidate";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 
 export async function registerUser(
   prevState: RegisterFormState | undefined,
   formData: FormData,
 ): Promise<RegisterFormState> {
-  try {
-    const name = formData.get("name");
-    const nickname = formData.get("nickname");
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const passConfirmation = formData.get("passConfirmation");
-    const icon = formData.get("icon") as File;
-    const birthdate = String(formData.get("birthdate"));
-    const workingTime = String(formData.get("workingTime"));
-    const lifeHistory = String(formData.get("lifeHistory"));
-    const favoriteFood = String(formData.get("favoriteFood"));
-    const hobby = String(formData.get("hobby"));
-    const messageForChildren = String(formData.get("messageForChildren"));
-    const skill = String(formData.get("skill"));
-    const classURL = formData.get("classURL");
-    const meetingId = formData.get("meetingId");
-    const passcode = formData.get("passcode");
-    const passwordStrength = parseInt(
-      formData.get("passwordStrength") as string,
-      10,
-    );
-    const userType = formData.get("userType");
-    const isNative = String(formData.get("nativeStatus")) === "Native";
+  const name = formData.get("name");
+  const nickname = formData.get("nickname");
+  const email = formData.get("email");
+  const password = formData.get("password");
+  const passConfirmation = formData.get("passConfirmation");
+  const icon = formData.get("icon") as File;
+  const birthdate = String(formData.get("birthdate"));
+  const workingTime = String(formData.get("workingTime"));
+  const lifeHistory = String(formData.get("lifeHistory"));
+  const favoriteFood = String(formData.get("favoriteFood"));
+  const hobby = String(formData.get("hobby"));
+  const messageForChildren = String(formData.get("messageForChildren"));
+  const skill = String(formData.get("skill"));
+  const classURL = formData.get("classURL");
+  const meetingId = formData.get("meetingId");
+  const englishBackground = Number(formData.get("englishBackground"));
+  const passcode = formData.get("passcode");
+  const passwordStrength = parseInt(
+    formData.get("passwordStrength") as string,
+    10,
+  );
+  const userType = formData.get("userType");
 
+  try {
     // Get the cookies from the request headers
     const cookie = await getCookie();
 
@@ -63,6 +63,7 @@ export async function registerUser(
           meetingId,
           passcode,
           userType,
+          englishBackground,
         });
         if (!parsedForm1.success) {
           const validationErrors = parsedForm1.error.issues;
@@ -84,7 +85,10 @@ export async function registerUser(
         userData.append("classURL", parsedForm1.data.classURL);
         userData.append("meetingId", parsedForm1.data.meetingId);
         userData.append("passcode", parsedForm1.data.passcode);
-        userData.append("isNative", isNative ? "true" : "false");
+        userData.append(
+          "englishBackground",
+          parsedForm1.data.englishBackground.toString(),
+        );
 
         // Append the icon file if it exists
         if (icon.name && icon.size > 0) {
@@ -101,8 +105,10 @@ export async function registerUser(
 
         response = await registerInstructor(userData, cookie);
 
-        // Refresh cached instructor data for the instructor list page
-        revalidateInstructorList();
+        if (response.successMessage) {
+          // Refresh cached instructor data for the instructor list page
+          await revalidateInstructorList();
+        }
 
         return response;
 
@@ -127,8 +133,10 @@ export async function registerUser(
           cookie,
         });
 
-        // Refresh cached admin data for the admin list page
-        await revalidateAdminList();
+        if (response.successMessage) {
+          // Refresh cached admin data for the admin list page
+          await revalidateAdminList();
+        }
 
         return response;
 

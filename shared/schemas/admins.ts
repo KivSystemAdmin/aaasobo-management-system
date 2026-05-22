@@ -21,6 +21,42 @@ export const InstructorIdParams = z.object({
     .transform((val) => parseInt(val, 10)),
 });
 
+export const InstructorPayrollQuery = z.object({
+  month: z
+    .string()
+    .regex(/^\d{4}-(0[1-9]|1[0-2])$/, "month must be in YYYY-MM format"),
+});
+
+export const ClassListQuery = z.object({
+  today: z
+    .enum(["true", "false"])
+    .optional()
+    .transform((value) => value === "true"),
+});
+
+export const MessageBoardTarget = z.union([
+  z.literal(0),
+  z.literal(1),
+  z.literal(2),
+]);
+
+export const CreateMessageBoardPostRequest = z.object({
+  target: MessageBoardTarget,
+  body: z.string().trim().min(1, "Message body is required"),
+});
+
+export const CreateInstructorFeeRequest = z.object({
+  currency: z.string().regex(/^[A-Z]{3}$/, "currency must be a 3-letter code"),
+  effectiveFrom: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "effectiveFrom must be in YYYY-MM-DD format"),
+  trialFee: z.number().int().nonnegative(),
+  regularFee: z.number().int().nonnegative(),
+  cancelFee: z.number().int().nonnegative(),
+  cancelWithoutNoticeFee: z.number().int().nonnegative(),
+  monthlyCancelFee: z.number().int().nonnegative().default(0),
+});
+
 export const PlanIdParams = z.object({
   id: z
     .string()
@@ -63,7 +99,7 @@ export const RegisterInstructorRequest = z.object({
   classURL: z.string().min(1, "Class URL is required"),
   meetingId: z.string().min(1, "Meeting ID is required"),
   passcode: z.string().min(1, "Passcode is required"),
-  isNative: z.string("true") || z.string("false"),
+  englishBackground: z.string().describe("English background requirement"),
 });
 
 export const UpdateInstructorRequest = z.object({
@@ -81,7 +117,7 @@ export const UpdateInstructorRequest = z.object({
   classURL: z.string().min(1, "Class URL is required"),
   meetingId: z.string().min(1, "Meeting ID is required"),
   passcode: z.string().min(1, "Passcode is required"),
-  isNative: z.enum(["true", "false"]),
+  englishBackground: z.string().describe("English background requirement"),
 });
 
 // Plan schemas
@@ -93,14 +129,14 @@ export const RegisterPlanRequest = z.object({
     .int()
     .positive("Weekly class times must be a positive integer"),
   description: z.string().min(1, "Description is required"),
-  isNative: z.string("true") || z.string("false"),
+  englishBackground: z.number().describe("English background requirement"),
 });
 
 export const UpdatePlanRequest = z.object({
   planNameEng: z.string().min(1, "Plan name (English) is required"),
   planNameJpn: z.string().min(1, "Plan name (Japanese) is required"),
   description: z.string().min(1, "Description is required"),
-  isNative: z.string("true") || z.string("false"),
+  englishBackground: z.number().describe("English background requirement"),
 });
 
 // Event schemas
@@ -185,6 +221,113 @@ export const InstructorsListResponse = z.object({
   data: z.array(InstructorListItem),
 });
 
+export const InstructorPayrollFeePeriod = z.object({
+  currency: z.string().regex(/^[A-Z]{3}$/),
+  effectiveFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  effectiveTo: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable(),
+  trialFee: z.number().int(),
+  regularFee: z.number().int(),
+  cancelFee: z.number().int(),
+  cancelWithoutNoticeFee: z.number().int(),
+  monthlyCancelFee: z.number().int(),
+});
+
+export const InstructorPayrollMonthlyCancelFee = z.object({
+  cancelCount: z.number().int().nonnegative(),
+  threshold: z.literal(10),
+  unitFee: z.number().int().nonnegative(),
+  timesApplied: z.number().int().nonnegative(),
+  total: z.number().int().nonnegative(),
+});
+
+export const InstructorPayrollDailyBreakdown = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  counts: z.object({
+    trial: z.number().int().nonnegative(),
+    regular: z.number().int().nonnegative(),
+    cancel: z.number().int().nonnegative(),
+    cancelWithoutNotice: z.number().int().nonnegative(),
+  }),
+  total: z.number().int(),
+});
+
+export const InstructorPayrollPeriod = z.object({
+  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  sourceLastUpdatedAt: z.iso.datetime().nullable(),
+  currency: z
+    .string()
+    .regex(/^[A-Z]{3}$/)
+    .nullable(),
+  counts: z.object({
+    trial: z.number().int().nonnegative(),
+    regular: z.number().int().nonnegative(),
+    cancel: z.number().int().nonnegative(),
+    cancelWithoutNotice: z.number().int().nonnegative(),
+  }),
+  subtotals: z.object({
+    trial: z.number().int().nonnegative(),
+    regular: z.number().int().nonnegative(),
+    cancel: z.number().int().nonnegative(),
+    cancelWithoutNotice: z.number().int().nonnegative(),
+  }),
+  total: z.number().int(),
+  monthlyCancelFee: InstructorPayrollMonthlyCancelFee,
+  dailyBreakdown: z.array(InstructorPayrollDailyBreakdown),
+  appliedFeePeriods: z.array(InstructorPayrollFeePeriod),
+});
+
+export const InstructorPayrollResponse = z.object({
+  instructorId: z.number().int().positive(),
+  month: z.string().regex(/^\d{4}-\d{2}$/),
+  timezone: z.literal("Asia/Tokyo"),
+  periods: z.tuple([InstructorPayrollPeriod, InstructorPayrollPeriod]),
+});
+
+export const InstructorPayrollErrorResponse = z.object({
+  code: z.string(),
+  message: z.string(),
+});
+
+export const InstructorFeeRate = z.object({
+  id: z.number().int().positive(),
+  currency: z.string().regex(/^[A-Z]{3}$/),
+  effectiveFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  effectiveTo: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable(),
+  trialFee: z.number().int().nonnegative(),
+  regularFee: z.number().int().nonnegative(),
+  cancelFee: z.number().int().nonnegative(),
+  cancelWithoutNoticeFee: z.number().int().nonnegative(),
+  monthlyCancelFee: z.number().int().nonnegative(),
+});
+
+export const InstructorFeeRatesResponse = z.object({
+  instructorId: z.number().int().positive(),
+  fees: z.array(InstructorFeeRate),
+});
+
+export const CreateInstructorFeeResponse = z.object({
+  message: z.string(),
+  fee: InstructorFeeRate,
+});
+
+export const DeleteLatestInstructorFeeResponse = z.object({
+  message: z.string(),
+  deletedFeeId: z.number().int().positive(),
+  reactivatedFeeId: z.number().int().positive(),
+});
+
+export const InstructorFeeErrorResponse = z.object({
+  code: z.string(),
+  message: z.string(),
+});
+
 // Past instructor list item for table display
 export const PastInstructorListItem = z.object({
   No: z.number(),
@@ -205,6 +348,7 @@ export const CustomerListItem = z.object({
   Children: z.string().nullable(),
   Email: z.string(),
   Prefecture: z.string(),
+  "Start Date (JST)": z.string(),
 });
 
 export const CustomersListResponse = z.object({
@@ -217,6 +361,7 @@ export const PastCustomerListItem = z.object({
   ID: z.number(),
   "Past Customer": z.string(),
   "Past Children": z.string().nullable(),
+  "Start Date (JST)": z.string(),
   "End Date (JST)": z.string(),
 });
 
@@ -293,6 +438,8 @@ export const ClassListItem = z.object({
   CustomerID: z.number(),
   Status: z.string(),
   "Class Code": z.string(),
+  "Is Free Trial": z.boolean(),
+  "Canceled At": z.string().nullable(),
 });
 
 export const ClassesListResponse = z.object({
@@ -309,6 +456,22 @@ export const ScheduleListItem = z.object({
 
 export const SchedulesListResponse = z.object({
   organizedData: z.array(ScheduleListItem),
+});
+
+export const MessageBoardPostItem = z.object({
+  id: z.number().int().positive(),
+  target: MessageBoardTarget,
+  body: z.string(),
+  createdAt: z.iso.datetime(),
+});
+
+export const MessageBoardPostsResponse = z.object({
+  data: z.array(MessageBoardPostItem),
+});
+
+export const CreateMessageBoardPostResponse = z.object({
+  message: z.string(),
+  data: MessageBoardPostItem,
 });
 
 // Update response schemas
@@ -372,6 +535,10 @@ export const UpdateSubscriptionToTerminateClassRequest = z.object({
   recurringClassIds: z.array(z.number()),
 });
 
+export const UpdateSelectTypeUrlRequest = z.object({
+  selectType: z.string(),
+});
+
 // Error response schemas
 export const ValidationErrorResponse = z.object({
   items: z.array(z.string()),
@@ -383,9 +550,66 @@ export const ConflictErrorResponse = z.object({
 
 export const InstructorUpdateErrorResponse = z.record(z.string(), z.string());
 
+export const ImportNormalizeGeneratedEmailItem = z.object({
+  row: z.number().int().positive(),
+  customerName: z.string(),
+  generatedEmail: z.string(),
+});
+
+export const ImportNormalizedDownloadParams = z.object({
+  jobId: z.string().min(1, "jobId is required"),
+});
+
+export const ImportNormalizeResponse = z.object({
+  jobId: z.string(),
+  files: z.record(z.string(), z.string()),
+  report: z.object({
+    rawRows: z.number().int().nonnegative(),
+    normalizedRowsByFile: z.record(z.string(), z.number().int().nonnegative()),
+    generatedCustomerEmails: z.array(ImportNormalizeGeneratedEmailItem),
+    warnings: z.array(z.string()),
+  }),
+});
+
+export const ImportExecuteRequest = z.object({
+  jobId: z.string().min(1).optional(),
+});
+
+export const ImportExecuteValidationIssue = z.object({
+  file: z.string(),
+  row: z.number().int().positive().nullable(),
+  column: z.string().nullable(),
+  message: z.string(),
+});
+
+export const ImportExecuteReport = z.object({
+  rowsByFile: z.record(z.string(), z.number().int().nonnegative()),
+});
+
+export const ImportExecuteResponse = z.object({
+  message: z.string(),
+  imported: z.boolean(),
+  report: ImportExecuteReport,
+});
+
+export const ImportExecuteErrorResponse = z.object({
+  message: z.string(),
+  report: ImportExecuteReport,
+  issues: z.array(ImportExecuteValidationIssue),
+});
+
 export type AdminIdParams = z.infer<typeof AdminIdParams>;
 export type CustomerIdParams = z.infer<typeof CustomerIdParams>;
 export type InstructorIdParams = z.infer<typeof InstructorIdParams>;
+export type InstructorPayrollQuery = z.infer<typeof InstructorPayrollQuery>;
+export type ClassListQuery = z.infer<typeof ClassListQuery>;
+export type MessageBoardTarget = z.infer<typeof MessageBoardTarget>;
+export type CreateMessageBoardPostRequest = z.infer<
+  typeof CreateMessageBoardPostRequest
+>;
+export type CreateInstructorFeeRequest = z.infer<
+  typeof CreateInstructorFeeRequest
+>;
 export type PlanIdParams = z.infer<typeof PlanIdParams>;
 export type EventIdParams = z.infer<typeof EventIdParams>;
 
@@ -407,6 +631,35 @@ export type AdminProfile = z.infer<typeof AdminProfile>;
 export type AdminResponse = z.infer<typeof AdminResponse>;
 export type AdminsListResponse = z.infer<typeof AdminsListResponse>;
 export type InstructorsListResponse = z.infer<typeof InstructorsListResponse>;
+export type InstructorPayrollFeePeriod = z.infer<
+  typeof InstructorPayrollFeePeriod
+>;
+export type InstructorPayrollMonthlyCancelFee = z.infer<
+  typeof InstructorPayrollMonthlyCancelFee
+>;
+export type InstructorPayrollDailyBreakdown = z.infer<
+  typeof InstructorPayrollDailyBreakdown
+>;
+export type InstructorPayrollPeriod = z.infer<typeof InstructorPayrollPeriod>;
+export type InstructorPayrollResponse = z.infer<
+  typeof InstructorPayrollResponse
+>;
+export type InstructorPayrollErrorResponse = z.infer<
+  typeof InstructorPayrollErrorResponse
+>;
+export type InstructorFeeRate = z.infer<typeof InstructorFeeRate>;
+export type InstructorFeeRatesResponse = z.infer<
+  typeof InstructorFeeRatesResponse
+>;
+export type CreateInstructorFeeResponse = z.infer<
+  typeof CreateInstructorFeeResponse
+>;
+export type DeleteLatestInstructorFeeResponse = z.infer<
+  typeof DeleteLatestInstructorFeeResponse
+>;
+export type InstructorFeeErrorResponse = z.infer<
+  typeof InstructorFeeErrorResponse
+>;
 export type PastInstructorsListResponse = z.infer<
   typeof PastInstructorsListResponse
 >;
@@ -422,6 +675,13 @@ export type SubscriptionsListResponse = z.infer<
 export type EventsListResponse = z.infer<typeof EventsListResponse>;
 export type ClassesListResponse = z.infer<typeof ClassesListResponse>;
 export type SchedulesListResponse = z.infer<typeof SchedulesListResponse>;
+export type MessageBoardPostItem = z.infer<typeof MessageBoardPostItem>;
+export type MessageBoardPostsResponse = z.infer<
+  typeof MessageBoardPostsResponse
+>;
+export type CreateMessageBoardPostResponse = z.infer<
+  typeof CreateMessageBoardPostResponse
+>;
 
 export type UpdateAdminResponse = z.infer<typeof UpdateAdminResponse>;
 export type UpdateInstructorResponse = z.infer<typeof UpdateInstructorResponse>;
@@ -436,4 +696,16 @@ export type UpdateSubscriptionToAddClassRequest = z.infer<
 >;
 export type UpdateSubscriptionToTerminateClassRequest = z.infer<
   typeof UpdateSubscriptionToTerminateClassRequest
+>;
+export type ImportNormalizeResponse = z.infer<typeof ImportNormalizeResponse>;
+export type ImportNormalizedDownloadParams = z.infer<
+  typeof ImportNormalizedDownloadParams
+>;
+export type ImportExecuteRequest = z.infer<typeof ImportExecuteRequest>;
+export type ImportExecuteResponse = z.infer<typeof ImportExecuteResponse>;
+export type ImportExecuteErrorResponse = z.infer<
+  typeof ImportExecuteErrorResponse
+>;
+export type UpdateSelectTypeUrlRequest = z.infer<
+  typeof UpdateSelectTypeUrlRequest
 >;

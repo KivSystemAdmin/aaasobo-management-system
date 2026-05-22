@@ -1,44 +1,129 @@
 @use "@/styles/variables.module.scss" as *;
 
 $border_radius: 0.5rem;
-$font_size: 0.9rem;
+$font_size: 0.95rem;
 
 .container {
   box-sizing: border-box;
-  background-color: $gray-background;
+  background: linear-gradient(180deg, #f6f8fc 0%, #f1f3f9 100%);
   margin: 1rem;
-  padding: 1rem;
-  border-radius: $border_radius;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #dbe3f0;
+  box-shadow:
+    0 8px 24px rgba(66, 70, 120, 0.08),
+    0 2px 8px rgba(66, 70, 120, 0.08);
 }
 
 .filterContainer {
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
-  gap: 1rem;
+  gap: 1.25rem;
 
-  select,
-  input {
+  .formHeader {
+    h3 {
+      margin: 0 0 0.25rem;
+      font-size: 1.25rem;
+      color: #1f2a44;
+      line-height: 1.3;
+    }
+
+    p {
+      margin: 0;
+      color: #60708f;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+  }
+
+  .planDate {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .fieldGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .fieldLabel {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #1f2a44;
+  }
+
+  .selectField,
+  .dateField {
+    width: 100%;
     padding: 0.5rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #d5deec;
     border-radius: $border_radius;
     font-size: $font_size;
-    color: #888888;
+    color: #888;
+    background-color: #fff;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
-  select {
-    width: 260px;
+  .selectField {
+    min-height: 42px;
   }
 
-  input {
-    width: 160px;
+  .dateField {
+    max-width: 260px;
   }
 
-  input:not(:placeholder-shown) {
+  .selectTypeInput {
+    width: 100%;
+    min-height: 42px;
+    padding: 0.5rem;
+    font-size: 0.95rem;
+    background-color: #fff;
+    border-radius: 0.75rem;
+    border: 1px solid #d5deec;
+
+    &:focus {
+      border-color: $blue_primary;
+      box-shadow: 0 0 0 3px rgba(74, 75, 166, 0.15);
+    }
+  }
+
+  .selectField:focus,
+  .dateField:focus {
+    outline: none;
+    border-color: $blue_primary;
+    box-shadow: 0 0 0 3px rgba(74, 75, 166, 0.15);
+  }
+
+  .dateField:not(:placeholder-shown) {
     color: #000000;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 1rem;
+    padding-top: 0.25rem;
   }
 }
 
 .horizontalLine {
   margin: 1.5rem 1rem 1.5rem 1rem;
   border-top: 1px solid $gray-background;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .filterContainer {
+    .dateField {
+      max-width: 100%;
+    }
+  }
 }

@@ -108,6 +108,30 @@ describe("PATCH /admins/event-list/update/:id", () => {
       })
       .expect(401);
   });
+
+  it("rejects updates to protected default events by name", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+    const event = await createEvent({
+      name: "お休み / No Class",
+      color: "#111111",
+    });
+
+    await request(server)
+      .patch(`/admins/event-list/update/${event.id}`)
+      .set("Cookie", authCookie)
+      .send({
+        eventNameJpn: "更新イベント",
+        eventNameEng: "Updated Event",
+        color: "#222222",
+      })
+      .expect(403);
+
+    const unchangedEvent = await prisma.event.findUnique({
+      where: { id: event.id },
+    });
+    expect(unchangedEvent?.name).toBe("お休み / No Class");
+  });
 });
 
 describe("DELETE /admins/event-list/delete/:id", () => {
@@ -133,5 +157,23 @@ describe("DELETE /admins/event-list/delete/:id", () => {
     await request(server)
       .delete(`/admins/event-list/delete/${event.id}`)
       .expect(401);
+  });
+
+  it("rejects deletes to protected default events by name", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+    const event = await createEvent({
+      name: "お休み振替対象日 / No Class (Rebookable)",
+      color: "#222222",
+    });
+
+    await request(server)
+      .delete(`/admins/event-list/delete/${event.id}`)
+      .set("Cookie", authCookie)
+      .expect(403);
+
+    expect(
+      await prisma.event.findUnique({ where: { id: event.id } }),
+    ).toBeTruthy();
   });
 });

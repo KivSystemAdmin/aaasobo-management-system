@@ -18,7 +18,7 @@ import {
   revalidatePlanList,
   revalidateSubscriptionList,
 } from "./revalidate";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 import { validateSession } from "./validateSession";
 import {
   generateClasses,
@@ -27,13 +27,16 @@ import {
 } from "@/lib/api/classesApi";
 import { revalidatePath } from "next/cache";
 import {
+  updateSelectTypeUrl,
   updateSubscriptionToAddClass,
   updateSubscriptionToTerminateClass,
 } from "@/lib/api/subscriptionsApi";
 import {
+  UpdateSelectTypeUrlRequest,
   UpdateSubscriptionToAddClassRequest,
   UpdateSubscriptionToTerminateClassRequest,
 } from "@shared/schemas/admins";
+import { EnglishBackground } from "@/types";
 
 export async function updateEventAction(
   prevState: UpdateFormState | undefined,
@@ -90,18 +93,18 @@ export async function updatePlanAction(
     const description = formData.get("description");
     // Hidden input tag fields
     const planId = Number(formData.get("planId"));
-    const isNative = formData.get("isNative");
+    const englishBackground = Number(formData.get("englishBackground"));
 
     let requestNameEng: string | null = null;
     let requestNameJpn: string | null = null;
     let requestDescription: string | null = null;
-    let requestIsNative: string | null = null;
+    let requestEnglishBackground: EnglishBackground | null = null;
 
     const parsedForm = planUpdateSchema.safeParse({
       planNameEng,
       planNameJpn,
       description,
-      isNative,
+      englishBackground,
     });
 
     if (!parsedForm.success) {
@@ -112,7 +115,7 @@ export async function updatePlanAction(
     requestNameEng = parsedForm.data.planNameEng;
     requestNameJpn = parsedForm.data.planNameJpn;
     requestDescription = parsedForm.data.description;
-    requestIsNative = parsedForm.data.isNative ? "true" : "false";
+    requestEnglishBackground = parsedForm.data.englishBackground;
 
     // Get the cookies from the request headers
     const cookie = await getCookie();
@@ -122,7 +125,7 @@ export async function updatePlanAction(
       requestNameEng,
       requestNameJpn,
       requestDescription,
-      requestIsNative,
+      requestEnglishBackground,
       cookie,
     );
 
@@ -207,10 +210,13 @@ export async function updateAttendanceAction(
 
   const path =
     userType === "admin"
-      ? `/admins/${userId}/instructor-list/${instructorId}/class-schedule`
-      : `/instructors/${userId}/class-schedule`;
+      ? `/admins/instructor-list/${instructorId}/class-schedule`
+      : "/instructors/class-schedule";
 
   revalidatePath(path);
+
+  // Refresh cached class data for the class list page
+  revalidateClassList();
 
   return { success: true, message: "Attendance updated successfully." };
 }
@@ -245,10 +251,13 @@ export async function updateClassStatusAction(
 
   const path =
     userType === "admin"
-      ? `/admins/${userId}/instructor-list/${instructorId}/class-schedule`
-      : `/instructors/${userId}/class-schedule`;
+      ? `/admins/instructor-list/${instructorId}/class-schedule`
+      : "/instructors/class-schedule";
 
   revalidatePath(path);
+
+  // Refresh cached class data for the class list page
+  revalidateClassList();
 
   return {
     success: true,
@@ -287,6 +296,7 @@ export async function generateClassesAction(
     // Update the business schedule
     await generateClasses(Number(year), month, cookie);
 
+    // Refresh cached class data for the class list page
     revalidateClassList();
 
     return {
@@ -331,6 +341,30 @@ export async function updateSubscriptionToTerminateClassAction(
   try {
     const cookie = await getCookie();
     const response = await updateSubscriptionToTerminateClass(
+      subscriptionId,
+      updateDate,
+      cookie,
+    );
+
+    // Refresh cached subscription data for the subscription list page
+    revalidateSubscriptionList();
+
+    return response;
+  } catch (error) {
+    console.error("Unexpected error in updateContent server action:", error);
+    return {
+      errorMessage: GENERAL_ERROR_MESSAGE,
+    };
+  }
+}
+
+export async function updateSelectTypeUrlAction(
+  subscriptionId: number,
+  updateDate: UpdateSelectTypeUrlRequest,
+): Promise<DeleteFormState> {
+  try {
+    const cookie = await getCookie();
+    const response = await updateSelectTypeUrl(
       subscriptionId,
       updateDate,
       cookie,

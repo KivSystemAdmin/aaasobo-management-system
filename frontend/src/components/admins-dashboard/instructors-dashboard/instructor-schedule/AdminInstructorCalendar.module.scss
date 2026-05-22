@@ -1,0 +1,329 @@
+@use "@/styles/variables.module.scss" as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: $text-dark;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.legendSymbol {
+  width: 14px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: inherit;
+}
+
+.eventBlock {
+  min-height: 100%;
+  padding: 1px 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  color: #1f2937;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.eventHeader {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusSymbol {
+  width: 10px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.eventTitle {
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.calendarEvent {
+  border-radius: 4px !important;
+  border: 1px solid $border-light !important;
+  background: $white-background !important;
+  color: $text-dark !important;
+  box-shadow: none !important;
+
+  :global(.fc-event-main) {
+    color: inherit !important;
+  }
+}
+
+.slotOpen {
+  background: rgba($green-success, 0.08) !important;
+  border-color: rgba($green-success, 0.28) !important;
+  color: $green-success-hover !important;
+}
+
+.slotBooked {
+  background: rgba($blue_primary, 0.08) !important;
+  border-color: rgba($blue_primary, 0.2) !important;
+  color: $blue_primary !important;
+}
+
+.slotCompleted {
+  background: $completed-background-color !important;
+  border-color: rgba($green-success-hover, 0.16) !important;
+  color: $green-success-hover !important;
+}
+
+.slotAbsent {
+  background: rgba($red-alert, 0.08) !important;
+  border-color: rgba($red-alert, 0.2) !important;
+  color: $red-alert-hover !important;
+}
+
+.legendOpen {
+  background: rgba($green-success, 0.08);
+  border-color: rgba($green-success, 0.28);
+}
+
+.legendBooked {
+  background: rgba($blue_primary, 0.08);
+  border-color: rgba($blue_primary, 0.2);
+}
+
+.legendCompleted {
+  background: $completed-background-color;
+  border-color: rgba($green-success-hover, 0.16);
+}
+
+.legendAbsent {
+  background: rgba($red-alert, 0.08);
+  border-color: rgba($red-alert, 0.2);
+}
+
+.slotCanceled {
+  background: $canceled-background-color !important;
+  border-color: rgba($canceled-text-color, 0.18) !important;
+  color: $canceled-text-color !important;
+
+  :global(.fc-event-main) {
+    color: inherit !important;
+  }
+}
+
+.modal {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modalHeader {
+  margin-bottom: 16px;
+  flex-shrink: 0;
+
+  h2 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+  }
+}
+
+.editLegend {
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.editLegendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #666;
+}
+
+.editLegendBox {
+  width: 20px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid #d1d5db;
+}
+
+.available {
+  background-color: #a2b098;
+}
+
+.absence {
+  background-color: #dc2626;
+}
+
+.withBadge {
+  position: relative;
+}
+
+.withBadge::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid white;
+  box-sizing: border-box;
+}
+
+.willBeAbsent::after {
+  background-color: #dc2626;
+}
+
+.willBeAvailable::after {
+  background-color: #a2b098;
+}
+
+.calendarContainer {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.eventBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+.summaryModal {
+  width: min(880px, 85vw);
+  padding: 32px;
+}
+
+.summaryHeader {
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+.summaryTableWrapper {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: auto;
+  max-height: 50vh;
+}
+
+.summaryTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+
+  th,
+  td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 14px;
+  }
+
+  th {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    color: #374151;
+    font-weight: 600;
+  }
+
+  td {
+    color: #111827;
+    background: #fff;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.summaryActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}

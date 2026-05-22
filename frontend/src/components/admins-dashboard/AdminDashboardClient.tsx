@@ -4,6 +4,7 @@ import TabFunction from "@/components/admins-dashboard/TabFunction";
 import AdminProfile from "@/components/admins-dashboard/AdminProfile";
 import { useTabSelect } from "@/hooks/useTabSelect";
 import Loading from "@/components/elements/loading/Loading";
+import { MASKED_HEAD_LETTERS } from "@/lib/data/data";
 
 export default function AdminTabs({
   userId,
@@ -15,11 +16,16 @@ export default function AdminTabs({
   admin: Admin | string;
   userSessionType: UserType;
 }) {
-  const adminName = typeof admin !== "string" ? admin.name : null;
+  const adminName =
+    typeof admin !== "string"
+      ? admin.email.includes(MASKED_HEAD_LETTERS)
+        ? "Unknown"
+        : admin.name
+      : "Unknown";
   const breadcrumb = [
     "Admin List",
-    `/admins/${userId}/admin-list`,
-    `Admin Page (${adminName || "Unknown"})`,
+    "/admins/admin-list",
+    `Admin Page (${adminName})`,
   ];
   const activeTabName = "activeAdminTab";
 

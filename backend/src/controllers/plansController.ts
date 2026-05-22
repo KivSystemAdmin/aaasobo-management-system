@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { RequestWithParams } from "../middlewares/validationMiddleware";
-import { getAllPlans, getPlanById } from "../services/plansService";
+import {
+  getAllPlans,
+  getPlanById,
+  deleteUnnecessaryPlans,
+} from "../services/plansService";
 import type { PlanIdParams } from "../../../shared/schemas/plans";
 
 // Get all plans' information
@@ -37,10 +41,29 @@ export const getPlanController = async (
         name: plan.name,
         weeklyClassTimes: plan.weeklyClassTimes,
         description: plan.description,
-        isNative: plan.isNative,
+        englishBackground: plan.englishBackground,
       },
     });
   } catch (error) {
     return setErrorResponse(res, error);
+  }
+};
+
+// Delete unnecessary plans
+export const deleteUnnecessaryPlansController = async (
+  _: Request,
+  res: Response,
+) => {
+  try {
+    const deletedPlans = await deleteUnnecessaryPlans();
+    res.status(200).json({ deletedPlans });
+  } catch (error) {
+    console.error("Error deleting unnecessary plans", {
+      error,
+      context: {
+        time: new Date().toISOString(),
+      },
+    });
+    res.sendStatus(500);
   }
 };

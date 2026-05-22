@@ -1,11 +1,165 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, Prisma } from "../../generated/prisma/client";
+import { MessageTarget } from "../types";
 
 const adapter = new PrismaPg({
   connectionString: process.env.POSTGRES_PRISMA_URL,
 });
 export const prisma = new PrismaClient({ adapter });
+
+type SyntheticCustomerSeed = {
+  name: string;
+  email: string;
+  prefecture: string;
+  hasSeenWelcome: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  terminationAt: Date | null;
+  childNames: [string, string];
+};
+
+const syntheticCustomerSeeds: SyntheticCustomerSeed[] = Array.from(
+  { length: 30 },
+  (_, index) => {
+    const customerNames = [
+      "Asami Takeda",
+      "Kazuya Oshima",
+      "Natsuki Morita",
+      "Ryohei Shibata",
+      "Emi Kurihara",
+      "Takumi Nishio",
+      "Aya Hoshino",
+      "Daigo Matsuda",
+      "Miyu Fujisaki",
+      "Koki Arai",
+      "Sayaka Arakawa",
+      "Tatsuya Imai",
+      "Rena Kawaguchi",
+      "Yoshiki Kitamura",
+      "Hina Kuroda",
+      "Soma Nagasawa",
+      "Yurika Ogata",
+      "Keisuke Sakurai",
+      "Maho Sugawara",
+      "Naoto Tomita",
+      "Ami Uematsu",
+      "Shin Watanabe",
+      "Yuka Yamamoto",
+      "Reo Yoshida",
+      "Kanna Aoyama",
+      "Hikaru Endo",
+      "Misato Goto",
+      "Riku Honda",
+      "Yui Ishii",
+      "Takeru Jinno",
+    ];
+    const childNamesPool = [
+      "Arisa",
+      "Sorato",
+      "Miori",
+      "Keito",
+      "Nanaka",
+      "Rento",
+      "Sakina",
+      "Ryusei",
+      "Akari",
+      "Haruma",
+      "Yuina",
+      "Kosei",
+      "Minori",
+      "Renji",
+      "Aona",
+      "Kaito",
+      "Rinka",
+      "Taiga",
+      "Ayane",
+      "Yuto",
+      "Nene",
+      "Sotaro",
+      "Koharu",
+      "Rikuto",
+      "Meika",
+      "Itsuki",
+      "Hinano",
+      "Reona",
+      "Suzuka",
+      "Naoto",
+      "Rio",
+      "Shunta",
+      "Airi",
+      "Towa",
+      "Yuika",
+      "Kentaro",
+      "Hana",
+      "Ryoma",
+      "Mao",
+      "Sena",
+      "Riko",
+      "Haru",
+      "Miu",
+      "Yuma",
+      "Noa",
+      "Koki",
+      "Yuzuki",
+      "Taichi",
+      "Mina",
+      "Ren",
+      "Karin",
+      "Sho",
+      "Sara",
+      "Yusei",
+      "Niko",
+      "Rui",
+      "Rina",
+      "Yudai",
+      "Asuka",
+      "Hinata",
+    ];
+    const prefectures = [
+      "東京都 / Tokyo",
+      "神奈川県 / Kanagawa",
+      "大阪府 / Osaka",
+      "愛知県 / Aichi",
+      "福岡県 / Fukuoka",
+      "北海道 / Hokkaido",
+    ];
+
+    const name = customerNames[index];
+    const createdAt = new Date(
+      Date.UTC(2024, 6 + (index % 18), 3 + (index % 17)),
+    );
+    const updatedAt = new Date(
+      Date.UTC(
+        createdAt.getUTCFullYear(),
+        createdAt.getUTCMonth(),
+        createdAt.getUTCDate() + 4 + (index % 5),
+      ),
+    );
+    const graduationOffsetMonths = 2 + (index % 6);
+    const terminationAt =
+      index % 4 === 0
+        ? new Date(
+            Date.UTC(
+              createdAt.getUTCFullYear(),
+              createdAt.getUTCMonth() + graduationOffsetMonths,
+              25,
+            ),
+          )
+        : null;
+
+    return {
+      name,
+      email: `sample-family-${String(index + 1).padStart(2, "0")}@example.com`,
+      prefecture: prefectures[index % prefectures.length],
+      hasSeenWelcome: index % 2 === 0,
+      createdAt,
+      updatedAt,
+      terminationAt,
+      childNames: [childNamesPool[index * 2], childNamesPool[index * 2 + 1]],
+    };
+  },
+);
 
 async function insertInstructors() {
   await prisma.instructor.createMany({
@@ -29,7 +183,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu", // AaasoBo!Helen
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "elian@example.com",
@@ -49,7 +203,7 @@ async function insertInstructors() {
         password:
           "$2b$12$pNrLSRYlTIwTl//Tz3KMA.K2gdqRWA2/aikJ9ilr0ItQZWe1bJoay", // password: AaasoBo!Elian
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "lori@example.com",
@@ -69,7 +223,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "kaori@example.com",
@@ -89,7 +243,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "winnie@example.com",
@@ -109,7 +263,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "claude@example.com",
@@ -129,7 +283,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "jdy@example.com",
@@ -149,7 +303,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "mae@example.com",
@@ -169,7 +323,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "eiyd@example.com",
@@ -189,7 +343,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "kechia@example.com",
@@ -209,7 +363,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "yasmin@example.com",
@@ -229,7 +383,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "dani@example.com",
@@ -249,7 +403,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "angela@example.com",
@@ -269,7 +423,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "ronilo@example.com",
@@ -289,7 +443,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "sheryll@example.com",
@@ -309,7 +463,7 @@ async function insertInstructors() {
         password:
           "$2b$12$KIe8onrscIo38gG7qugTuOgx5CY7JQ6VkvFKh/skOwkw1tNWdpVlu", // AaasoBo!Helen
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "rina@example.com",
@@ -329,7 +483,7 @@ async function insertInstructors() {
         passcode: "rina",
         password: "$2b$12$WzRinaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "tina@example.com",
@@ -350,7 +504,7 @@ async function insertInstructors() {
         password: "$2b$12$WzTinaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-08-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "mark@example.com",
@@ -370,7 +524,7 @@ async function insertInstructors() {
         password: "$2b$12$WzMarkExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-08-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "liza@example.com",
@@ -390,7 +544,7 @@ async function insertInstructors() {
         password: "$2b$12$WzLizaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-09-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "paolo@example.com",
@@ -410,7 +564,7 @@ async function insertInstructors() {
         password: "$2b$12$WzPaoloExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-04-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "marie@example.com",
@@ -430,7 +584,7 @@ async function insertInstructors() {
         password: "$2b$12$WzMarieExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-06-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "justin@example.com",
@@ -451,7 +605,7 @@ async function insertInstructors() {
           "$2b$12$WzJustinExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2024-08-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "carla@example.com",
@@ -471,7 +625,7 @@ async function insertInstructors() {
         password: "$2b$12$WzCarlaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-08-31T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "gem@example.com",
@@ -491,7 +645,7 @@ async function insertInstructors() {
         password: "$2b$12$WzGemExampleHash000000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-08-07T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "aileen@example.com",
@@ -512,7 +666,7 @@ async function insertInstructors() {
           "$2b$12$WzAileenExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-04-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "niko@example.com",
@@ -533,7 +687,7 @@ async function insertInstructors() {
           "$2b$12$WzNikoExampleHash000000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-06-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "jonah@example.com",
@@ -553,7 +707,7 @@ async function insertInstructors() {
         password: "$2b$12$WzJonahExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-03-11T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "grace@example.com",
@@ -573,7 +727,7 @@ async function insertInstructors() {
         password: "$2b$12$WzGraceExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-01-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "andy@example.com",
@@ -593,7 +747,7 @@ async function insertInstructors() {
         password: "$2b$12$WzAndyExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2025-02-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "fame@example.com",
@@ -613,7 +767,7 @@ async function insertInstructors() {
         password: "$2b$12$WzFameExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2024-12-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "faith@example.com",
@@ -633,7 +787,7 @@ async function insertInstructors() {
         password: "$2b$12$WzFaithExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: "2024-12-27T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "yuki.nakamura@example.com",
@@ -653,7 +807,7 @@ async function insertInstructors() {
         password: "$2b$12$WzYukiExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-01T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "alex.thompson@example.com",
@@ -674,7 +828,7 @@ async function insertInstructors() {
         password: "$2b$12$WzAlexExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-02T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "mina.sato@example.com",
@@ -695,7 +849,7 @@ async function insertInstructors() {
         password: "$2b$12$WzMinaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-03T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "daniel.green@example.com",
@@ -716,7 +870,7 @@ async function insertInstructors() {
           "$2b$12$WzDanielExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-04T00:00:00.000Z",
         terminationAt: "2025-03-30T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "haruka.fujimoto@example.com",
@@ -738,7 +892,7 @@ async function insertInstructors() {
           "$2b$12$WzHarukaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-05T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "ryan.chen@example.com",
@@ -759,7 +913,7 @@ async function insertInstructors() {
         password: "$2b$12$WzRyanExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-06T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "kana.watanabe@example.com",
@@ -780,7 +934,7 @@ async function insertInstructors() {
         password: "$2b$12$WzKanaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-07T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "thomas.walker@example.com",
@@ -802,7 +956,7 @@ async function insertInstructors() {
           "$2b$12$WzThomasExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-08T00:00:00.000Z",
         terminationAt: "2025-02-14T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "miyu.takahashi@example.com",
@@ -822,7 +976,7 @@ async function insertInstructors() {
         password: "$2b$12$WzMiyuExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-09T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "ethan.rivera@example.com",
@@ -842,7 +996,7 @@ async function insertInstructors() {
         password: "$2b$12$WzEthanExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-10T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "aoi.suzuki@example.com",
@@ -863,7 +1017,7 @@ async function insertInstructors() {
         password: "$2b$12$WzAoiExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-11T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "logan.wright@example.com",
@@ -884,7 +1038,7 @@ async function insertInstructors() {
         password: "$2b$12$WzLoganExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-12T00:00:00.000Z",
         terminationAt: "2025-06-01T00:00:00.000Z",
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "sayaka.kobayashi@example.com",
@@ -905,12 +1059,12 @@ async function insertInstructors() {
           "$2b$12$WzSayakaExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-13T00:00:00.000Z",
         terminationAt: null,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         email: "george.adams@example.com",
         name: "George Adams",
-        nickname: "George (Native)",
+        nickname: "George",
         birthdate: new Date("1986-08-08"),
         lifeHistory:
           "Instructor specializing in data visualization and storytelling.",
@@ -927,12 +1081,12 @@ async function insertInstructors() {
           "$2b$12$WzGeorgeExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-14T00:00:00.000Z",
         terminationAt: null,
-        isNative: true,
+        englishBackground: 1,
       },
       {
         email: "emi.nakagawa@example.com",
         name: "Emi Nakagawa",
-        nickname: "Emi (Native)",
+        nickname: "Emi",
         birthdate: new Date("1990-12-12"),
         lifeHistory:
           "Web instructor focused on building inclusive and responsive UI.",
@@ -947,12 +1101,12 @@ async function insertInstructors() {
         passcode: "emi",
         password: "$2b$12$WzEmiExampleHash0000000000000000000000000000000000",
         createdAt: "2024-08-15T00:00:00.000Z",
-        isNative: true,
+        englishBackground: 1,
       },
       {
         email: "niki.alvarez@example.com",
         name: "Niki Alvarez",
-        nickname: "Niki (Native)",
+        nickname: "Niki",
         birthdate: new Date("1990-10-20"),
         lifeHistory: "Enjoys language exchange sessions with students.",
         favoriteFood: "Grilled fish",
@@ -967,9 +1121,95 @@ async function insertInstructors() {
         password:
           "$2b$12$WzNikiExampleHash000000000000000000000000000000000000",
         createdAt: "2024-08-22T00:00:00.000Z",
-        isNative: true,
+        englishBackground: 2,
       },
     ],
+  });
+}
+
+async function insertInstructorTagCatalogs() {
+  await prisma.instructorTagCatalog.createMany({
+    data: [
+      { label: "Minecraft", sortOrder: 1 },
+      { label: "Kids Specialist", sortOrder: 2 },
+      { label: "Phonics Expert", sortOrder: 3 },
+      { label: "Grammar Coach", sortOrder: 4 },
+      { label: "Conversation Focus", sortOrder: 5 },
+      { label: "Beginner Friendly", sortOrder: 6 },
+      { label: "Pronunciation Focus", sortOrder: 7 },
+      { label: "Exam Preparation", sortOrder: 8 },
+      { label: "Reading Support", sortOrder: 9 },
+      { label: "Writing Support", sortOrder: 10 },
+      { label: "Listening Training", sortOrder: 11 },
+      { label: "Speaking Training", sortOrder: 12 },
+      { label: "Homework Support", sortOrder: 13 },
+      { label: "Interactive Lessons", sortOrder: 14 },
+      { label: "Storytelling", sortOrder: 15 },
+      { label: "Music Activities", sortOrder: 16 },
+      { label: "Game-based Learning", sortOrder: 17 },
+      { label: "STEM English", sortOrder: 18 },
+      { label: "Art Activities", sortOrder: 19 },
+      { label: "Travel English", sortOrder: 20 },
+      { label: "Business English", sortOrder: 21 },
+      { label: "Daily Conversation", sortOrder: 22 },
+      { label: "Parent Feedback", sortOrder: 23 },
+      { label: "Flexible Schedule", sortOrder: 24 },
+      { label: "Weekend Available", sortOrder: 25 },
+      { label: "Morning Available", sortOrder: 26 },
+      { label: "Evening Available", sortOrder: 27 },
+      { label: "Advanced Learners", sortOrder: 28 },
+      { label: "Shy Kids Support", sortOrder: 29 },
+      { label: "Motivational Coach", sortOrder: 30 },
+    ],
+    skipDuplicates: true,
+  });
+}
+
+async function insertInstructorTagAssignments() {
+  const [instructors, tags] = await Promise.all([
+    prisma.instructor.findMany({
+      select: { id: true },
+      orderBy: { id: "asc" },
+    }),
+    prisma.instructorTagCatalog.findMany({
+      where: { deletedAt: null },
+      select: { id: true },
+      orderBy: { sortOrder: "asc" },
+    }),
+  ]);
+
+  const tagIds = tags.map(({ id }) => id);
+
+  const data = instructors.flatMap(({ id: instructorId }, instructorIndex) => {
+    const tagCount = tagIds.length;
+    if (tagCount === 0) {
+      return [];
+    }
+    const selectedCount = Math.min(tagCount, 3 + (instructorIndex % 8));
+    const startIndex = instructorIndex % tagCount;
+    const step = (instructorIndex % 4) + 1;
+
+    const selectedTagIds = new Set<number>();
+    let cursor = startIndex;
+
+    while (selectedTagIds.size < selectedCount) {
+      selectedTagIds.add(tagIds[cursor]);
+      cursor = (cursor + step) % tagCount;
+    }
+
+    const updatedBy =
+      instructorIndex % 3 === 0 ? null : (instructorIndex % 2) + 1;
+
+    return [...selectedTagIds].map((tagId) => ({
+      instructorId,
+      tagId,
+      updatedBy,
+    }));
+  });
+
+  await prisma.instructorTagAssignment.createMany({
+    data,
+    skipDuplicates: true,
   });
 }
 
@@ -1570,6 +1810,21 @@ async function insertCustomers() {
         updatedAt: "2025-09-01T00:00:00.000Z",
         terminationAt: null,
       },
+      ...syntheticCustomerSeeds.map((customerSeed, index) => ({
+        name: customerSeed.name,
+        email: customerSeed.email,
+        password:
+          "$2b$12$47fH6clEdzE2Dd8d7KCeQe2WM2KVeGD25KugHll808LBI6kI.dQqK", // AaasoBo!Admin
+        prefecture: customerSeed.prefecture,
+        hasSeenWelcome: customerSeed.hasSeenWelcome,
+        emailVerified:
+          index % 5 === 0 ? null : customerSeed.updatedAt.toISOString(),
+        createdAt: customerSeed.createdAt.toISOString(),
+        updatedAt: customerSeed.updatedAt.toISOString(),
+        terminationAt: customerSeed.terminationAt
+          ? customerSeed.terminationAt.toISOString()
+          : null,
+      })),
     ],
   });
 }
@@ -1593,11 +1848,55 @@ async function insertAdmins() {
   });
 }
 
+async function insertInstructorFees() {
+  const helen = await getInstructor("Helen");
+
+  await prisma.instructorFee.createMany({
+    data: [
+      {
+        instructorId: helen.id,
+        currency: "JPY",
+        effectiveFrom: new Date("2026-03-01T00:00:00.000Z"),
+        effectiveTo: new Date("2026-03-15T00:00:00.000Z"),
+        trialFee: 1000,
+        regularFee: 2000,
+        cancelFee: 500,
+        cancelWithoutNoticeFee: 250,
+        monthlyCancelFee: 0,
+      },
+      {
+        instructorId: helen.id,
+        currency: "JPY",
+        effectiveFrom: new Date("2026-03-16T00:00:00.000Z"),
+        effectiveTo: null,
+        trialFee: 1500,
+        regularFee: 2500,
+        cancelFee: 600,
+        cancelWithoutNoticeFee: 300,
+        monthlyCancelFee: 1000,
+      },
+    ],
+  });
+}
+
 async function insertClasses() {
   const alice = await getCustomer("Alice");
   const bob = await getCustomer("Bob");
+  const hana = await getCustomer("山田 花");
   const helen = await getInstructor("Helen");
   const elian = await getInstructor("Elian");
+  const aliceHelenRecurringClass = await prisma.recurringClass.findFirst({
+    where: {
+      subscriptionId: alice.subscription[0].id,
+      instructorId: helen.id,
+      endAt: null,
+    },
+    select: { id: true },
+  });
+
+  if (!aliceHelenRecurringClass) {
+    throw new Error("Active recurring class for Alice and Helen not found");
+  }
 
   await prisma.class.createMany({
     data: [
@@ -1695,7 +1994,7 @@ async function insertClasses() {
         dateTime: "2026-01-06T07:00:00Z",
         status: "booked",
         subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
+        recurringClassId: aliceHelenRecurringClass.id,
         rebookableUntil: "2026-04-30T09:00:00Z",
         createdAt: "2025-05-20T07:00:00Z",
         updatedAt: "2025-05-20T07:00:00Z",
@@ -1708,7 +2007,7 @@ async function insertClasses() {
         dateTime: "2026-01-06T08:00:00Z",
         status: "rebooked",
         subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
+        recurringClassId: aliceHelenRecurringClass.id,
         rebookableUntil: "2026-04-30T09:00:00Z",
         createdAt: "2025-05-20T07:00:00Z",
         updatedAt: "2025-05-20T07:00:00Z",
@@ -1721,7 +2020,7 @@ async function insertClasses() {
         dateTime: "2026-01-06T09:00:00Z",
         status: "canceledByCustomer",
         subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
+        recurringClassId: aliceHelenRecurringClass.id,
         rebookableUntil: "2026-04-30T09:00:00Z",
         createdAt: "2025-05-20T07:00:00Z",
         updatedAt: "2025-05-20T07:00:00Z",
@@ -1734,7 +2033,7 @@ async function insertClasses() {
         dateTime: "2026-01-06T10:00:00Z",
         status: "canceledByInstructor",
         subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
+        recurringClassId: aliceHelenRecurringClass.id,
         rebookableUntil: "2026-04-30T09:00:00Z",
         createdAt: "2025-05-20T07:00:00Z",
         updatedAt: "2025-05-20T07:00:00Z",
@@ -1747,7 +2046,7 @@ async function insertClasses() {
         dateTime: "2026-01-06T06:00:00Z",
         status: "completed",
         subscriptionId: alice.subscription[0].id,
-        recurringClassId: 1,
+        recurringClassId: aliceHelenRecurringClass.id,
         rebookableUntil: "2026-04-30T09:00:00Z",
         createdAt: "2025-05-20T07:00:00Z",
         updatedAt: "2025-05-20T07:00:00Z",
@@ -1773,6 +2072,63 @@ async function insertClasses() {
         updatedAt: "2025-05-20T07:00:00Z",
         classCode: "ft-0-2",
         isFreeTrial: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2026-03-02T01:00:00Z",
+        status: "completed",
+        subscriptionId: alice.subscription[0].id,
+        createdAt: "2026-03-02T01:00:00Z",
+        updatedAt: "2026-03-05T10:00:00.000Z",
+        classCode: "payroll-1",
+        isFreeTrial: true,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2026-03-10T03:00:00Z",
+        status: "completed",
+        subscriptionId: alice.subscription[0].id,
+        createdAt: "2026-03-10T03:00:00Z",
+        updatedAt: "2026-03-12T10:00:00.000Z",
+        classCode: "payroll-2",
+        isFreeTrial: false,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2026-03-14T00:00:00Z",
+        status: "canceledByInstructor",
+        canceledAt: "2026-03-13T14:00:00Z",
+        subscriptionId: alice.subscription[0].id,
+        createdAt: "2026-03-13T14:00:00Z",
+        updatedAt: "2026-03-15T09:12:00.000Z",
+        classCode: "payroll-3",
+        isFreeTrial: false,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2026-03-16T00:00:00Z",
+        status: "completed",
+        subscriptionId: alice.subscription[0].id,
+        createdAt: "2026-03-16T00:00:00Z",
+        updatedAt: "2026-03-20T03:00:00.000Z",
+        classCode: "payroll-4",
+        isFreeTrial: false,
+      },
+      {
+        instructorId: helen.id,
+        customerId: alice.id,
+        dateTime: "2026-03-19T23:00:00Z",
+        status: "canceledByInstructor",
+        canceledAt: "2026-03-19T15:30:00Z",
+        subscriptionId: alice.subscription[0].id,
+        createdAt: "2026-03-19T15:30:00Z",
+        updatedAt: "2026-03-28T03:00:00.000Z",
+        classCode: "payroll-5",
+        isFreeTrial: false,
       },
       // {
       //   instructorId: helen.id,
@@ -1992,11 +2348,87 @@ async function insertClasses() {
       // },
     ],
   });
+
+  const monthlyTrendSeed = Array.from({ length: 12 }, (_, index) => {
+    const date = new Date(Date.UTC(2025, 3 + index, 15));
+    const month = `${date.getUTCFullYear()}-${String(
+      date.getUTCMonth() + 1,
+    ).padStart(2, "0")}`;
+    const customer = syntheticCustomerSeeds[index].name;
+    const statusCycle = [
+      "completed",
+      "completed",
+      "canceledByCustomer",
+      "completed",
+      "canceledByInstructor",
+    ] as const;
+
+    return {
+      month,
+      customer,
+      status: statusCycle[index % statusCycle.length],
+    };
+  });
+
+  const additionalClasses = await Promise.all(
+    monthlyTrendSeed.map(async (seed, index) => {
+      const customer = await getCustomer(seed.customer);
+      const classDate = new Date(`${seed.month}-15T07:00:00.000Z`);
+      const isWithInstructor = index % 3 !== 0;
+      const instructorId = isWithInstructor
+        ? index % 2 === 0
+          ? helen.id
+          : elian.id
+        : null;
+
+      const subscriptionId =
+        customer.name === alice.name
+          ? alice.subscription[0].id
+          : customer.name === bob.name
+            ? bob.subscription[0].id
+            : customer.name === hana.name
+              ? hana.subscription[0].id
+              : null;
+
+      return {
+        instructorId,
+        customerId: customer.id,
+        dateTime: classDate,
+        status: seed.status,
+        subscriptionId,
+        rebookableUntil: new Date(
+          classDate.getTime() + 1000 * 60 * 60 * 24 * 7,
+        ),
+        createdAt: new Date(classDate.getTime() - 1000 * 60 * 60 * 24 * 2),
+        updatedAt: new Date(classDate.getTime() - 1000 * 60 * 60 * 24),
+        classCode: `dashboard-trend-${index + 1}`,
+        isFreeTrial: subscriptionId === null,
+      };
+    }),
+  );
+
+  await prisma.class.createMany({
+    data: additionalClasses,
+  });
 }
 
 async function insertChildren() {
   const alice = await getCustomer("Alice");
   const bob = await getCustomer("Bob");
+  const charlie = await getCustomer("Charlie");
+  const emily = await getCustomer("Emily");
+  const taro = await getCustomer("佐藤 太郎");
+  const david = await getCustomer("David");
+  const ethan = await getCustomer("Ethan");
+  const olivia = await getCustomer("Olivia");
+  const james = await getCustomer("James");
+  const lucas = await getCustomer("Lucas");
+  const henry = await getCustomer("Henry");
+  const sophia = await getCustomer("Sophia");
+  const benjamin = await getCustomer("Benjamin");
+  const demoCustomers = await Promise.all(
+    syntheticCustomerSeeds.map(({ name }) => getCustomer(name)),
+  );
 
   await prisma.child.createMany({
     data: [
@@ -2021,6 +2453,109 @@ async function insertChildren() {
         personalInfo:
           "Age: 7 years, English Level: Intermediate. Loves drawing and is very creative. Enjoys reading stories.",
       },
+      {
+        name: "Mio",
+        customerId: charlie.id,
+        birthdate: new Date("2017-02-19"),
+        personalInfo:
+          "Age: 8 years, English Level: Beginner. Loves animals and learning songs in English.",
+      },
+      {
+        name: "Riku",
+        customerId: emily.id,
+        birthdate: new Date("2016-10-11"),
+        personalInfo:
+          "Age: 9 years, English Level: Intermediate. Enjoys science topics and speaking challenges.",
+      },
+      {
+        name: "Hina",
+        customerId: taro.id,
+        birthdate: new Date("2018-07-03"),
+        personalInfo:
+          "Age: 7 years, English Level: Beginner. Likes roleplay and practicing greetings.",
+      },
+      {
+        name: "Aoi",
+        customerId: david.id,
+        birthdate: new Date("2017-12-21"),
+        personalInfo:
+          "Age: 8 years, English Level: Beginner. Very active and enjoys game-based lessons.",
+      },
+      {
+        name: "Leo",
+        customerId: ethan.id,
+        birthdate: new Date("2016-05-09"),
+        personalInfo:
+          "Age: 9 years, English Level: Intermediate. Interested in sports and vocabulary quizzes.",
+      },
+      {
+        name: "Sora",
+        customerId: olivia.id,
+        birthdate: new Date("2019-01-14"),
+        personalInfo:
+          "Age: 7 years, English Level: Beginner. Enjoys picture books and short conversations.",
+      },
+      {
+        name: "Mina",
+        customerId: james.id,
+        birthdate: new Date("2017-08-30"),
+        personalInfo:
+          "Age: 8 years, English Level: Intermediate. Likes discussing favorite foods and hobbies.",
+      },
+      {
+        name: "Ren",
+        customerId: lucas.id,
+        birthdate: new Date("2018-03-08"),
+        personalInfo:
+          "Age: 8 years, English Level: Beginner. Enjoys phonics and speaking in complete sentences.",
+      },
+      {
+        name: "Yuna",
+        customerId: henry.id,
+        birthdate: new Date("2016-09-17"),
+        personalInfo:
+          "Age: 9 years, English Level: Intermediate. Loves storytelling and question-answer practice.",
+      },
+      {
+        name: "Kaito",
+        customerId: sophia.id,
+        birthdate: new Date("2017-04-26"),
+        personalInfo:
+          "Age: 8 years, English Level: Beginner. Enjoys songs and repeating useful classroom phrases.",
+      },
+      {
+        name: "Nico",
+        customerId: benjamin.id,
+        birthdate: new Date("2018-11-05"),
+        personalInfo:
+          "Age: 7 years, English Level: Beginner. Likes introducing himself and talking about school.",
+      },
+      ...demoCustomers.flatMap((customer, index) => {
+        const [firstChildName, secondChildName] =
+          syntheticCustomerSeeds[index].childNames;
+        const baseChild = {
+          name: firstChildName,
+          customerId: customer.id,
+          birthdate: new Date(2017, (index + 1) % 12, 10),
+          personalInfo:
+            "Sample profile: beginner learner with varied interests for dashboard data.",
+        };
+
+        if (index % 2 === 0) {
+          return [
+            baseChild,
+            {
+              name: secondChildName,
+              customerId: customer.id,
+              birthdate: new Date(2019, (index + 4) % 12, 20),
+              personalInfo:
+                "Sample profile: sibling account to diversify child count in dashboard data.",
+            },
+          ];
+        }
+
+        return [baseChild];
+      }),
     ],
   });
 }
@@ -2080,25 +2615,25 @@ async function insertPlans() {
         name: "月3,180円プラン / 3,180 yen/month Plan",
         description: "2 classes per week",
         weeklyClassTimes: 2,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         name: "月7,980円プラン / 7,980 yen/month Plan",
         description: "5 classes per week",
         weeklyClassTimes: 5,
-        isNative: false,
+        englishBackground: 0,
       },
       {
         name: "月5,980円プラン / 5,980 yen/month Plan",
         description: "1 classes per week",
         weeklyClassTimes: 1,
-        isNative: true,
+        englishBackground: 1,
       },
       {
         name: "月10,800円プラン / 10,800 yen/month Plan",
         description: "2 classes per week",
         weeklyClassTimes: 2,
-        isNative: true,
+        englishBackground: 2,
       },
     ],
   });
@@ -2118,36 +2653,42 @@ async function insertSubscriptions() {
       {
         customerId: alice.id,
         planId: plan1.id,
+        selectType: "https://...1",
         startAt: new Date("2024-08-01"),
         endAt: null,
       },
       {
         customerId: alice.id,
         planId: plan2.id,
+        selectType: "https://...2",
         startAt: new Date("2025-01-01"),
         endAt: null,
       },
       {
         customerId: bob.id,
         planId: plan2.id,
+        selectType: "https://...3",
         startAt: new Date("2024-06-01"),
         endAt: null,
       },
       {
         customerId: bob.id,
         planId: plan3.id,
+        selectType: "https://...4",
         startAt: new Date("2024-06-01"),
         endAt: null,
       },
       {
         customerId: hana.id,
         planId: plan1.id,
+        selectType: "https://...5",
         startAt: new Date("2025-04-04"),
         endAt: null,
       },
       {
         customerId: hana.id,
         planId: plan4.id,
+        selectType: "https://...6",
         startAt: new Date("2025-04-04"),
         endAt: null,
       },
@@ -2307,8 +2848,8 @@ async function insertRecurringClasses() {
 async function insertInstructorSchedules() {
   const helen = await getInstructor("Helen");
   const elian = await getInstructor("Elian");
-  const niki = await getInstructor("Niki (Native)");
-  const emi = await getInstructor("Emi (Native)");
+  const niki = await getInstructor("Niki");
+  const emi = await getInstructor("Emi");
 
   // Helen's first schedule (historical - 2024-06-01 to 2024-07-31)
   const helenSchedule1 = await prisma.instructorSchedule.create({
@@ -2706,6 +3247,32 @@ async function insertEvents() {
 }
 
 async function insertSchedules() {
+  const [noClassEvent, noClassRebookableEvent, themeClassWeekEvent] =
+    await Promise.all([
+      prisma.event.findFirst({
+        where: { name: "お休み / No Class" },
+        select: { id: true },
+      }),
+      prisma.event.findFirst({
+        where: { name: "お休み振替対象日 / No Class (Rebookable)" },
+        select: { id: true },
+      }),
+      prisma.event.findFirst({
+        where: { name: "テーマクラスウィーク / Theme Class Week" },
+        select: { id: true },
+      }),
+    ]);
+
+  if (!noClassEvent || !noClassRebookableEvent || !themeClassWeekEvent) {
+    throw new Error("Required events for business schedules were not found");
+  }
+
+  const legacyEventIdMap: Record<number, number> = {
+    2: noClassEvent.id,
+    3: noClassRebookableEvent.id,
+    4: themeClassWeekEvent.id,
+  };
+
   await prisma.schedule.createMany({
     data: [
       {
@@ -3332,7 +3899,10 @@ async function insertSchedules() {
         date: new Date("2025-12-31T00:00:00Z"),
         eventId: 2,
       },
-    ],
+    ].map((schedule) => ({
+      ...schedule,
+      eventId: legacyEventIdMap[schedule.eventId],
+    })),
   });
 }
 
@@ -3344,7 +3914,64 @@ async function insertSystemStatus() {
   });
 }
 
-async function getCustomer(name: "Alice" | "Bob" | "山田 花") {
+async function insertMessageBoardPosts() {
+  await prisma.messageBoardPost.createMany({
+    data: [
+      {
+        target: MessageTarget.customer,
+        body: "Spring campaign starts next week. Please check your registered class times.",
+        createdAt: new Date("2026-03-01T09:00:00.000Z"),
+      },
+      {
+        target: MessageTarget.instructor,
+        body: "Please submit your March lesson reflections by Friday 18:00 JST.",
+        createdAt: new Date("2026-03-02T09:00:00.000Z"),
+      },
+      {
+        target: MessageTarget.both,
+        body: "The system will undergo maintenance on March 15 from 02:00 to 04:00 JST.",
+        createdAt: new Date("2026-03-03T09:00:00.000Z"),
+      },
+      {
+        target: MessageTarget.customer,
+        body: "Golden Week booking slots will be released early on April 1.",
+        createdAt: new Date("2026-03-04T09:00:00.000Z"),
+      },
+      {
+        target: MessageTarget.instructor,
+        body: "Please confirm your available schedule for next month by end of day Thursday.",
+        createdAt: new Date("2026-03-05T09:00:00.000Z"),
+      },
+      {
+        target: MessageTarget.both,
+        body: "A new Message Board toggle feature is now available on calendar pages.",
+        createdAt: new Date("2026-03-06T09:00:00.000Z"),
+      },
+      {
+        target: MessageTarget.customer,
+        body: "Need help with rebooking? Contact support and include the class code.",
+        createdAt: new Date("2026-03-07T09:00:00.000Z"),
+      },
+      {
+        target: MessageTarget.instructor,
+        body: "Reminder: update your profile self-introduction for the new school year.",
+        createdAt: new Date("2026-03-08T09:00:00.000Z"),
+      },
+      {
+        target: MessageTarget.both,
+        body: "Thank you for joining AaasoBo! Let's keep making English fun together.",
+        createdAt: new Date("2026-03-09T09:00:00.000Z"),
+      },
+      {
+        target: MessageTarget.both,
+        body: "Dashboard refresh speed was improved. Please report any loading issues.",
+        createdAt: new Date("2026-03-10T09:00:00.000Z"),
+      },
+    ],
+  });
+}
+
+async function getCustomer(name: string) {
   const customer = await prisma.customer.findFirst({
     where: { name },
     include: { children: true, subscription: true },
@@ -3359,9 +3986,7 @@ async function getCustomer(name: "Alice" | "Bob" | "山田 花") {
   return customer;
 }
 
-async function getInstructor(
-  nickname: "Helen" | "Elian" | "Niki (Native)" | "Emi (Native)",
-) {
+async function getInstructor(nickname: "Helen" | "Elian" | "Niki" | "Emi") {
   const instructor = await prisma.instructor.findFirst({ where: { nickname } });
   if (!instructor) {
     throw new Error(`Instructor ${nickname} not found`);
@@ -3384,11 +4009,70 @@ async function getPlan(
 }
 
 async function deleteAll(table: Uncapitalize<Prisma.ModelName>) {
-  // Use raw SQL TRUNCATE to reset auto-increment sequences
-  const tableName = table.charAt(0).toUpperCase() + table.slice(1);
-  await prisma.$executeRawUnsafe(
-    `TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE`,
-  );
+  switch (table) {
+    case "admin":
+      await prisma.admin.deleteMany();
+      return;
+    case "child":
+      await prisma.child.deleteMany();
+      return;
+    case "class":
+      await prisma.class.deleteMany();
+      return;
+    case "classAttendance":
+      await prisma.classAttendance.deleteMany();
+      return;
+    case "customer":
+      await prisma.customer.deleteMany();
+      return;
+    case "event":
+      await prisma.event.deleteMany();
+      return;
+    case "messageBoardPost":
+      await prisma.messageBoardPost.deleteMany();
+      return;
+    case "instructor":
+      await prisma.instructor.deleteMany();
+      return;
+    case "instructorAbsence":
+      await prisma.instructorAbsence.deleteMany();
+      return;
+    case "instructorFee":
+      await prisma.instructorFee.deleteMany();
+      return;
+    case "instructorTagAssignment":
+      await prisma.instructorTagAssignment.deleteMany();
+      return;
+    case "instructorTagCatalog":
+      await prisma.instructorTagCatalog.deleteMany();
+      return;
+    case "instructorSchedule":
+      await prisma.instructorSchedule.deleteMany();
+      return;
+    case "instructorSlot":
+      await prisma.instructorSlot.deleteMany();
+      return;
+    case "plan":
+      await prisma.plan.deleteMany();
+      return;
+    case "recurringClass":
+      await prisma.recurringClass.deleteMany();
+      return;
+    case "recurringClassAttendance":
+      await prisma.recurringClassAttendance.deleteMany();
+      return;
+    case "schedule":
+      await prisma.schedule.deleteMany();
+      return;
+    case "subscription":
+      await prisma.subscription.deleteMany();
+      return;
+    case "systemStatus":
+      await prisma.systemStatus.deleteMany();
+      return;
+    default:
+      throw new Error(`Unsupported table for seed cleanup: ${table}`);
+  }
 }
 
 async function main() {
@@ -3401,20 +4085,24 @@ async function main() {
     await deleteAll("class");
     await deleteAll("recurringClass");
     await deleteAll("instructorSlot");
+    await deleteAll("instructorTagAssignment");
 
     // Dependent on the below
     await deleteAll("child");
     await deleteAll("subscription");
     await deleteAll("instructorSchedule");
+    await deleteAll("instructorFee");
     await deleteAll("schedule");
     await deleteAll("instructorAbsence");
 
     // Independent
     await deleteAll("admin");
     await deleteAll("instructor");
+    await deleteAll("instructorTagCatalog");
     await deleteAll("customer");
     await deleteAll("plan");
     await deleteAll("event");
+    await deleteAll("messageBoardPost");
   }
 
   {
@@ -3422,11 +4110,15 @@ async function main() {
     await insertPlans();
     await insertCustomers();
     await insertInstructors();
+    await insertInstructorTagCatalogs();
     await insertAdmins();
     await insertEvents();
     await insertSystemStatus();
+    await insertMessageBoardPosts();
 
     // Dependant on the above
+    await insertInstructorTagAssignments();
+    await insertInstructorFees();
     await insertInstructorSchedules();
     await insertSubscriptions();
     await insertChildren();

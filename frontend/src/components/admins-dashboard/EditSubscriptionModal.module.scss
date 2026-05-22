@@ -1,5 +1,8 @@
 @use "@/styles/variables.module.scss" as *;
 
+$border_radius: 0.5rem;
+$font_size: 0.9rem;
+
 .progressiveFlow {
   padding: 0;
   width: 100%;
@@ -44,6 +47,15 @@
   overflow: hidden;
   background: transparent;
   flex-shrink: 0;
+
+  input {
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: $border_radius;
+    font-size: $font_size;
+    color: black;
+    width: 100%;
+  }
 }
 
 .sectionHeader {

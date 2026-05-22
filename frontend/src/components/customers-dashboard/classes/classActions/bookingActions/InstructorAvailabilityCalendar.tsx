@@ -1,25 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { getInstructorAvailableSlots } from "@/lib/api/instructorsApi";
-import Calendar from "@/components/features/calendar/Calendar";
-import { EventSourceFuncArg, EventClickArg } from "@fullcalendar/core";
 import styles from "./InstructorAvailabilityCalendar.module.scss";
-import { greenSuccess } from "@/styles/colors";
-
-interface CalendarEvent {
-  id: string;
-  start: string;
-  end: string;
-  title: string;
-  color: string;
-  textColor: string;
-  extendedProps: {
-    type: "available";
-    instructorId: number;
-    instructorName: string;
-  };
-}
+import { EnglishBackground } from "@/types";
+import AvailabilityWeekGrid, {
+  AvailabilityWeekGridSlot,
+} from "./AvailabilityWeekGrid";
 
 interface InstructorAvailabilityCalendarProps {
   instructorId: number;
@@ -31,40 +18,6 @@ interface InstructorAvailabilityCalendarProps {
   language: "ja" | "en";
 }
 
-// Helper function to format date for API calls
-const formatJSTDate = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-// Helper function to create calendar event from slot data
-const createAvailableSlotEvent = (
-  slot: any,
-  language: "ja" | "en",
-  instructorId: number,
-  instructorName: string,
-): CalendarEvent => {
-  const start = slot.dateTime;
-  const end = new Date(new Date(start).getTime() + 25 * 60000).toISOString();
-
-  return {
-    id: `available-${start}`,
-    start,
-    end,
-    title: language === "ja" ? "予約可能" : "Available",
-    color: greenSuccess,
-    textColor: "#FFF",
-    extendedProps: {
-      type: "available" as const,
-      instructorId,
-      instructorName,
-    },
-  };
-};
-
-// Helper function to create instructor profile object
 const createInstructorProfile = (
   instructorId: number,
   instructorName: string,
@@ -73,7 +26,7 @@ const createInstructorProfile = (
   name: instructorName,
   nickname: instructorName,
   icon: "",
-  isNative: false,
+  englishBackground: EnglishBackground.NonNative,
 });
 
 export default function InstructorAvailabilityCalendar({
@@ -82,54 +35,30 @@ export default function InstructorAvailabilityCalendar({
   onSlotSelect,
   language,
 }: InstructorAvailabilityCalendarProps) {
-  const [refreshKey, setRefreshKey] = useState(0);
+  const fetchSlots = useCallback(
+    async (startDate: string, endDate: string) => {
+      const slotsResponse = await getInstructorAvailableSlots(
+        instructorId,
+        startDate,
+        endDate,
+        true,
+      );
 
-  const fetchCalendarEvents = useCallback(
-    async (info: EventSourceFuncArg) => {
-      const startStr = formatJSTDate(info.start);
-      const endDate = new Date(info.end);
-      endDate.setDate(endDate.getDate() + 1);
-      const endStr = formatJSTDate(endDate);
-
-      try {
-        const slotsResponse = await getInstructorAvailableSlots(
-          instructorId,
-          startStr,
-          endStr,
-          true, // Exclude booked slots for customer booking
-        );
-
-        if ("data" in slotsResponse) {
-          return slotsResponse.data.map((slot: any) =>
-            createAvailableSlotEvent(
-              slot,
-              language,
-              instructorId,
-              instructorName,
-            ),
-          );
-        }
-
-        return [];
-      } catch (error) {
-        console.error("Failed to fetch calendar data:", error);
+      if (!("data" in slotsResponse)) {
         return [];
       }
+
+      return slotsResponse.data.map((slot) => ({
+        dateTime: slot.dateTime,
+      }));
     },
-    [instructorId, instructorName, language],
+    [instructorId],
   );
 
-  const handleSlotClick = useCallback(
-    (clickInfo: EventClickArg) => {
-      const eventType = clickInfo.event.extendedProps.type;
-
-      if (eventType !== "available") {
-        return;
-      }
-
-      const dateTime = clickInfo.event.start!.toISOString();
+  const handleSlotSelect = useCallback(
+    (slot: AvailabilityWeekGridSlot) => {
       const instructor = createInstructorProfile(instructorId, instructorName);
-      onSlotSelect(dateTime, instructor);
+      onSlotSelect(slot.dateTime, instructor);
     },
     [instructorId, instructorName, onSlotSelect],
   );
@@ -149,16 +78,11 @@ export default function InstructorAvailabilityCalendar({
         </p>
       </div>
 
-      <div className={styles.calendarShell}>
-        <Calendar
-          height="500px"
-          contentHeight="400px"
-          key={refreshKey}
-          events={fetchCalendarEvents}
-          eventClick={handleSlotClick}
-          selectable={false}
-        />
-      </div>
+      <AvailabilityWeekGrid
+        fetchSlots={fetchSlots}
+        onSlotSelect={handleSlotSelect}
+        language={language}
+      />
     </div>
   );
 }

@@ -6,6 +6,11 @@ import {
   createAdmin,
   createCustomer,
   createClass,
+  createEvent,
+  createInstructorAbsence,
+  createInstructorSchedule,
+  createInstructorSlot,
+  createSchedule,
   generateAuthCookie,
 } from "../testUtils";
 
@@ -94,6 +99,136 @@ describe("GET /instructors/:id/calendar-classes", () => {
 
     // Instructor has no classes, should return empty array
     expect(response.body).toEqual([]);
+  });
+});
+
+describe("GET /instructors/:id/calendar-slots", () => {
+  it("returns open slots, classes, and absences for the requested range", async () => {
+    const instructor = await createInstructor();
+    const customer = await createCustomer();
+    const authCookie = await generateAuthCookie(instructor.id, "instructor");
+    const schedule = await createInstructorSchedule(instructor.id, {
+      effectiveFrom: new Date("2025-07-07"),
+      effectiveTo: null,
+      timezone: "Asia/Tokyo",
+    });
+
+    await createInstructorSlot(
+      schedule.id,
+      1,
+      new Date("1970-01-01T09:00:00.000Z"),
+    );
+    await createInstructorSlot(
+      schedule.id,
+      1,
+      new Date("1970-01-01T10:00:00.000Z"),
+    );
+    await createInstructorSlot(
+      schedule.id,
+      1,
+      new Date("1970-01-01T11:00:00.000Z"),
+    );
+    await createInstructorSlot(
+      schedule.id,
+      1,
+      new Date("1970-01-01T12:00:00.000Z"),
+    );
+
+    const bookedClass = await createClass(
+      customer.id,
+      instructor.id,
+      new Date("2025-07-07T01:00:00.000Z"),
+      { status: "booked" },
+    );
+
+    await createClass(
+      customer.id,
+      instructor.id,
+      new Date("2025-07-07T02:00:00.000Z"),
+      { status: "completed" },
+    );
+
+    await createInstructorAbsence(
+      instructor.id,
+      new Date("2025-07-07T00:00:00.000Z"),
+    );
+
+    const response = await request(server)
+      .get(`/instructors/${instructor.id}/calendar-slots`)
+      .set("Cookie", authCookie)
+      .query({
+        start: "2025-07-07",
+        end: "2025-07-08",
+        timezone: "Asia/Tokyo",
+      })
+      .expect(200);
+
+    expect(response.body.data).toEqual([
+      expect.objectContaining({
+        start: "2025-07-07T00:00:00.000Z",
+        slotType: "absence",
+        title: "Absent",
+      }),
+      expect.objectContaining({
+        start: bookedClass.dateTime?.toISOString(),
+        slotType: "booked",
+        classId: bookedClass.id,
+      }),
+      expect.objectContaining({
+        start: "2025-07-07T02:00:00.000Z",
+        slotType: "completed",
+      }),
+      expect.objectContaining({
+        start: "2025-07-07T03:00:00.000Z",
+        slotType: "open",
+        title: "Open",
+      }),
+    ]);
+  });
+
+  it("returns day-level business events and suppresses open slots on no-class days", async () => {
+    const instructor = await createInstructor();
+    const authCookie = await generateAuthCookie(instructor.id, "instructor");
+    const schedule = await createInstructorSchedule(instructor.id, {
+      effectiveFrom: new Date("2025-07-07"),
+      effectiveTo: null,
+      timezone: "Asia/Tokyo",
+    });
+    await createInstructorSlot(
+      schedule.id,
+      1,
+      new Date("1970-01-01T09:00:00.000Z"),
+    );
+    await createInstructorSlot(
+      schedule.id,
+      1,
+      new Date("1970-01-01T10:00:00.000Z"),
+    );
+    const noClassEvent = await createEvent({
+      name: "お休み / No Class",
+      color: "#FAD7CD",
+    });
+    await createSchedule(noClassEvent.id, new Date("2025-07-07T00:00:00.000Z"));
+
+    const response = await request(server)
+      .get(`/instructors/${instructor.id}/calendar-slots`)
+      .set("Cookie", authCookie)
+      .query({
+        start: "2025-07-07",
+        end: "2025-07-08",
+        timezone: "Asia/Tokyo",
+      })
+      .expect(200);
+
+    expect(response.body.data).toEqual([
+      expect.objectContaining({
+        start: "2025-07-07",
+        end: "2025-07-08",
+        slotType: "businessEvent",
+        title: "お休み / No Class",
+        allDay: true,
+      }),
+    ]);
   });
 });
 

@@ -12,6 +12,7 @@ import Loading from "@/components/elements/loading/Loading";
 import RebookingCompleteMessage from "./rebookingCompleteMessage/RebookingCompleteMessage";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { nHoursLater } from "@/lib/utils/dateUtils";
+import { EnglishBackground } from "@/types";
 
 export default function RebookingForm({
   customerId,
@@ -19,6 +20,7 @@ export default function RebookingForm({
   instructorProfiles,
   childProfiles,
   userSessionType,
+  adminId,
 }: RebookingFormProps) {
   const [instructorAvailabilities, setInstructorAvailabilities] = useState<
     { dateTime: string; availableInstructors: number[] }[] | []
@@ -34,6 +36,9 @@ export default function RebookingForm({
   const [dateTimeToRebook, setDateTimeToRebook] = useState<string | null>(null);
   const [rebookableClassesNumber, setRebookableClassesNumber] =
     useState<number>(0);
+  const [englishBackgroundArray, setEnglishBackgroundArray] = useState<
+    EnglishBackground[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const { language } = useLanguage();
@@ -42,7 +47,16 @@ export default function RebookingForm({
     const selectedClass = rebookableClasses.find(
       (classItem) => classItem.id === classId,
     );
-    const isNative = selectedClass?.subscription?.plan?.isNative ?? false;
+    const englishBackground =
+      selectedClass?.subscription?.plan?.englishBackground;
+    const englishBackgroundOrdered = [
+      EnglishBackground.NonNative,
+      EnglishBackground.NativeA,
+      EnglishBackground.NativeB,
+    ];
+    setEnglishBackgroundArray(
+      englishBackgroundOrdered.slice(0, englishBackground + 1),
+    );
     setClassToRebook(classId);
     setRebookingStep("selectOption");
     setIsLoading(true);
@@ -57,7 +71,7 @@ export default function RebookingForm({
       const result = await getAllInstructorAvailableSlots(
         startDate.toISOString().split("T")[0],
         endDate.toISOString().split("T")[0],
-        isNative,
+        englishBackground,
       );
 
       if ("data" in result) {
@@ -84,6 +98,7 @@ export default function RebookingForm({
       {rebookingStep === "selectClass" && (
         <RebookableClassesList
           customerId={customerId}
+          adminId={adminId}
           rebookableClasses={rebookableClasses}
           onRebookableClassSelect={handleRebookableClassSelect}
           language={language}
@@ -105,10 +120,13 @@ export default function RebookingForm({
           instructorProfiles={instructorProfiles}
           instructorAvailabilities={instructorAvailabilities}
           setInstructorToRebook={setInstructorToRebook}
+          englishBackgroundArray={englishBackgroundArray}
           rebookingOption={rebookingOption!}
           setRebookingStep={setRebookingStep}
           dateTimeToRebook={dateTimeToRebook}
           language={language}
+          adminId={adminId}
+          customerId={customerId}
         />
       )}
 

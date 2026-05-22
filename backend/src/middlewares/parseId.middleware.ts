@@ -1,6 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 
-export type RequestWithId = Request & { id: number; classId?: number };
+type AuthenticatedUser = {
+  id: string;
+  userType: string;
+};
+
+export type RequestWithId = Request & {
+  id: number;
+  classId?: number;
+  user?: AuthenticatedUser;
+};
 
 export function parseId(req: Request, res: Response, next: NextFunction) {
   const id = parseInt(req.params.id);

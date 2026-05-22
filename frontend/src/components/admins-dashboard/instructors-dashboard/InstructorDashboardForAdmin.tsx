@@ -1,12 +1,18 @@
 import {
   getInstructor,
+  getInstructorTagCatalog,
+  getInstructorTags,
   getInstructorScheduleById,
   getInstructorSchedules,
   type InstructorScheduleWithSlots,
 } from "@/lib/api/instructorsApi";
-import type { InstructorSchedule } from "@shared/schemas/instructors";
-import InstructorCalendar from "../../instructors-dashboard/class-schedule/instructorCalendar/InstructorCalendar";
+import type {
+  InstructorSchedule,
+  InstructorTagsResponse,
+  TagCatalogResponse,
+} from "@shared/schemas/instructors";
 import InstructorDashboardClient from "@/components/admins-dashboard/instructors-dashboard/InstructorDashboardClient";
+import AdminInstructorCalendar from "./instructor-schedule/AdminInstructorCalendar";
 import { getCookie } from "../../../proxy";
 
 export default async function InstructorDashboardForAdmin({
@@ -21,15 +27,7 @@ export default async function InstructorDashboardForAdmin({
   // Get the cookies from the request headers
   const cookie = await getCookie();
 
-  // Fetch instructor's data
-  // [For InstructorProfile]
-  const data = await getInstructor(instructorId, cookie);
-  let instructor = null;
-  if ("message" in data) {
-    instructor = data.message;
-  } else {
-    instructor = data.instructor;
-  }
+  let instructor: Instructor | string = "";
   const blobReadWriteToken = process.env.BLOB_READ_WRITE_TOKEN;
   const extractTokenLetters = (token: string) => {
     const parts = token.split("_");
@@ -40,12 +38,62 @@ export default async function InstructorDashboardForAdmin({
   let initialSchedules: InstructorSchedule[] = [];
   let initialSelectedScheduleId: number | null = null;
   let initialSelectedSchedule: InstructorScheduleWithSlots | null = null;
+  let initialInstructorTags: InstructorTagsResponse | null = null;
+  let initialTagCatalog: TagCatalogResponse["tags"] = [];
+
   try {
-    const schedulesResponse = await getInstructorSchedules(
-      instructorId,
-      cookie,
-    );
-    initialSchedules = schedulesResponse.schedules;
+    const [
+      instructorResult,
+      schedulesResult,
+      instructorTagsResult,
+      tagCatalogResult,
+    ] = await Promise.allSettled([
+      getInstructor(instructorId, cookie),
+      getInstructorSchedules(instructorId, cookie),
+      getInstructorTags(instructorId, cookie),
+      getInstructorTagCatalog(cookie),
+    ]);
+
+    if (instructorResult.status === "fulfilled") {
+      if ("message" in instructorResult.value) {
+        instructor = instructorResult.value.message;
+      } else {
+        instructor = instructorResult.value.instructor;
+      }
+    } else {
+      console.error(
+        "Failed to load instructor profile:",
+        instructorResult.reason,
+      );
+    }
+
+    if (schedulesResult.status === "fulfilled") {
+      initialSchedules = schedulesResult.value.schedules;
+    } else {
+      console.error(
+        "Failed to load instructor schedules:",
+        schedulesResult.reason,
+      );
+    }
+
+    if (instructorTagsResult.status === "fulfilled") {
+      initialInstructorTags = instructorTagsResult.value;
+    } else {
+      console.error(
+        "Failed to load instructor tags:",
+        instructorTagsResult.reason,
+      );
+    }
+
+    if (tagCatalogResult.status === "fulfilled") {
+      initialTagCatalog = tagCatalogResult.value;
+    } else {
+      console.error(
+        "Failed to load instructor tag catalog:",
+        tagCatalogResult.reason,
+      );
+    }
+
     const activeSchedule = initialSchedules.find(
       (schedule) => schedule.effectiveTo === null,
     );
@@ -59,7 +107,7 @@ export default async function InstructorDashboardForAdmin({
       initialSelectedSchedule = scheduleDetailResponse.schedule;
     }
   } catch (error) {
-    console.error("Failed to load instructor schedules:", error);
+    console.error("Failed to load instructor dashboard data:", error);
   }
 
   return (
@@ -72,12 +120,10 @@ export default async function InstructorDashboardForAdmin({
       initialSchedules={initialSchedules}
       initialSelectedScheduleId={initialSelectedScheduleId}
       initialSelectedSchedule={initialSelectedSchedule}
+      initialInstructorTags={initialInstructorTags}
+      initialTagCatalog={initialTagCatalog}
       classScheduleComponent={
-        <InstructorCalendar
-          adminId={adminId}
-          instructorId={instructorId}
-          userSessionType={userSessionType}
-        />
+        <AdminInstructorCalendar instructorId={instructorId} />
       }
     />
   );

@@ -1,0 +1,98 @@
+@use "@/styles/variables.module.scss" as *;
+
+.eventBlock {
+  min-height: 100%;
+  padding: 1px 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  color: #1f2937;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.eventHeader {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusSymbol {
+  width: 10px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.calendarEvent {
+  border-radius: 4px !important;
+  border: 1px solid $border-light !important;
+  background: $white-background !important;
+  color: $text-dark !important;
+  box-shadow: none !important;
+
+  :global(.fc-event-main) {
+    color: inherit !important;
+  }
+}
+
+.slotOpen {
+  background: rgba($green-success, 0.08) !important;
+  border-color: rgba($green-success, 0.28) !important;
+  color: $green-success-hover !important;
+}
+
+.slotBooked {
+  background: rgba($blue_primary, 0.08) !important;
+  border-color: rgba($blue_primary, 0.2) !important;
+  color: $blue_primary !important;
+}
+
+.slotCompleted {
+  background: $completed-background-color !important;
+  border-color: rgba($green-success-hover, 0.16) !important;
+  color: $green-success-hover !important;
+}
+
+.slotAbsent {
+  background: rgba($red-alert, 0.08) !important;
+  border-color: rgba($red-alert, 0.2) !important;
+  color: $red-alert-hover !important;
+}
+
+.slotCanceled {
+  background: $canceled-background-color !important;
+  border-color: rgba($canceled-text-color, 0.18) !important;
+  color: $canceled-text-color !important;
+
+  :global(.fc-event-main) {
+    color: inherit !important;
+  }
+}
+
+.businessEvent {
+  opacity: 0.22 !important;
+
+  :global(.fc-event-main) {
+    color: inherit !important;
+  }
+}

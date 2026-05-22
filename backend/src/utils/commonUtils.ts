@@ -20,6 +20,13 @@ export const AUTH_ROLES = {
 export const FREE_TRIAL_BOOKING_HOURS = 72;
 export const REGULAR_REBOOKING_HOURS = 3;
 export const MONTHS_TO_DELETE_CLASSES = 13;
+export const MONTHS_TO_DELETE_BUSINESS_CALENDAR = 13;
+export const MONTHS_TO_DELETE_ADMINS = 36;
+export const MONTHS_TO_DELETE_CUSTOMERS = 36;
+export const MONTHS_TO_DELETE_INSTRUCTORS = 36;
+export const MONTHS_TO_DELETE_PLANS = 36;
+export const MONTHS_TO_DELETE_POSTS = 12;
+export const MONTHS_TO_GET_POSTS = 3;
 
 // Masked user static values
 export const maskedHeadLetters = "Masked";
@@ -27,6 +34,14 @@ export const maskedSuffix = randomUUID().split("-")[0]; // Generate a short rand
 export const maskedBirthdate = new Date("1900-01-01");
 
 // Event registration and update static values
+export const NO_CLASS_EVENT_NAME = "お休み / No Class";
+export const REBOOKABLE_NO_CLASS_EVENT_NAME =
+  "お休み振替対象日 / No Class (Rebookable)";
+export const PROTECTED_DEFAULT_EVENT_NAMES = [
+  NO_CLASS_EVENT_NAME,
+  REBOOKABLE_NO_CLASS_EVENT_NAME,
+] as const;
+
 export const EVENT_CONFLICT_ITEMS = [
   "Japanese event name",
   "English event name",

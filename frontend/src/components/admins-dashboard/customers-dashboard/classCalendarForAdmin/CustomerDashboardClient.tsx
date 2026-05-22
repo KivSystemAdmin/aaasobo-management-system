@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import TabFunction from "@/components/admins-dashboard/TabFunction";
 import CustomerProfile from "@/components/customers-dashboard/profile/CustomerProfile";
 import ChildrenProfiles from "@/components/customers-dashboard/children-profiles/ChildrenProfiles";
@@ -23,43 +23,43 @@ function CustomerDashboardClient({
   customerProfile: CustomerProfile;
   childProfiles: Child[];
 }) {
-  const [previousListPage] = useState<string | null>(() => {
+  const previousListPage = useMemo(() => {
     if (typeof window === "undefined") {
       return null;
     }
     return localStorage.getItem("previousListPage");
-  });
+  }, []);
 
   const breadcrumb = useMemo(() => {
     switch (previousListPage) {
       case "class-list":
         return [
           "Class List",
-          `/admins/${adminId}/class-list`,
+          "/admins/class-list",
           `Customer Page (${customerProfile.name})`,
         ];
       case "customer-list":
         return [
           "Customer List",
-          `/admins/${adminId}/customer-list`,
+          "/admins/customer-list",
           `Customer Page (${customerProfile.name})`,
         ];
       case "child-list":
         return [
           "Child List",
-          `/admins/${adminId}/child-list`,
+          "/admins/child-list",
           `Customer Page (${customerProfile.name})`,
         ];
       case "subscription-list":
         return [
           "Subscription List",
-          `/admins/${adminId}/subscription-list`,
+          "/admins/subscription-list",
           `Customer Page (${customerProfile.name})`,
         ];
       default:
         return [];
     }
-  }, [adminId, customerProfile.name, previousListPage]);
+  }, [customerProfile.name, previousListPage]);
 
   // Get the active tab name to set the active tab in the TabFunction component.
   const activeTabName = "activeCustomerTab";

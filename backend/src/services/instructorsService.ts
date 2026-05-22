@@ -7,10 +7,12 @@ import {
   maskedHeadLetters,
   maskedSuffix,
   maskedBirthdate,
+  MONTHS_TO_DELETE_INSTRUCTORS,
 } from "../utils/commonUtils";
 import { convertToUTCDate } from "../utils/dateUtils";
 import { put, del } from "@vercel/blob";
 import { randomUUID } from "crypto";
+import { EnglishBackground } from "../types";
 
 // Register a new instructor account in the DB
 export const registerInstructor = async (data: {
@@ -29,7 +31,7 @@ export const registerInstructor = async (data: {
   classURL: string;
   meetingId: string;
   passcode: string;
-  isNative: boolean;
+  englishBackground: EnglishBackground;
 }) => {
   const hashedPassword = await hashPassword(data.password);
   const icon = data.icon;
@@ -62,7 +64,7 @@ export const registerInstructor = async (data: {
       classURL: data.classURL,
       meetingId: data.meetingId,
       passcode: data.passcode,
-      isNative: data.isNative,
+      englishBackground: data.englishBackground,
     },
   });
 
@@ -89,14 +91,40 @@ export const getAllInstructors = async () => {
 };
 
 // Fetch all instructors information
-export const getAllPastInstructors = async () => {
+
+export const getAllInstructorsForAdminList = async () => {
   try {
     const now = new Date();
     return await prisma.instructor.findMany({
       where: {
-        OR: [
-          { terminationAt: { lte: now } }, // Past termination
-        ],
+        OR: [{ terminationAt: null }, { terminationAt: { gt: now } }],
+      },
+      select: {
+        id: true,
+        name: true,
+        nickname: true,
+        email: true,
+        englishBackground: true,
+      },
+      orderBy: { id: "asc" },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch instructors.");
+  }
+};
+
+export const getAllPastInstructorsForAdminList = async () => {
+  try {
+    const now = new Date();
+    return await prisma.instructor.findMany({
+      where: {
+        OR: [{ terminationAt: { lte: now } }],
+      },
+      select: {
+        id: true,
+        nickname: true,
+        terminationAt: true,
       },
       orderBy: { terminationAt: "asc" },
     });
@@ -134,7 +162,7 @@ export const updateInstructor = async (
   classURL: string,
   meetingId: string,
   passcode: string,
-  isNative: boolean,
+  englishBackground: EnglishBackground,
 ) => {
   try {
     // Fetch the previous instructor data.
@@ -186,7 +214,7 @@ export const updateInstructor = async (
         terminationAt: leavingDate
           ? convertToUTCDate(leavingDate, "Asia/Tokyo")
           : null,
-        isNative,
+        englishBackground,
       },
     });
     return instructor;
@@ -202,6 +230,17 @@ export const getInstructorByEmail = async (
 ): Promise<Instructor | null> => {
   return await prisma.instructor.findUnique({
     where: { email },
+  });
+};
+
+export const getInstructorAuthByEmail = async (email: string) => {
+  return await prisma.instructor.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      name: true,
+      password: true,
+    },
   });
 };
 
@@ -276,28 +315,28 @@ export const getInstructorProfiles = async () => {
         { terminationAt: { gt: now } }, // Active (Future termination)
       ],
     },
-  });
-
-  const instructorProfiles = instructors.map((instructor: Instructor) => ({
-    id: instructor.id,
-    name: instructor.name,
-    nickname: instructor.nickname,
-    icon: instructor.icon,
-    isNative: instructor.isNative,
-  }));
-
-  return instructorProfiles;
-};
-
-export const getNativeInstructorProfiles = async () => {
-  const now = new Date();
-  const instructors = await prisma.instructor.findMany({
-    where: {
-      OR: [
-        { terminationAt: null }, // Active
-        { terminationAt: { gt: now } }, // Active (Future termination)
-      ],
-      isNative: true,
+    select: {
+      id: true,
+      name: true,
+      nickname: true,
+      icon: true,
+      englishBackground: true,
+      tagAssignments: {
+        where: {
+          tag: {
+            deletedAt: null,
+          },
+        },
+        select: {
+          tag: {
+            select: {
+              id: true,
+              label: true,
+              sortOrder: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -306,13 +345,18 @@ export const getNativeInstructorProfiles = async () => {
     name: instructor.name,
     nickname: instructor.nickname,
     icon: instructor.icon,
-    isNative: instructor.isNative,
+    englishBackground: instructor.englishBackground,
+    tags: instructor.tagAssignments
+      .map((assignment) => assignment.tag)
+      .sort((a, b) => a.sortOrder - b.sortOrder),
   }));
 
   return instructorProfiles;
 };
 
-export const getNonNativeInstructorProfiles = async () => {
+export const getInstructorProfilesByEnglishBackground = async (
+  englishBackground: EnglishBackground[],
+) => {
   const now = new Date();
   const instructors = await prisma.instructor.findMany({
     where: {
@@ -320,7 +364,32 @@ export const getNonNativeInstructorProfiles = async () => {
         { terminationAt: null }, // Active
         { terminationAt: { gt: now } }, // Active (Future termination)
       ],
-      isNative: false,
+      englishBackground: {
+        in: englishBackground,
+      }, // Specific English background
+    },
+    select: {
+      id: true,
+      name: true,
+      nickname: true,
+      icon: true,
+      englishBackground: true,
+      tagAssignments: {
+        where: {
+          tag: {
+            deletedAt: null,
+          },
+        },
+        select: {
+          tag: {
+            select: {
+              id: true,
+              label: true,
+              sortOrder: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -329,7 +398,10 @@ export const getNonNativeInstructorProfiles = async () => {
     name: instructor.name,
     nickname: instructor.nickname,
     icon: instructor.icon,
-    isNative: instructor.isNative,
+    englishBackground: instructor.englishBackground,
+    tags: instructor.tagAssignments
+      .map((assignment) => assignment.tag)
+      .sort((a, b) => a.sortOrder - b.sortOrder),
   }));
 
   return instructorProfiles;
@@ -390,7 +462,7 @@ export const maskInstructors = async (instructors: Instructor[]) => {
             classURL: `${maskedHeadLetters}_${suffix}${instructor.id}`,
             meetingId: `${maskedHeadLetters}_${suffix}${instructor.id}`,
             passcode: `${maskedHeadLetters}_${suffix}${instructor.id}`,
-            isNative: false,
+            englishBackground: EnglishBackground.NonNative, // Non-native
           },
         }),
       ),
@@ -399,4 +471,20 @@ export const maskInstructors = async (instructors: Instructor[]) => {
     console.error("Error masking instructors:", error);
     throw new Error("Failed to mask instructors");
   }
+};
+
+// Delete instructors who have left the service more than 3 years ago
+export const deletePastInstructors = async () => {
+  const thresholdDate = new Date();
+  thresholdDate.setMonth(
+    thresholdDate.getMonth() - MONTHS_TO_DELETE_INSTRUCTORS,
+  );
+
+  return await prisma.instructor.deleteMany({
+    where: {
+      terminationAt: {
+        lt: thresholdDate,
+      },
+    },
+  });
 };

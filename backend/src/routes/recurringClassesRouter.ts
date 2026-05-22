@@ -5,12 +5,14 @@ import {
   getRegularClassesBySubscriptionIdController,
   updateRegularClassController,
   getRecurringClassesByInstructorIdController,
+  getRecurringClassesHistoryCountController,
 } from "../../src/controllers/recurringClassesController";
 import { registerRoutes } from "../middlewares/validationMiddleware";
 import {
   RecurringClassIdParams,
   GetRecurringClassesBySubscriptionQuery,
   GetRecurringClassesByInstructorQuery,
+  GetRecurringClassesHistoryCountQuery,
   CreateRecurringClassRequest,
   UpdateRecurringClassRequest,
 } from "../../../shared/schemas/recurringClasses";
@@ -33,6 +35,29 @@ const getBySubscriptionIdConfig = {
     description: "Retrieves all recurring classes for a specific subscription",
     responses: {
       "200": { description: "List of recurring classes" },
+      "400": {
+        description: "Invalid query parameters",
+        schema: MessageErrorResponse,
+      },
+      "500": {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const getHistoryCountBySubscriptionIdConfig = {
+  method: "get" as const,
+  middleware: [verifyAuthentication(AUTH_ROLES.AC)] as RequestHandler[],
+  handler: getRecurringClassesHistoryCountController,
+  querySchema: GetRecurringClassesHistoryCountQuery,
+  openapi: {
+    summary: "Get recurring classes history count by subscription ID",
+    description:
+      "Retrieves the count of historical recurring classes for a subscription",
+    responses: {
+      "200": { description: "Recurring classes history count" },
       "400": {
         description: "Invalid query parameters",
         schema: MessageErrorResponse,
@@ -142,6 +167,7 @@ const updateConfig = {
 
 const routeConfigs = {
   "/": [getBySubscriptionIdConfig, createConfig],
+  "/history-count": [getHistoryCountBySubscriptionIdConfig],
   "/by-instructorId": [getByInstructorIdConfig],
   "/:id": [getByIdConfig, updateConfig],
 } as const;

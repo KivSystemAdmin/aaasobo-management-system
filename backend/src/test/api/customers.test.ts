@@ -325,7 +325,15 @@ describe("GET /customers/:id/rebookable-classes", () => {
     const customer = await createCustomer();
 
     // Create a regular rebookable class
-    await createClass(customer.id, undefined, undefined);
+    const adminCanceledClass = await createClass(
+      customer.id,
+      undefined,
+      undefined,
+      {
+        status: "canceledByAdmin",
+        rebookableUntil: new Date(Date.now() + 86400000),
+      },
+    );
 
     // Create a free trial class
     await prisma.class.create({
@@ -345,6 +353,11 @@ describe("GET /customers/:id/rebookable-classes", () => {
       .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: adminCanceledClass.id }),
+      ]),
+    );
   });
 });
 
@@ -374,6 +387,7 @@ describe("POST /customers/:id/subscription", () => {
     const subscriptionData = {
       planId: plan.id,
       startAt: faker.date.future().toISOString(),
+      selectType: faker.internet.url(),
     };
 
     await request(server)
@@ -395,6 +409,7 @@ describe("POST /customers/:id/subscription", () => {
     const subscriptionData = {
       planId: "invalid",
       startAt: faker.date.future().toISOString(),
+      selectType: faker.internet.url(),
     };
 
     await request(server)

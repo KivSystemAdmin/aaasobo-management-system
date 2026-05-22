@@ -1,7 +1,11 @@
 const { faker } = require("@faker-js/faker");
 import { hashPasswordSync } from "../utils/commonUtils";
 import { prisma } from "./setup";
-import { Status } from "../../generated/prisma";
+import { Prisma, Status } from "../../generated/prisma";
+
+export function setTestDataSeed(seed: number) {
+  faker.seed(seed);
+}
 
 /**
  * Generate a test admin
@@ -38,13 +42,17 @@ export function generateTestCustomer(): {
  */
 export function generateTestInstructor() {
   const birthdate = faker.date.past({ years: 30 });
+  const uniqueId = faker.string.uuid();
+  const uniqueDigits = faker.string.numeric(11);
+  const uniquePasscode = faker.string.alphanumeric(8);
+  const uniqueIcon = `${faker.image.avatar()}?id=${uniqueId}`;
   return {
     email: faker.internet.email().toLowerCase(),
     password: faker.internet.password(),
     name: faker.person.fullName(),
-    classURL: faker.internet.url(),
-    icon: faker.image.avatar(),
-    nickname: faker.person.firstName(),
+    classURL: `https://example.com/class/${uniqueId}`,
+    icon: uniqueIcon,
+    nickname: `${faker.person.firstName()}_${uniqueId.slice(0, 8)}`,
     birthdate: birthdate.toISOString().split("T")[0], // YYYY-MM-DD format for API
     lifeHistory: faker.lorem.paragraph(),
     favoriteFood: faker.food.dish(),
@@ -52,9 +60,9 @@ export function generateTestInstructor() {
     messageForChildren: faker.lorem.sentence(),
     workingTime: faker.lorem.words(3),
     skill: faker.lorem.sentence(),
-    meetingId: faker.string.numeric(11),
-    passcode: faker.string.alphanumeric(8),
-    isNative: false,
+    meetingId: uniqueDigits,
+    passcode: uniquePasscode,
+    englishBackground: faker.helpers.arrayElement([0, 1, 2]),
   };
 }
 
@@ -105,7 +113,7 @@ function generateTestPlan() {
     name: `${planNameJpn} / ${planNameEng}`,
     weeklyClassTimes: faker.number.int({ min: 1, max: 5 }),
     description: faker.lorem.sentence(),
-    isNative: false,
+    englishBackground: faker.helpers.arrayElement([0, 1, 2]),
   };
 }
 
@@ -168,6 +176,7 @@ function generateTestSubscription(planId: number, customerId: number) {
   return {
     planId,
     customerId,
+    selectType: faker.internet.url(),
     startAt,
     endAt: faker.date.future({ refDate: startAt }),
   };
@@ -234,9 +243,42 @@ export async function createClass(
   customerId: number,
   instructorId?: number,
   dateTime?: Date,
+  overrides?: Partial<Prisma.ClassUncheckedCreateInput>,
 ) {
   return await prisma.class.create({
-    data: generateTestClass(customerId, instructorId, dateTime),
+    data: {
+      ...generateTestClass(customerId, instructorId, dateTime),
+      ...overrides,
+    },
+  });
+}
+
+export async function createInstructorFee(
+  instructorId: number,
+  data?: Partial<{
+    currency: string;
+    effectiveFrom: Date;
+    effectiveTo: Date | null;
+    trialFee: number;
+    regularFee: number;
+    cancelFee: number;
+    cancelWithoutNoticeFee: number;
+    monthlyCancelFee: number;
+  }>,
+) {
+  return await prisma.instructorFee.create({
+    data: {
+      instructorId,
+      currency: data?.currency ?? "JPY",
+      effectiveFrom:
+        data?.effectiveFrom ?? new Date("2026-01-01T00:00:00.000Z"),
+      effectiveTo: data?.effectiveTo === undefined ? null : data.effectiveTo,
+      trialFee: data?.trialFee ?? 1000,
+      regularFee: data?.regularFee ?? 1000,
+      cancelFee: data?.cancelFee ?? 500,
+      cancelWithoutNoticeFee: data?.cancelWithoutNoticeFee ?? 0,
+      monthlyCancelFee: data?.monthlyCancelFee ?? 0,
+    },
   });
 }
 
@@ -353,6 +395,7 @@ export async function createInstructorAbsence(
 async function generateAuthToken(
   userId: number,
   userType: "admin" | "customer" | "instructor",
+  expirationTime: string = "1h",
 ): Promise<string> {
   const { SignJWT } = await import("jose");
   const secret = process.env.AUTH_SECRET;
@@ -365,7 +408,7 @@ async function generateAuthToken(
     userType,
   })
     .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime("1h")
+    .setExpirationTime(expirationTime)
     .sign(new TextEncoder().encode(secret));
 
   return token;
@@ -377,8 +420,13 @@ async function generateAuthToken(
 export async function generateAuthCookie(
   userId: number,
   userType: "admin" | "customer" | "instructor",
+  options?: { expirationTime?: string },
 ): Promise<string> {
   const salt = process.env.AUTH_SALT || "authjs.session-token";
-  const token = await generateAuthToken(userId, userType);
+  const token = await generateAuthToken(
+    userId,
+    userType,
+    options?.expirationTime ?? "1h",
+  );
   return `${salt}=${token}`;
 }

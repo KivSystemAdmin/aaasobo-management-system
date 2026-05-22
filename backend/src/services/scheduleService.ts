@@ -1,5 +1,6 @@
 import { Prisma } from "../../generated/prisma";
 import { prisma } from "../../prisma/prismaClient";
+import { MONTHS_TO_DELETE_BUSINESS_CALENDAR } from "../utils/commonUtils";
 
 // Fetch all schedules
 export const getAllSchedules = async () => {
@@ -61,5 +62,51 @@ export const updateSchedules = async (
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to update schedules.");
+  }
+};
+
+// Delete classes older than 1 year (13 months)
+export const deleteOldBusinessCalendar = async () => {
+  const thresholdDate = new Date();
+  thresholdDate.setMonth(
+    thresholdDate.getMonth() - MONTHS_TO_DELETE_BUSINESS_CALENDAR,
+  );
+
+  return await prisma.schedule.deleteMany({
+    where: {
+      date: {
+        lt: thresholdDate,
+      },
+    },
+  });
+};
+
+export const getSchedulesByEventNameAndDate = async (
+  eventName: string,
+  start: Date,
+  end: Date,
+  tx: Prisma.TransactionClient = prisma,
+) => {
+  try {
+    return await tx.schedule.findMany({
+      where: {
+        event: {
+          name: eventName,
+        },
+        date: {
+          gte: start,
+          lt: end,
+        },
+      },
+      orderBy: {
+        date: "asc",
+      },
+      include: {
+        event: true,
+      },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch schedules.");
   }
 };

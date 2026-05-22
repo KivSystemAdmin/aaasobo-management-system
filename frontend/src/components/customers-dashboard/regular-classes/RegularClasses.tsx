@@ -35,7 +35,7 @@ function RegularClasses({
   };
 
   const handleUpdateSubscription = () => {
-    setUpdateCount(updateCount + 1);
+    setUpdateCount((count) => count + 1);
   };
 
   useEffect(() => {

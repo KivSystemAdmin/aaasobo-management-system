@@ -1,0 +1,105 @@
+@use "@/styles/variables.module.scss" as *;
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  position: fixed;
+  height: 100vh;
+  overflow: auto;
+  width: 15rem;
+  flex: none;
+  background: inherit;
+  transition: transform 0.2s ease;
+  z-index: 30;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 1.5rem;
+  margin-left: 15rem;
+  height: 100vh;
+  overflow: auto;
+}
+
+.mobileHeader {
+  display: none;
+}
+
+.menuButton {
+  display: none;
+}
+
+.overlay {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .container {
+    position: relative;
+  }
+
+  .mobileHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    padding: 0.75rem 1rem;
+    background: $blue_primary;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .menuButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: transparent;
+    color: #ffffff;
+  }
+
+  .menuIcon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .sidebar {
+    width: 15rem;
+    transform: translateX(-100%);
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 20;
+  }
+
+  .content {
+    margin-left: 0;
+    padding: 4.5rem 1rem 1rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .sidebar {
+    width: 12rem;
+  }
+
+  .content {
+    margin-left: 12rem;
+  }
+}

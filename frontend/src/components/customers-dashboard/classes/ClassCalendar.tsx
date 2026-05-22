@@ -4,25 +4,35 @@ import ClassActions from "./classActions/ClassActions";
 import CustomerCalendar from "./customerCalensar/CustomerCalendar";
 import { getClasses, getCustomerById } from "@/lib/api/customersApi";
 import WelcomeModalController from "./welcomeModalController/WelcomModalController";
-import { getAllBusinessSchedules, getAllEvents } from "@/lib/api/adminsApi";
+import {
+  getAllBusinessSchedules,
+  getAllEvents,
+  getMessageBoardPosts,
+} from "@/lib/api/adminsApi";
 import { getCookie } from "../../../proxy";
+import MessageBoardPanel from "@/components/features/messageBoardPanel/MessageBoardPanel";
+import { MessageTarget } from "@/types";
 
 export default async function ClassCalendar({
   customerId,
   userSessionType,
+  adminId,
 }: {
   customerId: number;
   userSessionType: UserType;
+  adminId?: number;
 }) {
   // Get the cookies from the request headers
   const cookie = await getCookie();
 
-  const [classes, customer, schedule, events] = await Promise.all([
-    getClasses(customerId, cookie),
-    getCustomerById(customerId, cookie),
-    getAllBusinessSchedules(cookie),
-    getAllEvents(cookie),
-  ]);
+  const [classes, customer, schedule, events, messageBoardPosts] =
+    await Promise.all([
+      getClasses(customerId, cookie),
+      getCustomerById(customerId, cookie),
+      getAllBusinessSchedules(cookie),
+      getAllEvents(cookie),
+      getMessageBoardPosts(cookie),
+    ]);
 
   const createdAt = customer.createdAt;
   const hasSeenWelcomeModal = customer.hasSeenWelcome;
@@ -34,13 +44,25 @@ export default async function ClassCalendar({
       color: e["Color Code"],
     }),
   );
+  const visiblePosts = messageBoardPosts.filter(
+    (post) =>
+      post.target === MessageTarget.customer ||
+      post.target === MessageTarget.both,
+  );
 
   return (
     <main className={styles.calendarContainer}>
+      <MessageBoardPanel
+        posts={visiblePosts}
+        storageKey="customerClassCalendarMessageBoardOpenState"
+        readMessageStorageKey={"readCustomerMessageNumber"}
+      />
+
       <ClassActions
         userSessionType={userSessionType}
         customerId={customerId}
         terminationAt={terminationAt}
+        adminId={adminId}
       />
 
       <CustomerCalendar

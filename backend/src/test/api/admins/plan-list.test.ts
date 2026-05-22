@@ -3,6 +3,7 @@ import request from "supertest";
 import { server } from "../../../server";
 import { createAdmin, createPlan, generateAuthCookie } from "../../testUtils";
 import { prisma } from "../../setup";
+import { EnglishBackground } from "../../../types";
 
 describe("GET /admins/plan-list", () => {
   it("succeed with multiple plans", async () => {
@@ -24,6 +25,12 @@ describe("GET /admins/plan-list", () => {
         ID: plan1.id,
         "Plan (Japanese)": plan1NameJpn,
         "Plan (English)": plan1NameEng,
+        English:
+          plan1.englishBackground === EnglishBackground.NonNative
+            ? "Non Native"
+            : plan1.englishBackground === EnglishBackground.NativeA
+              ? "Native A"
+              : "Native B",
         "Weekly Class Times": plan1.weeklyClassTimes,
         Description: plan1.description,
       },
@@ -32,6 +39,12 @@ describe("GET /admins/plan-list", () => {
         ID: plan2.id,
         "Plan (Japanese)": plan2NameJpn,
         "Plan (English)": plan2NameEng,
+        English:
+          plan2.englishBackground === EnglishBackground.NonNative
+            ? "Non Native"
+            : plan2.englishBackground === EnglishBackground.NativeA
+              ? "Native A"
+              : "Native B",
         "Weekly Class Times": plan2.weeklyClassTimes,
         Description: plan2.description,
       },
@@ -48,7 +61,7 @@ describe("POST /admins/plan-list/register", () => {
       planNameJpn: "ベーシック",
       weeklyClassTimes: 2,
       description: "Test plan description",
-      isNative: "false",
+      englishBackground: EnglishBackground.NonNative,
     };
 
     await request(server)
@@ -69,7 +82,7 @@ describe("POST /admins/plan-list/register", () => {
       planNameJpn: "ベーシック",
       weeklyClassTimes: 2,
       description: "Test plan description",
-      isNative: "false",
+      englishBackground: EnglishBackground.NonNative,
     };
 
     await request(server)
@@ -94,7 +107,7 @@ describe("PATCH /admins/plan-list/update/:id", () => {
         planNameEng,
         planNameJpn,
         description: updatedDescription,
-        isNative: "false",
+        englishBackground: EnglishBackground.NonNative,
       })
       .expect(200);
 

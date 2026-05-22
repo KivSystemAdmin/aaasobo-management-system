@@ -6,6 +6,30 @@
       "schedule": "0 23 * * 0"
     },
     {
+      "path": "/api/cron-job/delete-old-business-calendar",
+      "schedule": "10 0 1 1 *"
+    },
+    {
+      "path": "/api/cron-job/delete-past-admins",
+      "schedule": "10 22 * * 0"
+    },
+    {
+      "path": "/api/cron-job/delete-past-customers",
+      "schedule": "20 22 * * 0"
+    },
+    {
+      "path": "/api/cron-job/delete-past-instructors",
+      "schedule": "30 22 * * 0"
+    },
+    {
+      "path": "/api/cron-job/delete-past-posts",
+      "schedule": "40 22 * * 0"
+    },
+    {
+      "path": "/api/cron-job/delete-unnecessary-plans",
+      "schedule": "0 1 1 1 *"
+    },
+    {
       "path": "/api/cron-job/mask-instructor",
       "schedule": "0 22 * * *"
     },

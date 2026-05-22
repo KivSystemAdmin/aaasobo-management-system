@@ -23,6 +23,7 @@ type ClassStatus =
   | "completed"
   | "canceledByCustomer"
   | "canceledByInstructor"
+  | "canceledByAdmin"
   | "pending"
   | "rebooked"
   | "freeTrial";
@@ -101,7 +102,7 @@ type Plan = {
   description: string;
   weeklyClassTimes?: number;
   terminationAt?: string | null;
-  isNative: boolean;
+  englishBackground: EnglishBackground;
 };
 
 type BusinessEventType = {
@@ -124,6 +125,7 @@ type Subscription = {
   startAt: string;
   endAt: string | null;
   plan: Plan;
+  selectType: string;
 };
 
 type RegisterSubscription = {
@@ -227,9 +229,13 @@ type ForgotPasswordFormState = {
 type RegisterFormState = {
   password?: string;
   name?: string;
-  isNative?: string;
+  nickname?: string;
+  englishBackground?: EnglishBackground;
   email?: string;
   passConfirmation?: string;
+  classURL?: string;
+  meetingId?: string;
+  passcode?: string;
   prefecture?: string;
   isAgreed?: string;
   weeklyClassTimes?: string;
@@ -246,7 +252,7 @@ type RegisterFormState = {
 
 type UpdateFormState = {
   name?: string;
-  isNative?: string;
+  englishBackground?: EnglishBackground;
   nickname?: string;
   email?: string;
   classURL?: string;
@@ -356,6 +362,13 @@ type CustomerCalendarProps = {
   userSessionType?: UserType;
 };
 
+type MessageBoardPostItem = {
+  id: number;
+  target: MessageTarget;
+  body: string;
+  createdAt: string;
+};
+
 type InstructorCalendarClientProps = {
   adminId?: number | null;
   instructorId: number | null;
@@ -367,6 +380,7 @@ type InstructorCalendarClientProps = {
   };
   businessSchedule: BusinessSchedule[];
   colorsForEvents: { event: string; color: string }[];
+  messageBoardPosts?: MessageBoardPostItem[];
 };
 
 type RebookableClass = {
@@ -466,19 +480,6 @@ type BirthdateInputProps = {
   useFormAction?: boolean;
 };
 
-type TextAreaInputProps = {
-  id?: string;
-  label?: string;
-  defaultValue?: string;
-  placeholder?: string;
-  required?: boolean;
-  error?: string;
-  onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void;
-  language?: LanguageType;
-  name?: string;
-  className?: string;
-};
-
 // Types related to RebookingForm
 type RebookingSteps =
   | "selectClass"
@@ -490,6 +491,7 @@ type RebookingSteps =
 
 type RebookingFormProps = {
   customerId: number;
+  adminId?: number;
   classId?: number;
   rebookableClasses: RebookableClass[] | [];
   instructorAvailabilities?: InstructorAvailability[] | [];
@@ -500,6 +502,7 @@ type RebookingFormProps = {
 
 type RebookableClassesListProps = {
   customerId: number;
+  adminId?: number;
   rebookableClasses: RebookableClass[] | [];
   onRebookableClassSelect: (classId: number) => void;
   language: LanguageType;
@@ -517,10 +520,13 @@ type RebookableInstructorsListProps = {
   instructorProfiles: InstructorRebookingProfile[];
   instructorAvailabilities: InstructorAvailability[] | [];
   setInstructorToRebook: (instructor: InstructorRebookingProfile) => void;
+  englishBackgroundArray: EnglishBackground[];
   rebookingOption: "instructor" | "dateTime";
   setRebookingStep: (step: RebookingSteps) => void;
   dateTimeToRebook: string | null;
   language: LanguageType;
+  adminId?: number;
+  customerId?: number;
 };
 
 type RebookableTimeSlotsProps = {
@@ -656,6 +662,9 @@ type CurrentListTableProps = {
   categoryType?: CategoryType;
   isAddButton?: boolean;
   isViewPastButton?: boolean;
+  isFilterActive?: boolean;
+  filterHref?: string;
+  clearFilterHref?: string;
   linkTarget?: string;
 };
 
@@ -674,3 +683,54 @@ type PastListTableProps = {
 type ListTableProps = CurrentListTableProps & {
   pastListTableProps?: PastListTableProps;
 };
+
+type MonthlyData = {
+  month: string;
+  value: number;
+};
+
+type InstructorAttendanceMonthly = {
+  year: number;
+  month: string;
+  trialLessons: number;
+  regularLessons: number;
+  completedLessons: number;
+  cancelLessons: number;
+  cancelWithoutNoticeLessons: number;
+  attendanceRate: number;
+};
+
+type InstructorAttendanceItem = {
+  id: number;
+  nickname: string;
+  imageUrl: string;
+  englishBackgroundClass: "non-native" | "native-a" | "native-b";
+  monthly: InstructorAttendanceMonthly[];
+};
+
+type MessageTarget = import("@/types").MessageTarget;
+
+type MessageItem = {
+  id: number;
+  target: MessageTarget;
+  body: string;
+  createdAt: string;
+};
+
+type InstructorEnglishBackgroundCounts = {
+  nonNative: number;
+  nativeA: number;
+  nativeB: number;
+};
+
+type DashboardMetric = {
+  totalCustomers: number;
+  totalChildren: number;
+  instructorsByEnglishBackground: {
+    nonNative: number;
+    nativeA: number;
+    nativeB: number;
+  };
+};
+
+type EnglishBackgroundFilter = "all" | "non-native" | "native-a" | "native-b";

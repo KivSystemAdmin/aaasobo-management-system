@@ -15,6 +15,10 @@ import {
   getAdminController,
   getAllAdminsController,
   getAllInstructorsController,
+  getInstructorPayrollController,
+  getInstructorFeesController,
+  createInstructorFeeController,
+  deleteLatestInstructorFeeController,
   getAllPastInstructorsController,
   getAllCustomersController,
   getAllPastCustomersController,
@@ -23,7 +27,14 @@ import {
   getAllSubscriptionsController,
   getAllEventsController,
   getClassesWithinPeriodController,
+  getMessageBoardPostsController,
+  createMessageBoardPostController,
 } from "../../src/controllers/adminsController";
+import {
+  downloadNormalizedImportPackageController,
+  executeNormalizedImportController,
+  normalizeImportSourceController,
+} from "../controllers/adminsImportController";
 import {
   getAllSchedulesController,
   updateBusinessScheduleController,
@@ -35,8 +46,18 @@ import {
 } from "../../../shared/schemas/common";
 import {
   AdminIdParams,
+  ClassListQuery,
+  CreateMessageBoardPostRequest,
   CustomerIdParams,
   InstructorIdParams,
+  InstructorPayrollQuery,
+  CreateInstructorFeeRequest,
+  InstructorPayrollResponse,
+  InstructorPayrollErrorResponse,
+  InstructorFeeRatesResponse,
+  CreateInstructorFeeResponse,
+  DeleteLatestInstructorFeeResponse,
+  InstructorFeeErrorResponse,
   PlanIdParams,
   EventIdParams,
   RegisterAdminRequest,
@@ -59,6 +80,8 @@ import {
   SubscriptionsListResponse,
   EventsListResponse,
   ClassesListResponse,
+  MessageBoardPostsResponse,
+  CreateMessageBoardPostResponse,
   SchedulesListResponse,
   UpdateAdminResponse,
   UpdateInstructorResponse,
@@ -68,11 +91,19 @@ import {
   ValidationErrorResponse,
   ConflictErrorResponse,
   InstructorUpdateErrorResponse,
+  ImportNormalizeResponse,
+  ImportExecuteRequest,
+  ImportExecuteResponse,
+  ImportExecuteErrorResponse,
+  ImportNormalizedDownloadParams,
 } from "../../../shared/schemas/admins";
 
 import { AUTH_ROLES } from "../utils/commonUtils";
 import { verifyAuthentication } from "../middlewares/auth.middleware";
-import upload from "../middlewares/upload.middleware";
+import upload, {
+  uploadAdminImportSourceFile,
+  uploadAdminImportZipFile,
+} from "../middlewares/upload.middleware";
 
 // Route configurations
 const registerAdminConfig = {
@@ -366,6 +397,145 @@ const getAllInstructorsConfig = {
       200: {
         description: "Instructors list retrieved successfully",
         schema: InstructorsListResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const getInstructorPayrollConfig = {
+  method: "get" as const,
+  paramsSchema: InstructorIdParams,
+  querySchema: InstructorPayrollQuery,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: getInstructorPayrollController,
+  openapi: {
+    summary: "Get instructor payroll",
+    description: "Get current payroll summary for one instructor and month",
+    responses: {
+      200: {
+        description: "Instructor payroll retrieved successfully",
+        schema: InstructorPayrollResponse,
+      },
+      400: {
+        description: "Invalid query parameters",
+        schema: MessageErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Instructor not found",
+        schema: MessageErrorResponse,
+      },
+      422: {
+        description: "Payroll data cannot be resolved",
+        schema: InstructorPayrollErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const getInstructorFeesConfig = {
+  method: "get" as const,
+  paramsSchema: InstructorIdParams,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: getInstructorFeesController,
+  openapi: {
+    summary: "Get instructor fee history",
+    description: "Get fee history for one instructor",
+    responses: {
+      200: {
+        description: "Instructor fee history retrieved successfully",
+        schema: InstructorFeeRatesResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Instructor not found",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const createInstructorFeeConfig = {
+  method: "post" as const,
+  paramsSchema: InstructorIdParams,
+  bodySchema: CreateInstructorFeeRequest,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: createInstructorFeeController,
+  openapi: {
+    summary: "Create instructor fee rate",
+    description: "Create a new latest instructor fee rate",
+    responses: {
+      201: {
+        description: "Instructor fee rate created successfully",
+        schema: CreateInstructorFeeResponse,
+      },
+      400: {
+        description: "Invalid request data",
+        schema: MessageErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Instructor not found",
+        schema: MessageErrorResponse,
+      },
+      409: {
+        description: "Fee rate cannot be created",
+        schema: InstructorFeeErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const deleteLatestInstructorFeeConfig = {
+  method: "delete" as const,
+  paramsSchema: InstructorIdParams,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: deleteLatestInstructorFeeController,
+  openapi: {
+    summary: "Delete latest instructor fee rate",
+    description:
+      "Delete the latest instructor fee rate and reopen the previous one",
+    responses: {
+      200: {
+        description: "Latest instructor fee rate deleted successfully",
+        schema: DeleteLatestInstructorFeeResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Instructor not found",
+        schema: MessageErrorResponse,
+      },
+      409: {
+        description: "Latest fee rate cannot be deleted",
+        schema: InstructorFeeErrorResponse,
       },
       500: {
         description: "Internal server error",
@@ -727,6 +897,7 @@ const getAllEventsConfig = {
 
 const getClassesWithinPeriodConfig = {
   method: "get" as const,
+  querySchema: ClassListQuery,
   middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
   handler: getClassesWithinPeriodController,
   openapi: {
@@ -736,6 +907,55 @@ const getClassesWithinPeriodConfig = {
       200: {
         description: "Classes list retrieved successfully",
         schema: ClassesListResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const getMessageBoardPostsConfig = {
+  method: "get" as const,
+  middleware: [verifyAuthentication(AUTH_ROLES.ACI)] as RequestHandler[],
+  handler: getMessageBoardPostsController,
+  openapi: {
+    summary: "Get message board posts",
+    description: "Get message board posts for dashboard and calendars",
+    responses: {
+      200: {
+        description: "Message board posts retrieved successfully",
+        schema: MessageBoardPostsResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const createMessageBoardPostConfig = {
+  method: "post" as const,
+  bodySchema: CreateMessageBoardPostRequest,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: createMessageBoardPostController,
+  openapi: {
+    summary: "Create message board post",
+    description: "Create a new message board post",
+    responses: {
+      201: {
+        description: "Message posted successfully",
+        schema: CreateMessageBoardPostResponse,
+      },
+      400: {
+        description: "Invalid request data",
+        schema: MessageErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
       },
       500: {
         description: "Internal server error",
@@ -793,6 +1013,112 @@ const getAllSchedulesConfig = {
   },
 } as const;
 
+const normalizeImportSourceConfig = {
+  method: "post" as const,
+  middleware: [
+    verifyAuthentication(AUTH_ROLES.A),
+    uploadAdminImportSourceFile,
+  ] as RequestHandler[],
+  handler: normalizeImportSourceController,
+  openapi: {
+    summary: "Normalize raw import CSV",
+    description:
+      "Normalize a raw spreadsheet-export CSV into the v1 normalized CSV package",
+    responses: {
+      200: {
+        description: "Normalization succeeded",
+        schema: ImportNormalizeResponse,
+      },
+      400: {
+        description: "Invalid or unsupported source file",
+        schema: MessageErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      413: {
+        description: "Uploaded file exceeds size limit",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const downloadNormalizedImportPackageConfig = {
+  method: "get" as const,
+  paramsSchema: ImportNormalizedDownloadParams,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: downloadNormalizedImportPackageController,
+  openapi: {
+    summary: "Download normalized import zip",
+    description:
+      "Download normalized CSV package zip by job ID generated from normalization",
+    responses: {
+      200: {
+        description: "Normalized package zip file",
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Job not found or expired",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const executeNormalizedImportConfig = {
+  method: "post" as const,
+  bodySchema: ImportExecuteRequest,
+  middleware: [
+    verifyAuthentication(AUTH_ROLES.A),
+    uploadAdminImportZipFile,
+  ] as RequestHandler[],
+  handler: executeNormalizedImportController,
+  openapi: {
+    summary: "Execute normalized import",
+    description:
+      "Validate a normalized import package from uploaded zip or prior normalization job",
+    responses: {
+      200: {
+        description: "Normalized import package validated",
+        schema: ImportExecuteResponse,
+      },
+      400: {
+        description: "Normalized package validation failed",
+        schema: ImportExecuteErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      413: {
+        description: "Uploaded file exceeds size limit",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Job not found or expired",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+} as const;
+
 const validatedRouteConfigs = {
   "/:id": [updateAdminConfig],
   "/admin-list": [getAllAdminsConfig],
@@ -810,11 +1136,18 @@ const validatedRouteConfigs = {
   "/event-list/register": [registerEventConfig],
   "/event-list/update/:id": [updateEventConfig],
   "/instructor-list": [getAllInstructorsConfig],
+  "/instructors/:id/fees": [getInstructorFeesConfig, createInstructorFeeConfig],
+  "/instructors/:id/fees/latest": [deleteLatestInstructorFeeConfig],
+  "/instructors/:id/payroll": [getInstructorPayrollConfig],
   "/instructor-list/past": [getAllPastInstructorsConfig],
   "/instructor-list/register": [registerInstructorConfig],
   "/instructor-list/register/withIcon": [registerInstructorWithIconConfig],
   "/instructor-list/update/:id": [updateInstructorConfig],
   "/instructor-list/update/:id/withIcon": [updateInstructorWithIconConfig],
+  "/import/normalize": [normalizeImportSourceConfig],
+  "/import/execute": [executeNormalizedImportConfig],
+  "/import/normalized/:jobId/download": [downloadNormalizedImportPackageConfig],
+  "/message-board": [getMessageBoardPostsConfig, createMessageBoardPostConfig],
   "/plan-list": [getAllPlansConfig],
   "/plan-list/delete/:id": [deletePlanConfig],
   "/plan-list/register": [registerPlanConfig],

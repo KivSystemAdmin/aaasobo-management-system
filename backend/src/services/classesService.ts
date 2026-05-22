@@ -1,6 +1,6 @@
 import { Prisma, Status } from "../../generated/prisma";
 import { prisma } from "../../prisma/prismaClient";
-import { getJstDayRange, nHoursLater } from "../utils/dateUtils";
+import { getJstDayRange, nDaysLater, nHoursLater } from "../utils/dateUtils";
 import { NewClassToRebookType } from "../controllers/classesController";
 import {
   FREE_TRIAL_BOOKING_HOURS,
@@ -14,6 +14,75 @@ import {
   REBOOKED_CLASS_COLOR,
   REGULAR_CLASS_COLOR,
 } from "../utils/colors";
+import { getInstructorAvailableSlots } from "./instructorScheduleService";
+
+type ClassListItem = {
+  id: number;
+  dateTime: Date | null;
+  status: Status;
+  recurringClassId: number | null;
+  customer: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  instructor: {
+    id: number;
+    name: string;
+  } | null;
+};
+
+type CustomerClassListItem = {
+  id: number;
+  dateTime: Date | null;
+  status: Status;
+  recurringClassId: number | null;
+  rebookableUntil: Date | null;
+  updatedAt: Date;
+  classCode: string;
+  customer: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  instructor: {
+    id: number;
+    name: string;
+    icon: string;
+    classURL: string;
+    nickname: string;
+    meetingId: string;
+    passcode: string;
+  } | null;
+  classAttendance: Array<{
+    children: {
+      id: number;
+      name: string;
+    };
+  }>;
+};
+
+type AdminClassPeriodListItem = {
+  id: number;
+  dateTime: Date | null;
+  status: Status;
+  classCode: string;
+  isFreeTrial: boolean;
+  canceledAt: Date | null;
+  customer: {
+    id: number;
+    name: string;
+  };
+  instructor: {
+    id: number;
+    nickname: string;
+  } | null;
+  classAttendance: Array<{
+    children: {
+      name: string;
+    };
+  }>;
+};
 
 export class InstructorUnavailableError extends Error {
   constructor() {
@@ -24,8 +93,26 @@ export class InstructorUnavailableError extends Error {
 // Fetch all the classes with related instructors and customers data
 export const getAllClasses = async () => {
   try {
-    const classes = await prisma.class.findMany({
-      include: { instructor: true, customer: true },
+    const classes: ClassListItem[] = await prisma.class.findMany({
+      select: {
+        id: true,
+        dateTime: true,
+        status: true,
+        recurringClassId: true,
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        instructor: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
       orderBy: { dateTime: "desc" },
     });
 
@@ -42,17 +129,41 @@ export const getClassesWithinPeriod = async (
   endDate: Date,
 ) => {
   try {
-    const classes = await prisma.class.findMany({
+    const classes: AdminClassPeriodListItem[] = await prisma.class.findMany({
       where: {
         dateTime: {
           gte: startDate,
           lte: endDate,
         },
       },
-      include: {
-        instructor: true,
-        customer: true,
-        classAttendance: { include: { children: true } },
+      select: {
+        id: true,
+        dateTime: true,
+        status: true,
+        classCode: true,
+        isFreeTrial: true,
+        canceledAt: true,
+        instructor: {
+          select: {
+            id: true,
+            nickname: true,
+          },
+        },
+        customer: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        classAttendance: {
+          select: {
+            children: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { dateTime: "asc" },
     });
@@ -67,12 +178,44 @@ export const getClassesWithinPeriod = async (
 // Fetch classes by customer id along with related instructors and customers data
 export const getClassesByCustomerId = async (customerId: number) => {
   try {
-    const classes = await prisma.class.findMany({
+    const classes: CustomerClassListItem[] = await prisma.class.findMany({
       where: { customerId },
-      include: {
-        instructor: true,
-        customer: true,
-        classAttendance: { include: { children: true } },
+      select: {
+        id: true,
+        dateTime: true,
+        status: true,
+        recurringClassId: true,
+        rebookableUntil: true,
+        updatedAt: true,
+        classCode: true,
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        instructor: {
+          select: {
+            id: true,
+            name: true,
+            icon: true,
+            classURL: true,
+            nickname: true,
+            meetingId: true,
+            passcode: true,
+          },
+        },
+        classAttendance: {
+          select: {
+            children: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { dateTime: "asc" },
     });
@@ -128,17 +271,17 @@ export const updateClass = async (
   status: Status,
   classDateTime: Date | string,
 ) => {
-  if (status === "canceledByInstructor") {
+  const now = new Date();
+
+  if (status === "canceledByInstructor" || status === "canceledByAdmin") {
     await prisma.$transaction(async (tx) => {
       await tx.class.update({
         where: { id },
         data: {
           status,
-          updatedAt: new Date(),
-          rebookableUntil: nHoursLater(
-            180 * 24,
-            new Date(classDateTime),
-          ).toISOString(), // If the class is canceled by the instructor, set rebookableUntil to 180 days (* 24 * 60 minutes) after the class dateTime
+          canceledAt: now,
+          updatedAt: now,
+          rebookableUntil: nHoursLater(180 * 24, new Date(classDateTime)),
         },
       });
 
@@ -152,7 +295,8 @@ export const updateClass = async (
       where: { id },
       data: {
         status,
-        updatedAt: new Date(),
+        canceledAt: status === "canceledByCustomer" ? now : null,
+        updatedAt: now,
         ...(status === "completed" && { rebookableUntil: null }),
       },
     });
@@ -162,14 +306,59 @@ export const updateClass = async (
 // Cancel a class
 export const cancelClassById = async (classId: number) => {
   await prisma.$transaction(async (tx) => {
+    const now = new Date();
+
     await tx.classAttendance.deleteMany({
       where: { classId },
     });
 
     await tx.class.update({
       where: { id: classId },
-      data: { status: "canceledByCustomer", updatedAt: new Date() },
+      data: {
+        status: "canceledByCustomer",
+        canceledAt: now,
+        updatedAt: now,
+      },
     });
+  });
+};
+
+// Cancel classes by instructor
+export const cancelClassByInstructor = async (
+  tx: Prisma.TransactionClient,
+  classId: number,
+) => {
+  const now = new Date();
+
+  await tx.classAttendance.deleteMany({
+    where: { classId },
+  });
+
+  await tx.class.update({
+    where: { id: classId },
+    data: {
+      status: "canceledByInstructor",
+      canceledAt: now,
+      updatedAt: now,
+    },
+  });
+};
+
+export const cancelClassByAdmin = async (
+  tx: Prisma.TransactionClient,
+  classId: number,
+  classDateTime: Date,
+) => {
+  const now = new Date();
+
+  await tx.class.update({
+    where: { id: classId },
+    data: {
+      status: "canceledByAdmin",
+      canceledAt: now,
+      updatedAt: now,
+      rebookableUntil: nDaysLater(180, classDateTime),
+    },
   });
 };
 
@@ -184,7 +373,7 @@ export const createClassesUsingRecurringClassId = async (
   dateTimes: Date[],
 ) => {
   try {
-    const createdClasses = await tx.class.createManyAndReturn({
+    await tx.class.createManyAndReturn({
       data: dateTimes.map((dateTime, index) => {
         return {
           recurringClassId,
@@ -193,10 +382,18 @@ export const createClassesUsingRecurringClassId = async (
           subscriptionId,
           status: "booked",
           dateTime,
+          rebookableUntil: nDaysLater(180, dateTime),
           updatedAt: new Date(),
           classCode: `${recurringClassId}-${index}`,
         };
       }),
+    });
+
+    const createdClasses = await tx.class.findMany({
+      where: {
+        recurringClassId,
+        dateTime: { in: dateTimes },
+      },
     });
 
     await tx.classAttendance.createMany({
@@ -210,7 +407,7 @@ export const createClassesUsingRecurringClassId = async (
         .flat(),
     });
 
-    return { createdClasses };
+    return createdClasses;
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to add classes.");
@@ -221,12 +418,13 @@ export const getExcludedClasses = async (
   tx: Prisma.TransactionClient,
   recurringClassIds: number[],
   date: Date,
+  until: Date,
 ) => {
   try {
     const excludedClassData = await tx.class.findMany({
       where: {
         recurringClassId: { in: recurringClassIds },
-        dateTime: { gte: date },
+        dateTime: { gte: date, lt: until },
       },
     });
 
@@ -308,7 +506,14 @@ export const getRebookableClasses = async (customerId: number) => {
     where: {
       customerId,
       isFreeTrial: false,
-      status: { in: ["canceledByCustomer", "canceledByInstructor", "pending"] },
+      status: {
+        in: [
+          "canceledByCustomer",
+          "canceledByInstructor",
+          "canceledByAdmin",
+          "pending",
+        ],
+      },
       rebookableUntil: {
         gte: rebookableFrom,
       },
@@ -328,7 +533,14 @@ export const getRebookableClasses = async (customerId: number) => {
     where: {
       customerId,
       isFreeTrial: true,
-      status: { in: ["canceledByCustomer", "canceledByInstructor", "pending"] },
+      status: {
+        in: [
+          "canceledByCustomer",
+          "canceledByInstructor",
+          "canceledByAdmin",
+          "pending",
+        ],
+      },
       rebookableUntil: {
         gte: freeTrialBookableFrom,
       },
@@ -405,13 +617,19 @@ export const getUpcomingClasses = async (customerId: number) => {
 
 export const cancelClasses = async (classIds: number[]) => {
   return prisma.$transaction(async (tx) => {
+    const now = new Date();
+
     await tx.classAttendance.deleteMany({
       where: { classId: { in: classIds } },
     });
 
     await tx.class.updateMany({
       where: { id: { in: classIds } },
-      data: { status: "canceledByCustomer", updatedAt: new Date() },
+      data: {
+        status: "canceledByCustomer",
+        canceledAt: now,
+        updatedAt: now,
+      },
     });
 
     return true;
@@ -462,6 +680,7 @@ export const getCustomerClasses = async (customerId: number) => {
       rebooked: REBOOKED_CLASS_COLOR,
       canceledByCustomer: CANCELED_CLASS_COLOR,
       canceledByInstructor: CANCELED_CLASS_COLOR,
+      canceledByAdmin: CANCELED_CLASS_COLOR,
       completed: COMPLETED_CLASS_COLOR,
     };
 
@@ -504,7 +723,13 @@ export const getCalendarClasses = async (instructorId: number) => {
     where: {
       instructorId: instructorId,
       status: {
-        in: ["booked", "rebooked", "completed", "canceledByInstructor"],
+        in: [
+          "booked",
+          "rebooked",
+          "completed",
+          "canceledByInstructor",
+          "canceledByAdmin",
+        ],
       },
     },
     orderBy: {
@@ -530,6 +755,7 @@ export const getCalendarClasses = async (instructorId: number) => {
       booked: REGULAR_CLASS_COLOR,
       rebooked: REBOOKED_CLASS_COLOR,
       canceledByInstructor: CANCELED_CLASS_COLOR,
+      canceledByAdmin: CANCELED_CLASS_COLOR,
       completed: COMPLETED_CLASS_COLOR,
     };
 
@@ -585,7 +811,8 @@ export const rebookClass = async (
     // If the old class status is "canceled", update the rebookableUntil field to null to prevent further rebooking.
     if (
       oldClass.status === "canceledByCustomer" ||
-      oldClass.status === "canceledByInstructor"
+      oldClass.status === "canceledByInstructor" ||
+      oldClass.status === "canceledByAdmin"
     ) {
       await tx.class.update({
         where: { id: oldClass.id },
@@ -627,13 +854,35 @@ const assertInstructorAvailable = async (
   newClass: NewClassToRebookType,
 ) => {
   if (!newClass.instructorId || !newClass.dateTime) return;
+
+  const targetDateTime = new Date(newClass.dateTime);
   const absence = await tx.instructorAbsence.findFirst({
     where: {
       instructorId: newClass.instructorId,
-      absentAt: new Date(newClass.dateTime),
+      absentAt: targetDateTime,
     },
   });
   if (absence) {
+    throw new InstructorUnavailableError();
+  }
+
+  const targetDate = targetDateTime.toISOString().slice(0, 10);
+  const nextDate = nDaysLater(1, new Date(`${targetDate}T00:00:00.000Z`))
+    .toISOString()
+    .slice(0, 10);
+
+  const availableSlots = await getInstructorAvailableSlots(
+    newClass.instructorId,
+    targetDate,
+    nextDate,
+    "Asia/Tokyo",
+    false,
+  );
+  const hasSlot = availableSlots.some(
+    (slot) => slot.dateTime === targetDateTime.toISOString(),
+  );
+
+  if (!hasSlot) {
     throw new InstructorUnavailableError();
   }
 };
@@ -751,7 +1000,13 @@ export const getSameDateClasses = async (
     where: {
       instructorId,
       status: {
-        in: ["booked", "rebooked", "canceledByInstructor", "completed"],
+        in: [
+          "booked",
+          "rebooked",
+          "canceledByInstructor",
+          "canceledByAdmin",
+          "completed",
+        ],
       },
       dateTime: {
         gte: startOfDay,

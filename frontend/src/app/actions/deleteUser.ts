@@ -9,7 +9,7 @@ import {
   revalidateClassList,
   revalidateSubscriptionList,
 } from "./revalidate";
-import { getCookie } from "../../proxy";
+import { getCookie } from "@/proxy";
 import { getUserSession } from "@/lib/auth/sessionUtils";
 import { LOGIN_REQUIRED_MESSAGE } from "@/lib/messages/customerDashboard";
 import { deleteChild } from "@/lib/api/childrenApi";
@@ -95,10 +95,14 @@ export async function deleteChildProfileAction(
 
   const path =
     loggedInUserType === "admin"
-      ? `/admins/${loggedInUserId}/customer-list/${customerId}`
-      : `/customers/${loggedInUserId}/children-profiles`;
+      ? `/admins/customer-list/${customerId}`
+      : "/customers/children-profiles";
 
   revalidatePath(path);
+
+  // Refresh cached customer data for the customer list page
+  revalidateCustomerList();
+  revalidateClassList();
 
   return resultMessage;
 }

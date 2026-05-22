@@ -12,6 +12,7 @@ interface BookingModalProps {
   classCode?: string;
   childProfiles: Child[];
   customerId: number;
+  adminId?: number;
   plan?: Plan;
 }
 
@@ -24,6 +25,7 @@ export default function BookingModal({
   classCode,
   childProfiles,
   customerId,
+  adminId,
   plan,
 }: BookingModalProps) {
   return (
@@ -36,6 +38,7 @@ export default function BookingModal({
         classCode={classCode}
         childProfiles={childProfiles}
         customerId={customerId}
+        adminId={adminId}
         plan={plan}
       />
     </Modal>

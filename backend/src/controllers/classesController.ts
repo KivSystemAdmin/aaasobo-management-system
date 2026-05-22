@@ -15,6 +15,8 @@ import {
   InstructorUnavailableError,
   rebookClass,
   updateClass,
+  cancelClassByAdmin,
+  cancelClassByInstructor,
 } from "../services/classesService";
 import {
   RequestWithParams,
@@ -45,6 +47,7 @@ import {
   getMonthNumber,
   isSameLocalDate,
   nHoursBefore,
+  toDateKey,
 } from "../utils/dateUtils";
 import { getInstructorContactById } from "../services/instructorsService";
 import { getCustomerContactById } from "../services/customersService";
@@ -55,12 +58,26 @@ import {
 } from "../lib/email/mail";
 import {
   FREE_TRIAL_BOOKING_HOURS,
+  NO_CLASS_EVENT_NAME,
+  REBOOKABLE_NO_CLASS_EVENT_NAME,
   REGULAR_REBOOKING_HOURS,
 } from "../utils/commonUtils";
 import {
   createAttendances,
   deleteAttendancesByClassId,
 } from "../services/classAttendancesService";
+import { getInstructorAbsencesByMonth } from "../services/instructorAbsenceService";
+import { getSchedulesByEventNameAndDate } from "../services/scheduleService";
+
+function getJstRecurringParts(date: Date): { weekday: number; time: string } {
+  const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+  const hour = String(jstDate.getUTCHours()).padStart(2, "0");
+  const minute = String(jstDate.getUTCMinutes()).padStart(2, "0");
+  return {
+    weekday: jstDate.getUTCDay(),
+    time: `${hour}:${minute}`,
+  };
+}
 
 // GET all classes along with related instructors and customers data
 export const getAllClassesController = async (_: Request, res: Response) => {
@@ -228,33 +245,66 @@ export const rebookClassController = async (
 
     res.sendStatus(201);
   } catch (error) {
-    if (error instanceof InstructorUnavailableError) {
+    const isPrismaError =
+      error instanceof Prisma.PrismaClientKnownRequestError ||
+      error instanceof Prisma.PrismaClientUnknownRequestError;
+    const prismaErrorCode =
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      typeof (error as { code?: unknown }).code === "string"
+        ? (error as { code: string }).code
+        : null;
+    const message =
+      typeof error === "object" && error !== null && "message" in error
+        ? String((error as { message?: unknown }).message)
+        : "";
+
+    if (
+      error instanceof InstructorUnavailableError ||
+      message === "instructor unavailable"
+    ) {
       return res.status(400).json({ errorType: "instructor unavailable" });
     }
     if (error instanceof RebookControllerError) {
       return res.status(error.status).json({ errorType: error.errorType });
     }
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === "P2002") {
-        return res.status(400).json({
-          errorType: "instructor conflict",
-        });
+    if (
+      isPrismaError ||
+      prismaErrorCode === "P2002" ||
+      prismaErrorCode === "P2034" ||
+      prismaErrorCode === "P2028"
+    ) {
+      if (prismaErrorCode === "P2002") {
+        return res.status(400).json({ errorType: "instructor conflict" });
       }
-      if (error.code === "P2034") {
-        return res.status(409).json({
-          errorType: "likely instructor conflict",
-        });
+      if (prismaErrorCode === "P2034" || prismaErrorCode === "P2028") {
+        return res
+          .status(409)
+          .json({ errorType: "likely instructor conflict" });
+      }
+      if (prismaErrorCode === "P2025") {
+        return res
+          .status(409)
+          .json({ errorType: "likely instructor conflict" });
       }
     }
-
-    const message =
-      typeof error === "object" && error !== null && "message" in error
-        ? String((error as { message?: unknown }).message)
-        : "";
+    if (
+      message.includes("Unique constraint failed") ||
+      message.includes("duplicate key value violates unique constraint")
+    ) {
+      return res.status(400).json({ errorType: "instructor conflict" });
+    }
     if (
       message.includes("TransactionWriteConflict") ||
       message.includes("could not serialize access") ||
-      message.includes("SQLSTATE 40001")
+      message.includes("SQLSTATE 40001") ||
+      message.includes("serialization failure") ||
+      message.includes("deadlock detected") ||
+      message.includes("transaction is aborted") ||
+      message.includes("lock timeout") ||
+      message.includes("statement timeout") ||
+      message.includes("Transaction API error")
     ) {
       return res.status(409).json({
         errorType: "likely instructor conflict",
@@ -378,9 +428,11 @@ const notifySameDayRebookIfNeeded = async ({
   if (!isSameDay) return;
 
   try {
-    const instructor = await getInstructorContactById(newClass.instructorId!);
-    const customer = await getCustomerContactById(newClass.customerId);
-    const children = await getChildrenNamesByIds(childrenIds);
+    const [instructor, customer, children] = await Promise.all([
+      getInstructorContactById(newClass.instructorId!),
+      getCustomerContactById(newClass.customerId),
+      getChildrenNamesByIds(childrenIds),
+    ]);
 
     if (!instructor || !customer || !children) {
       console.error(
@@ -484,10 +536,13 @@ export const createClassesForMonthController = async (
   try {
     const result = await prisma.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        // First date of a giving month.
+        // First date of the given month
         const monthNum = getMonthNumber(month);
         if (monthNum === -1) throw new Error("Invalid month");
         const firstDateOfMonth = new Date(Date.UTC(year, monthNum, 1));
+
+        // Define until when schedule should be created
+        const until = getFirstDateInMonths(firstDateOfMonth, 1);
 
         // Get valid recurring classes.
         const recurringClasses = await getValidRecurringClasses(
@@ -495,7 +550,7 @@ export const createClassesForMonthController = async (
           firstDateOfMonth,
         );
 
-        // Get excluded classes.
+        // Get already existing classes
         const recurringClassIds = recurringClasses.map(
           (recurringClass) => recurringClass.id,
         );
@@ -503,16 +558,67 @@ export const createClassesForMonthController = async (
           tx,
           recurringClassIds,
           firstDateOfMonth,
+          until,
         );
 
-        // TODO: Get the instructors' unavailability and exclude it.
-        // TODO: Get the holiday and exclude it.
+        // Extract instructor ids
+        const instructorIds = recurringClasses
+          .map((r) => r.instructorId)
+          .filter(Boolean) as number[];
 
-        // Define until when schedule should be created.
-        const until = getFirstDateInMonths(firstDateOfMonth, 1);
-        until.setUTCDate(until.getUTCDate() - 1);
+        // Get instructor absences
+        const instructorAbsences = await getInstructorAbsencesByMonth(
+          instructorIds,
+          firstDateOfMonth,
+          until,
+          tx,
+        );
 
-        // Repeat the number of recurring classes.
+        // Get no classes
+        const noClasses = await getSchedulesByEventNameAndDate(
+          NO_CLASS_EVENT_NAME,
+          firstDateOfMonth,
+          until,
+          tx,
+        );
+
+        // Get rebookable no classes
+        const rebookableNoClasses = await getSchedulesByEventNameAndDate(
+          REBOOKABLE_NO_CLASS_EVENT_NAME,
+          firstDateOfMonth,
+          until,
+          tx,
+        );
+
+        // Prepare sets
+        const existingSet = new Set(
+          excludedClasses.map(
+            (cls) =>
+              `${cls.instructorId}-${new Date(cls.dateTime!).toISOString()}`,
+          ),
+        );
+
+        // TEMP: Adjust timezone. Remove once timezone handling is fixed.
+        const absenceSet = new Set(
+          instructorAbsences.map(
+            (absence) =>
+              `${absence.instructorId}-${new Date(
+                absence.absentAt.getTime() + 9 * 60 * 60 * 1000,
+              ).toISOString()}`,
+          ),
+        );
+
+        const noClassSet = new Set(
+          noClasses.map((schedule) => toDateKey(new Date(schedule.date!))),
+        );
+
+        const rebookableSet = new Set(
+          rebookableNoClasses.map((schedule) =>
+            toDateKey(new Date(schedule.date!)),
+          ),
+        );
+
+        // Generate classes for each recurring class
         await Promise.all(
           recurringClasses.map(async (recurringClass) => {
             const {
@@ -535,20 +641,17 @@ export const createClassesForMonthController = async (
               return;
             }
 
-            // If startAt is earlier than firstDateOfMonth, skip it.
-            if (startAt && firstDateOfMonth < new Date(startAt)) {
+            // If startAt is earlier than the end of the current month, skip it.
+            if (startAt > until) {
               return;
             }
 
-            // Extract time from startAt
-            const hours = startAt.getHours().toString().padStart(2, "0");
-            const minutes = startAt.getMinutes().toString().padStart(2, "0");
-            const time = `${hours}:${minutes}`;
+            const { weekday, time } = getJstRecurringParts(startAt);
 
             // Get the first date of the class of the month
             const firstDate = calculateFirstDate(
-              firstDateOfMonth,
-              days[startAt.getDay()],
+              firstDateOfMonth < startAt ? startAt : firstDateOfMonth,
+              days[weekday],
               time,
             );
 
@@ -558,36 +661,60 @@ export const createClassesForMonthController = async (
               endAt && endAt < until ? endAt : until,
             );
 
-            // if you find the same dateTime and instructor id as in the excludedClass, skip it.
-            const isExistingClass = excludedClasses.some((excludedClass) => {
-              const excludedClassDateTimesStr = new Date(
-                excludedClass.dateTime!, // All "excludedClasses" are selected by dateTime, so dateTime is guaranteed to exist.
-              ).toISOString();
-              const dateTimesStr = dateTimes.map((date) =>
-                new Date(date).toISOString(),
-              );
-              return (
-                dateTimesStr.includes(excludedClassDateTimesStr) &&
-                excludedClass.instructorId === instructorId
-              );
-            });
-            if (isExistingClass) {
-              return;
-            }
+            // filter part
+            let filtered = dateTimes;
+
+            // Exclude the dateTimes that already exist.
+            filtered = filtered.filter(
+              (date) =>
+                !existingSet.has(`${instructorId}-${date.toISOString()}`),
+            );
+
+            // Exclude the no class.
+            filtered = filtered.filter(
+              (date) => !noClassSet.has(toDateKey(date)),
+            );
+
+            if (filtered.length === 0) return;
 
             const childrenIds = recurringClassAttendance.map(
               (attendee) => attendee.childrenId,
             );
 
             // Create the classes and its attendance based on the recurring id.
-            await createClassesUsingRecurringClassId(
+            const createdClasses = await createClassesUsingRecurringClassId(
               tx,
               id,
               instructorId,
               subscription.customerId,
               subscriptionId,
               childrenIds,
-              dateTimes,
+              filtered,
+            );
+
+            // Cancel class due to instructor absence or rebookable no class
+            await Promise.all(
+              createdClasses.map(async (createdClass) => {
+                if (!createdClass.dateTime) return;
+
+                const isInstructorAbsent = absenceSet.has(
+                  `${instructorId}-${createdClass.dateTime.toISOString()}`,
+                );
+
+                const isRebookableNoClass = rebookableSet.has(
+                  toDateKey(createdClass.dateTime),
+                );
+
+                if (isInstructorAbsent) {
+                  await cancelClassByInstructor(tx, createdClass.id);
+                } else if (isRebookableNoClass) {
+                  await cancelClassByAdmin(
+                    tx,
+                    createdClass.id,
+                    createdClass.dateTime,
+                  );
+                }
+              }),
             );
           }),
         );

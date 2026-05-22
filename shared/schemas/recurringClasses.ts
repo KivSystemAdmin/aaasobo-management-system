@@ -21,6 +21,13 @@ export const GetRecurringClassesByInstructorQuery = z.object({
     .transform(Number),
 });
 
+export const GetRecurringClassesHistoryCountQuery = z.object({
+  subscriptionId: z
+    .string()
+    .regex(/^\d+$/, "Subscription ID must be a valid number")
+    .transform(Number),
+});
+
 // Request body schemas
 export const CreateRecurringClassRequest = z.object({
   instructorId: z
@@ -110,6 +117,9 @@ export type GetRecurringClassesBySubscriptionQuery = z.infer<
 >;
 export type GetRecurringClassesByInstructorQuery = z.infer<
   typeof GetRecurringClassesByInstructorQuery
+>;
+export type GetRecurringClassesHistoryCountQuery = z.infer<
+  typeof GetRecurringClassesHistoryCountQuery
 >;
 export type CreateRecurringClassRequest = z.infer<
   typeof CreateRecurringClassRequest

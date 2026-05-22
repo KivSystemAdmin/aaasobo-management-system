@@ -3,10 +3,12 @@ import { registerRoutes } from "../../src/middlewares/validationMiddleware";
 import {
   deleteSubscriptionController,
   getSubscriptionByIdController,
+  updateSelectTypeUrlController,
   updateSubscriptionToAddClassController,
   updateSubscriptionToTerminateClassController,
 } from "../../src/controllers/subscriptionsController";
 import {
+  CancelSubscriptionBody,
   DeleteSubscriptionResponse,
   SubscriptionIdParams,
   SubscriptionResponse,
@@ -55,6 +57,7 @@ const deleteSubscription = {
   middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
   handler: deleteSubscriptionController,
   paramsSchema: SubscriptionIdParams,
+  bodySchema: CancelSubscriptionBody,
   openapi: {
     summary: "Delete a subscription",
     description:
@@ -136,6 +139,34 @@ const updateSubscriptionToTerminateClass = {
   },
 };
 
+const updateSelectTypeUrl = {
+  method: "patch" as const,
+  handler: updateSelectTypeUrlController,
+  paramsSchema: SubscriptionIdParams,
+  openapi: {
+    summary: "Update a SelectType url",
+    description: "Update a SelectType url",
+    responses: {
+      "200": {
+        description: "Subscription updated successfully",
+        schema: UpdateSubscriptionResponse,
+      },
+      "404": {
+        description: "Subscription not found",
+        schema: ErrorResponse,
+      },
+      "400": {
+        description: "Invalid subscription ID",
+        schema: ErrorResponse,
+      },
+      "500": {
+        description: "Internal server error",
+        schema: ErrorResponse,
+      },
+    },
+  },
+};
+
 const routeConfigs: Record<string, readonly RouteConfig[]> = {
   "/:id": [
     getSubscriptionByIdConfig,
@@ -145,6 +176,7 @@ const routeConfigs: Record<string, readonly RouteConfig[]> = {
   ],
   "/:id/increase-recurring-class": [updateSubscriptionToAddClass],
   "/:id/decrease-recurring-class": [updateSubscriptionToTerminateClass],
+  "/:id/update-select-type": [updateSelectTypeUrl],
 };
 
 registerRoutes(subscriptionsRouter, routeConfigs);

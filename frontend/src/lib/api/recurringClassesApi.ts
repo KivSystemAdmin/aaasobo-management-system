@@ -55,6 +55,48 @@ export const getRecurringClassesBySubscriptionId = async (
   }
 };
 
+export const getRecurringClassesHistoryCountBySubscriptionId = async (
+  subscriptionId: number,
+  cookie?: string,
+): Promise<number> => {
+  const params = new URLSearchParams({
+    subscriptionId: subscriptionId.toString(),
+  });
+  let apiURL;
+  let headers;
+  let response;
+  const method = "GET";
+
+  if (cookie) {
+    // From server component
+    apiURL = `${BASE_URL}/history-count?${params.toString()}`;
+    headers = { "Content-Type": "application/json", Cookie: cookie };
+    response = await fetch(apiURL, {
+      method,
+      headers,
+    });
+  } else {
+    // From client component (via proxy)
+    apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+    const backendEndpoint = `/recurring-classes/history-count?${params.toString()}`;
+    headers = {
+      "Content-Type": "application/json",
+      "backend-endpoint": backendEndpoint,
+    };
+    response = await fetch(apiURL, {
+      method,
+      headers,
+    });
+  }
+
+  if (response.status !== 200) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const data = await response.json();
+
+  return data.count;
+};
+
 export const editRecurringClass = async (
   recurringClassId: number,
   recurringClassData: UpdateRecurringClassRequest,
