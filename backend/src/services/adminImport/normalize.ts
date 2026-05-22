@@ -41,6 +41,18 @@ interface NormalizeRawScheduleResult {
   report: NormalizationReport;
 }
 
+interface RecurringClassNormalizationOptions {
+  startAt: string;
+  endAt?: string;
+  customerNames?: string[];
+  instructorNames?: string[];
+  classTypes?: string[];
+}
+
+interface NormalizeRawScheduleOptions {
+  recurringClasses?: RecurringClassNormalizationOptions;
+}
+
 interface RawClassRow {
   sourceRow: number;
   prefecture: string;
@@ -50,7 +62,10 @@ interface RawClassRow {
   instructorName: string;
   weekday: number | null;
   startTime: string | null;
+  classType: string;
   childBirthdate: string | null;
+  siblingBirthdate: string | null;
+  detailUrl: string;
   personalInfo: string;
   email: string;
 }
@@ -130,6 +145,20 @@ interface InstructorFeeRow {
   regular_fee: string;
   cancel_fee: string;
   cancel_without_notice_fee: string;
+  monthly_cancel_fee: string;
+}
+
+interface RecurringClassRow {
+  recurring_class_ref: string;
+  subscription_ref: string;
+  instructor_ref: string;
+  start_at: string;
+  end_at: string;
+}
+
+interface RecurringClassAttendanceRow {
+  recurring_class_ref: string;
+  child_ref: string;
 }
 
 const RAW_COLUMN = {
@@ -140,7 +169,10 @@ const RAW_COLUMN = {
   instructorName: 7,
   weekday: 8,
   timeRange: 9,
+  classType: 10,
   childBirthdate: 11,
+  siblingBirthdate: 12,
+  detailUrl: 14,
   personalInfo: 16,
   email: 17,
 } as const;
@@ -207,6 +239,7 @@ export const NORMALIZED_HEADERS = {
     "regular_fee",
     "cancel_fee",
     "cancel_without_notice_fee",
+    "monthly_cancel_fee",
   ],
   "instructor_schedules.csv": [
     "instructor_ref",
@@ -246,6 +279,60 @@ export const NORMALIZED_HEADERS = {
 export const MANDATORY_NORMALIZED_FILES = Object.keys(
   NORMALIZED_HEADERS,
 ) as NormalizedFileName[];
+
+const DEFAULT_BUSINESS_EVENTS = [
+  {
+    event_ref: "EV0001",
+    name: "通常授業日 / Regular Class Day",
+    color: "#FFFFFF",
+  },
+  {
+    event_ref: "EV0002",
+    name: "お休み / No Class",
+    color: "#FAD7CD",
+  },
+  {
+    event_ref: "EV0003",
+    name: "お休み振替対象日 / No Class (Rebookable)",
+    color: "#FF0000",
+  },
+  {
+    event_ref: "EV0004",
+    name: "テーマクラスウィーク / Theme Class Week",
+    color: "#FFFF00",
+  },
+];
+
+const DEFAULT_PLAN_DEFINITIONS = [
+  {
+    price: "3180",
+    name: "月3,180円プラン / 3,180 yen/month Plan",
+    description: "2 classes per week",
+    weekly_class_times: "2",
+    english_background: "0",
+  },
+  {
+    price: "7980",
+    name: "月7,980円プラン / 7,980 yen/month Plan",
+    description: "5 classes per week",
+    weekly_class_times: "5",
+    english_background: "0",
+  },
+  {
+    price: "5980",
+    name: "月5,980円プラン / 5,980 yen/month Plan",
+    description: "1 classes per week",
+    weekly_class_times: "1",
+    english_background: "1",
+  },
+  {
+    price: "10800",
+    name: "月10,800円プラン / 10,800 yen/month Plan",
+    description: "2 classes per week",
+    weekly_class_times: "2",
+    english_background: "2",
+  },
+] as const;
 
 class RefSequence {
   private value = 1;
@@ -422,6 +509,74 @@ function parseWeeklyClassTimes(planName: string): number {
   return 1;
 }
 
+function normalizePlanPrice(planName: string): string {
+  return planName.replace(/[^\d]/g, "");
+}
+
+function buildPlanFromRaw(planRef: string, planName: string): PlanRow {
+  const defaultPlan = DEFAULT_PLAN_DEFINITIONS.find((plan) =>
+    normalizePlanPrice(planName).includes(plan.price),
+  );
+  if (defaultPlan) {
+    return {
+      plan_ref: planRef,
+      name: defaultPlan.name,
+      description: defaultPlan.description,
+      weekly_class_times: defaultPlan.weekly_class_times,
+      english_background: defaultPlan.english_background,
+      termination_at: "",
+    };
+  }
+
+  const weeklyClassTimes = parseWeeklyClassTimes(planName);
+  return {
+    plan_ref: planRef,
+    name: planName,
+    description: `${weeklyClassTimes} classes per week`,
+    weekly_class_times: String(weeklyClassTimes),
+    english_background: "0",
+    termination_at: "",
+  };
+}
+
+function splitChildNames(childName: string): string[] {
+  const parenthetical = childName.match(/^(.+?)\s*[（(]([^）)]+)[）)]$/);
+  if (parenthetical) {
+    return [parenthetical[1], ...parenthetical[2].split(/[,&、，]/)]
+      .map((name) => name.trim())
+      .filter(Boolean);
+  }
+
+  return childName
+    .split(/[&、，]/)
+    .map((name) => name.trim())
+    .filter(Boolean);
+}
+
+function findBirthdateInText(name: string, text: string): string | null {
+  const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = text.match(new RegExp(`${escapedName}\\s*(\\d{1,2}/\\d{1,2})`));
+  return parseBirthdate(match?.[1] ?? "");
+}
+
+function childNamesAndBirthdates(row: RawClassRow): {
+  name: string;
+  birthdate: string;
+}[] {
+  const names = splitChildNames(
+    row.childName || `Imported Child ${row.sourceRow}`,
+  );
+  const birthdates = [row.childBirthdate, row.siblingBirthdate].filter(
+    (birthdate): birthdate is string => !!birthdate,
+  );
+
+  return names.map((name, index) => ({
+    name,
+    birthdate:
+      findBirthdateInText(name, row.personalInfo) ?? birthdates[index] ?? "",
+  }));
+}
+
 function normalizeEmail(value: string): string {
   return value.trim().toLowerCase();
 }
@@ -434,7 +589,73 @@ function generateTempPassword(): string {
   return randomBytes(6).toString("base64url");
 }
 
-function toRecordSet(rows: RawClassRow[]): {
+function buildFallbackSelectType(customerRef: string, planRef: string): string {
+  return `https://example.com/subscriptions/${customerRef.toLowerCase()}-${planRef.toLowerCase()}`;
+}
+
+function buildOptionSet(values: string[] | undefined): Set<string> | null {
+  if (!values || values.length === 0) {
+    return null;
+  }
+  return new Set(values.map((value) => value.trim()).filter(Boolean));
+}
+
+function dateOnlyFromDateTime(value: string): string {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) {
+    throw new Error(
+      "recurringClasses.startAt must start with an ISO date, for example 2026-06-01T00:00:00+09:00",
+    );
+  }
+  return `${match[1]}-${match[2]}-${match[3]}`;
+}
+
+function timezoneSuffixFromDateTime(value: string): string {
+  const match = value.match(/(Z|[+-]\d{2}:\d{2})$/);
+  return match?.[1] ?? "+09:00";
+}
+
+function nextDateOnOrAfter(dateOnly: string, weekday: number): string {
+  const date = new Date(`${dateOnly}T00:00:00.000Z`);
+  const dayOffset = (weekday - date.getUTCDay() + 7) % 7;
+  date.setUTCDate(date.getUTCDate() + dayOffset);
+  return date.toISOString().slice(0, 10);
+}
+
+function buildRecurringStartAt(
+  startAt: string,
+  weekday: number,
+  startTime: string,
+): string {
+  const firstDate = nextDateOnOrAfter(dateOnlyFromDateTime(startAt), weekday);
+  const timezoneSuffix = timezoneSuffixFromDateTime(startAt);
+  return `${firstDate}T${startTime}:00${timezoneSuffix}`;
+}
+
+function shouldGenerateRecurringClass(
+  row: RawClassRow,
+  options: RecurringClassNormalizationOptions,
+): boolean {
+  const customerNames = buildOptionSet(options.customerNames);
+  const instructorNames = buildOptionSet(options.instructorNames);
+  const classTypes = buildOptionSet(options.classTypes ?? ["R"]);
+
+  if (customerNames && !customerNames.has(row.customerName)) {
+    return false;
+  }
+  if (instructorNames && !instructorNames.has(row.instructorName)) {
+    return false;
+  }
+  if (classTypes && !classTypes.has(row.classType)) {
+    return false;
+  }
+  return true;
+}
+
+function toRecordSet(
+  rows: RawClassRow[],
+  options: NormalizeRawScheduleOptions = {},
+): {
   plans: PlanRow[];
   customers: CustomerRow[];
   children: ChildRow[];
@@ -442,6 +663,8 @@ function toRecordSet(rows: RawClassRow[]): {
   instructors: InstructorRow[];
   instructorFees: InstructorFeeRow[];
   instructorSchedules: InstructorScheduleRow[];
+  recurringClasses: RecurringClassRow[];
+  recurringClassAttendance: RecurringClassAttendanceRow[];
   generatedCustomerEmails: GeneratedEmailReportItem[];
   warnings: string[];
 } {
@@ -450,6 +673,7 @@ function toRecordSet(rows: RawClassRow[]): {
   const childSeq = new RefSequence("CH");
   const subscriptionSeq = new RefSequence("SU");
   const instructorSeq = new RefSequence("IN");
+  const recurringClassSeq = new RefSequence("RC");
 
   const plans: PlanRow[] = [];
   const customers: CustomerRow[] = [];
@@ -458,6 +682,8 @@ function toRecordSet(rows: RawClassRow[]): {
   const instructors: InstructorRow[] = [];
   const instructorFees: InstructorFeeRow[] = [];
   const instructorSchedules: InstructorScheduleRow[] = [];
+  const recurringClasses: RecurringClassRow[] = [];
+  const recurringClassAttendance: RecurringClassAttendanceRow[] = [];
   const generatedCustomerEmails: GeneratedEmailReportItem[] = [];
   const warnings: string[] = [];
 
@@ -467,19 +693,15 @@ function toRecordSet(rows: RawClassRow[]): {
   const subscriptionsByIdentity = new Map<string, SubscriptionRow>();
   const instructorsByName = new Map<string, InstructorRow>();
   const instructorSchedulesByIdentity = new Set<string>();
+  const recurringClassesByIdentity = new Set<string>();
 
   for (const row of rows) {
-    const planName = row.planName || "Imported Plan";
+    const rawPlanName = row.planName || "Imported Plan";
+    const planDraft = buildPlanFromRaw("PL0000", rawPlanName);
+    const planName = planDraft.name;
     let plan = plansByName.get(planName);
     if (!plan) {
-      plan = {
-        plan_ref: planSeq.next(),
-        name: planName,
-        description: `Imported from raw plan label: ${planName}`,
-        weekly_class_times: String(parseWeeklyClassTimes(planName)),
-        english_background: "0",
-        termination_at: "",
-      };
+      plan = { ...planDraft, plan_ref: planSeq.next() };
       plansByName.set(planName, plan);
       plans.push(plan);
     }
@@ -514,32 +736,45 @@ function toRecordSet(rows: RawClassRow[]): {
       customers.push(customer);
     }
 
-    const childName = row.childName || `Imported Child ${row.sourceRow}`;
-    const childIdentity = `${customer.customer_ref}:${childName}`;
-    if (!childrenByIdentity.has(childIdentity)) {
-      const child: ChildRow = {
-        child_ref: childSeq.next(),
-        customer_ref: customer.customer_ref,
-        name: childName,
-        birthdate: row.childBirthdate ?? "",
-        personal_info: row.personalInfo,
-      };
-      childrenByIdentity.set(childIdentity, child);
-      children.push(child);
-    }
+    const rowChildren = childNamesAndBirthdates(row).map((child) => {
+      const childIdentity = `${customer.customer_ref}:${child.name}`;
+      let childRow = childrenByIdentity.get(childIdentity);
+      if (!childRow) {
+        childRow = {
+          child_ref: childSeq.next(),
+          customer_ref: customer.customer_ref,
+          name: child.name,
+          birthdate: child.birthdate,
+          personal_info: row.personalInfo,
+        };
+        childrenByIdentity.set(childIdentity, childRow);
+        children.push(childRow);
+      }
+      return childRow;
+    });
 
     const subscriptionIdentity = `${customer.customer_ref}:${plan.plan_ref}`;
-    if (!subscriptionsByIdentity.has(subscriptionIdentity)) {
-      const subscription: SubscriptionRow = {
+    let subscription = subscriptionsByIdentity.get(subscriptionIdentity);
+    const fallbackSelectType = buildFallbackSelectType(
+      customer.customer_ref,
+      plan.plan_ref,
+    );
+    if (!subscription) {
+      subscription = {
         subscription_ref: subscriptionSeq.next(),
         customer_ref: customer.customer_ref,
         plan_ref: plan.plan_ref,
-        select_type: `https://example.com/subscriptions/${customer.customer_ref.toLowerCase()}-${plan.plan_ref.toLowerCase()}`,
+        select_type: row.detailUrl || fallbackSelectType,
         start_at: "2020-01-01T00:00:00+09:00",
         end_at: "",
       };
       subscriptionsByIdentity.set(subscriptionIdentity, subscription);
       subscriptions.push(subscription);
+    } else if (
+      row.detailUrl &&
+      subscription.select_type === fallbackSelectType
+    ) {
+      subscription.select_type = row.detailUrl;
     }
 
     if (row.instructorName) {
@@ -554,7 +789,7 @@ function toRecordSet(rows: RawClassRow[]): {
           temp_password: generateTempPassword(),
           class_url: `https://import.local/class/${instructorRef.toLowerCase()}`,
           icon: `https://import.local/icon/${instructorRef.toLowerCase()}.png`,
-          nickname: `import_${instructorRef.toLowerCase()}`,
+          nickname: row.instructorName,
           meeting_id: `9000${serial}`,
           passcode: generateTempPassword().slice(0, 8),
           birthdate: "1990-01-01",
@@ -578,6 +813,7 @@ function toRecordSet(rows: RawClassRow[]): {
           regular_fee: "100",
           cancel_fee: "50",
           cancel_without_notice_fee: "100",
+          monthly_cancel_fee: "200",
         });
       }
 
@@ -592,17 +828,67 @@ function toRecordSet(rows: RawClassRow[]): {
         );
       }
       if (row.weekday !== null && row.startTime) {
-        const key = `${instructor.instructor_ref}:2020-01-01:2099-12-31:Asia/Tokyo:${row.weekday}:${row.startTime}`;
+        const effectiveFrom = options.recurringClasses
+          ? dateOnlyFromDateTime(options.recurringClasses.startAt)
+          : "2020-01-01";
+        const key = `${instructor.instructor_ref}:${effectiveFrom}:Asia/Tokyo:${row.weekday}:${row.startTime}`;
         if (!instructorSchedulesByIdentity.has(key)) {
           instructorSchedulesByIdentity.add(key);
           instructorSchedules.push({
             instructor_ref: instructor.instructor_ref,
-            effective_from: "2020-01-01",
-            effective_to: "2099-12-31",
+            effective_from: effectiveFrom,
+            effective_to: "",
             timezone: "Asia/Tokyo",
             weekday: String(row.weekday),
             start_time: row.startTime,
           });
+        }
+      }
+
+      if (
+        options.recurringClasses &&
+        shouldGenerateRecurringClass(row, options.recurringClasses)
+      ) {
+        const subscription = subscriptionsByIdentity.get(subscriptionIdentity);
+        if (rowChildren.length === 0 || !subscription) {
+          warnings.push(
+            `Row ${row.sourceRow}: recurring class could not be linked to child or subscription`,
+          );
+        } else if (row.weekday === null || !row.startTime) {
+          warnings.push(
+            `Row ${row.sourceRow}: recurring class skipped because weekday or time could not be normalized`,
+          );
+        } else {
+          const key = [
+            subscription.subscription_ref,
+            instructor.instructor_ref,
+            rowChildren.map((child) => child.child_ref).join(","),
+            row.weekday,
+            row.startTime,
+            options.recurringClasses.startAt,
+            options.recurringClasses.endAt ?? "",
+          ].join("\u0000");
+          if (!recurringClassesByIdentity.has(key)) {
+            recurringClassesByIdentity.add(key);
+            const recurringClassRef = recurringClassSeq.next();
+            recurringClasses.push({
+              recurring_class_ref: recurringClassRef,
+              subscription_ref: subscription.subscription_ref,
+              instructor_ref: instructor.instructor_ref,
+              start_at: buildRecurringStartAt(
+                options.recurringClasses.startAt,
+                row.weekday,
+                row.startTime,
+              ),
+              end_at: options.recurringClasses.endAt ?? "",
+            });
+            recurringClassAttendance.push(
+              ...rowChildren.map((child) => ({
+                recurring_class_ref: recurringClassRef,
+                child_ref: child.child_ref,
+              })),
+            );
+          }
         }
       }
     }
@@ -616,6 +902,8 @@ function toRecordSet(rows: RawClassRow[]): {
     instructors,
     instructorFees,
     instructorSchedules,
+    recurringClasses,
+    recurringClassAttendance,
     generatedCustomerEmails,
     warnings,
   };
@@ -641,6 +929,7 @@ function buildRawRows(allRows: CsvRow[]): RawClassRow[] {
   let currentEmail = "";
   let currentPersonalInfo = "";
   let currentBirthdate: string | null = null;
+  let currentSiblingBirthdate: string | null = null;
 
   for (let i = headerIndex + 1; i < allRows.length; i += 1) {
     const row = allRows[i];
@@ -655,7 +944,10 @@ function buildRawRows(allRows: CsvRow[]): RawClassRow[] {
     const instructorName = trimOrEmpty(row[RAW_COLUMN.instructorName]);
     const weekdayText = trimOrEmpty(row[RAW_COLUMN.weekday]);
     const timeRange = trimOrEmpty(row[RAW_COLUMN.timeRange]);
+    const classType = trimOrEmpty(row[RAW_COLUMN.classType]);
     const childBirthRaw = trimOrEmpty(row[RAW_COLUMN.childBirthdate]);
+    const siblingBirthRaw = trimOrEmpty(row[RAW_COLUMN.siblingBirthdate]);
+    const detailUrl = trimOrEmpty(row[RAW_COLUMN.detailUrl]);
     const personalInfo = trimOrEmpty(row[RAW_COLUMN.personalInfo]);
     const email = trimOrEmpty(row[RAW_COLUMN.email]);
 
@@ -678,8 +970,12 @@ function buildRawRows(allRows: CsvRow[]): RawClassRow[] {
       currentPersonalInfo = personalInfo;
     }
     const parsedBirthdate = parseBirthdate(childBirthRaw);
+    const parsedSiblingBirthdate = parseBirthdate(siblingBirthRaw);
     if (parsedBirthdate) {
       currentBirthdate = parsedBirthdate;
+    }
+    if (parsedSiblingBirthdate) {
+      currentSiblingBirthdate = parsedSiblingBirthdate;
     }
 
     if (!currentCustomerName || !childName) {
@@ -695,7 +991,10 @@ function buildRawRows(allRows: CsvRow[]): RawClassRow[] {
       instructorName,
       weekday: parseWeekday(weekdayText),
       startTime: normalizeTime(timeRange),
+      classType,
       childBirthdate: parsedBirthdate ?? currentBirthdate,
+      siblingBirthdate: parsedSiblingBirthdate ?? currentSiblingBirthdate,
+      detailUrl,
       personalInfo: personalInfo || currentPersonalInfo,
       email: currentEmail,
     });
@@ -720,10 +1019,11 @@ function rowsToCsvWithHeaders<K extends NormalizedFileName, R extends object>(
 
 export function normalizeRawScheduleCsvToPackage(
   rawCsvContent: string,
+  options: NormalizeRawScheduleOptions = {},
 ): NormalizeRawScheduleResult {
   const parsed = parseCsv(rawCsvContent);
   const rawRows = buildRawRows(parsed);
-  const mapped = toRecordSet(rawRows);
+  const mapped = toRecordSet(rawRows, options);
 
   const files: NormalizedFileMap = {
     "plans.csv": rowsToCsvWithHeaders("plans.csv", mapped.plans),
@@ -749,15 +1049,18 @@ export function normalizeRawScheduleCsvToPackage(
       "instructor_absences.csv",
       [],
     ),
-    "events.csv": rowsToCsvWithHeaders("events.csv", []),
+    "events.csv": rowsToCsvWithHeaders("events.csv", DEFAULT_BUSINESS_EVENTS),
     "schedules.csv": rowsToCsvWithHeaders("schedules.csv", []),
     "system_status.csv": rowsToCsvWithHeaders("system_status.csv", [
       { status: "Running" },
     ]),
-    "recurring_classes.csv": rowsToCsvWithHeaders("recurring_classes.csv", []),
+    "recurring_classes.csv": rowsToCsvWithHeaders(
+      "recurring_classes.csv",
+      mapped.recurringClasses,
+    ),
     "recurring_class_attendance.csv": rowsToCsvWithHeaders(
       "recurring_class_attendance.csv",
-      [],
+      mapped.recurringClassAttendance,
     ),
     "classes.csv": rowsToCsvWithHeaders("classes.csv", []),
     "class_attendance.csv": rowsToCsvWithHeaders("class_attendance.csv", []),
@@ -772,11 +1075,11 @@ export function normalizeRawScheduleCsvToPackage(
     "instructor_fees.csv": mapped.instructorFees.length,
     "instructor_schedules.csv": mapped.instructorSchedules.length,
     "instructor_absences.csv": 0,
-    "events.csv": 0,
+    "events.csv": DEFAULT_BUSINESS_EVENTS.length,
     "schedules.csv": 0,
     "system_status.csv": 1,
-    "recurring_classes.csv": 0,
-    "recurring_class_attendance.csv": 0,
+    "recurring_classes.csv": mapped.recurringClasses.length,
+    "recurring_class_attendance.csv": mapped.recurringClassAttendance.length,
     "classes.csv": 0,
     "class_attendance.csv": 0,
   };

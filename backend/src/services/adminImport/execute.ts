@@ -72,7 +72,8 @@ type RowByFile = {
     | "trial_fee"
     | "regular_fee"
     | "cancel_fee"
-    | "cancel_without_notice_fee",
+    | "cancel_without_notice_fee"
+    | "monthly_cancel_fee",
     string
   >;
   "instructor_schedules.csv": Record<
@@ -189,7 +190,6 @@ const IMPORT_RESET_TABLES = [
   "SystemStatus",
   "PasswordResetToken",
   "VerificationToken",
-  "Admin",
 ] as const;
 const IMPORT_RESET_TRUNCATE_SQL = `TRUNCATE TABLE ${IMPORT_RESET_TABLES.map((table) => `"${table}"`).join(", ")} RESTART IDENTITY CASCADE`;
 
@@ -934,6 +934,7 @@ export function validateNormalizedImportFiles(
       ["regular_fee", row.data.regular_fee],
       ["cancel_fee", row.data.cancel_fee],
       ["cancel_without_notice_fee", row.data.cancel_without_notice_fee],
+      ["monthly_cancel_fee", row.data.monthly_cancel_fee],
     ] as const) {
       if (value && !/^\d+$/.test(value)) {
         addIssue(
@@ -1690,8 +1691,6 @@ export function validateNormalizedImportFiles(
   };
 }
 
-const DEFAULT_SEED_ADMIN_EMAILS = ["admin@example.com", "admin2@example.com"];
-
 function parseOptionalDate(value: string): Date | null {
   if (!value) {
     return null;
@@ -1710,40 +1709,8 @@ function parseTimeAsDate(value: string): Date {
   return new Date(`1970-01-01T${value}:00.000Z`);
 }
 
-function parseSeedAdminEmails(): string[] {
-  const configured =
-    process.env.IMPORT_SEED_ADMIN_EMAILS ?? process.env.SEED_ADMIN_EMAILS;
-  const source = configured
-    ? configured
-        .split(",")
-        .map((email) => email.trim().toLowerCase())
-        .filter((email) => email.length > 0)
-    : DEFAULT_SEED_ADMIN_EMAILS;
-  return Array.from(new Set(source));
-}
-
 async function resetImportTargetData(tx: TxClient) {
-  const seedAdminEmails = parseSeedAdminEmails();
-  const seedAdmins = await tx.admin.findMany({
-    where: {
-      email: {
-        in: seedAdminEmails,
-      },
-    },
-    select: {
-      name: true,
-      email: true,
-      password: true,
-    },
-  });
-
   await tx.$executeRawUnsafe(IMPORT_RESET_TRUNCATE_SQL);
-
-  if (seedAdmins.length > 0) {
-    await tx.admin.createMany({
-      data: seedAdmins,
-    });
-  }
 }
 
 async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
@@ -1869,6 +1836,7 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
         regularFee: Number(row.data.regular_fee),
         cancelFee: Number(row.data.cancel_fee),
         cancelWithoutNoticeFee: Number(row.data.cancel_without_notice_fee),
+        monthlyCancelFee: Number(row.data.monthly_cancel_fee || "0"),
       })),
     });
   }

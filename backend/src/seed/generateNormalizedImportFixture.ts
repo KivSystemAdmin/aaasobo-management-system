@@ -100,6 +100,7 @@ type InstructorFeeDef = {
   regular_fee: string;
   cancel_fee: string;
   cancel_without_notice_fee: string;
+  monthly_cancel_fee: string;
 };
 
 type InstructorScheduleDef = {
@@ -484,6 +485,7 @@ function instructorFeeRows(from: string): InstructorFeeDef[] {
       regular_fee: "100",
       cancel_fee: "50",
       cancel_without_notice_fee: "100",
+      monthly_cancel_fee: "200",
     });
   }
   return rows;

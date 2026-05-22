@@ -55,22 +55,26 @@ const getDayNumber = (day: Day): number => {
   return days.indexOf(day);
 };
 
-// Calculate the first date of `day` and `time` after `from`.
-// e.g., from: "2024-08-01", day: "Mon", time: "09:00" => "2024-08-05T00:00:00Z"
+// Calculate the first JST date/time of `day` and `time` after `from`.
 export function calculateFirstDate(from: Date, day: Day, time: string): Date {
-  const date = new Date(from);
-
-  // The following calculation for setDate works only for after 09:00 in Japanese time.
-  // Japanese time is UTC+9. Thus, after 09:00, date.getUTCDay() returns the same day as in Japan.
-  date.setDate(
-    date.getDate() + ((getDayNumber(day) - date.getUTCDay() + 7) % 7),
+  const fromInJst = new Date(from.getTime() + JAPAN_TIME_DIFF * 60 * 60 * 1000);
+  const offsetDays = (getDayNumber(day) - fromInJst.getUTCDay() + 7) % 7;
+  const [hour, minute] = time.split(":").map(Number);
+  const candidate = new Date(
+    Date.UTC(
+      fromInJst.getUTCFullYear(),
+      fromInJst.getUTCMonth(),
+      fromInJst.getUTCDate() + offsetDays,
+      hour - JAPAN_TIME_DIFF,
+      minute,
+    ),
   );
 
-  const [hour, minute] = time.split(":");
-  // TODO: Consider the affected part.
-  date.setUTCHours(parseInt(hour));
-  date.setUTCMinutes(parseInt(minute));
-  return date;
+  if (candidate < from) {
+    candidate.setUTCDate(candidate.getUTCDate() + 7);
+  }
+
+  return candidate;
 }
 
 export const getMonthNumber = (month: Month): number => {

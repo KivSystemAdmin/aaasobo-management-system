@@ -1,7 +1,9 @@
 export {
   buildNormalizedPackageZip,
   normalizeRawScheduleCsvToPackage,
+  parseCsv,
 } from "./normalize";
+export type { NormalizedFileName } from "./normalize";
 
 export {
   executeNormalizedImportFiles,

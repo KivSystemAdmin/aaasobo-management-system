@@ -524,6 +524,53 @@ describe("POST /classes/create-classes", () => {
     expect(created.length).toBeGreaterThan(0);
   });
 
+  it("preserves JST weekday and time when generating classes for month", async () => {
+    const admin = await createAdmin();
+    const customer = await createCustomer();
+    const instructor = await createInstructor();
+    const child = await createChild(customer.id);
+    const plan = await createPlan();
+    const subscription = await createSubscription(plan.id, customer.id, {
+      startAt: new Date("2026-06-01T00:00:00.000Z"),
+      endAt: null,
+    });
+    const recurringClass = await prisma.recurringClass.create({
+      data: {
+        instructorId: instructor.id,
+        subscriptionId: subscription.id,
+        startAt: new Date("2026-06-05T07:00:00.000Z"),
+        recurringClassAttendance: {
+          create: {
+            childrenId: child.id,
+          },
+        },
+      },
+    });
+
+    await request(server)
+      .post("/classes/create-classes")
+      .set("Cookie", await generateAuthCookie(admin.id, "admin"))
+      .send({
+        year: 2026,
+        month: "June",
+      })
+      .expect(201);
+
+    const created = await prisma.class.findMany({
+      where: { recurringClassId: recurringClass.id },
+      orderBy: { dateTime: "asc" },
+    });
+
+    expect(
+      created.map((classItem) => classItem.dateTime?.toISOString()),
+    ).toEqual([
+      "2026-06-05T07:00:00.000Z",
+      "2026-06-12T07:00:00.000Z",
+      "2026-06-19T07:00:00.000Z",
+      "2026-06-26T07:00:00.000Z",
+    ]);
+  });
+
   it("uses no-class event names when generating classes for month", async () => {
     const admin = await createAdmin();
     const customer = await createCustomer();
