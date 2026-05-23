@@ -27,6 +27,10 @@ Date constraints:
 
 - `from <= completed-until <= to`
 
+## Optional CLI Parameters
+
+- `--instructors COUNT` defaults to `10`
+
 ## Fixed Global Rules
 
 - Timezone is fixed to `Asia/Tokyo` (not configurable).
@@ -34,19 +38,19 @@ Date constraints:
 - No dependency on current date/time.
 - Same inputs should produce stable outputs for the same faker/package version.
 
-## Dataset Size (Fixed)
+## Dataset Size
 
-- instructors: `10`
-- customers: `100`
+- instructors: configured by `--instructors`
+- customers: `instructors * 10`
 - child distribution:
-  - 90 customers with 1 child
-  - 10 customers with 2 children
+  - `instructors * 9` customers with 1 child
+  - `instructors` customers with 2 children
 
 Derived totals:
 
-- children: `110`
-- subscriptions: `100`
-- recurring classes: `110` (see plan mapping below)
+- children: `instructors * 11`
+- subscriptions: `instructors * 10`
+- recurring classes: `instructors * 11` (see plan mapping below)
 
 ## Plan Mapping
 
@@ -120,7 +124,7 @@ Rule:
 
 - Let `R = total recurring classes`.
 - Let `I = total instructors`.
-- Assign exactly `R / I` recurring classes per instructor (this spec currently yields `110 / 10 = 11`).
+- Assign exactly `R / I` recurring classes per instructor (this spec currently yields `11` per instructor).
 - Use deterministic ordering:
   - recurring class candidates sorted by `subscription_ref`, then class sequence index
   - instructors sorted by `instructor_ref`

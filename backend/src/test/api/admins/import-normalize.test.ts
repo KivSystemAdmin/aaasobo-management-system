@@ -604,6 +604,28 @@ describe("POST /admins/import/execute", () => {
     expect(classAttendance).toBe(generated.rows["class_attendance.csv"].length);
   }, 120_000);
 
+  it("scales the deterministic fixture from the instructor count option", async () => {
+    const generated = await generateNormalizedImportFixture({
+      from: "2026-01-01",
+      completedUntil: "2026-01-03",
+      to: "2026-01-07",
+      instructorCount: 5,
+    });
+
+    const validation = validateNormalizedImportFiles(generated.files);
+    expect(validation.issues).toEqual([]);
+    expect(validation.isValid).toBe(true);
+    expect(generated.rows["instructors.csv"]).toHaveLength(5);
+    expect(generated.rows["customers.csv"]).toHaveLength(50);
+    expect(generated.rows["children.csv"]).toHaveLength(55);
+    expect(generated.rows["subscriptions.csv"]).toHaveLength(50);
+    expect(generated.rows["recurring_classes.csv"]).toHaveLength(55);
+    expect(generated.rows["recurring_class_attendance.csv"]).toHaveLength(65);
+    expect(generated.rows["classes.csv"]).toHaveLength(55);
+    expect(generated.rows["class_attendance.csv"]).toHaveLength(65);
+    expect(generated.rows["instructor_schedules.csv"]).toHaveLength(77);
+  });
+
   it("accepts multiple slot rows that share the same instructor schedule key", async () => {
     const admin = await createAdmin();
     const authCookie = await generateAuthCookie(admin.id, "admin");

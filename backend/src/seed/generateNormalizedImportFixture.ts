@@ -11,11 +11,8 @@ const TIMEZONE = "Asia/Tokyo";
 const TZ_OFFSET = "+09:00";
 const FAKER_SEED = 20250301;
 
-const INSTRUCTOR_COUNT = 10;
-const CUSTOMER_COUNT = 100;
-const DOUBLE_CHILD_CUSTOMER_COUNT = 10;
-const SINGLE_CHILD_CUSTOMER_COUNT =
-  CUSTOMER_COUNT - DOUBLE_CHILD_CUSTOMER_COUNT;
+const DEFAULT_INSTRUCTOR_COUNT = 10;
+const CUSTOMERS_PER_INSTRUCTOR = 10;
 
 const PATTERN_A_SLOTS: SlotDef[] = buildPatternSlots(
   [1, 2, 3],
@@ -199,6 +196,7 @@ type Args = {
   from: string;
   completedUntil: string;
   to: string;
+  instructorCount: number;
   outDir: string;
 };
 
@@ -206,6 +204,7 @@ export type GenerateNormalizedImportFixtureOptions = {
   from: string;
   completedUntil: string;
   to: string;
+  instructorCount?: number;
 };
 
 export type GeneratedNormalizedImportFixture = {
@@ -219,7 +218,7 @@ function usageAndExit(message?: string): never {
     console.error(`Error: ${message}`);
   }
   console.error(
-    "Usage: ts-node ./src/seed/generateNormalizedImportFixture.ts --from YYYY-MM-DD --completed-until YYYY-MM-DD --to YYYY-MM-DD [--out-dir PATH]",
+    "Usage: ts-node ./src/seed/generateNormalizedImportFixture.ts --from YYYY-MM-DD --completed-until YYYY-MM-DD --to YYYY-MM-DD [--instructors COUNT] [--out-dir PATH]",
   );
   process.exit(1);
 }
@@ -244,6 +243,7 @@ function parseArgs(argv: string[]): Args {
   const from = map.get("from");
   const completedUntil = map.get("completed-until");
   const to = map.get("to");
+  const instructorCount = parseInstructorCount(map.get("instructors"));
   const outDir =
     map.get("out-dir") ??
     path.resolve(process.cwd(), "../docs/testing/data-import/generated");
@@ -272,7 +272,21 @@ function parseArgs(argv: string[]): Args {
     usageAndExit("--completed-until must be <= --to");
   }
 
-  return { from, completedUntil, to, outDir };
+  return { from, completedUntil, to, instructorCount, outDir };
+}
+
+function parseInstructorCount(value: string | undefined): number {
+  if (value === undefined) {
+    return DEFAULT_INSTRUCTOR_COUNT;
+  }
+  if (!/^\d+$/.test(value)) {
+    usageAndExit(`Invalid --instructors: ${value}`);
+  }
+  const count = Number(value);
+  if (!Number.isSafeInteger(count) || count < 1) {
+    usageAndExit("--instructors must be a positive integer");
+  }
+  return count;
 }
 
 function isValidDateOnly(value: string): boolean {
@@ -433,10 +447,13 @@ function scheduleRows(from: string, to: string): ScheduleDef[] {
   ];
 }
 
-function instructorRows(fakerEn: FakerLike): InstructorDef[] {
+function instructorRows(
+  fakerEn: FakerLike,
+  instructorCount: number,
+): InstructorDef[] {
   const rows: InstructorDef[] = [];
   const nicknameCounts = new Map<string, number>();
-  for (let i = 1; i <= INSTRUCTOR_COUNT; i += 1) {
+  for (let i = 1; i <= instructorCount; i += 1) {
     const instructorRef = ref("IN", i);
     const lowerRef = instructorRef.toLowerCase();
     const first = sanitizeEnglishNamePart(fakerEn.person.firstName(), "Alex");
@@ -473,9 +490,12 @@ function slotsForInstructor(instructorIndexOneBased: number): SlotDef[] {
   return instructorIndexOneBased % 2 === 1 ? PATTERN_A_SLOTS : PATTERN_B_SLOTS;
 }
 
-function instructorFeeRows(from: string): InstructorFeeDef[] {
+function instructorFeeRows(
+  from: string,
+  instructorCount: number,
+): InstructorFeeDef[] {
   const rows: InstructorFeeDef[] = [];
-  for (let i = 1; i <= INSTRUCTOR_COUNT; i += 1) {
+  for (let i = 1; i <= instructorCount; i += 1) {
     rows.push({
       instructor_ref: ref("IN", i),
       currency: "PHP",
@@ -491,9 +511,12 @@ function instructorFeeRows(from: string): InstructorFeeDef[] {
   return rows;
 }
 
-function instructorScheduleRows(from: string): InstructorScheduleDef[] {
+function instructorScheduleRows(
+  from: string,
+  instructorCount: number,
+): InstructorScheduleDef[] {
   const rows: InstructorScheduleDef[] = [];
-  for (let i = 1; i <= INSTRUCTOR_COUNT; i += 1) {
+  for (let i = 1; i <= instructorCount; i += 1) {
     const instructorRef = ref("IN", i);
     const slots = slotsForInstructor(i);
     for (const slot of slots) {
@@ -510,9 +533,12 @@ function instructorScheduleRows(from: string): InstructorScheduleDef[] {
   return rows;
 }
 
-function customerRows(fakerJa: FakerLike): CustomerDef[] {
+function customerRows(
+  fakerJa: FakerLike,
+  customerCount: number,
+): CustomerDef[] {
   const rows: CustomerDef[] = [];
-  for (let i = 1; i <= CUSTOMER_COUNT; i += 1) {
+  for (let i = 1; i <= customerCount; i += 1) {
     const customerRef = ref("CU", i);
     const lowerRef = customerRef.toLowerCase();
     const family = fakerJa.person.lastName();
@@ -530,16 +556,20 @@ function customerRows(fakerJa: FakerLike): CustomerDef[] {
   return rows;
 }
 
-function childRows(fakerEn: FakerLike): ChildDef[] {
+function childRows(
+  fakerEn: FakerLike,
+  customerCount: number,
+  singleChildCustomerCount: number,
+): ChildDef[] {
   const rows: ChildDef[] = [];
   let childSeq = 1;
   for (
     let customerIndex = 1;
-    customerIndex <= CUSTOMER_COUNT;
+    customerIndex <= customerCount;
     customerIndex += 1
   ) {
     const customerRef = ref("CU", customerIndex);
-    const childCount = customerIndex <= SINGLE_CHILD_CUSTOMER_COUNT ? 1 : 2;
+    const childCount = customerIndex <= singleChildCustomerCount ? 1 : 2;
     for (let j = 1; j <= childCount; j += 1) {
       rows.push({
         child_ref: ref("CH", childSeq),
@@ -555,11 +585,15 @@ function childRows(fakerEn: FakerLike): ChildDef[] {
   return rows;
 }
 
-function subscriptionRows(from: string): SubscriptionDef[] {
+function subscriptionRows(
+  from: string,
+  customerCount: number,
+  singleChildCustomerCount: number,
+): SubscriptionDef[] {
   const rows: SubscriptionDef[] = [];
-  for (let i = 1; i <= CUSTOMER_COUNT; i += 1) {
+  for (let i = 1; i <= customerCount; i += 1) {
     const customerRef = ref("CU", i);
-    const hasTwoChildren = i > SINGLE_CHILD_CUSTOMER_COUNT;
+    const hasTwoChildren = i > singleChildCustomerCount;
     rows.push({
       subscription_ref: ref("SU", i),
       customer_ref: customerRef,
@@ -612,14 +646,15 @@ function recurringCandidates(
 function assignRecurringClasses(
   candidates: RecurringCandidate[],
   from: string,
+  instructorCount: number,
 ): RecurringAssignment[] {
-  if (candidates.length % INSTRUCTOR_COUNT !== 0) {
+  if (candidates.length % instructorCount !== 0) {
     throw new Error(
-      `Recurring classes (${candidates.length}) must be divisible by instructor count (${INSTRUCTOR_COUNT})`,
+      `Recurring classes (${candidates.length}) must be divisible by instructor count (${instructorCount})`,
     );
   }
 
-  const perInstructor = candidates.length / INSTRUCTOR_COUNT;
+  const perInstructor = candidates.length / instructorCount;
   const assignmentCountByInstructor = new Map<string, number>();
   const rows: RecurringAssignment[] = [];
 
@@ -649,7 +684,7 @@ function assignRecurringClasses(
     assignmentCountByInstructor.set(instructorRef, assignedCount + 1);
   }
 
-  for (let i = 1; i <= INSTRUCTOR_COUNT; i += 1) {
+  for (let i = 1; i <= instructorCount; i += 1) {
     const instructorRef = ref("IN", i);
     const count = assignmentCountByInstructor.get(instructorRef) ?? 0;
     if (count !== perInstructor) {
@@ -779,6 +814,13 @@ async function writeDeterministicZip(
 export async function generateNormalizedImportFixture(
   options: GenerateNormalizedImportFixtureOptions,
 ): Promise<GeneratedNormalizedImportFixture> {
+  const instructorCount = options.instructorCount ?? DEFAULT_INSTRUCTOR_COUNT;
+  if (!Number.isSafeInteger(instructorCount) || instructorCount < 1) {
+    throw new Error("instructorCount must be a positive integer");
+  }
+  const customerCount = instructorCount * CUSTOMERS_PER_INSTRUCTOR;
+  const singleChildCustomerCount = customerCount - instructorCount;
+
   const { fakerEN_US, fakerJA } = (await import("@faker-js/faker")) as {
     fakerEN_US: FakerLike;
     fakerJA: FakerLike;
@@ -787,14 +829,23 @@ export async function generateNormalizedImportFixture(
   fakerJA.seed(FAKER_SEED);
 
   const plans = planRows();
-  const instructors = instructorRows(fakerEN_US);
-  const customers = customerRows(fakerJA);
-  const children = childRows(fakerEN_US);
-  const subscriptions = subscriptionRows(options.from);
+  const instructors = instructorRows(fakerEN_US, instructorCount);
+  const customers = customerRows(fakerJA, customerCount);
+  const children = childRows(
+    fakerEN_US,
+    customerCount,
+    singleChildCustomerCount,
+  );
+  const subscriptions = subscriptionRows(
+    options.from,
+    customerCount,
+    singleChildCustomerCount,
+  );
   const childRefsByCustomer = buildCustomerChildMap(children);
   const recurring = assignRecurringClasses(
     recurringCandidates(subscriptions, childRefsByCustomer),
     options.from,
+    instructorCount,
   );
   const { classes, classAttendance } = classRowsAndAttendance(
     recurring,
@@ -808,8 +859,11 @@ export async function generateNormalizedImportFixture(
     "children.csv": children,
     "subscriptions.csv": subscriptions,
     "instructors.csv": instructors,
-    "instructor_fees.csv": instructorFeeRows(options.from),
-    "instructor_schedules.csv": instructorScheduleRows(options.from),
+    "instructor_fees.csv": instructorFeeRows(options.from, instructorCount),
+    "instructor_schedules.csv": instructorScheduleRows(
+      options.from,
+      instructorCount,
+    ),
     "instructor_absences.csv": [],
     "events.csv": eventRows(),
     "schedules.csv": scheduleRows(options.from, options.to),
@@ -828,7 +882,12 @@ export async function generateNormalizedImportFixture(
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
-  const generated = await generateNormalizedImportFixture(args);
+  const generated = await generateNormalizedImportFixture({
+    from: args.from,
+    completedUntil: args.completedUntil,
+    to: args.to,
+    instructorCount: args.instructorCount,
+  });
   const { files, rows, zipFileName } = generated;
 
   await writeCsvFiles(args.outDir, files);
