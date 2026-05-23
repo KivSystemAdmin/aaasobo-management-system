@@ -3,7 +3,7 @@ import type {
   InstructorPayrollPeriod,
   InstructorPayrollResponse,
 } from "../../../shared/schemas/admins";
-import type { Status } from "../../generated/prisma";
+import type { Status } from "@prisma/client";
 
 const PAYROLL_TIMEZONE = "Asia/Tokyo";
 const MONTH_FORMATTER = new Intl.DateTimeFormat("en-CA", {

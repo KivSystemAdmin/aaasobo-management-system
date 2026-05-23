@@ -1,4 +1,4 @@
-import { Customer, Prisma } from "../../generated/prisma";
+import { Customer, Prisma } from "@prisma/client";
 import { prisma } from "../../prisma/prismaClient";
 import {
   hashPassword,

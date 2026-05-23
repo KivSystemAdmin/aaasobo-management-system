@@ -1,5 +1,5 @@
 import { prisma } from "../../prisma/prismaClient";
-import { Admin } from "../../generated/prisma";
+import { Admin } from "@prisma/client";
 import {
   hashPassword,
   maskedHeadLetters,

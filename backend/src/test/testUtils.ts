@@ -1,7 +1,7 @@
 const { faker } = require("@faker-js/faker");
 import { hashPasswordSync } from "../utils/commonUtils";
 import { prisma } from "./setup";
-import { Prisma, Status } from "../../generated/prisma";
+import { Prisma, Status } from "@prisma/client";
 
 export function setTestDataSeed(seed: number) {
   faker.seed(seed);

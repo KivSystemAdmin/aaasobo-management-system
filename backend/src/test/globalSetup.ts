@@ -3,7 +3,7 @@ import {
   type StartedPostgreSqlContainer,
 } from "@testcontainers/postgresql";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../../generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import { mkdir, rm, writeFile } from "fs/promises";
 import path from "path";

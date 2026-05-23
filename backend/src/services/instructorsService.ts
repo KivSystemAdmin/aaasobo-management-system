@@ -1,5 +1,5 @@
 import { prisma } from "../../prisma/prismaClient";
-import { Instructor } from "../../generated/prisma";
+import { Instructor } from "@prisma/client";
 import {
   hashPassword,
   defaultUserImageUrl,

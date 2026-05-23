@@ -1,4 +1,4 @@
-import { Prisma, Status } from "../../generated/prisma";
+import { Prisma, Status } from "@prisma/client";
 import { Request, Response } from "express";
 import {
   cancelClassById,

@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { Prisma, Status } from "../../../generated/prisma";
+import { Prisma, Status } from "@prisma/client";
 import { prisma } from "../../../prisma/prismaClient";
 import { hashPassword } from "../../utils/commonUtils";
 import {

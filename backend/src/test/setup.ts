@@ -1,6 +1,6 @@
 import { afterAll, beforeEach } from "vitest";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../../generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { execSync } from "child_process";
 import { readFile } from "fs/promises";
 import path from "path";
