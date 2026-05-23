@@ -155,7 +155,7 @@ interface ImportValidationResult {
   report: ImportValidationReport;
 }
 
-const REF_PATTERN = /^[A-Z]{2}[0-9]{4}$/;
+const REF_PATTERN = /^[A-Z]{2}[0-9]{4,}$/;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const DATETIME_PATTERN =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
@@ -1741,6 +1741,7 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       email: row.data.email,
       password: customerPasswords[index],
       prefecture: row.data.prefecture,
+      emailVerified: new Date(),
       hasSeenWelcome: row.data.has_seen_welcome === "true",
       terminationAt: parseOptionalDateTime(row.data.termination_at),
     })),
