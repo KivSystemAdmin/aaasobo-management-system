@@ -626,6 +626,44 @@ describe("POST /admins/import/execute", () => {
     expect(generated.rows["instructor_schedules.csv"]).toHaveLength(77);
   });
 
+  it("imports the deterministic fixture with more than 9999 classes", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+    const generated = await generateNormalizedImportFixture({
+      from: "2026-01-01",
+      completedUntil: "2026-05-22",
+      to: "2026-05-31",
+      instructorCount: 50,
+    });
+
+    const validation = validateNormalizedImportFiles(generated.files);
+    expect(validation.issues).toEqual([]);
+    expect(validation.isValid).toBe(true);
+
+    const zipBuffer = await buildZipBuffer(generated.files);
+    const response = await request(server)
+      .post("/admins/import/execute")
+      .set("Cookie", authCookie)
+      .attach("file", zipBuffer, {
+        filename: generated.zipFileName,
+        contentType: "application/zip",
+      })
+      .expect(200);
+
+    expect(response.body.imported).toBe(true);
+
+    const customerLoginResponse = await request(server)
+      .post("/users/authenticate")
+      .send({
+        email: generated.rows["customers.csv"][0].email,
+        password: generated.rows["customers.csv"][0].temp_password,
+        userType: "customer",
+      })
+      .expect(200);
+
+    expect(customerLoginResponse.body).toEqual({ id: expect.any(Number) });
+  }, 120_000);
+
   it("accepts multiple slot rows that share the same instructor schedule key", async () => {
     const admin = await createAdmin();
     const authCookie = await generateAuthCookie(admin.id, "admin");
