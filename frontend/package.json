@@ -8,6 +8,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "playwright test",
     "lint": "eslint .",
     "lint:unused": "knip"
   },

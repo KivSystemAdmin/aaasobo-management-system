@@ -8,12 +8,14 @@ import {
   FREE_TRIAL_BOOKING_INSTRUCTION_MESSAGE,
   MEMBERSHIP_INSTRUCTION_MESSAGE,
   LOGIN_REQUIRED_MESSAGE,
+  WELCOME_SEEN_UPDATE_ERROR_MESSAGE,
   WELCOME_MODAL_TITLE1,
 } from "@/lib/messages/customerDashboard";
 import { validateSession } from "@/app/actions/validateSession";
 import { confirmAndDeclineFreeTrialClass } from "@/lib/utils/confirmAndDeclineFreeTrialClass";
 import { errorAlert } from "@/lib/utils/alertUtils";
 import { CONTACT_EMAIL, LINE_QR_CODE_URL } from "@/lib/data/contacts";
+import { useRouter } from "next/navigation";
 
 export default function WelcomeModal({
   customerId,
@@ -21,6 +23,8 @@ export default function WelcomeModal({
   setIsWelcomeModalOpen,
   userSessionType,
 }: WelcomeModalProps) {
+  const router = useRouter();
+
   const handleClick = async () => {
     const { isValid, error } = await validateSession(customerId);
 
@@ -32,9 +36,13 @@ export default function WelcomeModal({
       );
     }
 
-    await markWelcomeSeen(customerId);
+    const isMarkedAsSeen = await markWelcomeSeen(customerId);
+    if (!isMarkedAsSeen) {
+      return errorAlert(WELCOME_SEEN_UPDATE_ERROR_MESSAGE[language]);
+    }
 
     setIsWelcomeModalOpen(false);
+    router.refresh();
   };
 
   return (

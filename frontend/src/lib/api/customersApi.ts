@@ -496,7 +496,7 @@ export const getChildProfiles = async (
 export const markWelcomeSeen = async (
   customerId: number,
   cookie?: string,
-): Promise<void> => {
+): Promise<boolean> => {
   try {
     let apiURL;
     let headers;
@@ -529,9 +529,13 @@ export const markWelcomeSeen = async (
       console.error(
         `Failed to update welcome status: ${response.status} ${response.statusText}`,
       );
+      return false;
     }
+
+    return true;
   } catch (error) {
     console.error("API error while marking welcome message as seen:", error);
+    return false;
   }
 };
 
