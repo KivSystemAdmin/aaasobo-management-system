@@ -9,6 +9,7 @@ import {
 } from "../../testUtils";
 import { prisma } from "../../setup";
 import { EnglishBackground } from "../../../types";
+import { ENGLISH_BACKGROUND_LABELS } from "../../../constants/englishBackground";
 
 describe("GET /admins/instructor-list", () => {
   it("succeed with multiple instructors", async () => {
@@ -28,11 +29,9 @@ describe("GET /admins/instructor-list", () => {
         ID: instructor1.id,
         Instructor: instructor1.nickname,
         English:
-          instructor1.englishBackground === EnglishBackground.NonNative
-            ? "Program Original"
-            : instructor1.englishBackground === EnglishBackground.NativeA
-              ? "Native A"
-              : "Native B",
+          ENGLISH_BACKGROUND_LABELS[
+            instructor1.englishBackground as EnglishBackground
+          ],
         "Full Name": instructor1.name,
         Email: instructor1.email,
       },
@@ -41,11 +40,9 @@ describe("GET /admins/instructor-list", () => {
         ID: instructor2.id,
         Instructor: instructor2.nickname,
         English:
-          instructor2.englishBackground === EnglishBackground.NonNative
-            ? "Program Original"
-            : instructor2.englishBackground === EnglishBackground.NativeA
-              ? "Native A"
-              : "Native B",
+          ENGLISH_BACKGROUND_LABELS[
+            instructor2.englishBackground as EnglishBackground
+          ],
         "Full Name": instructor2.name,
         Email: instructor2.email,
       },

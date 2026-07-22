@@ -23,6 +23,7 @@ import {
 import { confirmAlert } from "@/lib/utils/alertUtils";
 import { getLocalizedText } from "@/lib/utils/stringUtils";
 import { EnglishBackground } from "@/types";
+import { ENGLISH_BACKGROUND_LABELS } from "@/lib/data/englishBackground";
 
 function PlanProfile({
   plan,
@@ -62,12 +63,6 @@ function PlanProfile({
   const [localMessages, setLocalMessages] = useState<Record<string, string>>(
     {},
   );
-
-  const englishBackgroundLabels = [
-    "Program Original",
-    "Native A",
-    "Native B",
-  ] as const;
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -285,7 +280,7 @@ function PlanProfile({
                         }
                         onChange={handleRadioChange}
                         label={
-                          englishBackgroundLabels[EnglishBackground.NonNative]
+                          ENGLISH_BACKGROUND_LABELS[EnglishBackground.NonNative]
                         }
                         className={styles.planTypeRadio}
                       />
@@ -298,7 +293,7 @@ function PlanProfile({
                         }
                         onChange={handleRadioChange}
                         label={
-                          englishBackgroundLabels[EnglishBackground.NativeA]
+                          ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeA]
                         }
                         className={styles.planTypeRadio}
                       />
@@ -311,14 +306,18 @@ function PlanProfile({
                         }
                         onChange={handleRadioChange}
                         label={
-                          englishBackgroundLabels[EnglishBackground.NativeB]
+                          ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeB]
                         }
                         className={styles.planTypeRadio}
                       />
                     </>
                   ) : (
                     <h4 className={styles.planDescription__text}>
-                      {englishBackgroundLabels[latestPlan.englishBackground]}
+                      {
+                        ENGLISH_BACKGROUND_LABELS[
+                          latestPlan.englishBackground as EnglishBackground
+                        ]
+                      }
                     </h4>
                   )}
                 </div>
