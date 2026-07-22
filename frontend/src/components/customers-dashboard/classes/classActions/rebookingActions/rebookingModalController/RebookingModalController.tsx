@@ -18,10 +18,6 @@ export default function RebookingModalController({
   const [isRebookingModalOpen, setIsRebookingModalOpen] = useState(false);
   const rebookableClassesNumber = rebookableClasses.length;
 
-  const hasFreeTrial =
-    rebookableClassesNumber > 0 &&
-    rebookableClasses.some((classItem) => classItem.isFreeTrial === true);
-
   const handleRebookingClick = () => {
     if (!hasChildProfile)
       return errorAlert(CHILD_PROFILE_REQUIRED_MESSAGE[language]);
@@ -30,12 +26,8 @@ export default function RebookingModalController({
 
   const buttonText =
     language === "ja"
-      ? hasFreeTrial
-        ? `クラスを予約${rebookableClassesNumber > 0 ? ` (${rebookableClassesNumber})` : ""}`
-        : `振替予約${rebookableClassesNumber > 0 ? ` (${rebookableClassesNumber})` : ""}`
-      : hasFreeTrial
-        ? `Book Class${rebookableClassesNumber > 0 ? ` (${rebookableClassesNumber})` : ""}`
-        : `Rebook Class${rebookableClassesNumber > 0 ? ` (${rebookableClassesNumber})` : ""}`;
+      ? `クラスを予約 (${rebookableClassesNumber})`
+      : `Book Class (${rebookableClassesNumber})`;
 
   return (
     <>
