@@ -681,13 +681,14 @@ export const getInstructorPayroll = async (
   instructorId: number,
   month: string,
   cookie?: string,
+  audience: "admin" | "instructor" = "admin",
 ): Promise<InstructorPayrollResponse | InstructorPayrollApiError> => {
   try {
     let apiURL;
     let headers;
     let response;
     const method = "GET";
-    const backendEndpoint = `/admins/instructors/${instructorId}/payroll?month=${month}`;
+    const backendEndpoint = `/${audience === "admin" ? "admins/instructors" : "instructors"}/${instructorId}/payroll?month=${month}`;
 
     if (cookie) {
       apiURL = `${BACKEND_ORIGIN}${backendEndpoint}`;

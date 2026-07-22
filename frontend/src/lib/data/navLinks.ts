@@ -11,6 +11,7 @@ import {
   BellIcon,
   ArrowUpOnSquareIcon,
   ClipboardDocumentCheckIcon,
+  BanknotesIcon,
 } from "@heroicons/react/24/outline";
 
 export function getLinks(
@@ -138,6 +139,11 @@ export function getLinks(
       name: "Schedule",
       href: "/instructors/availability",
       icon: ClockIcon,
+    },
+    {
+      name: "Payroll",
+      href: "/instructors/payroll",
+      icon: BanknotesIcon,
     },
     {
       name: "AaasoBo! Calendar",
