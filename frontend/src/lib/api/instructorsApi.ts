@@ -1183,7 +1183,7 @@ export const getActiveInstructorSchedule = async (
   instructorId: number,
   effectiveDate: string,
   cookie?: string,
-) => {
+): Promise<{ schedule: InstructorScheduleWithSlots | null }> => {
   try {
     let apiURL;
     let headers;
@@ -1215,6 +1215,10 @@ export const getActiveInstructorSchedule = async (
         method,
         headers,
       });
+    }
+
+    if (response.status === 404) {
+      return { schedule: null };
     }
 
     if (response.status !== 200) {

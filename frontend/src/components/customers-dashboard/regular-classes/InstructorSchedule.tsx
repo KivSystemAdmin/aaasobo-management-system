@@ -5,6 +5,7 @@ import {
   getActiveInstructorSchedule,
   InstructorSlot,
 } from "@/lib/api/instructorsApi";
+import { getTodayInJapanISODate } from "@/lib/utils/dateUtils";
 import { WEEKDAYS } from "@/lib/utils/scheduleUtils";
 import styles from "./InstructorSchedule.module.scss";
 
@@ -34,9 +35,10 @@ export default function InstructorSchedule({
 
       try {
         // Get instructor's active schedule directly
+        const today = getTodayInJapanISODate();
         const response = await getActiveInstructorSchedule(
           instructorId,
-          effectiveDate,
+          effectiveDate || today,
         );
         // Set the slots from the active schedule
         setSlots(response.schedule?.slots || []);
