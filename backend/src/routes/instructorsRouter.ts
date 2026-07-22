@@ -223,15 +223,15 @@ const instructorPayrollConfig = {
   paramsSchema: InstructorIdParams,
   querySchema: InstructorPayrollQuery,
   middleware: [
-    verifyAuthentication(AUTH_ROLES.I, {
+    verifyAuthentication(AUTH_ROLES.AI, {
       requireIdCheck: AUTH_ROLES.I,
     }),
   ] as RequestHandler[],
   handler: getInstructorPayrollController,
   openapi: {
-    summary: "Get own instructor payroll",
+    summary: "Get instructor payroll",
     description:
-      "Get the authenticated instructor's payroll summary for one month",
+      "Get an instructor's payroll summary for one month; instructors may only access their own payroll",
     responses: {
       200: {
         description: "Instructor payroll retrieved successfully",

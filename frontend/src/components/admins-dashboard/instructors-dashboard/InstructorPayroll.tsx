@@ -308,10 +308,8 @@ function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
 
 export default function InstructorPayroll({
   instructorId,
-  audience = "admin",
 }: {
   instructorId: number;
-  audience?: "admin" | "instructor";
 }) {
   const [selectedMonth, setSelectedMonth] = useState(() =>
     getCurrentJstMonth(),
@@ -331,12 +329,7 @@ export default function InstructorPayroll({
 
     const loadPayroll = async () => {
       setIsLoading(true);
-      const response = await getInstructorPayroll(
-        instructorId,
-        requestedMonth,
-        undefined,
-        audience,
-      );
+      const response = await getInstructorPayroll(instructorId, requestedMonth);
 
       if (!isMounted) {
         return;
@@ -358,7 +351,7 @@ export default function InstructorPayroll({
     return () => {
       isMounted = false;
     };
-  }, [audience, instructorId, requestedMonth]);
+  }, [instructorId, requestedMonth]);
 
   const handleMonthChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedMonth(event.target.value);
