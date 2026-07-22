@@ -81,16 +81,6 @@ export function getLinks(
       icon: UsersIcon,
     },
     {
-      name: "Plan List",
-      href: "/admins/plan-list",
-      icon: AcademicCapIcon,
-    },
-    {
-      name: "Event List",
-      href: "/admins/event-list",
-      icon: BellIcon,
-    },
-    {
       name: "Admin List",
       href: "/admins/admin-list",
       icon: UserIcon,
@@ -104,6 +94,16 @@ export function getLinks(
       name: "AaasoBo! Calendar",
       href: "/admins/business-calendar",
       icon: CalendarDaysIcon,
+    },
+    {
+      name: "Plan List",
+      href: "/admins/plan-list",
+      icon: AcademicCapIcon,
+    },
+    {
+      name: "Event List",
+      href: "/admins/event-list",
+      icon: BellIcon,
     },
     {
       name: "Data Import",
