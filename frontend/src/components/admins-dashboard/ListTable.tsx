@@ -240,6 +240,23 @@ function ListTable({
     [currentData, omitItems, linkItems, linkUrls, replaceItems, linkTarget],
   );
 
+  const filterColumns = useMemo(() => {
+    if (currentData.length === 0) return [];
+
+    const availableColumns = Object.keys(currentData[0]).filter(
+      (key) => !omitItems.includes(key),
+    );
+
+    if (listType !== "Customer List") return availableColumns;
+
+    const prioritizedColumns = ["Children", "Customer"];
+
+    return [
+      ...prioritizedColumns.filter((key) => availableColumns.includes(key)),
+      ...availableColumns.filter((key) => !prioritizedColumns.includes(key)),
+    ];
+  }, [currentData, omitItems, listType]);
+
   // Configure the filter
   const filteredData = useMemo(
     () =>
@@ -316,14 +333,11 @@ function ListTable({
               <option disabled value="0">
                 Select a column
               </option>
-              {currentData.length > 0 &&
-                Object.keys(currentData[0])
-                  .filter((key) => !omitItems.includes(key))
-                  .map((key) => (
-                    <option key={key} value={key}>
-                      {key}
-                    </option>
-                  ))}
+              {filterColumns.map((key) => (
+                <option key={key} value={key}>
+                  {key}
+                </option>
+              ))}
             </select>
             <input
               type="text"
