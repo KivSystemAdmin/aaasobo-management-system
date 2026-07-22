@@ -77,7 +77,7 @@ function calcInstructorEnglishBackgroundCounts(
     (counts, instructor) => {
       const normalized = instructor.English.trim().toLowerCase();
 
-      if (normalized === "non native") {
+      if (normalized === "program original") {
         counts.nonNative += 1;
       } else if (normalized === "native a") {
         counts.nativeA += 1;

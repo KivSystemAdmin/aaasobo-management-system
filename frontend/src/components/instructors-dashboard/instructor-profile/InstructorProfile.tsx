@@ -115,7 +115,7 @@ function InstructorProfile({
   const { language } = useLanguage();
   const formRef = useRef<HTMLFormElement>(null);
   const englishBackgroundLabels = [
-    "Non Native",
+    "Program Original",
     "Native A",
     "Native B",
   ] as const;

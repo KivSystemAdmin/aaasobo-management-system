@@ -361,7 +361,7 @@ export const getAllInstructorsController = async (
     const data = instructors.map((instructor, number) => {
       const { id, name, nickname, email } = instructor;
       const englishBackgroundLabel: Record<EnglishBackground, string> = {
-        [EnglishBackground.NonNative]: "Non Native",
+        [EnglishBackground.NonNative]: "Program Original",
         [EnglishBackground.NativeA]: "Native A",
         [EnglishBackground.NativeB]: "Native B",
       };
@@ -839,7 +839,7 @@ export const getAllPlansController = async (_: Request, res: Response) => {
         plan;
       const [planNameJpn, planNameEng] = name.split(" / ");
       const englishBackgroundLabel: Record<EnglishBackground, string> = {
-        [EnglishBackground.NonNative]: "Non Native",
+        [EnglishBackground.NonNative]: "Program Original",
         [EnglishBackground.NativeA]: "Native A",
         [EnglishBackground.NativeB]: "Native B",
       };

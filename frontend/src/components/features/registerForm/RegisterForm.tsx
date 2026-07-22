@@ -65,7 +65,7 @@ const RegisterForm = ({
     EnglishBackground.NonNative,
   );
   const englishBackgroundLabels = [
-    "Non Native",
+    "Program Original",
     "Native A",
     "Native B",
   ] as const;

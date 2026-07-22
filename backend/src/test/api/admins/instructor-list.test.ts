@@ -29,7 +29,7 @@ describe("GET /admins/instructor-list", () => {
         Instructor: instructor1.nickname,
         English:
           instructor1.englishBackground === EnglishBackground.NonNative
-            ? "Non Native"
+            ? "Program Original"
             : instructor1.englishBackground === EnglishBackground.NativeA
               ? "Native A"
               : "Native B",
@@ -42,7 +42,7 @@ describe("GET /admins/instructor-list", () => {
         Instructor: instructor2.nickname,
         English:
           instructor2.englishBackground === EnglishBackground.NonNative
-            ? "Non Native"
+            ? "Program Original"
             : instructor2.englishBackground === EnglishBackground.NativeA
               ? "Native A"
               : "Native B",

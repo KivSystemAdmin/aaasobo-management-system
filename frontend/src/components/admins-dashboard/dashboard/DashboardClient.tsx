@@ -350,7 +350,7 @@ export default function DashboardClient({
         <article className={styles.kpiCard}>
           <UserIcon className={styles.kpiIcon} />
           <div>
-            <p>Non Native</p>
+            <p>Program Original</p>
             <strong>{metrics.instructorsByEnglishBackground.nonNative}</strong>
           </div>
         </article>
@@ -399,7 +399,7 @@ export default function DashboardClient({
           <div className={styles.englishBackgroundFilterGroup}>
             {[
               { value: "all", label: "All" },
-              { value: "non-native", label: "Non Native" },
+              { value: "non-native", label: "Program Original" },
               { value: "native-a", label: "Native A" },
               { value: "native-b", label: "Native B" },
             ].map((option) => (
