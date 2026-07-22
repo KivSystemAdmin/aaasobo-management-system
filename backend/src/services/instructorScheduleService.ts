@@ -94,15 +94,17 @@ export const getActiveInstructorSchedule = async (
   effectiveDate: string,
 ) => {
   try {
+    const targetDate = new Date(effectiveDate);
     const activeSchedule = await prisma.instructorSchedule.findFirst({
       where: {
         instructorId,
-        effectiveFrom: { lte: new Date(effectiveDate) },
-        effectiveTo: null,
+        effectiveFrom: { lte: targetDate },
+        OR: [{ effectiveTo: null }, { effectiveTo: { gt: targetDate } }],
       },
       include: {
         slots: { orderBy: [{ weekday: "asc" }, { startTime: "asc" }] },
       },
+      orderBy: { effectiveFrom: "desc" },
     });
 
     if (!activeSchedule) {

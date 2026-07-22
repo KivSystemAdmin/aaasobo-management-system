@@ -5,6 +5,7 @@ import {
   getActiveInstructorSchedule,
   InstructorSlot,
 } from "@/lib/api/instructorsApi";
+import { getTodayInJapanISODate } from "@/lib/utils/dateUtils";
 import ScheduleCalendar from "@/components/admins-dashboard/instructors-dashboard/instructor-schedule/ScheduleCalendar";
 import Loading from "@/components/elements/loading/Loading";
 import styles from "./page.module.scss";
@@ -22,7 +23,7 @@ export default function AvailabilityPageClient({
     const fetchSchedule = async () => {
       try {
         setLoading(true);
-        const today = new Date().toISOString().split("T")[0];
+        const today = getTodayInJapanISODate();
         const scheduleData = await getActiveInstructorSchedule(
           instructorId,
           today,
