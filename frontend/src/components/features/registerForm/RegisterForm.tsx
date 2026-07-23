@@ -33,6 +33,7 @@ import Uploader from "./uploadImages/Uploader";
 import { EnglishBackground } from "@/types";
 import RadioButton from "../../elements/radioButton/RadioButton";
 import TextAreaInput from "../../elements/textAreaInput/TextAreaInput";
+import { ENGLISH_BACKGROUND_LABELS } from "@/lib/data/englishBackground";
 
 const RegisterForm = ({
   categoryType,
@@ -64,12 +65,6 @@ const RegisterForm = ({
   const [englishBackground, setEnglishBackground] = useState<EnglishBackground>(
     EnglishBackground.NonNative,
   );
-  const englishBackgroundLabels = [
-    "Non Native",
-    "Native A",
-    "Native B",
-  ] as const;
-
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEnglishBackground = Number(e.target.value);
     setEnglishBackground(newEnglishBackground);
@@ -368,7 +363,7 @@ const RegisterForm = ({
                   value={EnglishBackground.NonNative}
                   checked={englishBackground === EnglishBackground.NonNative}
                   onChange={handleRadioChange}
-                  label={englishBackgroundLabels[EnglishBackground.NonNative]}
+                  label={ENGLISH_BACKGROUND_LABELS[EnglishBackground.NonNative]}
                   className={styles.englishBackgroundRadio}
                 />
                 <RadioButton
@@ -376,7 +371,7 @@ const RegisterForm = ({
                   value={EnglishBackground.NativeA}
                   checked={englishBackground === EnglishBackground.NativeA}
                   onChange={handleRadioChange}
-                  label={englishBackgroundLabels[EnglishBackground.NativeA]}
+                  label={ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeA]}
                   className={styles.englishBackgroundRadio}
                 />
                 <RadioButton
@@ -384,7 +379,7 @@ const RegisterForm = ({
                   value={EnglishBackground.NativeB}
                   checked={englishBackground === EnglishBackground.NativeB}
                   onChange={handleRadioChange}
-                  label={englishBackgroundLabels[EnglishBackground.NativeB]}
+                  label={ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeB]}
                   className={styles.englishBackgroundRadio}
                 />
               </div>
@@ -476,7 +471,7 @@ const RegisterForm = ({
               value={EnglishBackground.NonNative}
               checked={englishBackground === EnglishBackground.NonNative}
               onChange={handleRadioChange}
-              label={englishBackgroundLabels[EnglishBackground.NonNative]}
+              label={ENGLISH_BACKGROUND_LABELS[EnglishBackground.NonNative]}
               className={styles.englishBackgroundRadio}
             />
             <RadioButton
@@ -484,7 +479,7 @@ const RegisterForm = ({
               value={EnglishBackground.NativeA}
               checked={englishBackground === EnglishBackground.NativeA}
               onChange={handleRadioChange}
-              label={englishBackgroundLabels[EnglishBackground.NativeA]}
+              label={ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeA]}
               className={styles.englishBackgroundRadio}
             />
             <RadioButton
@@ -492,7 +487,7 @@ const RegisterForm = ({
               value={EnglishBackground.NativeB}
               checked={englishBackground === EnglishBackground.NativeB}
               onChange={handleRadioChange}
-              label={englishBackgroundLabels[EnglishBackground.NativeB]}
+              label={ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeB]}
               className={styles.englishBackgroundRadio}
             />
           </div>

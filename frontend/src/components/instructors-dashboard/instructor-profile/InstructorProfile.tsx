@@ -36,6 +36,7 @@ import InstructorFeeRates from "./InstructorFeeRates";
 import { EnglishBackground } from "@/types";
 import RadioButton from "../../elements/radioButton/RadioButton";
 import TextAreaInput from "../../elements/textAreaInput/TextAreaInput";
+import { ENGLISH_BACKGROUND_LABELS } from "@/lib/data/englishBackground";
 
 // Define the specific string fields that are editable in this component
 type EditableInstructorFields =
@@ -114,11 +115,6 @@ function InstructorProfile({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { language } = useLanguage();
   const formRef = useRef<HTMLFormElement>(null);
-  const englishBackgroundLabels = [
-    "Non Native",
-    "Native A",
-    "Native B",
-  ] as const;
   const englishBackgroundClassNames = ["", "nativeA", "nativeB"] as const;
 
   const handleEditClick = () => {
@@ -293,8 +289,8 @@ function InstructorProfile({
                       }`}
                   >
                     {
-                      englishBackgroundLabels[
-                        latestInstructor.englishBackground
+                      ENGLISH_BACKGROUND_LABELS[
+                        latestInstructor.englishBackground as EnglishBackground
                       ]
                     }
                   </div>
@@ -328,7 +324,7 @@ function InstructorProfile({
                     EnglishBackground.NonNative
                   }
                   onChange={handleRadioChange}
-                  label={englishBackgroundLabels[EnglishBackground.NonNative]}
+                  label={ENGLISH_BACKGROUND_LABELS[EnglishBackground.NonNative]}
                   className={styles.englishBackgroundRadio}
                 />
                 <RadioButton
@@ -339,7 +335,7 @@ function InstructorProfile({
                     EnglishBackground.NativeA
                   }
                   onChange={handleRadioChange}
-                  label={englishBackgroundLabels[EnglishBackground.NativeA]}
+                  label={ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeA]}
                   className={styles.englishBackgroundRadio}
                 />
                 <RadioButton
@@ -350,7 +346,7 @@ function InstructorProfile({
                     EnglishBackground.NativeB
                   }
                   onChange={handleRadioChange}
-                  label={englishBackgroundLabels[EnglishBackground.NativeB]}
+                  label={ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeB]}
                   className={styles.englishBackgroundRadio}
                 />
               </>

@@ -8,6 +8,8 @@ import { getAllPlans } from "@/lib/api/plansApi";
 import { registerSubscription } from "@/lib/api/subscriptionsApi";
 import ActionButton from "@/components/elements/buttons/actionButton/ActionButton";
 import InputField from "@/components/elements/inputField/InputField";
+import { ENGLISH_BACKGROUND_LABELS } from "@/lib/data/englishBackground";
+import { EnglishBackground } from "@/types";
 
 function AddSubscription({
   customerId,
@@ -128,20 +130,11 @@ function AddSubscription({
                     <option disabled value="">
                       Select a category
                     </option>
-                    {englishBGs.map((bg) => {
-                      const label =
-                        bg === 1
-                          ? "Native A"
-                          : bg === 2
-                            ? "Native B"
-                            : "Non Native";
-
-                      return (
-                        <option key={bg} value={bg}>
-                          {label}
-                        </option>
-                      );
-                    })}
+                    {englishBGs.map((bg) => (
+                      <option key={bg} value={bg}>
+                        {ENGLISH_BACKGROUND_LABELS[bg as EnglishBackground]}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className={styles.fieldGroup}>
