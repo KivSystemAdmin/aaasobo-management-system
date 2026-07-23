@@ -280,6 +280,11 @@ export const WELCOME_MODAL_TITLE1 = {
   en: "Welcome to AaasoBo! – Online English Classes for Kids",
 };
 
+export const WELCOME_SEEN_UPDATE_ERROR_MESSAGE = {
+  ja: "表示済みの状態を保存できなかったため、次回もこの案内が表示される場合があります。",
+  en: "We couldn't save that you dismissed this welcome message, so it may appear again next time.",
+};
+
 export const FREE_TRIAL_BOOKING_INSTRUCTION_MESSAGE = {
   ja: "無料トライアルは、画面右上の「クラスを予約」からご予約ください。",
   en: "To book your free trial class, click the 'Book Class' button at the top right of the page.",
