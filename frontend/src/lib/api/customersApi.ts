@@ -502,6 +502,7 @@ export const markWelcomeSeen = async (
     let headers;
     let response;
     const method = "PATCH";
+    const body = JSON.stringify({});
 
     if (cookie) {
       // From server component
@@ -510,6 +511,7 @@ export const markWelcomeSeen = async (
       response = await fetch(apiURL, {
         method,
         headers,
+        body,
       });
     } else {
       // From client component (via proxy)
@@ -522,6 +524,7 @@ export const markWelcomeSeen = async (
       response = await fetch(apiURL, {
         method,
         headers,
+        body,
       });
     }
 
