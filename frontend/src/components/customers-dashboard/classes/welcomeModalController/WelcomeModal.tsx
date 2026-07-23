@@ -16,6 +16,8 @@ import { confirmAndDeclineFreeTrialClass } from "@/lib/utils/confirmAndDeclineFr
 import { errorAlert } from "@/lib/utils/alertUtils";
 import { CONTACT_EMAIL, LINE_QR_CODE_URL } from "@/lib/data/contacts";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function WelcomeModal({
   customerId,
@@ -37,11 +39,13 @@ export default function WelcomeModal({
     }
 
     const isMarkedAsSeen = await markWelcomeSeen(customerId);
+    setIsWelcomeModalOpen(false);
+
     if (!isMarkedAsSeen) {
-      return errorAlert(WELCOME_SEEN_UPDATE_ERROR_MESSAGE[language]);
+      toast.warning(WELCOME_SEEN_UPDATE_ERROR_MESSAGE[language]);
+      return;
     }
 
-    setIsWelcomeModalOpen(false);
     router.refresh();
   };
 

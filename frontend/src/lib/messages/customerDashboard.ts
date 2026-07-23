@@ -281,8 +281,8 @@ export const WELCOME_MODAL_TITLE1 = {
 };
 
 export const WELCOME_SEEN_UPDATE_ERROR_MESSAGE = {
-  ja: "開始状態を保存できませんでした。時間をおいて、もう一度お試しください。",
-  en: "We couldn't save your welcome status. Please wait a moment and try again.",
+  ja: "表示済みの状態を保存できなかったため、次回もこの案内が表示される場合があります。",
+  en: "We couldn't save that you dismissed this welcome message, so it may appear again next time.",
 };
 
 export const FREE_TRIAL_BOOKING_INSTRUCTION_MESSAGE = {
