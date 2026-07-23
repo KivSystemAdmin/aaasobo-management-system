@@ -1,4 +1,4 @@
-import { Prisma } from "../../generated/prisma";
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../prisma/prismaClient";
 import { MONTHS_TO_DELETE_BUSINESS_CALENDAR } from "../utils/commonUtils";
 

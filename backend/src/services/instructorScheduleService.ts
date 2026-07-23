@@ -1,5 +1,5 @@
 import { prisma } from "../../prisma/prismaClient";
-import { Prisma, Status } from "../../generated/prisma";
+import { Prisma, Status } from "@prisma/client";
 import { JAPAN_TIME_DIFF, nDaysLater, nHoursLater } from "../utils/dateUtils";
 import { EnglishBackground } from "../types";
 import {

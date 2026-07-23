@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../../prisma/prismaClient";
-import { Prisma } from "../../generated/prisma";
+import { Prisma } from "@prisma/client";
 import { nHoursLater } from "../utils/dateUtils";
 import { hashToken, safeCompareHash } from "../utils/tokenUtils";
 

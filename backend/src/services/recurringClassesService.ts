@@ -1,5 +1,5 @@
 import { prisma } from "../../prisma/prismaClient";
-import { Prisma, RecurringClass, Class } from "../../generated/prisma";
+import { Prisma, RecurringClass, Class } from "@prisma/client";
 import { JAPAN_TIME_DIFF, nDaysLater, nHoursBefore } from "../utils/dateUtils";
 import {
   NO_CLASS_EVENT_NAME,
