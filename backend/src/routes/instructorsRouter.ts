@@ -48,6 +48,11 @@ import {
   UpdateInstructorTagsRequest,
 } from "../../../shared/schemas/instructors";
 import {
+  InstructorPayrollErrorResponse,
+  InstructorPayrollQuery,
+  InstructorPayrollResponse,
+} from "../../../shared/schemas/admins";
+import {
   type RequestWithId,
   parseId,
 } from "../../src/middlewares/parseId.middleware";
@@ -75,6 +80,7 @@ import {
   getTagCatalogController,
   updateInstructorTagsController,
 } from "../controllers/instructorTagsController";
+import { getInstructorPayrollController } from "../controllers/adminsController";
 
 const profilesConfig = {
   method: "get" as const,
@@ -207,6 +213,53 @@ const instructorProfileConfig = {
       },
       500: {
         description: "Internal server error",
+      },
+    },
+  },
+} as const;
+
+const instructorPayrollConfig = {
+  method: "get" as const,
+  paramsSchema: InstructorIdParams,
+  querySchema: InstructorPayrollQuery,
+  middleware: [
+    verifyAuthentication(AUTH_ROLES.AI, {
+      requireIdCheck: AUTH_ROLES.I,
+    }),
+  ] as RequestHandler[],
+  handler: getInstructorPayrollController,
+  openapi: {
+    summary: "Get instructor payroll",
+    description:
+      "Get an instructor's payroll summary for one month; instructors may only access their own payroll",
+    responses: {
+      200: {
+        description: "Instructor payroll retrieved successfully",
+        schema: InstructorPayrollResponse,
+      },
+      400: {
+        description: "Invalid query parameters",
+        schema: MessageErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      403: {
+        description: "Instructor ID does not match the authenticated user",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Instructor not found",
+        schema: MessageErrorResponse,
+      },
+      422: {
+        description: "Payroll data cannot be resolved",
+        schema: InstructorPayrollErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
       },
     },
   },
@@ -723,6 +776,7 @@ const validatedRouteConfigs = {
   "/:id/calendar-slots": [calendarSlotsConfig],
   "/:id/calendar-classes": [calendarClassesConfig],
   "/:id/classes/:classId/same-date": [sameDateClassesConfig],
+  "/:id/payroll": [instructorPayrollConfig],
   "/:id/profile": [instructorProfileConfig],
   "/:id/schedules": [instructorSchedulesConfig, createScheduleConfig],
   "/:id/schedules/active": [activeScheduleConfig],
