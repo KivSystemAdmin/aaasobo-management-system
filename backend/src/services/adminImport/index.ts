@@ -15,3 +15,9 @@ export {
   getNormalizedImportJobZip,
   storeNormalizedImportJob,
 } from "./jobStore";
+
+export {
+  executeIncrementalImport,
+  IncrementalImportValidationError,
+} from "./incremental";
+export type { IncrementalImportOperation } from "./incremental";

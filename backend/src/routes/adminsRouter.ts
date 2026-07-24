@@ -31,6 +31,8 @@ import {
 } from "../../src/controllers/adminsController";
 import {
   downloadNormalizedImportPackageController,
+  executeIncrementalCustomerImportController,
+  executeIncrementalInstructorImportController,
   executeNormalizedImportController,
   normalizeImportSourceController,
 } from "../controllers/adminsImportController";
@@ -1077,6 +1079,59 @@ const executeNormalizedImportConfig = {
   },
 } as const;
 
+const incrementalImportOpenApi = (summary: string, description: string) => ({
+  summary,
+  description,
+  responses: {
+    200: {
+      description: "Incremental import succeeded",
+      schema: ImportExecuteResponse,
+    },
+    400: {
+      description: "Incremental package validation failed",
+      schema: ImportExecuteErrorResponse,
+    },
+    401: {
+      description: "Unauthorized",
+      schema: MessageErrorResponse,
+    },
+    413: {
+      description: "Uploaded file exceeds size limit",
+      schema: MessageErrorResponse,
+    },
+    500: {
+      description: "Internal server error",
+      schema: ErrorResponse,
+    },
+  },
+});
+
+const incrementalCustomerImportConfig = {
+  method: "post" as const,
+  middleware: [
+    verifyAuthentication(AUTH_ROLES.A),
+    uploadAdminImportZipFile,
+  ] as RequestHandler[],
+  handler: executeIncrementalCustomerImportController,
+  openapi: incrementalImportOpenApi(
+    "Add customers from a focused import package",
+    "Atomically add customers, children, and subscriptions without changing existing records",
+  ),
+} as const;
+
+const incrementalInstructorImportConfig = {
+  method: "post" as const,
+  middleware: [
+    verifyAuthentication(AUTH_ROLES.A),
+    uploadAdminImportZipFile,
+  ] as RequestHandler[],
+  handler: executeIncrementalInstructorImportController,
+  openapi: incrementalImportOpenApi(
+    "Add instructors from a focused import package",
+    "Atomically add instructors, fees, schedules, and slots without changing existing records",
+  ),
+} as const;
+
 const validatedRouteConfigs = {
   "/:id": [updateAdminConfig],
   "/admin-list": [getAllAdminsConfig],
@@ -1103,6 +1158,8 @@ const validatedRouteConfigs = {
   "/instructor-list/update/:id/withIcon": [updateInstructorWithIconConfig],
   "/import/normalize": [normalizeImportSourceConfig],
   "/import/execute": [executeNormalizedImportConfig],
+  "/import/incremental/customers": [incrementalCustomerImportConfig],
+  "/import/incremental/instructors": [incrementalInstructorImportConfig],
   "/import/normalized/:jobId/download": [downloadNormalizedImportPackageConfig],
   "/message-board": [getMessageBoardPostsConfig, createMessageBoardPostConfig],
   "/plan-list": [getAllPlansConfig],
