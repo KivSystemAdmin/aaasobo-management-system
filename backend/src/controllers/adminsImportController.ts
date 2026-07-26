@@ -1,11 +1,14 @@
 import { Request, Response } from "express";
 import {
   buildNormalizedPackageZip,
+  executeIncrementalImport,
   executeNormalizedImportFiles,
   extractNormalizedFilesFromZip,
   getNormalizedImportJobZip,
   normalizeRawScheduleCsvToPackage,
   storeNormalizedImportJob,
+  IncrementalImportValidationError,
+  type IncrementalImportOperation,
   validateNormalizedImportFiles,
 } from "../services/adminImport";
 
@@ -95,7 +98,16 @@ export const executeNormalizedImportController = async (
     if (!validationResult.isValid) {
       return res.status(400).json({
         message: "Normalized import validation failed",
-        report: validationResult.report,
+        operation: "clean-start",
+        report: {
+          ...validationResult.report,
+          importedByFile: Object.fromEntries(
+            Object.keys(validationResult.report.rowsByFile).map((file) => [
+              file,
+              0,
+            ]),
+          ),
+        },
         issues: validationResult.issues,
       });
     }
@@ -104,8 +116,12 @@ export const executeNormalizedImportController = async (
 
     return res.status(200).json({
       message: "Normalized import executed successfully",
+      operation: "clean-start",
       imported: true,
-      report: validationResult.report,
+      report: {
+        ...validationResult.report,
+        importedByFile: { ...validationResult.report.rowsByFile },
+      },
     });
   } catch (error) {
     console.error("Failed to execute normalized import", { error });
@@ -114,3 +130,47 @@ export const executeNormalizedImportController = async (
     });
   }
 };
+
+const executeIncrementalImportController =
+  (operation: IncrementalImportOperation) =>
+  async (req: Request, res: Response) => {
+    const file = req.file;
+    if (!file) {
+      return res
+        .status(400)
+        .json({ message: 'Missing ZIP upload. Use field name "file".' });
+    }
+
+    try {
+      const result = await executeIncrementalImport(file.buffer, operation);
+      return res.status(200).json({
+        message:
+          operation === "incremental-customers"
+            ? "Customers added successfully"
+            : "Instructors added successfully",
+        ...result,
+      });
+    } catch (error) {
+      if (error instanceof IncrementalImportValidationError) {
+        return res.status(400).json({
+          message: error.message,
+          operation: error.operation,
+          report: error.report,
+          issues: error.issues,
+        });
+      }
+      console.error("Failed to execute incremental import", {
+        operation,
+        error,
+      });
+      return res.status(500).json({
+        error:
+          error instanceof Error ? error.message : "Import execution failed",
+      });
+    }
+  };
+
+export const executeIncrementalCustomerImportController =
+  executeIncrementalImportController("incremental-customers");
+export const executeIncrementalInstructorImportController =
+  executeIncrementalImportController("incremental-instructors");
