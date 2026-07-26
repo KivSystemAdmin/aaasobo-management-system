@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import request from "supertest";
 import JSZip from "jszip";
 import { server } from "../../../server";
+import { generateIncrementalImportFixture } from "../../../seed/generateIncrementalImportFixture";
 import { executeIncrementalImport } from "../../../services/adminImport";
 import {
   createAdmin,
@@ -94,6 +95,52 @@ async function postIncremental(
 }
 
 describe("incremental admin imports", () => {
+  it("accepts both deterministic dummy packages from the fixture generator", async () => {
+    const admin = await createAdmin();
+    const cookie = await generateAuthCookie(admin.id, "admin");
+    await createPlan({
+      name: "Dummy Exact Plan",
+      description: "Fixture plan",
+      weeklyClassTimes: 1,
+      englishBackground: 0,
+    });
+    const fixture = await generateIncrementalImportFixture({
+      customerCount: 2,
+      instructorCount: 2,
+      namespace: "api-test",
+      planName: "Dummy Exact Plan",
+      startDate: "2026-03-01",
+    });
+
+    const customerResponse = await request(server)
+      .post("/admins/import/incremental/customers")
+      .set("Cookie", cookie)
+      .attach("file", fixture.customerZip, {
+        filename: fixture.customerZipFileName,
+        contentType: "application/zip",
+      })
+      .expect(200);
+    const instructorResponse = await request(server)
+      .post("/admins/import/incremental/instructors")
+      .set("Cookie", cookie)
+      .attach("file", fixture.instructorZip, {
+        filename: fixture.instructorZipFileName,
+        contentType: "application/zip",
+      })
+      .expect(200);
+
+    expect(customerResponse.body.report.importedByFile).toEqual({
+      "customers.csv": 2,
+      "children.csv": 2,
+      "subscriptions.csv": 2,
+    });
+    expect(instructorResponse.body.report.importedByFile).toEqual({
+      "instructors.csv": 2,
+      "instructor_fees.csv": 2,
+      "instructor_schedules.csv": 4,
+    });
+  });
+
   it("atomically adds customers, children, and exact-name subscriptions while preserving existing data", async () => {
     const admin = await createAdmin();
     const cookie = await generateAuthCookie(admin.id, "admin");
