@@ -111,6 +111,12 @@ describe("incremental admin imports", () => {
       planName: "Dummy Exact Plan",
       startDate: "2026-03-01",
     });
+    expect(fixture.customerFiles["customers.csv"]).toContain(
+      ",cu0001@example.com,Temp-cu0001,",
+    );
+    expect(fixture.instructorFiles["instructors.csv"]).toContain(
+      ",in0001@example.com,Temp-in0001,",
+    );
 
     const customerResponse = await request(server)
       .post("/admins/import/incremental/customers")

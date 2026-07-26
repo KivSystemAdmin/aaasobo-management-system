@@ -143,11 +143,12 @@ function customerRows(
   for (let index = 1; index <= count; index += 1) {
     const suffix = padded(index);
     const customerRef = ref("CU", index);
+    const lowerRef = customerRef.toLowerCase();
     customers.push({
       customer_ref: customerRef,
       name: `Incremental Customer ${suffix}`,
-      email: `incremental-customer-${namespace}-${suffix}@example.com`,
-      temp_password: `Customer-${namespace}-${suffix}!`,
+      email: `${lowerRef}@example.com`,
+      temp_password: `Temp-${lowerRef}`,
       prefecture: index % 2 === 0 ? "Osaka" : "Tokyo",
       termination_at: "",
       has_seen_welcome: index % 2 === 0 ? "true" : "false",
@@ -185,11 +186,12 @@ function instructorRows(count: number, namespace: string, startDate: string) {
   for (let index = 1; index <= count; index += 1) {
     const suffix = padded(index);
     const instructorRef = ref("IN", index);
+    const lowerRef = instructorRef.toLowerCase();
     instructors.push({
       instructor_ref: instructorRef,
       name: `Incremental Instructor ${suffix}`,
-      email: `incremental-instructor-${namespace}-${suffix}@example.com`,
-      temp_password: `Instructor-${namespace}-${suffix}!`,
+      email: `${lowerRef}@example.com`,
+      temp_password: `Temp-${lowerRef}`,
       class_url: `https://example.com/incremental/${namespace}/classes/${suffix}`,
       icon: `https://example.com/incremental/${namespace}/icons/${suffix}.png`,
       nickname: `dummy_${namespace}_${suffix}`,

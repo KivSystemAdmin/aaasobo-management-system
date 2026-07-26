@@ -101,8 +101,8 @@ subdirectories for inspection.
 Optional arguments:
 
 - `--customers` and `--instructors` default to `5`.
-- `--namespace` defaults to `sample`. Change it before importing another
-  generated package into the same database to avoid uniqueness conflicts.
+- `--namespace` defaults to `sample` and differentiates generated URLs,
+  nicknames, meeting IDs, and passcodes.
 - `--plan-name` defaults to the weekly native-A plan created by
   `npm run seed:dummy`. The name must exactly match one existing database plan.
 - `--start-date` defaults to `2026-01-01`.
@@ -111,3 +111,8 @@ Optional arguments:
 
 The exported `generateIncrementalImportFixture()` function returns both file
 maps and ZIP buffers for automated tests or other programmatic use.
+
+Generated login credentials follow the normalized fixture convention:
+
+- customer `CU0001`: `cu0001@example.com` / `Temp-cu0001`
+- instructor `IN0001`: `in0001@example.com` / `Temp-in0001`
