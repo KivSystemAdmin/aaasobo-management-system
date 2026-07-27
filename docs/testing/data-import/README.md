@@ -77,40 +77,80 @@ Run from `backend/`:
 
 ```sh
 npm run fixture:generate:incremental-import -- \
-  --customers 5 \
-  --instructors 5 \
-  --namespace local-01 \
-  --plan-name "月5,980円プラン / 5,980 yen/month Plan" \
+  --target customers \
+  --number 5 \
+  --start-id 1 \
+  --start-instructor-id 1 \
+  --end-instructor-id 5 \
   --start-date 2026-01-01
 ```
 
-This creates two directly uploadable, deterministic packages:
+This creates one directly uploadable, deterministic customer package:
 
-- `incremental-customers-<namespace>.zip`
+- `incremental-customers-0001-0005.zip`
   - `customers.csv`
   - `children.csv`
   - `subscriptions.csv`
-- `incremental-instructors-<namespace>.zip`
+  - `recurring_classes.csv`
+  - `recurring_class_attendance.csv`
+
+To generate an instructor package independently:
+
+```sh
+npm run fixture:generate:incremental-import -- \
+  --target instructors \
+  --number 5 \
+  --start-id 1 \
+  --start-date 2026-01-01
+```
+
+This creates:
+
+- `incremental-instructors-0001-0005.zip`
   - `instructors.csv`
   - `instructor_fees.csv`
   - `instructor_schedules.csv`
 
-All CSV files are also written into `customers/` and `instructors/`
-subdirectories for inspection.
+The selected package's CSV files are also written into its corresponding
+subdirectory for inspection.
 
-Optional arguments:
+Arguments:
 
-- `--customers` and `--instructors` default to `5`.
-- `--namespace` defaults to `sample` and differentiates generated URLs,
-  nicknames, meeting IDs, and passcodes.
-- `--plan-name` defaults to the weekly native-A plan created by
-  `npm run seed:dummy`. The name must exactly match one existing database plan.
+- `--target` is required and accepts `customers` or `instructors`.
+- `--number` configures the selected target's count and defaults to `5`.
+- `--start-id` defaults to `1` and controls generated reference and credential
+  suffixes, not database primary keys. For example, `--target customers
+  --start-id 25` starts at `CU0025`.
+- `--start-instructor-id` and `--end-instructor-id` are optional customer-only
+  arguments that must be supplied together. They are inclusive existing
+  database instructor IDs. When supplied, each ¥5,980 subscription receives two
+  regular classes.
 - `--start-date` defaults to `2026-01-01`.
 - `--out-dir` defaults to
   `../docs/testing/data-import/generated/incremental`.
 
-The exported `generateIncrementalImportFixture()` function returns both file
-maps and ZIP buffers for automated tests or other programmatic use.
+The exported `generateIncrementalImportFixture()` function accepts the
+required `target` and its corresponding count and start-ID options. It returns
+the selected file map and ZIP buffer for automated tests or other programmatic
+use.
+
+Customer subscriptions use the `月5,980円プラン / 5,980 yen/month Plan`
+created by the initial import generator.
+
+Regular classes rotate through the inclusive instructor range before consuming
+the next slot for each instructor. For example, instructor IDs 1 through 3 are
+assigned as `1/slot 1`, `2/slot 1`, `3/slot 1`, `1/slot 2`, and so on. Slots
+follow the initial generator's Pattern A and Pattern B ordering. The customer
+import verifies that every instructor exists and that each selected slot
+matches an active database schedule. It fails atomically if the range has
+insufficient unique slots or the database does not match the generated fixture.
+
+Customer, instructor, and child names use the same seeded Faker patterns as the
+initial import generator. Customer prefecture is `東京都 / Tokyo`.
+Instructor English backgrounds alternate between Program Original and Native A,
+and instructor schedules use the initial generator's Pattern A and Pattern B
+weekly slots. Instructor nicknames use the Faker-generated first name, adding a
+numeric suffix only when a duplicate first name occurs.
 
 Generated login credentials follow the normalized fixture convention:
 

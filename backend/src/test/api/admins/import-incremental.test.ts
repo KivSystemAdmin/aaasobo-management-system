@@ -99,38 +99,93 @@ describe("incremental admin imports", () => {
     const admin = await createAdmin();
     const cookie = await generateAuthCookie(admin.id, "admin");
     await createPlan({
-      name: "Dummy Exact Plan",
+      name: "月5,980円プラン / 5,980 yen/month Plan",
       description: "Fixture plan",
-      weeklyClassTimes: 1,
+      weeklyClassTimes: 2,
       englishBackground: 0,
     });
-    const fixture = await generateIncrementalImportFixture({
-      customerCount: 2,
-      instructorCount: 2,
-      namespace: "api-test",
-      planName: "Dummy Exact Plan",
-      startDate: "2026-03-01",
-    });
-    expect(fixture.customerFiles["customers.csv"]).toContain(
-      ",cu0001@example.com,Temp-cu0001,",
+    const [customerFixture, instructorFixture] = await Promise.all([
+      generateIncrementalImportFixture({
+        target: "customers",
+        number: 2,
+        startId: 21,
+        startDate: "2026-03-01",
+        startInstructorId: 1,
+        endInstructorId: 3,
+      }),
+      generateIncrementalImportFixture({
+        target: "instructors",
+        number: 3,
+        startId: 31,
+        startDate: "2026-03-01",
+      }),
+    ]);
+    expect(customerFixture.customerFiles["customers.csv"]).toContain(
+      ",cu0021@example.com,Temp-cu0021,",
     );
-    expect(fixture.instructorFiles["instructors.csv"]).toContain(
-      ",in0001@example.com,Temp-in0001,",
+    expect(customerFixture.customerFiles["customers.csv"]).toContain(
+      ",東京都 / Tokyo,",
     );
+    expect(customerFixture.customerFiles["customers.csv"]).not.toContain(
+      "Incremental Customer",
+    );
+    expect(customerFixture.customerFiles["children.csv"]).not.toContain(
+      "Child 00021",
+    );
+    expect(instructorFixture.instructorFiles["instructors.csv"]).toContain(
+      ",in0031@example.com,Temp-in0031,",
+    );
+    expect(instructorFixture.instructorFiles["instructors.csv"]).not.toContain(
+      "Incremental Instructor",
+    );
+    expect(
+      instructorFixture.instructorFiles["instructors.csv"]
+        .trim()
+        .split("\n")
+        .slice(1)
+        .map((row) => {
+          const columns = row.split(",");
+          const firstName = columns[1]?.split(" ")[0];
+          const nickname = columns[6];
+          return nickname?.replace(/\d+$/, "") === firstName;
+        }),
+    ).toEqual([true, true, true]);
+    expect(
+      instructorFixture.instructorFiles["instructors.csv"]
+        .trim()
+        .split("\n")
+        .slice(1)
+        .map((row) => row.split(",").at(-2)),
+    ).toEqual(["0", "1", "0"]);
+    expect(
+      customerFixture.customerFiles["recurring_classes.csv"]
+        ?.trim()
+        .split("\n")
+        .slice(1)
+        .map((row) => {
+          const columns = row.split(",");
+          return [columns[2], columns[3]];
+        }),
+    ).toEqual([
+      ["1", "2026-03-02T16:00:00+09:00"],
+      ["2", "2026-03-05T18:30:00+09:00"],
+      ["3", "2026-03-02T16:00:00+09:00"],
+      ["1", "2026-03-02T16:30:00+09:00"],
+    ]);
 
-    const customerResponse = await request(server)
-      .post("/admins/import/incremental/customers")
-      .set("Cookie", cookie)
-      .attach("file", fixture.customerZip, {
-        filename: fixture.customerZipFileName,
-        contentType: "application/zip",
-      })
-      .expect(200);
     const instructorResponse = await request(server)
       .post("/admins/import/incremental/instructors")
       .set("Cookie", cookie)
-      .attach("file", fixture.instructorZip, {
-        filename: fixture.instructorZipFileName,
+      .attach("file", instructorFixture.instructorZip, {
+        filename: instructorFixture.instructorZipFileName,
+        contentType: "application/zip",
+      })
+      .expect(200);
+    const customerResponse = await request(server)
+      .post("/admins/import/incremental/customers")
+      .set("Cookie", cookie)
+      .attach("file", customerFixture.customerZip, {
+        filename: customerFixture.customerZipFileName,
         contentType: "application/zip",
       })
       .expect(200);
@@ -139,12 +194,46 @@ describe("incremental admin imports", () => {
       "customers.csv": 2,
       "children.csv": 2,
       "subscriptions.csv": 2,
+      "recurring_classes.csv": 4,
+      "recurring_class_attendance.csv": 4,
     });
     expect(instructorResponse.body.report.importedByFile).toEqual({
-      "instructors.csv": 2,
-      "instructor_fees.csv": 2,
-      "instructor_schedules.csv": 4,
+      "instructors.csv": 3,
+      "instructor_fees.csv": 3,
+      "instructor_schedules.csv": 46,
     });
+    const recurringClasses = await prisma.recurringClass.findMany({
+      orderBy: { id: "asc" },
+      include: { recurringClassAttendance: true },
+    });
+    expect(
+      recurringClasses.map((recurringClass) => ({
+        instructorId: recurringClass.instructorId,
+        startAt: recurringClass.startAt?.toISOString(),
+        attendance: recurringClass.recurringClassAttendance.length,
+      })),
+    ).toEqual([
+      {
+        instructorId: 1,
+        startAt: "2026-03-02T07:00:00.000Z",
+        attendance: 1,
+      },
+      {
+        instructorId: 2,
+        startAt: "2026-03-05T09:30:00.000Z",
+        attendance: 1,
+      },
+      {
+        instructorId: 3,
+        startAt: "2026-03-02T07:00:00.000Z",
+        attendance: 1,
+      },
+      {
+        instructorId: 1,
+        startAt: "2026-03-02T07:30:00.000Z",
+        attendance: 1,
+      },
+    ]);
   });
 
   it("atomically adds customers, children, and exact-name subscriptions while preserving existing data", async () => {
@@ -189,6 +278,57 @@ describe("incremental admin imports", () => {
       planId: plan.id,
       selectType: "https://example.com/select/1",
     });
+  });
+
+  it("rejects regular classes for missing instructor IDs without writing customers", async () => {
+    const admin = await createAdmin();
+    const cookie = await generateAuthCookie(admin.id, "admin");
+    await createPlan({
+      name: "月5,980円プラン / 5,980 yen/month Plan",
+      description: "Fixture plan",
+      weeklyClassTimes: 2,
+      englishBackground: 0,
+    });
+    const fixture = await generateIncrementalImportFixture({
+      target: "customers",
+      number: 1,
+      startId: 41,
+      startInstructorId: 999,
+      endInstructorId: 999,
+      startDate: "2026-03-01",
+    });
+
+    const response = await request(server)
+      .post("/admins/import/incremental/customers")
+      .set("Cookie", cookie)
+      .attach("file", fixture.customerZip, {
+        filename: fixture.customerZipFileName,
+        contentType: "application/zip",
+      })
+      .expect(400);
+
+    expect(response.body.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          file: "recurring_classes.csv",
+          column: "instructor_id",
+          message: "Instructor ID 999 does not exist",
+        }),
+      ]),
+    );
+    expect(await prisma.customer.count()).toBe(0);
+    expect(await prisma.recurringClass.count()).toBe(0);
+  });
+
+  it("rejects an instructor range without enough unique slots", async () => {
+    await expect(
+      generateIncrementalImportFixture({
+        target: "customers",
+        number: 8,
+        startInstructorId: 1,
+        endInstructorId: 1,
+      }),
+    ).rejects.toThrow("insufficient unique slots");
   });
 
   it("atomically adds instructors with fees and grouped slots without absences", async () => {

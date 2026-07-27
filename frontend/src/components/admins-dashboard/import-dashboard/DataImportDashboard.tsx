@@ -133,10 +133,6 @@ export default function DataImportDashboard({ adminId }: { adminId: number }) {
             ? "Requires customers.csv, children.csv, and subscriptions.csv."
             : "Requires instructors.csv, instructor_fees.csv, and instructor_schedules.csv."}
         </p>
-        <p className={styles.safeText}>
-          Add-only: existing data is preserved. If any row fails validation,
-          nothing is imported.
-        </p>
         <label
           className={styles.fileInputLabel}
           htmlFor={`incremental-${target}-zip`}
@@ -307,28 +303,14 @@ export default function DataImportDashboard({ adminId }: { adminId: number }) {
         <h1>Data Import</h1>
         <p className={styles.subText}>
           Add focused customer or instructor packages, or replace import data
-          with a clean-start package.
+          with a clean package.
         </p>
         <p className={styles.subText}>Admin ID: {adminId}</p>
       </header>
 
-      <section className={styles.operationSection}>
-        <div>
-          <h2>Incremental import (add-only)</h2>
-          <p className={styles.subText}>
-            Adds new records atomically without deleting or changing existing
-            data.
-          </p>
-        </div>
-        <div className={styles.cardGrid}>
-          {renderIncrementalCard("customers")}
-          {renderIncrementalCard("instructors")}
-        </div>
-      </section>
-
       <section className={`${styles.operationSection} ${styles.destructive}`}>
         <div>
-          <h2>Clean-start import (destructive)</h2>
+          <h2>Clean import (destructive)</h2>
           <p className={styles.warningText}>
             Replaces all import-target data. Use only when intentionally
             rebuilding the database.
@@ -495,6 +477,20 @@ export default function DataImportDashboard({ adminId }: { adminId: number }) {
             </table>
           </div>
         )}
+      </section>
+
+      <section className={styles.operationSection}>
+        <div>
+          <h2>Incremental import (add-only)</h2>
+          <p className={styles.subText}>
+            Adds new records atomically without deleting or changing existing
+            data.
+          </p>
+        </div>
+        <div className={styles.cardGrid}>
+          {renderIncrementalCard("customers")}
+          {renderIncrementalCard("instructors")}
+        </div>
       </section>
 
       <Modal

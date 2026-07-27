@@ -8,7 +8,12 @@ export type IncrementalImportOperation =
   | "incremental-customers"
   | "incremental-instructors";
 
-type CustomerFileName = "customers.csv" | "children.csv" | "subscriptions.csv";
+type CustomerFileName =
+  | "customers.csv"
+  | "children.csv"
+  | "subscriptions.csv"
+  | "recurring_classes.csv"
+  | "recurring_class_attendance.csv";
 type InstructorFileName =
   | "instructors.csv"
   | "instructor_fees.csv"
@@ -46,6 +51,10 @@ const CUSTOMER_FILES: readonly CustomerFileName[] = [
   "children.csv",
   "subscriptions.csv",
 ];
+const OPTIONAL_CUSTOMER_FILES: readonly CustomerFileName[] = [
+  "recurring_classes.csv",
+  "recurring_class_attendance.csv",
+];
 const INSTRUCTOR_FILES: readonly InstructorFileName[] = [
   "instructors.csv",
   "instructor_fees.csv",
@@ -77,6 +86,14 @@ const HEADERS: Record<IncrementalFileName, readonly string[]> = {
     "start_at",
     "end_at",
   ],
+  "recurring_classes.csv": [
+    "recurring_class_ref",
+    "subscription_ref",
+    "instructor_id",
+    "start_at",
+    "end_at",
+  ],
+  "recurring_class_attendance.csv": ["recurring_class_ref", "child_ref"],
   "instructors.csv": [
     "instructor_ref",
     "name",
@@ -330,9 +347,17 @@ async function parsePackage(
     ]);
   }
 
+  const packageFiles = [...filesFor(operation)];
+  if (
+    operation === "incremental-customers" &&
+    OPTIONAL_CUSTOMER_FILES.some((file) => zip.file(file))
+  ) {
+    packageFiles.push(...OPTIONAL_CUSTOMER_FILES);
+  }
+
   const rows: Partial<Record<IncrementalFileName, ParsedRow[]>> = {};
   const rowsByFile: Record<string, number> = {};
-  for (const file of filesFor(operation)) {
+  for (const file of packageFiles) {
     const entry = zip.file(file);
     if (!entry) {
       issue(issues, file, null, null, `Missing required file: ${file}`);
@@ -402,9 +427,7 @@ async function parsePackage(
 
   const report = {
     rowsByFile,
-    importedByFile: Object.fromEntries(
-      filesFor(operation).map((file) => [file, 0]),
-    ),
+    importedByFile: Object.fromEntries(packageFiles.map((file) => [file, 0])),
   };
   const parsed = { rows, report };
   validateFileData(operation, parsed, issues);
@@ -423,6 +446,9 @@ function validateFileData(
     const customers = parsed.rows["customers.csv"] ?? [];
     const children = parsed.rows["children.csv"] ?? [];
     const subscriptions = parsed.rows["subscriptions.csv"] ?? [];
+    const recurringClasses = parsed.rows["recurring_classes.csv"] ?? [];
+    const recurringAttendance =
+      parsed.rows["recurring_class_attendance.csv"] ?? [];
 
     for (const row of customers) {
       required(issues, "customers.csv", row, [
@@ -481,6 +507,45 @@ function validateFileData(
       assertDateTime(issues, "subscriptions.csv", row, "end_at");
       assertRange(issues, "subscriptions.csv", row, "start_at", "end_at");
     }
+    for (const row of recurringClasses) {
+      required(issues, "recurring_classes.csv", row, [
+        "recurring_class_ref",
+        "subscription_ref",
+        "instructor_id",
+        "start_at",
+      ]);
+      assertRef(issues, "recurring_classes.csv", row, "recurring_class_ref");
+      assertRef(issues, "recurring_classes.csv", row, "subscription_ref");
+      if (
+        row.data.instructor_id &&
+        (!/^\d+$/.test(row.data.instructor_id) ||
+          Number(row.data.instructor_id) < 1)
+      ) {
+        issue(
+          issues,
+          "recurring_classes.csv",
+          row.rowNumber,
+          "instructor_id",
+          "instructor_id must be a positive integer",
+        );
+      }
+      assertDateTime(issues, "recurring_classes.csv", row, "start_at");
+      assertDateTime(issues, "recurring_classes.csv", row, "end_at");
+      assertRange(issues, "recurring_classes.csv", row, "start_at", "end_at");
+    }
+    for (const row of recurringAttendance) {
+      required(issues, "recurring_class_attendance.csv", row, [
+        "recurring_class_ref",
+        "child_ref",
+      ]);
+      assertRef(
+        issues,
+        "recurring_class_attendance.csv",
+        row,
+        "recurring_class_ref",
+      );
+      assertRef(issues, "recurring_class_attendance.csv", row, "child_ref");
+    }
 
     assertUnique(issues, "customers.csv", customers, ["customer_ref"]);
     assertUnique(issues, "customers.csv", customers, ["email"]);
@@ -489,6 +554,19 @@ function validateFileData(
       "subscription_ref",
     ]);
     assertUnique(issues, "subscriptions.csv", subscriptions, ["select_type"]);
+    assertUnique(issues, "recurring_classes.csv", recurringClasses, [
+      "recurring_class_ref",
+    ]);
+    assertUnique(issues, "recurring_classes.csv", recurringClasses, [
+      "instructor_id",
+      "start_at",
+    ]);
+    assertUnique(
+      issues,
+      "recurring_class_attendance.csv",
+      recurringAttendance,
+      ["recurring_class_ref", "child_ref"],
+    );
     const customerRefs = new Set(customers.map((row) => row.data.customer_ref));
     assertReferences(
       issues,
@@ -505,6 +583,37 @@ function validateFileData(
       "customer_ref",
       customerRefs,
       "customers.csv",
+    );
+    const subscriptionRefs = new Set(
+      subscriptions.map((row) => row.data.subscription_ref),
+    );
+    const recurringClassRefs = new Set(
+      recurringClasses.map((row) => row.data.recurring_class_ref),
+    );
+    const childRefs = new Set(children.map((row) => row.data.child_ref));
+    assertReferences(
+      issues,
+      "recurring_classes.csv",
+      recurringClasses,
+      "subscription_ref",
+      subscriptionRefs,
+      "subscriptions.csv",
+    );
+    assertReferences(
+      issues,
+      "recurring_class_attendance.csv",
+      recurringAttendance,
+      "recurring_class_ref",
+      recurringClassRefs,
+      "recurring_classes.csv",
+    );
+    assertReferences(
+      issues,
+      "recurring_class_attendance.csv",
+      recurringAttendance,
+      "child_ref",
+      childRefs,
+      "children.csv",
     );
     return;
   }
@@ -746,20 +855,39 @@ async function validateCustomerDatabase(
   const planNames = [
     ...new Set(subscriptions.map((row) => row.data.plan_name)),
   ];
-  const [existingCustomers, existingSubscriptions, plans] = await Promise.all([
-    tx.customer.findMany({
-      where: { email: { in: emails } },
-      select: { email: true },
-    }),
-    tx.subscription.findMany({
-      where: { selectType: { in: selectTypes } },
-      select: { selectType: true },
-    }),
-    tx.plan.findMany({
-      where: { name: { in: planNames } },
-      select: { id: true, name: true },
-    }),
-  ]);
+  const recurringClasses = parsed.rows["recurring_classes.csv"] ?? [];
+  const instructorIds = [
+    ...new Set(
+      recurringClasses
+        .map((row) => Number(row.data.instructor_id))
+        .filter(Number.isSafeInteger),
+    ),
+  ];
+  const [existingCustomers, existingSubscriptions, plans, instructors] =
+    await Promise.all([
+      tx.customer.findMany({
+        where: { email: { in: emails } },
+        select: { email: true },
+      }),
+      tx.subscription.findMany({
+        where: { selectType: { in: selectTypes } },
+        select: { selectType: true },
+      }),
+      tx.plan.findMany({
+        where: { name: { in: planNames } },
+        select: { id: true, name: true },
+      }),
+      tx.instructor.findMany({
+        where: { id: { in: instructorIds } },
+        select: {
+          id: true,
+          instructorSchedules: {
+            include: { slots: true },
+            orderBy: { effectiveFrom: "desc" },
+          },
+        },
+      }),
+    ]);
 
   for (const existing of existingCustomers) {
     issue(
@@ -810,6 +938,51 @@ async function validateCustomerDatabase(
       }
     }
     if (matches.length === 1) planIds.set(planName, matches[0].id);
+  }
+
+  const instructorById = new Map(
+    instructors.map((instructor) => [instructor.id, instructor]),
+  );
+  for (const row of recurringClasses) {
+    const instructorId = Number(row.data.instructor_id);
+    if (!Number.isSafeInteger(instructorId)) continue;
+    const instructor = instructorById.get(instructorId);
+    if (!instructor) {
+      issue(
+        issues,
+        "recurring_classes.csv",
+        row.rowNumber,
+        "instructor_id",
+        `Instructor ID ${instructorId} does not exist`,
+      );
+      continue;
+    }
+    if (!validDateTime(row.data.start_at)) continue;
+    const localDate = row.data.start_at.slice(0, 10);
+    const localTime = row.data.start_at.slice(11, 16);
+    const weekday = new Date(`${localDate}T00:00:00.000Z`).getUTCDay();
+    const activeSchedule = instructor.instructorSchedules.find((schedule) => {
+      const effectiveFrom = schedule.effectiveFrom.toISOString().slice(0, 10);
+      const effectiveTo = schedule.effectiveTo?.toISOString().slice(0, 10);
+      return (
+        effectiveFrom <= localDate &&
+        (effectiveTo === undefined || localDate < effectiveTo)
+      );
+    });
+    const matchesSlot = activeSchedule?.slots.some(
+      (slot) =>
+        slot.weekday === weekday &&
+        slot.startTime.toISOString().slice(11, 16) === localTime,
+    );
+    if (!matchesSlot) {
+      issue(
+        issues,
+        "recurring_classes.csv",
+        row.rowNumber,
+        "start_at",
+        `Instructor ID ${instructorId} has no matching active schedule slot at ${row.data.start_at}`,
+      );
+    }
   }
   return planIds;
 }
@@ -871,6 +1044,8 @@ async function insertCustomers(
   options: IncrementalImportExecutionOptions,
 ) {
   const customerIds = new Map<string, number>();
+  const childIds = new Map<string, number>();
+  const subscriptionIds = new Map<string, number>();
   let insertedCount = 0;
   for (const row of parsed.rows["customers.csv"] ?? []) {
     const customer = await tx.customer.create({
@@ -890,25 +1065,71 @@ async function insertCustomers(
     await options.onPrimaryRecordInserted?.(insertedCount);
   }
   if ((parsed.rows["children.csv"] ?? []).length > 0) {
-    await tx.child.createMany({
+    const childRows = parsed.rows["children.csv"] ?? [];
+    const createdChildren = await tx.child.createManyAndReturn({
       data: (parsed.rows["children.csv"] ?? []).map((row) => ({
         customerId: customerIds.get(row.data.customer_ref)!,
         name: row.data.name,
         birthdate: optionalDateOnly(row.data.birthdate),
         personalInfo: row.data.personal_info || null,
       })),
+      select: { id: true },
+    });
+    childRows.forEach((row, index) => {
+      childIds.set(row.data.child_ref, createdChildren[index].id);
     });
   }
   if ((parsed.rows["subscriptions.csv"] ?? []).length > 0) {
-    await tx.subscription.createMany({
-      data: (parsed.rows["subscriptions.csv"] ?? []).map((row) => ({
+    const subscriptionRows = parsed.rows["subscriptions.csv"] ?? [];
+    const createdSubscriptions = await tx.subscription.createManyAndReturn({
+      data: subscriptionRows.map((row) => ({
         customerId: customerIds.get(row.data.customer_ref)!,
         planId: planIds.get(row.data.plan_name)!,
         selectType: row.data.select_type,
         startAt: new Date(row.data.start_at),
         endAt: optionalDateTime(row.data.end_at),
       })),
+      select: { id: true },
     });
+    subscriptionRows.forEach((row, index) => {
+      subscriptionIds.set(
+        row.data.subscription_ref,
+        createdSubscriptions[index].id,
+      );
+    });
+  }
+
+  const recurringRows = parsed.rows["recurring_classes.csv"] ?? [];
+  if (recurringRows.length > 0) {
+    const createdRecurringClasses = await tx.recurringClass.createManyAndReturn(
+      {
+        data: recurringRows.map((row) => ({
+          subscriptionId: subscriptionIds.get(row.data.subscription_ref)!,
+          instructorId: Number(row.data.instructor_id),
+          startAt: new Date(row.data.start_at),
+          endAt: optionalDateTime(row.data.end_at),
+        })),
+        select: { id: true },
+      },
+    );
+    const recurringClassIds = new Map<string, number>();
+    recurringRows.forEach((row, index) => {
+      recurringClassIds.set(
+        row.data.recurring_class_ref,
+        createdRecurringClasses[index].id,
+      );
+    });
+    const attendanceRows = parsed.rows["recurring_class_attendance.csv"] ?? [];
+    if (attendanceRows.length > 0) {
+      await tx.recurringClassAttendance.createMany({
+        data: attendanceRows.map((row) => ({
+          recurringClassId: recurringClassIds.get(
+            row.data.recurring_class_ref,
+          )!,
+          childrenId: childIds.get(row.data.child_ref)!,
+        })),
+      });
+    }
   }
 }
 
