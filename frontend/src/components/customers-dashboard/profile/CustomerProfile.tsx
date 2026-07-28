@@ -223,7 +223,7 @@ function CustomerProfile({
               ) : null}
               <ActionButton
                 className="editCustomer"
-                btnText={language === "ja" ? "プロフィールを編集" : "Edit"}
+                btnText={language === "ja" ? "編集" : "Edit"}
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
