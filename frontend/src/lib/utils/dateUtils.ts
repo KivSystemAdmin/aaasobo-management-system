@@ -93,8 +93,12 @@ export function getEndTime(date: Date): Date {
 }
 
 // Function to return short form of the day of the week.
-export function getWeekday(date: Date, timeZone: string) {
-  return new Intl.DateTimeFormat("en-US", {
+export function getWeekday(
+  date: Date,
+  timeZone: string,
+  locale: string = "en-US",
+) {
+  return new Intl.DateTimeFormat(locale, {
     weekday: "short",
     timeZone,
   }).format(date);
