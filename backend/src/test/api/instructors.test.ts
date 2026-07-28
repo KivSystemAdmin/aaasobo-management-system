@@ -10,6 +10,7 @@ import {
   createInstructorAbsence,
   createInstructorSchedule,
   createInstructorSlot,
+  createInstructorFee,
   createSchedule,
   generateAuthCookie,
 } from "../testUtils";
@@ -18,8 +19,9 @@ describe("GET /instructors/all-profiles", () => {
   it("succeed returning detailed instructor profiles", async () => {
     const customer = await createCustomer();
     const authCookie = await generateAuthCookie(customer.id, "customer");
+    const instructor = await createInstructor();
     await createInstructor();
-    await createInstructor();
+    await createInstructorFee(instructor.id);
 
     const response = await request(server)
       .get("/instructors/all-profiles")
@@ -27,6 +29,10 @@ describe("GET /instructors/all-profiles", () => {
       .expect(200);
 
     expect(response.body.instructorProfiles).toHaveLength(2);
+    for (const profile of response.body.instructorProfiles) {
+      expect(profile).not.toHaveProperty("fees");
+      expect(profile).not.toHaveProperty("instructorFees");
+    }
   });
 
   it("fail for unauthenticated request", async () => {
@@ -59,8 +65,9 @@ describe("GET /instructors/profiles", () => {
   it("succeed returning public instructor profiles", async () => {
     const customer = await createCustomer();
     const authCookie = await generateAuthCookie(customer.id, "customer");
+    const instructor = await createInstructor();
     await createInstructor();
-    await createInstructor();
+    await createInstructorFee(instructor.id);
 
     const response = await request(server)
       .get("/instructors/profiles")
@@ -68,6 +75,10 @@ describe("GET /instructors/profiles", () => {
       .expect(200);
 
     expect(response.body).toHaveLength(2);
+    for (const profile of response.body) {
+      expect(profile).not.toHaveProperty("fees");
+      expect(profile).not.toHaveProperty("instructorFees");
+    }
   });
 });
 
