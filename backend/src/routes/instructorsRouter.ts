@@ -9,6 +9,7 @@ import {
   getInstructorProfilesController,
   getSameDateClassesController,
   getInstructorProfilesByEnglishBackgroundController,
+  getMyInstructorFeesController,
 } from "../../src/controllers/instructorsController";
 import { registerRoutes } from "../middlewares/validationMiddleware";
 import {
@@ -48,6 +49,7 @@ import {
   UpdateInstructorTagsRequest,
 } from "../../../shared/schemas/instructors";
 import {
+  InstructorFeeRatesResponse,
   InstructorPayrollErrorResponse,
   InstructorPayrollQuery,
   InstructorPayrollResponse,
@@ -213,6 +215,39 @@ const instructorProfileConfig = {
       },
       500: {
         description: "Internal server error",
+      },
+    },
+  },
+} as const;
+
+const myInstructorFeesConfig = {
+  method: "get" as const,
+  middleware: [verifyAuthentication(AUTH_ROLES.I)] as RequestHandler[],
+  handler: getMyInstructorFeesController,
+  openapi: {
+    summary: "Get authenticated instructor fee history",
+    description:
+      "Get fee history for the authenticated instructor. The instructor identity is derived from the verified session.",
+    responses: {
+      200: {
+        description: "Instructor fee history retrieved successfully",
+        schema: InstructorFeeRatesResponse,
+      },
+      401: {
+        description: "Authentication required",
+        schema: MessageErrorResponse,
+      },
+      403: {
+        description: "Only instructors may access this endpoint",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Instructor not found",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
       },
     },
   },
@@ -762,6 +797,7 @@ const validatedRouteConfigs = {
   "/available-slots": [availableSlotsConfig],
   "/available-slots/by-type": [availableSlotsByTypeConfig],
   "/class/:id": [classInstructorConfig],
+  "/fees": [myInstructorFeesConfig],
   "/profiles": [profilesConfig],
   "/profiles/english-background/:englishBackground": [
     englishBackgroundProfilesConfig,

@@ -18,7 +18,9 @@ async function Page() {
     instructor = data.instructor;
   }
 
-  return <InstructorProfile instructor={instructor} />;
+  return (
+    <InstructorProfile instructor={instructor} userSessionType="instructor" />
+  );
 }
 
 export default Page;

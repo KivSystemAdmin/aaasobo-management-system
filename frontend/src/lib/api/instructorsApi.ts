@@ -34,12 +34,18 @@ import type {
   UpdateInstructorTagsRequest,
 } from "@shared/schemas/instructors";
 import { EnglishBackground } from "@/types";
+import type { InstructorFeeRatesResponse } from "@shared/schemas/admins";
 
 const BACKEND_ORIGIN =
   process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
 const BASE_URL = `${BACKEND_ORIGIN}/instructors`;
 
 type Response<T> = T | { message: string };
+type InstructorFeeApiError = {
+  status: number;
+  code: string;
+  message: string;
+};
 
 export type InstructorSlot = {
   scheduleId: number;
@@ -49,6 +55,47 @@ export type InstructorSlot = {
 
 export type InstructorScheduleWithSlots = InstructorSchedule & {
   slots: InstructorSlot[];
+};
+
+export const getMyInstructorFees = async (): Promise<
+  InstructorFeeRatesResponse | InstructorFeeApiError
+> => {
+  try {
+    const backendEndpoint = "/instructors/fees";
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "backend-endpoint": backendEndpoint,
+          "no-cache": "true",
+        },
+      },
+    );
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      return {
+        status: response.status,
+        code:
+          typeof data?.code === "string" ? data.code : "INSTRUCTOR_FEE_ERROR",
+        message:
+          typeof data?.message === "string"
+            ? data.message
+            : `HTTP error! status: ${response.status}`,
+      };
+    }
+
+    return data as InstructorFeeRatesResponse;
+  } catch (error) {
+    console.error("Failed to fetch authenticated instructor fees:", error);
+    return {
+      status: 500,
+      code: "INSTRUCTOR_FEE_ERROR",
+      message: GENERAL_ERROR_MESSAGE,
+    };
+  }
 };
 
 // GET instructors data

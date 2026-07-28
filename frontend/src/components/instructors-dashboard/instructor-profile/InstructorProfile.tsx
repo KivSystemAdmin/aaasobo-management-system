@@ -696,11 +696,16 @@ function InstructorProfile({
               </div>
             )}
 
-            {userSessionType === "admin" &&
-              !isCustomerView &&
-              latestInstructor && (
-                <InstructorFeeRates instructorId={latestInstructor.id} />
-              )}
+            {!isCustomerView &&
+              latestInstructor &&
+              (userSessionType === "admin" ? (
+                <InstructorFeeRates
+                  access="admin"
+                  instructorId={latestInstructor.id}
+                />
+              ) : userSessionType === "instructor" ? (
+                <InstructorFeeRates access="instructor" />
+              ) : null)}
 
             {(latestInstructor.tags?.length || 0) > 0 && (
               <div className={styles.insideContainer}>
