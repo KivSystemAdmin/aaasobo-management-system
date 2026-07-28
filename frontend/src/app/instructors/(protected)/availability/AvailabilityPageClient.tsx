@@ -58,7 +58,7 @@ export default function AvailabilityPageClient({
   return (
     <div>
       <h1 className={styles.title}>Instructor Schedule Calendar</h1>
-      <p>This shows the current active schedule for this instructor.</p>
+      <p>This is your current schedule in Japan Standard Time (JST).</p>
       <ScheduleCalendar slots={slots} />
     </div>
   );
