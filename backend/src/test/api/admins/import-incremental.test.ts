@@ -135,6 +135,9 @@ describe("incremental admin imports", () => {
     expect(instructorFixture.instructorFiles["instructors.csv"]).toContain(
       ",in0031@example.com,Temp-in0031,",
     );
+    expect(instructorFixture.instructorFiles["instructors.csv"]).toContain(
+      ",http://localhost:3000/images/default-user-icon.jpg?id=in0031,",
+    );
     expect(instructorFixture.instructorFiles["instructors.csv"]).not.toContain(
       "Incremental Instructor",
     );
