@@ -30,6 +30,7 @@ interface ProgressiveBookingFlowProps {
   childProfiles: Child[];
   customerId: number;
   plan?: Plan;
+  onBookingSuccess: () => void;
 }
 
 type StepStatus = "completed" | "current" | "pending";
@@ -62,6 +63,7 @@ export default function ProgressiveBookingFlow({
   customerId,
   adminId,
   plan,
+  onBookingSuccess,
 }: ProgressiveBookingFlowProps) {
   // All hooks must be called at the top level
   const [selectedMode, setSelectedMode] = useState<
@@ -335,7 +337,7 @@ export default function ProgressiveBookingFlow({
           : "Booking completed successfully.",
       );
       onClose();
-      window.location.reload();
+      onBookingSuccess();
     } catch (error) {
       console.error("Booking failed:", error);
       errorAlert(language === "ja" ? "予約に失敗しました" : "Booking failed");

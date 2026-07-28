@@ -19,6 +19,7 @@ import {
 } from "@/lib/data/data";
 import BookingModal from "../../bookingActions/BookingModal";
 import { errorAlert } from "@/lib/utils/alertUtils";
+import { useBookingSuccess } from "../rebookingModalController/RebookingModalController";
 
 export default function RebookableClassList({
   customerId,
@@ -28,6 +29,8 @@ export default function RebookableClassList({
   userSessionType,
   childProfiles,
 }: RebookableClassListProps) {
+  const onBookingSuccess = useBookingSuccess();
+
   const handleRebook = (
     id: number,
     rebookableUntil: Date,
@@ -168,6 +171,7 @@ export default function RebookableClassList({
           customerId={customerId}
           adminId={adminId}
           plan={plan}
+          onBookingSuccess={onBookingSuccess}
         />
       )}
     </ul>
