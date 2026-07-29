@@ -5,9 +5,7 @@ import { EnglishBackground } from "../types";
 import {
   CANCELED_CLASS_COLOR,
   COMPLETED_CLASS_COLOR,
-  FREE_TRIAL_CLASS_COLOR,
-  REBOOKED_CLASS_COLOR,
-  REGULAR_CLASS_COLOR,
+  UPCOMING_CLASS_COLOR,
 } from "../utils/colors";
 import {
   NO_CLASS_EVENT_NAME,
@@ -520,17 +518,14 @@ export const getInstructorCalendarSlots = async (
       Extract<Status, "booked" | "rebooked" | "completed">,
       string
     > = {
-      booked: REGULAR_CLASS_COLOR,
-      rebooked: REBOOKED_CLASS_COLOR,
+      booked: UPCOMING_CLASS_COLOR,
+      rebooked: UPCOMING_CLASS_COLOR,
       completed: COMPLETED_CLASS_COLOR,
     };
 
     const classSlots = classes
       .filter((classItem) => classItem.dateTime !== null)
       .map((classItem) => {
-        const isBookedOrRebooked =
-          classItem.status === "booked" || classItem.status === "rebooked";
-
         return {
           start: classItem.dateTime!.toISOString(),
           end: new Date(
@@ -541,9 +536,7 @@ export const getInstructorCalendarSlots = async (
               .map((attendance) => attendance.children.name)
               .join(", ") || "Class",
           color:
-            classItem.isFreeTrial && isBookedOrRebooked
-              ? FREE_TRIAL_CLASS_COLOR
-              : statusColorMap[classItem.status as keyof typeof statusColorMap],
+            statusColorMap[classItem.status as keyof typeof statusColorMap],
           slotType: classItem.status as "booked" | "rebooked" | "completed",
           classId: classItem.id,
         };
