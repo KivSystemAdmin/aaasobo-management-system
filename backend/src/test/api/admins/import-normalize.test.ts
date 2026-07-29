@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 import request from "supertest";
 import JSZip from "jszip";
+import { Prisma } from "@prisma/client";
 import { server } from "../../../server";
 import { generateNormalizedImportFixture } from "../../../seed/generateNormalizedImportFixture";
 import { validateNormalizedImportFiles } from "../../../services/adminImport";
+import {
+  IMPORT_PRESERVED_TABLES,
+  IMPORT_RESET_TABLES,
+} from "../../../services/adminImport/execute";
 import {
   createAdmin,
   createCustomer,
@@ -316,6 +321,16 @@ describe("POST /admins/import/normalize", () => {
 });
 
 describe("POST /admins/import/execute", () => {
+  it("defines a clean-import policy for every application table", () => {
+    const categorizedTables = [
+      ...IMPORT_RESET_TABLES,
+      ...IMPORT_PRESERVED_TABLES,
+    ].sort();
+    const applicationTables = Object.values(Prisma.ModelName).sort();
+
+    expect(categorizedTables).toEqual(applicationTables);
+  });
+
   it("executes normalized package by jobId", async () => {
     const admin = await createAdmin();
     const authCookie = await generateAuthCookie(admin.id, "admin");
