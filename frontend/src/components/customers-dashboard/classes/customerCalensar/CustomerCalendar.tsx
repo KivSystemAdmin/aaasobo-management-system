@@ -13,8 +13,8 @@ import Modal from "@/components/elements/modal/Modal";
 import ClassDetail from "@/components/features/classDetail/ClassDetail";
 import {
   createRenderEventContent,
+  getCurrentMonthValidRange,
   getDayCellColorHandler,
-  getValidRange,
 } from "@/lib/utils/calendarUtils";
 import CalendarLegend from "@/components/features/calendarLegend/CalendarLegend";
 
@@ -38,14 +38,7 @@ export default function CustomerCalendar({
     setIsClassDetailModalOpen(true);
   };
 
-  const validRange = () => {
-    const now = new Date();
-    const currentMonthStart = `${now.getFullYear()}-${String(
-      now.getMonth() + 1,
-    ).padStart(2, "0")}-01`;
-
-    return getValidRange(currentMonthStart, 3);
-  };
+  const validRange = () => getCurrentMonthValidRange(3);
   const renderCustomerEventContent = createRenderEventContent("customer");
 
   const handleModalClose = () => {
