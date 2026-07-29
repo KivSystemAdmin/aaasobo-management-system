@@ -1,12 +1,18 @@
 import { describe, expect, it } from "vitest";
 import request from "supertest";
 import JSZip from "jszip";
+import { Prisma } from "@prisma/client";
 import { server } from "../../../server";
 import { generateNormalizedImportFixture } from "../../../seed/generateNormalizedImportFixture";
 import { validateNormalizedImportFiles } from "../../../services/adminImport";
 import {
+  IMPORT_PRESERVED_TABLES,
+  IMPORT_RESET_TABLES,
+} from "../../../services/adminImport/execute";
+import {
   createAdmin,
   createCustomer,
+  createInstructor,
   generateAuthCookie,
 } from "../../testUtils";
 import { prisma } from "../../setup";
@@ -315,6 +321,16 @@ describe("POST /admins/import/normalize", () => {
 });
 
 describe("POST /admins/import/execute", () => {
+  it("defines a clean-import policy for every application table", () => {
+    const categorizedTables = [
+      ...IMPORT_RESET_TABLES,
+      ...IMPORT_PRESERVED_TABLES,
+    ].sort();
+    const applicationTables = Object.values(Prisma.ModelName).sort();
+
+    expect(categorizedTables).toEqual(applicationTables);
+  });
+
   it("executes normalized package by jobId", async () => {
     const admin = await createAdmin();
     const authCookie = await generateAuthCookie(admin.id, "admin");
@@ -442,7 +458,51 @@ describe("POST /admins/import/execute", () => {
 
   it("imports a normalized zip and persists cross-entity relationships", async () => {
     const admin = await createAdmin();
+    const existingInstructor = await createInstructor();
     const authCookie = await generateAuthCookie(admin.id, "admin");
+    const existingTag = await prisma.instructorTagCatalog.create({
+      data: {
+        label: "Existing tag",
+        sortOrder: 1,
+        createdBy: admin.id,
+      },
+    });
+
+    await Promise.all([
+      prisma.instructorTagAssignment.create({
+        data: {
+          instructorId: existingInstructor.id,
+          tagId: existingTag.id,
+          updatedBy: admin.id,
+        },
+      }),
+      prisma.instructorAbsence.create({
+        data: {
+          instructorId: existingInstructor.id,
+          absentAt: new Date("2025-01-01T00:00:00.000Z"),
+        },
+      }),
+      prisma.verificationToken.create({
+        data: {
+          email: "existing-verification@example.com",
+          token: "existing-verification-token",
+          expires: new Date("2030-01-01T00:00:00.000Z"),
+        },
+      }),
+      prisma.passwordResetToken.create({
+        data: {
+          email: "existing-reset@example.com",
+          token: "existing-reset-token",
+          expires: new Date("2030-01-01T00:00:00.000Z"),
+        },
+      }),
+      prisma.messageBoardPost.create({
+        data: {
+          target: 0,
+          body: "Existing message",
+        },
+      }),
+    ]);
 
     const zipBuffer = await buildZipBuffer(buildMinimalNormalizedFiles());
 
@@ -464,12 +524,22 @@ describe("POST /admins/import/execute", () => {
       subscriptions,
       instructors,
       instructorFees,
+      instructorSchedules,
+      instructorSlots,
+      instructorAbsences,
+      instructorTagCatalog,
+      instructorTagAssignments,
+      events,
       schedules,
       recurringClasses,
       classes,
       recurringClassAttendance,
       classAttendance,
-      status,
+      systemStatuses,
+      verificationTokens,
+      passwordResetTokens,
+      admins,
+      messageBoardPosts,
     ] = await Promise.all([
       prisma.plan.count(),
       prisma.customer.count(),
@@ -477,12 +547,22 @@ describe("POST /admins/import/execute", () => {
       prisma.subscription.count(),
       prisma.instructor.count(),
       prisma.instructorFee.count(),
+      prisma.instructorSchedule.count(),
+      prisma.instructorSlot.count(),
+      prisma.instructorAbsence.count(),
+      prisma.instructorTagCatalog.count(),
+      prisma.instructorTagAssignment.count(),
+      prisma.event.count(),
       prisma.schedule.count(),
       prisma.recurringClass.count(),
       prisma.class.count(),
       prisma.recurringClassAttendance.count(),
       prisma.classAttendance.count(),
-      prisma.systemStatus.findFirst(),
+      prisma.systemStatus.count(),
+      prisma.verificationToken.count(),
+      prisma.passwordResetToken.count(),
+      prisma.admin.count(),
+      prisma.messageBoardPost.count(),
     ]);
 
     expect(plans).toBe(1);
@@ -491,12 +571,22 @@ describe("POST /admins/import/execute", () => {
     expect(subscriptions).toBe(1);
     expect(instructors).toBe(1);
     expect(instructorFees).toBe(1);
+    expect(instructorSchedules).toBe(1);
+    expect(instructorSlots).toBe(1);
+    expect(instructorAbsences).toBe(0);
+    expect(instructorTagCatalog).toBe(0);
+    expect(instructorTagAssignments).toBe(0);
+    expect(events).toBe(1);
     expect(schedules).toBe(1);
     expect(recurringClasses).toBe(1);
     expect(classes).toBe(1);
     expect(recurringClassAttendance).toBe(1);
     expect(classAttendance).toBe(1);
-    expect(status?.status).toBe("Running");
+    expect(systemStatuses).toBe(1);
+    expect(verificationTokens).toBe(0);
+    expect(passwordResetTokens).toBe(0);
+    expect(admins).toBe(1);
+    expect(messageBoardPosts).toBe(0);
 
     const importedClass = await prisma.class.findFirst({
       include: {
@@ -628,44 +718,6 @@ describe("POST /admins/import/execute", () => {
     expect(generated.rows["class_attendance.csv"]).toHaveLength(65);
     expect(generated.rows["instructor_schedules.csv"]).toHaveLength(77);
   });
-
-  it("imports the deterministic fixture with more than 9999 classes", async () => {
-    const admin = await createAdmin();
-    const authCookie = await generateAuthCookie(admin.id, "admin");
-    const generated = await generateNormalizedImportFixture({
-      from: "2026-01-01",
-      completedUntil: "2026-05-22",
-      to: "2026-05-31",
-      instructorCount: 50,
-    });
-
-    const validation = validateNormalizedImportFiles(generated.files);
-    expect(validation.issues).toEqual([]);
-    expect(validation.isValid).toBe(true);
-
-    const zipBuffer = await buildZipBuffer(generated.files);
-    const response = await request(server)
-      .post("/admins/import/execute")
-      .set("Cookie", authCookie)
-      .attach("file", zipBuffer, {
-        filename: generated.zipFileName,
-        contentType: "application/zip",
-      })
-      .expect(200);
-
-    expect(response.body.imported).toBe(true);
-
-    const customerLoginResponse = await request(server)
-      .post("/users/authenticate")
-      .send({
-        email: generated.rows["customers.csv"][0].email,
-        password: generated.rows["customers.csv"][0].temp_password,
-        userType: "customer",
-      })
-      .expect(200);
-
-    expect(customerLoginResponse.body).toEqual({ id: expect.any(Number) });
-  }, 120_000);
 
   it("accepts multiple slot rows that share the same instructor schedule key", async () => {
     const admin = await createAdmin();

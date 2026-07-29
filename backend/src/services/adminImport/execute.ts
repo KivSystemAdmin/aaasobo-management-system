@@ -171,7 +171,7 @@ const STATUS_VALUES = new Set([
   "declined",
 ]);
 const IMPORT_TRANSACTION_TIMEOUT_MS = 180_000;
-const IMPORT_RESET_TABLES = [
+export const IMPORT_RESET_TABLES = [
   "ClassAttendance",
   "Class",
   "RecurringClassAttendance",
@@ -183,7 +183,10 @@ const IMPORT_RESET_TABLES = [
   "InstructorSlot",
   "InstructorSchedule",
   "InstructorFee",
+  "InstructorTagAssignment",
+  "InstructorTagCatalog",
   "Instructor",
+  "MessageBoardPost",
   "Schedule",
   "Event",
   "Plan",
@@ -191,6 +194,7 @@ const IMPORT_RESET_TABLES = [
   "PasswordResetToken",
   "VerificationToken",
 ] as const;
+export const IMPORT_PRESERVED_TABLES = ["Admin"] as const;
 const IMPORT_RESET_TRUNCATE_SQL = `TRUNCATE TABLE ${IMPORT_RESET_TABLES.map((table) => `"${table}"`).join(", ")} RESTART IDENTITY CASCADE`;
 
 interface RowEnvelope<T> {
