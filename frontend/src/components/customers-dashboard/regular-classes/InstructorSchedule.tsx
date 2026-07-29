@@ -7,6 +7,7 @@ import {
 } from "@/lib/api/instructorsApi";
 import { getTodayInJapanISODate } from "@/lib/utils/dateUtils";
 import { WEEKDAYS } from "@/lib/utils/scheduleUtils";
+import { EDIT_REGULAR_CLASS_MESSAGES } from "@/lib/messages/customerDashboard";
 import styles from "./InstructorSchedule.module.scss";
 
 interface InstructorScheduleProps {
@@ -15,6 +16,7 @@ interface InstructorScheduleProps {
   onSlotSelect: (weekday: number, startTime: string) => void;
   selectedWeekday: number | null;
   selectedStartTime: string;
+  language: LanguageType;
 }
 
 export default function InstructorSchedule({
@@ -23,7 +25,9 @@ export default function InstructorSchedule({
   onSlotSelect,
   selectedWeekday,
   selectedStartTime,
+  language,
 }: InstructorScheduleProps) {
+  const messages = EDIT_REGULAR_CLASS_MESSAGES[language];
   const [slots, setSlots] = useState<InstructorSlot[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
@@ -44,7 +48,7 @@ export default function InstructorSchedule({
         setSlots(response.schedule?.slots || []);
       } catch (error) {
         console.error("Failed to fetch instructor schedule:", error);
-        setError("Failed to load instructor schedule");
+        setError(messages.scheduleLoadFailed);
       } finally {
         setLoading(false);
       }
@@ -53,7 +57,7 @@ export default function InstructorSchedule({
     if (instructorId) {
       fetchSchedule();
     }
-  }, [instructorId, effectiveDate]);
+  }, [instructorId, effectiveDate, messages.scheduleLoadFailed]);
 
   // Group JST slots by weekday
   const slotsByWeekday = (slots || []).reduce(
@@ -92,7 +96,7 @@ export default function InstructorSchedule({
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner}></div>
-        <span>Loading instructor schedule...</span>
+        <span>{messages.loadingSchedule}</span>
       </div>
     );
   }
@@ -108,10 +112,7 @@ export default function InstructorSchedule({
   if (!slots || slots.length === 0) {
     return (
       <div className={styles.emptyContainer}>
-        <span>
-          No available time slots found for this instructor on the selected
-          date.
-        </span>
+        <span>{messages.noAvailableSlots}</span>
       </div>
     );
   }
@@ -123,7 +124,7 @@ export default function InstructorSchedule({
         <div className={styles.header}>
           {WEEKDAYS.map((day, index) => (
             <div key={day} className={styles.dayHeader}>
-              {day}
+              {messages.weekdays[index]}
             </div>
           ))}
         </div>
@@ -151,7 +152,7 @@ export default function InstructorSchedule({
                 >
                   {slotInfo.displayTime}
                 </button>
-              )) || <div className={styles.noSlots}>No slots</div>}
+              )) || <div className={styles.noSlots}>{messages.noSlots}</div>}
             </div>
           ))}
         </div>
