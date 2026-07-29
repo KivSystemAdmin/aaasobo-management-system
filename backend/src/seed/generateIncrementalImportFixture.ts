@@ -52,8 +52,7 @@ const MAX_COUNT = 99_999;
 const DEFAULT_START_ID = 1;
 const MAX_ID = 99_999;
 const FAKER_SEED = 20250301;
-const DEFAULT_DUMMY_INSTRUCTOR_ICON_URL =
-  "http://localhost:3000/images/default-user-icon.jpg";
+const DEFAULT_DUMMY_INSTRUCTOR_ICON = "/images/default-user-icon.jpg";
 const PATTERN_A_SLOTS = buildPatternSlots(
   ["1", "2", "3"],
   ["16:00", "16:30", "17:00", "17:30", "18:00"],
@@ -405,7 +404,7 @@ function instructorRows(
       email: `${lowerRef}@example.com`,
       temp_password: `Temp-${lowerRef}`,
       class_url: `https://class.example.com/${lowerRef}`,
-      icon: `${DEFAULT_DUMMY_INSTRUCTOR_ICON_URL}?id=${lowerRef}`,
+      icon: `${DEFAULT_DUMMY_INSTRUCTOR_ICON}?id=${lowerRef}`,
       nickname,
       meeting_id: `MID${String(index).padStart(4, "0")}`,
       passcode: `PIN${String(index).padStart(4, "0")}`,
