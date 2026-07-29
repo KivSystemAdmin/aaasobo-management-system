@@ -220,6 +220,7 @@ function RegularClassesTable({
           adminId={adminId}
           onSuccess={handleEditSuccess}
           plan={plan}
+          language={language}
         />
       )}
     </div>
