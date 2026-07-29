@@ -443,7 +443,51 @@ describe("POST /admins/import/execute", () => {
 
   it("imports a normalized zip and persists cross-entity relationships", async () => {
     const admin = await createAdmin();
+    const existingInstructor = await createInstructor();
     const authCookie = await generateAuthCookie(admin.id, "admin");
+    const existingTag = await prisma.instructorTagCatalog.create({
+      data: {
+        label: "Existing tag",
+        sortOrder: 1,
+        createdBy: admin.id,
+      },
+    });
+
+    await Promise.all([
+      prisma.instructorTagAssignment.create({
+        data: {
+          instructorId: existingInstructor.id,
+          tagId: existingTag.id,
+          updatedBy: admin.id,
+        },
+      }),
+      prisma.instructorAbsence.create({
+        data: {
+          instructorId: existingInstructor.id,
+          absentAt: new Date("2025-01-01T00:00:00.000Z"),
+        },
+      }),
+      prisma.verificationToken.create({
+        data: {
+          email: "existing-verification@example.com",
+          token: "existing-verification-token",
+          expires: new Date("2030-01-01T00:00:00.000Z"),
+        },
+      }),
+      prisma.passwordResetToken.create({
+        data: {
+          email: "existing-reset@example.com",
+          token: "existing-reset-token",
+          expires: new Date("2030-01-01T00:00:00.000Z"),
+        },
+      }),
+      prisma.messageBoardPost.create({
+        data: {
+          target: 0,
+          body: "Existing message",
+        },
+      }),
+    ]);
 
     const zipBuffer = await buildZipBuffer(buildMinimalNormalizedFiles());
 
@@ -465,12 +509,22 @@ describe("POST /admins/import/execute", () => {
       subscriptions,
       instructors,
       instructorFees,
+      instructorSchedules,
+      instructorSlots,
+      instructorAbsences,
+      instructorTagCatalog,
+      instructorTagAssignments,
+      events,
       schedules,
       recurringClasses,
       classes,
       recurringClassAttendance,
       classAttendance,
-      status,
+      systemStatuses,
+      verificationTokens,
+      passwordResetTokens,
+      admins,
+      messageBoardPosts,
     ] = await Promise.all([
       prisma.plan.count(),
       prisma.customer.count(),
@@ -478,12 +532,22 @@ describe("POST /admins/import/execute", () => {
       prisma.subscription.count(),
       prisma.instructor.count(),
       prisma.instructorFee.count(),
+      prisma.instructorSchedule.count(),
+      prisma.instructorSlot.count(),
+      prisma.instructorAbsence.count(),
+      prisma.instructorTagCatalog.count(),
+      prisma.instructorTagAssignment.count(),
+      prisma.event.count(),
       prisma.schedule.count(),
       prisma.recurringClass.count(),
       prisma.class.count(),
       prisma.recurringClassAttendance.count(),
       prisma.classAttendance.count(),
-      prisma.systemStatus.findFirst(),
+      prisma.systemStatus.count(),
+      prisma.verificationToken.count(),
+      prisma.passwordResetToken.count(),
+      prisma.admin.count(),
+      prisma.messageBoardPost.count(),
     ]);
 
     expect(plans).toBe(1);
@@ -492,12 +556,22 @@ describe("POST /admins/import/execute", () => {
     expect(subscriptions).toBe(1);
     expect(instructors).toBe(1);
     expect(instructorFees).toBe(1);
+    expect(instructorSchedules).toBe(1);
+    expect(instructorSlots).toBe(1);
+    expect(instructorAbsences).toBe(0);
+    expect(instructorTagCatalog).toBe(0);
+    expect(instructorTagAssignments).toBe(0);
+    expect(events).toBe(1);
     expect(schedules).toBe(1);
     expect(recurringClasses).toBe(1);
     expect(classes).toBe(1);
     expect(recurringClassAttendance).toBe(1);
     expect(classAttendance).toBe(1);
-    expect(status?.status).toBe("Running");
+    expect(systemStatuses).toBe(1);
+    expect(verificationTokens).toBe(0);
+    expect(passwordResetTokens).toBe(0);
+    expect(admins).toBe(1);
+    expect(messageBoardPosts).toBe(0);
 
     const importedClass = await prisma.class.findFirst({
       include: {
@@ -719,56 +793,6 @@ describe("POST /admins/import/execute", () => {
     expect(admin1.email).toBe("admin@example.com");
     expect(admin2.email).toBe("admin2@example.com");
     expect(admin3.email).toBe("temporary-admin@example.com");
-  });
-
-  it("clears instructor tags and message board posts during full reset import", async () => {
-    const admin = await createAdmin();
-    const instructor = await createInstructor();
-    const authCookie = await generateAuthCookie(admin.id, "admin");
-    const tag = await prisma.instructorTagCatalog.create({
-      data: {
-        label: "Existing tag",
-        sortOrder: 1,
-        createdBy: admin.id,
-      },
-    });
-
-    await Promise.all([
-      prisma.instructorTagAssignment.create({
-        data: {
-          instructorId: instructor.id,
-          tagId: tag.id,
-          updatedBy: admin.id,
-        },
-      }),
-      prisma.messageBoardPost.create({
-        data: {
-          target: 0,
-          body: "Existing message",
-        },
-      }),
-    ]);
-
-    const zipBuffer = await buildZipBuffer(buildMinimalNormalizedFiles());
-
-    await request(server)
-      .post("/admins/import/execute")
-      .set("Cookie", authCookie)
-      .attach("file", zipBuffer, {
-        filename: "normalized.zip",
-        contentType: "application/zip",
-      })
-      .expect(200);
-
-    const [tagCount, assignmentCount, messageCount] = await Promise.all([
-      prisma.instructorTagCatalog.count(),
-      prisma.instructorTagAssignment.count(),
-      prisma.messageBoardPost.count(),
-    ]);
-
-    expect(tagCount).toBe(0);
-    expect(assignmentCount).toBe(0);
-    expect(messageCount).toBe(0);
   });
 
   it("rolls back reset and inserts when import fails mid-transaction", async () => {
