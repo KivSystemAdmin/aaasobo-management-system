@@ -44,6 +44,11 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "6mb",
+    },
+  },
   turbopack: {
     resolveAlias: {
       "@": "./src",
