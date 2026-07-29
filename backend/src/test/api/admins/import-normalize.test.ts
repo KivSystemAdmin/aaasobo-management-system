@@ -616,6 +616,9 @@ describe("POST /admins/import/execute", () => {
     expect(validation.issues).toEqual([]);
     expect(validation.isValid).toBe(true);
     expect(generated.rows["instructors.csv"]).toHaveLength(5);
+    expect(generated.files["instructors.csv"]).toContain(
+      ",/images/default-user-icon.jpg?id=in0001,",
+    );
     expect(generated.rows["customers.csv"]).toHaveLength(50);
     expect(generated.rows["children.csv"]).toHaveLength(55);
     expect(generated.rows["subscriptions.csv"]).toHaveLength(50);

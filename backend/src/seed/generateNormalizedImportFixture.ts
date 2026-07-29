@@ -13,6 +13,7 @@ const FAKER_SEED = 20250301;
 
 const DEFAULT_INSTRUCTOR_COUNT = 10;
 const CUSTOMERS_PER_INSTRUCTOR = 10;
+const DEFAULT_DUMMY_INSTRUCTOR_ICON = "/images/default-user-icon.jpg";
 
 const PATTERN_A_SLOTS: SlotDef[] = buildPatternSlots(
   [1, 2, 3],
@@ -468,7 +469,7 @@ function instructorRows(
       email: `${lowerRef}@example.com`,
       temp_password: `Temp-${lowerRef}`,
       class_url: `https://class.example.com/${lowerRef}`,
-      icon: `https://img.example.com/${lowerRef}.png`,
+      icon: `${DEFAULT_DUMMY_INSTRUCTOR_ICON}?id=${lowerRef}`,
       nickname,
       meeting_id: `MID${String(i).padStart(4, "0")}`,
       passcode: `PIN${String(i).padStart(4, "0")}`,

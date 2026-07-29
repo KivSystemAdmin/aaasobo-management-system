@@ -652,12 +652,21 @@ function validateFileData(
           const url = new URL(row.data[column]);
           if (!["http:", "https:"].includes(url.protocol)) throw new Error();
         } catch {
+          if (
+            column === "icon" &&
+            row.data[column].startsWith("/images/") &&
+            !row.data[column].startsWith("//")
+          ) {
+            continue;
+          }
           issue(
             issues,
             "instructors.csv",
             row.rowNumber,
             column,
-            "URL must use http or https",
+            column === "icon"
+              ? "URL must use http or https or a local /images/ path"
+              : "URL must use http or https",
           );
         }
       }
