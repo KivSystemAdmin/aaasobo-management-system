@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useState } from "react";
 import styles from "./RegisterForm.module.scss";
 import {
   EnvelopeIcon,
@@ -61,7 +61,6 @@ const RegisterForm = ({
   const { localMessages, clearErrorMessage, resetMessages } =
     useFormMessages(registerResultState);
   const { passwordStrength } = usePasswordStrength(password);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [englishBackground, setEnglishBackground] = useState<EnglishBackground>(
     EnglishBackground.NonNative,
   );
@@ -385,27 +384,7 @@ const RegisterForm = ({
               </div>
 
               {/* Image File */}
-              <input
-                type="file"
-                name="icon"
-                ref={fileInputRef}
-                style={{ display: "none" }}
-              />
-              <Uploader
-                onFileSelect={(file) => {
-                  if (fileInputRef.current && file) {
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    fileInputRef.current.files = dataTransfer.files;
-                  }
-                }}
-                clearFileInputRef={() => {
-                  if (fileInputRef.current) {
-                    fileInputRef.current.value = "";
-                  }
-                }}
-                label={"Instructor profile image"}
-              />
+              <Uploader label={"Instructor profile image"} />
             </>
           )}
         </>

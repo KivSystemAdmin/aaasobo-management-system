@@ -112,7 +112,6 @@ function InstructorProfile({
   const [isEditing, setIsEditing] = useState(false);
   const [userStatus, setUserStatus] = useState<string>("Active");
   const [leavingDate, setLeavingDate] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { language } = useLanguage();
   const formRef = useRef<HTMLFormElement>(null);
   const englishBackgroundClassNames = ["", "nativeA", "nativeB"] as const;
@@ -246,26 +245,7 @@ function InstructorProfile({
               <>
                 {/* Image Uploader */}
                 <p className={styles.profileImage__text}>Profile Image</p>
-                <input
-                  type="file"
-                  name="icon"
-                  ref={fileInputRef}
-                  style={{ display: "none" }}
-                />
-                <Uploader
-                  onFileSelect={(file) => {
-                    if (fileInputRef.current && file) {
-                      const dataTransfer = new DataTransfer();
-                      dataTransfer.items.add(file);
-                      fileInputRef.current.files = dataTransfer.files;
-                    }
-                  }}
-                  clearFileInputRef={() => {
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = "";
-                    }
-                  }}
-                />
+                <Uploader />
               </>
             )}
 
@@ -741,11 +721,6 @@ function InstructorProfile({
 
             {/* Hidden input fields */}
             <input type="hidden" name="id" value={latestInstructor.id} />
-            <input
-              type="hidden"
-              name="icon"
-              value={latestInstructor.icon.url}
-            />
 
             {/* Action buttons for only admin */}
             {userSessionType === "admin" &&
