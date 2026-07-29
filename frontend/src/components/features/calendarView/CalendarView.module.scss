@@ -92,11 +92,9 @@
   border: 1.5px solid #7f8c6b;
   margin-right: 5px;
 
-  &.booked {
-    border: 1.5px solid #415a77;
-  }
+  &.booked,
   &.rebooked {
-    border: 1.5px solid #2c6e01;
+    border: 1.5px solid $blue-primary;
   }
 }
 
@@ -106,12 +104,12 @@
   margin-right: 5px;
 
   &__completed {
-    color: #7f8c6b;
+    color: $completed-text-color;
     width: 17px;
   }
 
   &__canceled {
-    color: #d7590f;
+    color: $canceled-text-color;
     width: 18px;
   }
 }
@@ -120,17 +118,15 @@
   color: white;
   display: flex;
   align-items: center;
-  &.booked {
-    color: #415a77;
-  }
+  &.booked,
   &.rebooked {
-    color: #2c6e01;
+    color: $blue-primary;
   }
   &.completed {
-    color: #7f8c6b;
+    color: $completed-text-color;
   }
   &.canceled {
-    color: #d7590f;
+    color: $canceled-text-color;
     text-decoration: line-through;
   }
 }
