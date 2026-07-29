@@ -21,7 +21,6 @@ import CalendarLegend from "@/components/features/calendarLegend/CalendarLegend"
 export default function CustomerCalendar({
   customerId,
   classes,
-  createdAt,
   businessSchedule,
   colorsForEvents,
   userSessionType,
@@ -39,7 +38,14 @@ export default function CustomerCalendar({
     setIsClassDetailModalOpen(true);
   };
 
-  const validRange = () => getValidRange(createdAt, 3);
+  const validRange = () => {
+    const now = new Date();
+    const currentMonthStart = `${now.getFullYear()}-${String(
+      now.getMonth() + 1,
+    ).padStart(2, "0")}-01`;
+
+    return getValidRange(currentMonthStart, 3);
+  };
   const renderCustomerEventContent = createRenderEventContent("customer");
 
   const handleModalClose = () => {

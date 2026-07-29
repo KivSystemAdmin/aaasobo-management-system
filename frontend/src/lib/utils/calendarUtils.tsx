@@ -117,12 +117,12 @@ export const createRenderEventContent = (userType: UserType) => {
   return RenderEventContent;
 };
 
-export const getValidRange = (createdAt: string, monthsAhead: number) => {
+export const getValidRange = (startDate: string, monthsAhead: number) => {
   const now = new Date();
   const end = new Date(now.getFullYear(), now.getMonth() + monthsAhead, 1);
 
   return {
-    start: createdAt.split("T")[0],
+    start: startDate.split("T")[0],
     end: end.toISOString().split("T")[0],
   };
 };

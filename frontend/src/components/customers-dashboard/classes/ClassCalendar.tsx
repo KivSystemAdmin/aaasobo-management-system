@@ -34,7 +34,6 @@ export default async function ClassCalendar({
       getMessageBoardPosts(cookie),
     ]);
 
-  const createdAt = customer.createdAt;
   const hasSeenWelcomeModal = customer.hasSeenWelcome;
   const terminationAt = customer.terminationAt;
 
@@ -68,7 +67,6 @@ export default async function ClassCalendar({
       <CustomerCalendar
         customerId={customerId}
         classes={classes}
-        createdAt={createdAt}
         businessSchedule={schedule.organizedData}
         colorsForEvents={colorsForEvents}
         userSessionType={userSessionType}
