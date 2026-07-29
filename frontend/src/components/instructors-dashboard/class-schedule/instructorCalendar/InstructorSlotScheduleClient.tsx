@@ -2,6 +2,7 @@
 
 import InstructorSlotCalendar from "@/components/features/instructorSlotCalendar/InstructorSlotCalendar";
 import MessageBoardPanel from "@/components/features/messageBoardPanel/MessageBoardPanel";
+import { getCurrentMonthValidRange } from "@/lib/utils/calendarUtils";
 import { MessageTarget } from "@/types";
 import styles from "./InstructorCalendarClient.module.scss";
 
@@ -37,6 +38,7 @@ export default function InstructorSlotScheduleClient({
           slotMaxTime: "24:00:00",
           slotDuration: "00:30:00",
           timeZone: "local",
+          validRange: getCurrentMonthValidRange(3),
         }}
       />
     </div>

@@ -13,15 +13,14 @@ import Modal from "@/components/elements/modal/Modal";
 import ClassDetail from "@/components/features/classDetail/ClassDetail";
 import {
   createRenderEventContent,
+  getCurrentMonthValidRange,
   getDayCellColorHandler,
-  getValidRange,
 } from "@/lib/utils/calendarUtils";
 import CalendarLegend from "@/components/features/calendarLegend/CalendarLegend";
 
 export default function CustomerCalendar({
   customerId,
   classes,
-  createdAt,
   businessSchedule,
   colorsForEvents,
   userSessionType,
@@ -39,7 +38,7 @@ export default function CustomerCalendar({
     setIsClassDetailModalOpen(true);
   };
 
-  const validRange = () => getValidRange(createdAt, 3);
+  const validRange = () => getCurrentMonthValidRange(3);
   const renderCustomerEventContent = createRenderEventContent("customer");
 
   const handleModalClose = () => {

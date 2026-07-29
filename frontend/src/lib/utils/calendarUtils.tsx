@@ -117,13 +117,25 @@ export const createRenderEventContent = (userType: UserType) => {
   return RenderEventContent;
 };
 
-export const getValidRange = (createdAt: string, monthsAhead: number) => {
+const getValidRange = (startDate: string, monthsAhead: number) => {
   const now = new Date();
   const end = new Date(now.getFullYear(), now.getMonth() + monthsAhead, 1);
 
   return {
-    start: createdAt.split("T")[0],
+    start: startDate.split("T")[0],
     end: end.toISOString().split("T")[0],
+  };
+};
+
+export const getCurrentMonthValidRange = (monthsAhead: number) => {
+  const now = new Date();
+  const end = new Date(now.getFullYear(), now.getMonth() + monthsAhead, 1);
+  const formatMonthStart = (date: Date) =>
+    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-01`;
+
+  return {
+    start: formatMonthStart(now),
+    end: formatMonthStart(end),
   };
 };
 
