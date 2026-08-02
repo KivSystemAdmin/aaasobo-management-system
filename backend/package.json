@@ -14,6 +14,7 @@
     "beta:generate-import": "ts-node ./src/seed/generateBetaImportFromRawSchedule.ts",
     "prisma:init": "prisma generate && npx prisma migrate reset && npm run db:bootstrap",
     "fixture:generate:normalized-import": "ts-node ./src/seed/generateNormalizedImportFixture.ts",
+    "fixture:generate:incremental-import": "ts-node ./src/seed/generateIncrementalImportFixture.ts",
     "test": "prisma generate && vitest run src/test/api",
     "test:api": "prisma generate && vitest run src/test/api",
     "test:performance": "prisma generate && vitest run src/test/performance",

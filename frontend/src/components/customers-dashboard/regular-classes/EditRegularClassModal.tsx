@@ -11,6 +11,7 @@ import {
   UserGroupIcon,
   AcademicCapIcon,
 } from "@heroicons/react/24/solid";
+import { EDIT_REGULAR_CLASS_MESSAGES } from "@/lib/messages/customerDashboard";
 import styles from "./EditRegularClassModal.module.scss";
 
 interface EditRegularClassModalProps {
@@ -23,6 +24,7 @@ interface EditRegularClassModalProps {
   adminId?: number;
   onSuccess?: () => void;
   plan?: Plan;
+  language: LanguageType;
 }
 
 export default function EditRegularClassModal({
@@ -35,7 +37,10 @@ export default function EditRegularClassModal({
   adminId,
   onSuccess,
   plan,
+  language,
 }: EditRegularClassModalProps) {
+  const messages = EDIT_REGULAR_CLASS_MESSAGES[language];
+
   // Form state
   const [startDate, setStartDate] = useState("");
   const [minDate, setMinDate] = useState("");
@@ -147,7 +152,7 @@ export default function EditRegularClassModal({
 
   const handleSubmit = async () => {
     if (!startDate) {
-      setError("Please select a start date");
+      setError(messages.selectStartDate);
       return;
     }
 
@@ -183,7 +188,7 @@ export default function EditRegularClassModal({
     }
 
     if (finalWeekday === null || !finalStartTime) {
-      setError("Unable to determine schedule. Please select a time slot.");
+      setError(messages.scheduleRequired);
       return;
     }
 
@@ -193,7 +198,7 @@ export default function EditRegularClassModal({
         : recurringClass.recurringClassAttendance.map((att) => att.children.id);
 
     if (finalChildrenIds.length === 0) {
-      setError("At least one child must be selected for the class");
+      setError(messages.childRequired);
       return;
     }
 
@@ -216,7 +221,7 @@ export default function EditRegularClassModal({
       onClose();
     } catch (error: any) {
       console.error("Failed to update regular class:", error);
-      setError(error.message || "Failed to update regular class");
+      setError(messages.updateFailed);
     } finally {
       setLoading(false);
     }
@@ -236,7 +241,7 @@ export default function EditRegularClassModal({
     <Modal isOpen={isOpen} onClose={resetAndClose} overlayClosable={true}>
       <div className={styles.progressiveFlow}>
         <div className={styles.modalHeader}>
-          <h2>Edit Regular Class Schedule</h2>
+          <h2>{messages.title}</h2>
         </div>
 
         <div className={styles.sectionsContainer}>
@@ -246,7 +251,7 @@ export default function EditRegularClassModal({
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <CalendarIcon className={styles.sectionIcon} />
-              <h3>Start New Schedule On</h3>
+              <h3>{messages.startNewScheduleOn}</h3>
             </div>
             <div className={styles.sectionContent}>
               <input
@@ -264,31 +269,20 @@ export default function EditRegularClassModal({
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <AcademicCapIcon className={styles.sectionIcon} />
-              <h3>Instructor & Schedule</h3>
+              <h3>{messages.instructorAndSchedule}</h3>
               {selectedInstructor &&
                 selectedWeekday !== null &&
                 selectedStartTime && (
                   <>
                     <span className={styles.selectedValue}>
                       {selectedInstructor.nickname} -{" "}
-                      {
-                        [
-                          "Sunday",
-                          "Monday",
-                          "Tuesday",
-                          "Wednesday",
-                          "Thursday",
-                          "Friday",
-                          "Saturday",
-                        ][selectedWeekday]
-                      }{" "}
-                      {selectedStartTime}
+                      {messages.weekdays[selectedWeekday]} {selectedStartTime}
                     </span>
                     <button
                       onClick={handleEditInstructor}
                       className={styles.changeButton}
                     >
-                      Change
+                      {messages.change}
                     </button>
                   </>
                 )}
@@ -301,7 +295,7 @@ export default function EditRegularClassModal({
                   <InstructorSelection
                     onInstructorSelect={handleInstructorSelect}
                     plan={plan}
-                    language="en"
+                    language={language}
                     adminId={adminId}
                     customerId={customerId}
                   />
@@ -315,6 +309,7 @@ export default function EditRegularClassModal({
                       onSlotSelect={handleScheduleSlotSelect}
                       selectedWeekday={selectedWeekday}
                       selectedStartTime={selectedStartTime}
+                      language={language}
                     />
                   )}
               </div>
@@ -325,26 +320,30 @@ export default function EditRegularClassModal({
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <UserGroupIcon className={styles.sectionIcon} />
-              <h3>Children</h3>
+              <h3>{messages.children}</h3>
               <span className={styles.selectedValue}>
                 {selectedChildrenIds.length > 0
                   ? `${allChildren
                       .filter((child) => selectedChildrenIds.includes(child.id))
                       .map((child) => child.name)
-                      .join(
-                        ", ",
-                      )} (${selectedChildrenIds.length} child${selectedChildrenIds.length !== 1 ? "ren" : ""})`
+                      .join(", ")} (${
+                      language === "ja"
+                        ? `${selectedChildrenIds.length}人`
+                        : `${selectedChildrenIds.length} child${selectedChildrenIds.length !== 1 ? "ren" : ""}`
+                    })`
                   : `${recurringClass.recurringClassAttendance
                       .map((att) => att.children.name)
-                      .join(
-                        ", ",
-                      )} (${recurringClass.recurringClassAttendance.length} child${recurringClass.recurringClassAttendance.length !== 1 ? "ren" : ""})`}
+                      .join(", ")} (${
+                      language === "ja"
+                        ? `${recurringClass.recurringClassAttendance.length}人`
+                        : `${recurringClass.recurringClassAttendance.length} child${recurringClass.recurringClassAttendance.length !== 1 ? "ren" : ""}`
+                    })`}
               </span>
               <button
                 onClick={() => setEditingChildren(!editingChildren)}
                 className={styles.changeButton}
               >
-                Change
+                {messages.change}
               </button>
             </div>
             {editingChildren && (
@@ -366,14 +365,14 @@ export default function EditRegularClassModal({
                     onClick={() => setEditingChildren(false)}
                     className={styles.cancelButton}
                   >
-                    Cancel
+                    {messages.cancel}
                   </button>
                   <button
                     onClick={handleConfirmChildrenSelection}
                     className={styles.confirmButton}
                     disabled={selectedChildrenIds.length === 0}
                   >
-                    Confirm
+                    {messages.confirm}
                   </button>
                 </div>
               </div>
@@ -383,14 +382,14 @@ export default function EditRegularClassModal({
           {/* Action Buttons */}
           <div className={styles.confirmationActions}>
             <button onClick={resetAndClose} className={styles.cancelButton}>
-              Cancel
+              {messages.cancel}
             </button>
             <button
               onClick={handleSubmit}
               className={styles.confirmButton}
               disabled={loading || selectedChildrenIds.length === 0}
             >
-              {loading ? "Applying..." : "Apply Changes"}
+              {loading ? messages.applying : messages.applyChanges}
             </button>
           </div>
         </div>

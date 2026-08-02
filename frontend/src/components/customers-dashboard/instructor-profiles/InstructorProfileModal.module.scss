@@ -5,8 +5,5 @@
   flex-direction: column;
   align-items: flex-start;
   background-color: #fff;
-  padding: 40px;
-  max-height: 90vh;
-  max-width: 100vh;
-  overflow-x: hidden;
+  max-width: min(100vh, calc(100vw - 32px));
 }

@@ -2,12 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import styles from "./InstructorCalendarForAdmin.module.scss";
-import {
-  getCalendarClasses,
-  getInstructorProfile,
-} from "@/lib/api/instructorsApi";
+import { getCalendarClasses } from "@/lib/api/instructorsApi";
 import Loading from "../elements/loading/Loading";
-import { getValidRange } from "@/lib/utils/calendarUtils";
+import { getCurrentMonthValidRange } from "@/lib/utils/calendarUtils";
 import { initialSetup } from "@/lib/utils/initialSetup";
 import InstructorCalendarClient from "../instructors-dashboard/class-schedule/instructorCalendar/InstructorCalendarClient";
 import InstructorSearch from "@/components/admins-dashboard/InstructorSearch";
@@ -40,17 +37,14 @@ function InstructorCalendarForAdmin({
     if (!instructorId) return;
 
     try {
-      const [classes, instructorProfile, schedule, events] = await Promise.all([
+      const [classes, schedule, events] = await Promise.all([
         getCalendarClasses(instructorId),
-        getInstructorProfile(instructorId),
         getAllBusinessSchedules(),
         getAllEvents(),
       ]);
 
       setInstructorCalendarEvents(classes);
-      const instructorCreatedAt = instructorProfile.createdAt;
-      const calendarValidRange = getValidRange(instructorCreatedAt, 3);
-      setCalendarValidRange(calendarValidRange);
+      setCalendarValidRange(getCurrentMonthValidRange(3));
       setSchedule(schedule);
       const colorsForEvents: { event: string; color: string }[] = events
         .map((e: EventColor) => ({

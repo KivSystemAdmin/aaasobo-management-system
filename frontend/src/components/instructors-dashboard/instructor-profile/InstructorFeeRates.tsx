@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
 import ActionButton from "../../elements/buttons/actionButton/ActionButton";
@@ -9,6 +9,7 @@ import {
   deleteLatestInstructorFee,
   getInstructorFees,
 } from "@/lib/api/adminsApi";
+import { getMyInstructorFees } from "@/lib/api/instructorsApi";
 import { confirmAlert, errorAlert } from "@/lib/utils/alertUtils";
 import type { InstructorFeeRate } from "@shared/schemas/admins";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -106,11 +107,14 @@ function FeeRateCard({
   );
 }
 
-export default function InstructorFeeRates({
-  instructorId,
-}: {
-  instructorId: number;
-}) {
+type InstructorFeeRatesProps =
+  | { access: "admin"; instructorId: number }
+  | { access: "instructor"; instructorId?: never };
+
+export default function InstructorFeeRates(props: InstructorFeeRatesProps) {
+  const { access } = props;
+  const instructorId =
+    props.access === "admin" ? props.instructorId : undefined;
   const [fees, setFees] = useState<InstructorFeeRate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -118,14 +122,17 @@ export default function InstructorFeeRates({
   const [formState, setFormState] = useState(createFormState());
   const { language } = useLanguage();
 
-  const applyFees = (nextFees: InstructorFeeRate[]) => {
+  const applyFees = useCallback((nextFees: InstructorFeeRate[]) => {
     setFees(nextFees);
     setFormState(createFormState(nextFees[0] ?? null));
-  };
+  }, []);
 
-  const loadFees = async () => {
+  const loadFees = useCallback(async () => {
     setIsLoading(true);
-    const response = await getInstructorFees(instructorId);
+    const response =
+      access === "admin"
+        ? await getInstructorFees(instructorId!)
+        : await getMyInstructorFees();
     if ("status" in response) {
       setIsLoading(false);
       await errorAlert(response.message);
@@ -134,12 +141,17 @@ export default function InstructorFeeRates({
 
     applyFees(response.fees);
     setIsLoading(false);
-  };
+  }, [access, applyFees, instructorId]);
 
   useEffect(() => {
     let isMounted = true;
 
-    getInstructorFees(instructorId).then(async (response) => {
+    const request =
+      access === "admin"
+        ? getInstructorFees(instructorId!)
+        : getMyInstructorFees();
+
+    request.then(async (response) => {
       if (!isMounted) {
         return;
       }
@@ -157,7 +169,7 @@ export default function InstructorFeeRates({
     return () => {
       isMounted = false;
     };
-  }, [instructorId]);
+  }, [access, applyFees, instructorId]);
 
   const activeFee = fees.find((fee) => fee.effectiveTo === null) ?? fees[0];
   const historicalFees = activeFee
@@ -182,6 +194,10 @@ export default function InstructorFeeRates({
   };
 
   const handleCreateFee = async () => {
+    if (access !== "admin" || instructorId === undefined) {
+      return;
+    }
+
     const trialFee = Number(formState.trialFee);
     const regularFee = Number(formState.regularFee);
     const cancelFee = Number(formState.cancelFee);
@@ -227,7 +243,12 @@ export default function InstructorFeeRates({
   };
 
   const handleDeleteLatest = async () => {
-    if (!activeFee || fees.length < 2) {
+    if (
+      access !== "admin" ||
+      instructorId === undefined ||
+      !activeFee ||
+      fees.length < 2
+    ) {
       return;
     }
 
@@ -263,15 +284,15 @@ export default function InstructorFeeRates({
           ) : activeFee ? (
             <FeeRateCard
               fee={activeFee}
-              isLatest={true}
-              onDelete={handleDeleteLatest}
+              isLatest={access === "admin"}
+              onDelete={access === "admin" ? handleDeleteLatest : undefined}
               isDeleteDisabled={isSubmitting || fees.length < 2}
             />
           ) : (
             <p className={styles.feeMutedText}>No fee rates registered yet.</p>
           )}
 
-          {isFormOpen && (
+          {access === "admin" && isFormOpen && (
             <div className={styles.feeForm}>
               <h4 className={styles.feeFormTitle}>New fee rate</h4>
               <div className={styles.feeFormGrid}>
@@ -356,34 +377,36 @@ export default function InstructorFeeRates({
             </div>
           )}
 
-          <div className={styles.feeActions}>
-            {isFormOpen ? (
-              <>
+          {access === "admin" && (
+            <div className={styles.feeActions}>
+              {isFormOpen ? (
+                <>
+                  <ActionButton
+                    type="button"
+                    onClick={handleCancelForm}
+                    btnText="Cancel"
+                    className="cancelBtn"
+                    disabled={isSubmitting}
+                  />
+                  <ActionButton
+                    type="button"
+                    onClick={handleCreateFee}
+                    btnText={isSubmitting ? "Saving..." : "Save"}
+                    className="saveBtn"
+                    disabled={isSubmitting}
+                  />
+                </>
+              ) : (
                 <ActionButton
                   type="button"
-                  onClick={handleCancelForm}
-                  btnText="Cancel"
-                  className="cancelBtn"
+                  onClick={handleOpenForm}
+                  btnText="Change fee rate"
+                  className="addBtn"
                   disabled={isSubmitting}
                 />
-                <ActionButton
-                  type="button"
-                  onClick={handleCreateFee}
-                  btnText={isSubmitting ? "Saving..." : "Save"}
-                  className="saveBtn"
-                  disabled={isSubmitting}
-                />
-              </>
-            ) : (
-              <ActionButton
-                type="button"
-                onClick={handleOpenForm}
-                btnText="Change fee rate"
-                className="addBtn"
-                disabled={isSubmitting}
-              />
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           <details className={styles.feeHistory}>
             <summary>Rate history</summary>

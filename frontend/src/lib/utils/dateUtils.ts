@@ -1,6 +1,8 @@
 import { addMinutes, addMonths, startOfDay, isAfter, format } from "date-fns";
 import { TZDate } from "@date-fns/tz";
 
+const JAPAN_TIME_ZONE = "Asia/Tokyo";
+
 // Function to format time for a given time zone(e.g., 19:00)
 export const formatTime = (date: Date, timeZone: string) => {
   return new Intl.DateTimeFormat("en-US", {
@@ -50,16 +52,39 @@ export const formatTimeWithAddedMinutes = (
 
 export const isPastPreviousDayDeadline = (classDateUTC: string): boolean => {
   // Convert class date from UTC to Japan time
-  const classDateInJapan = new TZDate(classDateUTC, "Asia/Tokyo");
+  const classDateInJapan = new TZDate(classDateUTC, JAPAN_TIME_ZONE);
 
   // Get the start of the class day in Japan time (00:00:00)
   const classDayStart = startOfDay(classDateInJapan);
 
   // Get the current date in Japan time (00:00:00 today)
-  const todayInJapan = startOfDay(new TZDate(new Date(), "Asia/Tokyo"));
+  const todayInJapan = startOfDay(new TZDate(new Date(), JAPAN_TIME_ZONE));
 
   // If class date is today or in the past, return true (deadline has passed)
   return !isAfter(classDayStart, todayInJapan);
+};
+
+const formatDateToISOInTimeZone = (date: Date, timeZone: string): string => {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+
+  const year = parts.find((part) => part.type === "year")?.value;
+  const month = parts.find((part) => part.type === "month")?.value;
+  const day = parts.find((part) => part.type === "day")?.value;
+
+  if (!year || !month || !day) {
+    throw new Error("Failed to format date in the requested time zone");
+  }
+
+  return `${year}-${month}-${day}`;
+};
+
+export const getTodayInJapanISODate = (): string => {
+  return formatDateToISOInTimeZone(new Date(), JAPAN_TIME_ZONE);
 };
 
 // Function to calculate the end time of a class.
@@ -68,8 +93,12 @@ export function getEndTime(date: Date): Date {
 }
 
 // Function to return short form of the day of the week.
-export function getWeekday(date: Date, timeZone: string) {
-  return new Intl.DateTimeFormat("en-US", {
+export function getWeekday(
+  date: Date,
+  timeZone: string,
+  locale: string = "en-US",
+) {
+  return new Intl.DateTimeFormat(locale, {
     weekday: "short",
     timeZone,
   }).format(date);

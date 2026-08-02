@@ -156,6 +156,7 @@ export default function InstructorsList({
       {selectedInstructor && (
         <Modal
           isOpen={!!selectedInstructor}
+          className="instructorProfile"
           onClose={() => {
             if (clickedInstructor) {
               setClickedInstructor(null);

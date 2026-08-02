@@ -582,18 +582,27 @@ export const ImportExecuteValidationIssue = z.object({
   message: z.string(),
 });
 
+export const ImportOperation = z.enum([
+  "clean-start",
+  "incremental-customers",
+  "incremental-instructors",
+]);
+
 export const ImportExecuteReport = z.object({
   rowsByFile: z.record(z.string(), z.number().int().nonnegative()),
+  importedByFile: z.record(z.string(), z.number().int().nonnegative()),
 });
 
 export const ImportExecuteResponse = z.object({
   message: z.string(),
+  operation: ImportOperation,
   imported: z.boolean(),
   report: ImportExecuteReport,
 });
 
 export const ImportExecuteErrorResponse = z.object({
   message: z.string(),
+  operation: ImportOperation,
   report: ImportExecuteReport,
   issues: z.array(ImportExecuteValidationIssue),
 });

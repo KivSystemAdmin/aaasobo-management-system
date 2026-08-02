@@ -1082,6 +1082,22 @@ describe("GET /instructors/:id/schedules/active", () => {
 
     expect(response.body.data.id).toBe(schedule.id);
   });
+
+  it("succeeds for a finite schedule that is active on the requested date", async () => {
+    const instructor = await createInstructor();
+    const schedule = await createInstructorSchedule(instructor.id, {
+      effectiveFrom: new Date("2024-01-01"),
+      effectiveTo: new Date("2024-07-01"),
+    });
+
+    const response = await request(server)
+      .get(`/instructors/${instructor.id}/schedules/active`)
+      .set("Cookie", authCookie)
+      .query({ effectiveDate: "2024-06-15" })
+      .expect(200);
+
+    expect(response.body.data.id).toBe(schedule.id);
+  });
 });
 
 describe("GET /instructors/:id/schedules/:scheduleId", () => {

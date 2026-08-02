@@ -1,0 +1,4 @@
+interface:
+  display_name: "Launch Task Worktree"
+  short_description: "Create task worktree from latest develop"
+  default_prompt: "Use $launch-task-worktree to create a task branch and worktree from the latest origin/develop."

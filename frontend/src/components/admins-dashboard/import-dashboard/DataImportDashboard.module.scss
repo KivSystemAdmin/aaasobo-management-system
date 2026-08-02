@@ -6,6 +6,70 @@
   max-width: 900px;
 }
 
+.operationSection {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #b7dfca;
+  border-radius: 0.65rem;
+  background: #f5fff9;
+
+  h2,
+  h3,
+  h4,
+  p {
+    margin: 0;
+  }
+}
+
+.destructive {
+  border-color: #efc1c1;
+  background: #fff9f9;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.importCard {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid $border-light;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+
+.warningText {
+  margin-top: 0.3rem !important;
+  color: $red-alert;
+  font-weight: 600;
+}
+
+.validationReport,
+.successReport {
+  display: grid;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid $border-light;
+}
+
+.successReport {
+  color: #26734d;
+}
+
+.countList {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
 .formSection {
   display: grid;
   gap: 0.5rem;

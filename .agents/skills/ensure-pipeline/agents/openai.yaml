@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ensure Pipeline"
+  short_description: "Run repo CI-equivalent checks before pushing."
+  default_prompt: "Use $ensure-pipeline to run the full local CI gate and fix any failures."

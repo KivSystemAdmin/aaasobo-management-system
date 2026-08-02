@@ -4,6 +4,7 @@ import { server } from "../../../server";
 import { createAdmin, createPlan, generateAuthCookie } from "../../testUtils";
 import { prisma } from "../../setup";
 import { EnglishBackground } from "../../../types";
+import { ENGLISH_BACKGROUND_LABELS } from "../../../constants/englishBackground";
 
 describe("GET /admins/plan-list", () => {
   it("succeed with multiple plans", async () => {
@@ -26,11 +27,9 @@ describe("GET /admins/plan-list", () => {
         "Plan (Japanese)": plan1NameJpn,
         "Plan (English)": plan1NameEng,
         English:
-          plan1.englishBackground === EnglishBackground.NonNative
-            ? "Non Native"
-            : plan1.englishBackground === EnglishBackground.NativeA
-              ? "Native A"
-              : "Native B",
+          ENGLISH_BACKGROUND_LABELS[
+            plan1.englishBackground as EnglishBackground
+          ],
         "Weekly Class Times": plan1.weeklyClassTimes,
         Description: plan1.description,
       },
@@ -40,11 +39,9 @@ describe("GET /admins/plan-list", () => {
         "Plan (Japanese)": plan2NameJpn,
         "Plan (English)": plan2NameEng,
         English:
-          plan2.englishBackground === EnglishBackground.NonNative
-            ? "Non Native"
-            : plan2.englishBackground === EnglishBackground.NativeA
-              ? "Native A"
-              : "Native B",
+          ENGLISH_BACKGROUND_LABELS[
+            plan2.englishBackground as EnglishBackground
+          ],
         "Weekly Class Times": plan2.weeklyClassTimes,
         Description: plan2.description,
       },

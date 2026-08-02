@@ -41,7 +41,11 @@ function RegularClassCard({
   const classDateTime = new Date(recurringClass.dateTime);
   const startTime = formatTime(classDateTime, timeZone);
   const endTime = formatTime(getEndTime(classDateTime), timeZone);
-  const day = getWeekday(classDateTime, timeZone);
+  const day = getWeekday(
+    classDateTime,
+    timeZone,
+    language === "ja" ? "ja-JP" : "en-US",
+  );
 
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();

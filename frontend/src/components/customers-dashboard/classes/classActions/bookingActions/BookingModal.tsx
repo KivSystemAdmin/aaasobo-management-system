@@ -14,6 +14,7 @@ interface BookingModalProps {
   customerId: number;
   adminId?: number;
   plan?: Plan;
+  onBookingSuccess: () => void;
 }
 
 export default function BookingModal({
@@ -27,6 +28,7 @@ export default function BookingModal({
   customerId,
   adminId,
   plan,
+  onBookingSuccess,
 }: BookingModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="booking">
@@ -40,6 +42,7 @@ export default function BookingModal({
         customerId={customerId}
         adminId={adminId}
         plan={plan}
+        onBookingSuccess={onBookingSuccess}
       />
     </Modal>
   );

@@ -88,6 +88,7 @@ import type {
   RegisterEventRequest,
   UpdateEventRequest,
 } from "../../../shared/schemas/admins";
+import { ENGLISH_BACKGROUND_LABELS } from "../constants/englishBackground";
 import { EnglishBackground } from "../types";
 
 // Register Admin
@@ -360,18 +361,12 @@ export const getAllInstructorsController = async (
     // Transform the data structure.
     const data = instructors.map((instructor, number) => {
       const { id, name, nickname, email } = instructor;
-      const englishBackgroundLabel: Record<EnglishBackground, string> = {
-        [EnglishBackground.NonNative]: "Non Native",
-        [EnglishBackground.NativeA]: "Native A",
-        [EnglishBackground.NativeB]: "Native B",
-      };
-
       return {
         No: number + 1,
         ID: id,
         Instructor: nickname,
         English:
-          englishBackgroundLabel[
+          ENGLISH_BACKGROUND_LABELS[
             instructor.englishBackground as EnglishBackground
           ],
         "Full Name": name,
@@ -838,18 +833,13 @@ export const getAllPlansController = async (_: Request, res: Response) => {
       const { id, name, weeklyClassTimes, description, englishBackground } =
         plan;
       const [planNameJpn, planNameEng] = name.split(" / ");
-      const englishBackgroundLabel: Record<EnglishBackground, string> = {
-        [EnglishBackground.NonNative]: "Non Native",
-        [EnglishBackground.NativeA]: "Native A",
-        [EnglishBackground.NativeB]: "Native B",
-      };
-
       return {
         No: number + 1,
         ID: id,
         "Plan (Japanese)": planNameJpn,
         "Plan (English)": planNameEng,
-        English: englishBackgroundLabel[englishBackground as EnglishBackground],
+        English:
+          ENGLISH_BACKGROUND_LABELS[englishBackground as EnglishBackground],
         "Weekly Class Times": weeklyClassTimes,
         Description: description,
       };

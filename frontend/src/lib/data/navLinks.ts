@@ -11,6 +11,7 @@ import {
   BellIcon,
   ArrowUpOnSquareIcon,
   ClipboardDocumentCheckIcon,
+  BanknotesIcon,
 } from "@heroicons/react/24/outline";
 
 export function getLinks(
@@ -110,6 +111,16 @@ export function getLinks(
       icon: CalendarDaysIcon,
     },
     {
+      name: language === "ja" ? "プランリスト" : "Plan List",
+      href: "/admins/plan-list",
+      icon: AcademicCapIcon,
+    },
+    {
+      name: "Event List",
+      href: "/admins/event-list",
+      icon: BellIcon,
+    },
+    {
       name: language === "ja" ? "データインポート" : "Data Import",
       href: "/admins/data-import",
       icon: ArrowUpOnSquareIcon,
@@ -142,6 +153,11 @@ export function getLinks(
       name: "Schedule",
       href: "/instructors/availability",
       icon: ClockIcon,
+    },
+    {
+      name: "Payroll",
+      href: "/instructors/payroll",
+      icon: BanknotesIcon,
     },
     {
       name: "AaasoBo! Calendar",

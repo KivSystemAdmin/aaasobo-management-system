@@ -9,6 +9,7 @@ import {
   getInstructorProfilesController,
   getSameDateClassesController,
   getInstructorProfilesByEnglishBackgroundController,
+  getMyInstructorFeesController,
 } from "../../src/controllers/instructorsController";
 import { registerRoutes } from "../middlewares/validationMiddleware";
 import {
@@ -48,6 +49,12 @@ import {
   UpdateInstructorTagsRequest,
 } from "../../../shared/schemas/instructors";
 import {
+  InstructorFeeRatesResponse,
+  InstructorPayrollErrorResponse,
+  InstructorPayrollQuery,
+  InstructorPayrollResponse,
+} from "../../../shared/schemas/admins";
+import {
   type RequestWithId,
   parseId,
 } from "../../src/middlewares/parseId.middleware";
@@ -75,6 +82,7 @@ import {
   getTagCatalogController,
   updateInstructorTagsController,
 } from "../controllers/instructorTagsController";
+import { getInstructorPayrollController } from "../controllers/adminsController";
 
 const profilesConfig = {
   method: "get" as const,
@@ -207,6 +215,86 @@ const instructorProfileConfig = {
       },
       500: {
         description: "Internal server error",
+      },
+    },
+  },
+} as const;
+
+const myInstructorFeesConfig = {
+  method: "get" as const,
+  middleware: [verifyAuthentication(AUTH_ROLES.I)] as RequestHandler[],
+  handler: getMyInstructorFeesController,
+  openapi: {
+    summary: "Get authenticated instructor fee history",
+    description:
+      "Get fee history for the authenticated instructor. The instructor identity is derived from the verified session.",
+    responses: {
+      200: {
+        description: "Instructor fee history retrieved successfully",
+        schema: InstructorFeeRatesResponse,
+      },
+      401: {
+        description: "Authentication required",
+        schema: MessageErrorResponse,
+      },
+      403: {
+        description: "Only instructors may access this endpoint",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Instructor not found",
+        schema: MessageErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: MessageErrorResponse,
+      },
+    },
+  },
+} as const;
+
+const instructorPayrollConfig = {
+  method: "get" as const,
+  paramsSchema: InstructorIdParams,
+  querySchema: InstructorPayrollQuery,
+  middleware: [
+    verifyAuthentication(AUTH_ROLES.AI, {
+      requireIdCheck: AUTH_ROLES.I,
+    }),
+  ] as RequestHandler[],
+  handler: getInstructorPayrollController,
+  openapi: {
+    summary: "Get instructor payroll",
+    description:
+      "Get an instructor's payroll summary for one month; instructors may only access their own payroll",
+    responses: {
+      200: {
+        description: "Instructor payroll retrieved successfully",
+        schema: InstructorPayrollResponse,
+      },
+      400: {
+        description: "Invalid query parameters",
+        schema: MessageErrorResponse,
+      },
+      401: {
+        description: "Unauthorized",
+        schema: MessageErrorResponse,
+      },
+      403: {
+        description: "Instructor ID does not match the authenticated user",
+        schema: MessageErrorResponse,
+      },
+      404: {
+        description: "Instructor not found",
+        schema: MessageErrorResponse,
+      },
+      422: {
+        description: "Payroll data cannot be resolved",
+        schema: InstructorPayrollErrorResponse,
+      },
+      500: {
+        description: "Internal server error",
+        schema: ErrorResponse,
       },
     },
   },
@@ -709,6 +797,7 @@ const validatedRouteConfigs = {
   "/available-slots": [availableSlotsConfig],
   "/available-slots/by-type": [availableSlotsByTypeConfig],
   "/class/:id": [classInstructorConfig],
+  "/fees": [myInstructorFeesConfig],
   "/profiles": [profilesConfig],
   "/profiles/english-background/:englishBackground": [
     englishBackgroundProfilesConfig,
@@ -723,6 +812,7 @@ const validatedRouteConfigs = {
   "/:id/calendar-slots": [calendarSlotsConfig],
   "/:id/calendar-classes": [calendarClassesConfig],
   "/:id/classes/:classId/same-date": [sameDateClassesConfig],
+  "/:id/payroll": [instructorPayrollConfig],
   "/:id/profile": [instructorProfileConfig],
   "/:id/schedules": [instructorSchedulesConfig, createScheduleConfig],
   "/:id/schedules/active": [activeScheduleConfig],

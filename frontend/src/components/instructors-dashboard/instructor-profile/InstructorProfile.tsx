@@ -36,6 +36,7 @@ import InstructorFeeRates from "./InstructorFeeRates";
 import { EnglishBackground } from "@/types";
 import RadioButton from "../../elements/radioButton/RadioButton";
 import TextAreaInput from "../../elements/textAreaInput/TextAreaInput";
+import { ENGLISH_BACKGROUND_LABELS } from "@/lib/data/englishBackground";
 
 // Define the specific string fields that are editable in this component
 type EditableInstructorFields =
@@ -111,14 +112,8 @@ function InstructorProfile({
   const [isEditing, setIsEditing] = useState(false);
   const [userStatus, setUserStatus] = useState<string>("Active");
   const [leavingDate, setLeavingDate] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { language } = useLanguage();
   const formRef = useRef<HTMLFormElement>(null);
-  const englishBackgroundLabels = [
-    "Non Native",
-    "Native A",
-    "Native B",
-  ] as const;
   const englishBackgroundClassNames = ["", "nativeA", "nativeB"] as const;
 
   const handleEditClick = () => {
@@ -250,26 +245,7 @@ function InstructorProfile({
               <>
                 {/* Image Uploader */}
                 <p className={styles.profileImage__text}>Profile Image</p>
-                <input
-                  type="file"
-                  name="icon"
-                  ref={fileInputRef}
-                  style={{ display: "none" }}
-                />
-                <Uploader
-                  onFileSelect={(file) => {
-                    if (fileInputRef.current && file) {
-                      const dataTransfer = new DataTransfer();
-                      dataTransfer.items.add(file);
-                      fileInputRef.current.files = dataTransfer.files;
-                    }
-                  }}
-                  clearFileInputRef={() => {
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = "";
-                    }
-                  }}
-                />
+                <Uploader />
               </>
             )}
 
@@ -293,8 +269,8 @@ function InstructorProfile({
                       }`}
                   >
                     {
-                      englishBackgroundLabels[
-                        latestInstructor.englishBackground
+                      ENGLISH_BACKGROUND_LABELS[
+                        latestInstructor.englishBackground as EnglishBackground
                       ]
                     }
                   </div>
@@ -328,7 +304,7 @@ function InstructorProfile({
                     EnglishBackground.NonNative
                   }
                   onChange={handleRadioChange}
-                  label={englishBackgroundLabels[EnglishBackground.NonNative]}
+                  label={ENGLISH_BACKGROUND_LABELS[EnglishBackground.NonNative]}
                   className={styles.englishBackgroundRadio}
                 />
                 <RadioButton
@@ -339,7 +315,7 @@ function InstructorProfile({
                     EnglishBackground.NativeA
                   }
                   onChange={handleRadioChange}
-                  label={englishBackgroundLabels[EnglishBackground.NativeA]}
+                  label={ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeA]}
                   className={styles.englishBackgroundRadio}
                 />
                 <RadioButton
@@ -350,7 +326,7 @@ function InstructorProfile({
                     EnglishBackground.NativeB
                   }
                   onChange={handleRadioChange}
-                  label={englishBackgroundLabels[EnglishBackground.NativeB]}
+                  label={ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeB]}
                   className={styles.englishBackgroundRadio}
                 />
               </>
@@ -700,11 +676,16 @@ function InstructorProfile({
               </div>
             )}
 
-            {userSessionType === "admin" &&
-              !isCustomerView &&
-              latestInstructor && (
-                <InstructorFeeRates instructorId={latestInstructor.id} />
-              )}
+            {!isCustomerView &&
+              latestInstructor &&
+              (userSessionType === "admin" ? (
+                <InstructorFeeRates
+                  access="admin"
+                  instructorId={latestInstructor.id}
+                />
+              ) : userSessionType === "instructor" ? (
+                <InstructorFeeRates access="instructor" />
+              ) : null)}
 
             {(latestInstructor.tags?.length || 0) > 0 && (
               <div className={styles.insideContainer}>
@@ -740,11 +721,6 @@ function InstructorProfile({
 
             {/* Hidden input fields */}
             <input type="hidden" name="id" value={latestInstructor.id} />
-            <input
-              type="hidden"
-              name="icon"
-              value={latestInstructor.icon.url}
-            />
 
             {/* Action buttons for only admin */}
             {userSessionType === "admin" &&

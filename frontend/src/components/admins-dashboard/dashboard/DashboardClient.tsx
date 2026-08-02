@@ -4,6 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { UserIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import styles from "./DashboardClient.module.scss";
+import {
+  ENGLISH_BACKGROUND_LABELS,
+  EnglishBackground,
+} from "@/lib/data/englishBackground";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { defaultUserImageUrl } from "@/lib/data/data";
@@ -360,30 +364,22 @@ export default function DashboardClient({
         <article className={styles.kpiCard}>
           <UserIcon className={styles.kpiIcon} />
           <div>
-            <p>ノンネイティブ</p>
-            <div className={styles.kpiValue}>
-              <strong>
-                {metrics.instructorsByEnglishBackground.nonNative}
-              </strong>
-              <span>名</span>
-            </div>
+            <p>{ENGLISH_BACKGROUND_LABELS[EnglishBackground.NonNative]}</p>
+            <strong>{metrics.instructorsByEnglishBackground.nonNative}</strong>
           </div>
         </article>
         <article className={styles.kpiCard}>
           <UserIcon className={styles.kpiIcon} />
           <div>
-            <p>ネイティブA</p>
-            <div className={styles.kpiValue}>
-              <strong>{metrics.instructorsByEnglishBackground.nativeA}</strong>
-              <span>名</span>
-            </div>
+            <p>{ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeA]}</p>
+            <strong>{metrics.instructorsByEnglishBackground.nativeA}</strong>
           </div>
         </article>
         <article className={styles.kpiCard}>
           <UserIcon className={styles.kpiIcon} />
           <div>
-            <p>ネイティブB</p>
-            <div className={styles.kpiValue}>
+            <p>{ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeB]}</p>
+            <article>
               <strong>{metrics.instructorsByEnglishBackground.nativeB}</strong>
               <span>名</span>
             </div>
@@ -417,10 +413,19 @@ export default function DashboardClient({
           />
           <div className={styles.englishBackgroundFilterGroup}>
             {[
-              { value: "all", label: "全員" },
-              { value: "non-native", label: "ノンネイティブ" },
-              { value: "native-a", label: "ネイティブA" },
-              { value: "native-b", label: "ネイティブB" },
+              { value: "all", label: "All" },
+              {
+                value: "non-native",
+                label: ENGLISH_BACKGROUND_LABELS[EnglishBackground.NonNative],
+              },
+              {
+                value: "native-a",
+                label: ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeA],
+              },
+              {
+                value: "native-b",
+                label: ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeB],
+              },
             ].map((option) => (
               <RadioButton
                 key={option.value}

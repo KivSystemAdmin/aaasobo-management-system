@@ -356,7 +356,6 @@ type BusinessCalendarClientProps = {
 type CustomerCalendarProps = {
   customerId: number;
   classes: CustomerClass[] | [];
-  createdAt: string;
   businessSchedule: BusinessSchedule[];
   colorsForEvents: { event: string; color: string }[];
   userSessionType?: UserType;

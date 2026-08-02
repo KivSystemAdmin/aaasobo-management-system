@@ -687,7 +687,7 @@ export const getInstructorPayroll = async (
     let headers;
     let response;
     const method = "GET";
-    const backendEndpoint = `/admins/instructors/${instructorId}/payroll?month=${month}`;
+    const backendEndpoint = `/instructors/${instructorId}/payroll?month=${month}`;
 
     if (cookie) {
       apiURL = `${BACKEND_ORIGIN}${backendEndpoint}`;

@@ -280,6 +280,11 @@ export const WELCOME_MODAL_TITLE1 = {
   en: "Welcome to AaasoBo! – Online English Classes for Kids",
 };
 
+export const WELCOME_SEEN_UPDATE_ERROR_MESSAGE = {
+  ja: "表示済みの状態を保存できなかったため、次回もこの案内が表示される場合があります。",
+  en: "We couldn't save that you dismissed this welcome message, so it may appear again next time.",
+};
+
 export const FREE_TRIAL_BOOKING_INSTRUCTION_MESSAGE = {
   ja: "無料トライアルは、画面右上の「クラスを予約」からご予約ください。",
   en: "To book your free trial class, click the 'Book Class' button at the top right of the page.",
@@ -381,3 +386,66 @@ export const EDIT_CLASS_ARIA_LABEL = {
   ja: "クラスを編集",
   en: "Edit class",
 };
+
+export const EDIT_REGULAR_CLASS_MESSAGES = {
+  ja: {
+    title: "レギュラークラスのスケジュールを編集",
+    startNewScheduleOn: "新しいスケジュールの開始日",
+    instructorAndSchedule: "講師とスケジュール",
+    change: "変更",
+    children: "お子さま",
+    cancel: "キャンセル",
+    confirm: "確定",
+    applying: "適用中...",
+    applyChanges: "変更を適用",
+    selectStartDate: "開始日を選択してください。",
+    scheduleRequired:
+      "スケジュールを特定できません。時間枠を選択してください。",
+    childRequired: "クラスに参加するお子さまを1人以上選択してください。",
+    updateFailed: "レギュラークラスの更新に失敗しました。",
+    loadingSchedule: "講師のスケジュールを読み込んでいます...",
+    scheduleLoadFailed: "講師のスケジュールの読み込みに失敗しました。",
+    noAvailableSlots:
+      "選択した日付に、この講師の予約可能な時間枠はありません。",
+    noSlots: "空きなし",
+    weekdays: [
+      "日曜日",
+      "月曜日",
+      "火曜日",
+      "水曜日",
+      "木曜日",
+      "金曜日",
+      "土曜日",
+    ],
+  },
+  en: {
+    title: "Edit Regular Class Schedule",
+    startNewScheduleOn: "Start New Schedule On",
+    instructorAndSchedule: "Instructor & Schedule",
+    change: "Change",
+    children: "Children",
+    cancel: "Cancel",
+    confirm: "Confirm",
+    applying: "Applying...",
+    applyChanges: "Apply Changes",
+    selectStartDate: "Please select a start date.",
+    scheduleRequired:
+      "Unable to determine schedule. Please select a time slot.",
+    childRequired: "At least one child must be selected for the class.",
+    updateFailed: "Failed to update regular class.",
+    loadingSchedule: "Loading instructor schedule...",
+    scheduleLoadFailed: "Failed to load instructor schedule.",
+    noAvailableSlots:
+      "No available time slots found for this instructor on the selected date.",
+    noSlots: "No slots",
+    weekdays: [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ],
+  },
+} as const;

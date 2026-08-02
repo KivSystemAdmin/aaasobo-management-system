@@ -11,6 +11,7 @@ const PROXY_URL = `${FRONTEND_ORIGIN}/api/proxy`;
 const normalizeErrorMessage = "Failed to normalize the source CSV";
 const executeErrorMessage = "Failed to execute normalized import";
 const downloadErrorMessage = "Failed to download normalized package";
+const incrementalErrorMessage = "Failed to execute incremental import";
 
 export interface AdminImportExecuteError extends Error {
   details?: unknown;
@@ -94,5 +95,31 @@ export const executeNormalizedImport = async ({
     throw error;
   }
 
+  return data as ImportExecuteResponse;
+};
+
+export const executeIncrementalAdminImport = async (
+  target: "customers" | "instructors",
+  file: File,
+): Promise<ImportExecuteResponse> => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await fetch(PROXY_URL, {
+    method: "POST",
+    headers: {
+      "backend-endpoint": `/admins/import/incremental/${target}`,
+    },
+    body: formData,
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    const error = new Error(
+      typeof data?.message === "string"
+        ? data.message
+        : incrementalErrorMessage,
+    ) as AdminImportExecuteError;
+    error.details = data;
+    throw error;
+  }
   return data as ImportExecuteResponse;
 };

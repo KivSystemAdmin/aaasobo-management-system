@@ -32,7 +32,7 @@ const createInstructorCanceledClasses = async (
   );
 };
 
-describe("GET /admins/instructors/:id/payroll", () => {
+describe("GET /instructors/:id/payroll as admin", () => {
   it("returns both payroll periods for the requested month", async () => {
     const admin = await createAdmin();
     const instructor = await createInstructor();
@@ -116,7 +116,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     );
 
     const response = await request(server)
-      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .get(`/instructors/${instructor.id}/payroll`)
       .query({ month: "2026-03" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(200);
@@ -265,7 +265,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     const instructor = await createInstructor();
 
     const response = await request(server)
-      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .get(`/instructors/${instructor.id}/payroll`)
       .query({ month: "2026-13" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(400);
@@ -325,7 +325,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     );
 
     const response = await request(server)
-      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .get(`/instructors/${instructor.id}/payroll`)
       .query({ month: "2026-03" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(200);
@@ -431,7 +431,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     );
 
     const response = await request(server)
-      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .get(`/instructors/${instructor.id}/payroll`)
       .query({ month: "2026-03" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(200);
@@ -487,7 +487,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     );
 
     const response = await request(server)
-      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .get(`/instructors/${instructor.id}/payroll`)
       .query({ month: "2026-03" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(200);
@@ -544,7 +544,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     );
 
     const response = await request(server)
-      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .get(`/instructors/${instructor.id}/payroll`)
       .query({ month: "2026-03" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(200);
@@ -584,7 +584,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     );
 
     const response = await request(server)
-      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .get(`/instructors/${instructor.id}/payroll`)
       .query({ month: "2026-03" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(200);
@@ -627,7 +627,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     );
 
     const response = await request(server)
-      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .get(`/instructors/${instructor.id}/payroll`)
       .query({ month: "2026-03" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(200);
@@ -665,7 +665,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     );
 
     const response = await request(server)
-      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .get(`/instructors/${instructor.id}/payroll`)
       .query({ month: "2026-03" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(422);
@@ -710,7 +710,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     );
 
     const response = await request(server)
-      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .get(`/instructors/${instructor.id}/payroll`)
       .query({ month: "2026-03" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(422);
@@ -722,7 +722,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     const admin = await createAdmin();
 
     const response = await request(server)
-      .get("/admins/instructors/999999/payroll")
+      .get("/instructors/999999/payroll")
       .query({ month: "2026-03" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(404);
@@ -746,7 +746,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     );
 
     const response = await request(server)
-      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .get(`/instructors/${instructor.id}/payroll`)
       .query({ month: "2026-03" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(422);
@@ -784,7 +784,7 @@ describe("GET /admins/instructors/:id/payroll", () => {
     );
 
     const response = await request(server)
-      .get(`/admins/instructors/${instructor.id}/payroll`)
+      .get(`/instructors/${instructor.id}/payroll`)
       .query({ month: "2026-03" })
       .set("Cookie", await generateAuthCookie(admin.id, "admin"))
       .expect(422);

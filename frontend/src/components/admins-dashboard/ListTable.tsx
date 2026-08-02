@@ -24,6 +24,8 @@ import GenerateClassesForm from "./GenerateClassesForm";
 import FilterButton from "./FilterButton";
 import { OMIT_CLASS_STATUSES, PAGE_SIZE_OPTIONS } from "@/lib/data/data";
 
+const ALL_COLUMNS_FILTER = "__all_columns__";
+
 function useTable<TData extends RowData>(options: TableOptions<TData>) {
   const resolvedOptions: TableOptionsResolved<TData> = {
     state: {},
@@ -71,7 +73,9 @@ function ListTable({
 }: ListTableProps) {
   const [currentData, setCurrentData] = useState<any[]>(fetchedData);
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [filterColumn, setFilterColumn] = useState<string>("0");
+  const [filterColumn, setFilterColumn] = useState<string>(
+    listType === "Customer List" ? ALL_COLUMNS_FILTER : "0",
+  );
   const [filterValue, setFilterValue] = useState<string>("");
   const [pagination, setPagination] = useState({
     pageIndex: 0, // Initial page index
@@ -240,17 +244,51 @@ function ListTable({
     [currentData, omitItems, linkItems, linkUrls, replaceItems, linkTarget],
   );
 
+  const filterColumns = useMemo(() => {
+    if (currentData.length === 0) return [];
+
+    const availableColumns = Object.keys(currentData[0]).filter(
+      (key) => !omitItems.includes(key),
+    );
+
+    if (listType !== "Customer List") return availableColumns;
+
+    const prioritizedColumns = ["Children", "Customer"];
+
+    return [
+      ALL_COLUMNS_FILTER,
+      ...prioritizedColumns.filter((key) => availableColumns.includes(key)),
+      ...availableColumns.filter(
+        (key) => key !== "No" && !prioritizedColumns.includes(key),
+      ),
+    ];
+  }, [currentData, omitItems, listType]);
+
   // Configure the filter
   const filteredData = useMemo(
     () =>
-      currentData.filter((eachData) =>
-        filterColumn && filterValue
+      currentData.filter((eachData) => {
+        if (!filterValue) return true;
+
+        const normalizedFilterValue = filterValue.toLowerCase();
+
+        if (filterColumn === ALL_COLUMNS_FILTER) {
+          return Object.keys(eachData)
+            .filter((key) => !omitItems.includes(key))
+            .some((key) =>
+              String(eachData[key])
+                .toLowerCase()
+                .includes(normalizedFilterValue),
+            );
+        }
+
+        return filterColumn !== "0"
           ? String(eachData[filterColumn])
               .toLowerCase()
-              .includes(filterValue.toLowerCase())
-          : true,
-      ),
-    [currentData, filterColumn, filterValue],
+              .includes(normalizedFilterValue)
+          : true;
+      }),
+    [currentData, filterColumn, filterValue, omitItems],
   );
 
   // Define the table configuration
@@ -268,17 +306,9 @@ function ListTable({
     onPaginationChange: setPagination, // Update the pagination state when internal APIs mutate the pagination state
   });
 
-  // Change the option color when selected
-  const changeOptionColor = (optionTag: HTMLSelectElement) => {
-    if (parseInt(optionTag.value) !== 0) {
-      optionTag.style.color = "#000000";
-    }
-  };
-
   // Handle the filter change
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setFilterColumn(event.target.value);
-    changeOptionColor(event.target);
   };
 
   // Render the modal component based on the modal type
@@ -312,18 +342,19 @@ function ListTable({
       <div className={styles.container}>
         <div className={styles.topContainer}>
           <div className={styles.filterContainer}>
-            <select value={filterColumn} onChange={handleChange}>
+            <select
+              value={filterColumn}
+              onChange={handleChange}
+              style={{ color: filterColumn === "0" ? "#888888" : "#000000" }}
+            >
               <option disabled value="0">
                 Select a column
               </option>
-              {currentData.length > 0 &&
-                Object.keys(currentData[0])
-                  .filter((key) => !omitItems.includes(key))
-                  .map((key) => (
-                    <option key={key} value={key}>
-                      {key}
-                    </option>
-                  ))}
+              {filterColumns.map((key) => (
+                <option key={key} value={key}>
+                  {key === ALL_COLUMNS_FILTER ? "All Columns" : key}
+                </option>
+              ))}
             </select>
             <input
               type="text"

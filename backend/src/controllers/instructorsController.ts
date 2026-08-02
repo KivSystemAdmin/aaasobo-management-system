@@ -1,6 +1,9 @@
-import { Instructor } from "../../generated/prisma";
+import { Instructor } from "@prisma/client";
 import { Request, Response } from "express";
-import { RequestWithParams } from "../middlewares/validationMiddleware";
+import {
+  RequestWithParams,
+  RequestWithQuery,
+} from "../middlewares/validationMiddleware";
 import {
   InstructorIdParams,
   ClassIdParams,
@@ -27,12 +30,48 @@ import {
 import { convertToTimezoneDate } from "../utils/dateUtils";
 import { EnglishBackground } from "../types";
 import { getTagsByInstructorIds } from "../services/instructorTagsService";
+import {
+  getInstructorFees,
+  InstructorFeeError,
+} from "../services/instructorFeeService";
 
 function setErrorResponse(res: Response, error: unknown) {
   return res
     .status(500)
     .json({ message: error instanceof Error ? error.message : `${error}` });
 }
+
+export const getMyInstructorFeesController = async (
+  req: RequestWithQuery<Record<string, never>>,
+  res: Response,
+) => {
+  if (!req.user?.id || req.user.userType !== "instructor") {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const instructorId = Number(req.user.id);
+  if (!Number.isSafeInteger(instructorId) || instructorId < 1) {
+    return res.status(401).json({ message: "Invalid authenticated user" });
+  }
+
+  try {
+    const fees = await getInstructorFees(instructorId);
+    return res.status(200).json(fees);
+  } catch (error) {
+    if (error instanceof InstructorFeeError) {
+      return res.status(error.statusCode).json({
+        code: error.code,
+        message: error.message,
+      });
+    }
+
+    console.error("Failed to fetch authenticated instructor fees", {
+      error,
+      instructorId,
+    });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 // Fetch instructor id by class id
 export const getInstructorIdByClassIdController = async (
