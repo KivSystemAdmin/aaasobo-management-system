@@ -15,8 +15,12 @@ export default async function Page() {
   const linkItems = ["Admin"]; // Set the item to be a link
   const replaceItems = ["ID"]; // Replace the item with the value(e.g., ID -> 1,2,3...)
   const linkUrls = ["/admins/admin-list/[ID]"]; // Set the link URL
+  const itemNameLabels: Record<string, string> = {
+    Admin: "管理者",
+    Email: "メールアドレス",
+  }; // Set the item name labels for the table
   const userType = "admin"; // Set the user type for the registration form
-  const isAddButton = true; // Enable the add button
+  const addButton: [boolean, string] = [true, "管理者"]; // Enable the add button and set the button text
   const data = await getAllAdmins(cookie); // Fetch all admins data
 
   return (
@@ -27,9 +31,10 @@ export default async function Page() {
         omitItems={omitItems}
         linkItems={linkItems}
         linkUrls={linkUrls}
+        itemNameLabels={itemNameLabels}
         replaceItems={replaceItems}
         userType={userType}
-        isAddButton={isAddButton}
+        addButton={addButton}
       />
     </div>
   );

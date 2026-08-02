@@ -3,7 +3,8 @@ import { InstructorSlot } from "@/lib/api/instructorsApi";
 import {
   BusinessTime,
   Weekday,
-  WEEKDAYS,
+  Weekday_Ja,
+  WEEKDAYS_JA,
   weekdayToDay,
 } from "@/lib/utils/scheduleUtils";
 import {
@@ -41,7 +42,7 @@ export default function ScheduleCalendar({ slots }: ScheduleCalendarProps) {
   return (
     <BaseCalendarRoot>
       <TimeColumn />
-      {WEEKDAYS.map((day) => (
+      {WEEKDAYS_JA.map((day) => (
         <DayColumn key={day} day={day} scheduledTimes={slotsByDay[day] || []} />
       ))}
     </BaseCalendarRoot>
@@ -52,7 +53,7 @@ function DayColumn({
   day,
   scheduledTimes,
 }: {
-  day: Weekday;
+  day: Weekday_Ja;
   scheduledTimes: string[];
 }) {
   const disabledTimes = BusinessTime.getDisabledTimes(day);

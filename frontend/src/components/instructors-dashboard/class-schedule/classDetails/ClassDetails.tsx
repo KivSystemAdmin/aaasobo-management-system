@@ -46,15 +46,15 @@ function ClassDetails({
     case "class-list": // Admin dashboard class list page
       if (userSessionType === "admin" && adminId) {
         breadcrumbHref = "/admins/class-list";
-        label1 = "Class List";
-        label2 = `Class Details Page (Instructor: ${classDetails.instructorName})`;
+        label1 = "クラスリスト";
+        label2 = `クラス詳細ページ (インストラクター: ${classDetails.instructorName})`;
       }
       break;
     case "instructor-list": // Admin dashboard instructor list page
       if (userSessionType === "admin" && adminId) {
         breadcrumbHref = "/admins/instructor-list";
-        label1 = "Instructor List";
-        label2 = `Class Details Page (Instructor: ${classDetails.instructorName})`;
+        label1 = "インストラクターリスト";
+        label2 = `クラス詳細ページ (インストラクター: ${classDetails.instructorName})`;
         // Set the active tab to the instructor calendar tab.
         localStorage.setItem("activeInstructorTab", "0");
       }

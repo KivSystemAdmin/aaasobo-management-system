@@ -229,12 +229,12 @@ function InstructorProfile({
             {/* User Status Switcher */}
             <StatusSwitcher
               isEditing={isEditing}
-              statusOptions={["Active", "Leaving"]}
+              statusOptions={["在籍中", "卒業予定"]}
               currentStatus={
-                latestInstructor.terminationAt === null ? "Active" : "Leaving"
+                latestInstructor.terminationAt === null ? "在籍中" : "卒業予定"
               }
               leavingDate={latestInstructor.terminationAt}
-              title="Status"
+              title="ステータス"
               onStatusChange={(newStatus, newDate) => {
                 setUserStatus(newStatus);
                 setLeavingDate(newDate ?? null);
@@ -244,7 +244,7 @@ function InstructorProfile({
             {isEditing && (
               <>
                 {/* Image Uploader */}
-                <p className={styles.profileImage__text}>Profile Image</p>
+                <p className={styles.profileImage__text}>プロフィール画像</p>
                 <Uploader />
               </>
             )}
@@ -295,7 +295,9 @@ function InstructorProfile({
             {/* English Background Selection (Radio button) */}
             {isEditing ? (
               <>
-                <p className={styles.englishBackground}>English Background</p>
+                <p className={styles.englishBackground}>
+                  インストラクタータイプ
+                </p>
                 <RadioButton
                   name="englishBackground"
                   value={EnglishBackground.NonNative}
@@ -731,7 +733,7 @@ function InstructorProfile({
                   <div className={styles.buttons}>
                     <ActionButton
                       className="cancelEditingInstructor"
-                      btnText="Cancel"
+                      btnText="キャンセル"
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();
@@ -741,7 +743,7 @@ function InstructorProfile({
 
                     <ActionButton
                       className="saveInstructor"
-                      btnText="Save"
+                      btnText="保存"
                       type="submit"
                       Icon={CheckIcon}
                     />
@@ -750,7 +752,7 @@ function InstructorProfile({
                   <div className={styles.buttons}>
                     <ActionButton
                       className="editInstructor"
-                      btnText="Edit"
+                      btnText="編集"
                       onClick={handleEditClick}
                     />
                   </div>

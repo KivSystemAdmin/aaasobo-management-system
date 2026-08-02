@@ -172,7 +172,7 @@ function PlanProfile({
   }
 
   if (!latestPlan) {
-    return <p>Plan not found</p>;
+    return <p>プランが見つかりません</p>;
   }
 
   return (
@@ -185,9 +185,7 @@ function PlanProfile({
               <div className={styles.planName__nameSection}>
                 {isEditing ? (
                   <div>
-                    <p className={styles.planName__text}>
-                      Plan Name (Japanese)
-                    </p>
+                    <p className={styles.planName__text}>プラン名 (日本語)</p>
                     <InputField
                       name="planNameJpn"
                       value={latestPlan.planNameJpn}
@@ -195,7 +193,7 @@ function PlanProfile({
                       error={localMessages.planNameJpn}
                       className={`${styles.planName__inputField} ${isEditing ? styles.editable : ""}`}
                     />
-                    <p className={styles.planName__text}>Plan Name (English)</p>
+                    <p className={styles.planName__text}>プラン名 (英語)</p>
                     <InputField
                       name="planNameEng"
                       value={latestPlan.planNameEng}
@@ -216,9 +214,9 @@ function PlanProfile({
                   {isEditing ? (
                     <>
                       <p>
-                        Weekly class times{" "}
+                        週ごとの授業時間{" "}
                         <span className={styles.weeklyClassTimes__redText}>
-                          (Uneditable)
+                          (編集不可)
                         </span>
                       </p>
                       <InputField
@@ -234,7 +232,7 @@ function PlanProfile({
                     </>
                   ) : (
                     <>
-                      <p>Weekly class times</p>
+                      <p>週ごとの授業時間</p>
                       <h4 className={styles.weeklyClassTimes__text}>
                         {latestPlan.weeklyClassTimes}
                       </h4>
@@ -247,7 +245,7 @@ function PlanProfile({
               <div className={styles.insideContainer}>
                 <PencilIcon className={styles.icon} />
                 <div>
-                  <p className={styles.planName__text}>Description</p>
+                  <p className={styles.planName__text}>説明</p>
                   {isEditing ? (
                     <InputField
                       name="description"
@@ -268,7 +266,9 @@ function PlanProfile({
               <div className={styles.insideContainer}>
                 <AcademicCapIcon className={styles.icon} />
                 <div>
-                  <p className={styles.planName__text}>Plan Type</p>
+                  <p className={styles.planName__text}>
+                    インストラクタータイプ
+                  </p>
                   {isEditing ? (
                     <>
                       <RadioButton
@@ -333,7 +333,7 @@ function PlanProfile({
                     <div className={styles.buttons}>
                       <ActionButton
                         className="cancelEditingPlan"
-                        btnText="Cancel"
+                        btnText="キャンセル"
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
@@ -342,7 +342,7 @@ function PlanProfile({
                       />
                       <ActionButton
                         className="savePlan"
-                        btnText="Save"
+                        btnText="保存"
                         type="submit"
                         Icon={CheckIcon}
                       />
@@ -352,7 +352,7 @@ function PlanProfile({
                       <div>
                         <ActionButton
                           className="deletePlan"
-                          btnText="Delete"
+                          btnText="削除"
                           type="button"
                           onClick={handleDeleteClick}
                         />
@@ -360,7 +360,7 @@ function PlanProfile({
                       <div>
                         <ActionButton
                           className="editPlan"
-                          btnText="Edit"
+                          btnText="編集"
                           type="button"
                           onClick={handleEditClick}
                         />

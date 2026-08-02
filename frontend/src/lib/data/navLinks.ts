@@ -57,71 +57,57 @@ export function getLinks(
 
   const adminLinks: LinkType[] = [
     {
-      name: language === "ja" ? "ダッシュボード" : "Dashboard",
+      name: "ダッシュボード",
       href: "/admins/dashboard",
       icon: HomeModernIcon,
     },
     {
-      name: language === "ja" ? "クラスカレンダー" : "Class Calendar",
+      name: "クラスカレンダー",
       href: "/admins/calendar",
       icon: CalendarDaysIcon,
     },
     {
-      name: language === "ja" ? "クラスリスト" : "Class List",
+      name: "クラスリスト",
       href: "/admins/class-list",
       icon: ClipboardDocumentListIcon,
     },
     {
-      name: language === "ja" ? "カスタマーリスト" : "Customer List",
+      name: "お客さまリスト",
       href: "/admins/customer-list",
       icon: UsersIcon,
     },
     {
-      name:
-        language === "ja" ? "インストラクター　　リスト" : "Instructor List",
+      name: "インストラクター　　リスト",
       href: "/admins/instructor-list",
       icon: UsersIcon,
     },
     {
-      name: language === "ja" ? "プランリスト" : "Plan List",
-      href: "/admins/plan-list",
-      icon: AcademicCapIcon,
-    },
-    {
-      name: language === "ja" ? "イベントリスト" : "Event List",
-      href: "/admins/event-list",
-      icon: BellIcon,
-    },
-    {
-      name: language === "ja" ? "アドミンリスト" : "Admin List",
+      name: "管理者リスト",
       href: "/admins/admin-list",
       icon: UserIcon,
     },
     {
-      name:
-        language === "ja"
-          ? "インストラクター　　　プロフィール"
-          : "Instructor Profiles",
+      name: "インストラクター　　　プロフィール",
       href: "/admins/instructor-profiles",
       icon: UsersIcon,
     },
     {
-      name: language === "ja" ? "アーソボカレンダー" : "AaasoBo! Calendar",
+      name: "アーソボカレンダー",
       href: "/admins/business-calendar",
       icon: CalendarDaysIcon,
     },
     {
-      name: language === "ja" ? "プランリスト" : "Plan List",
+      name: "プランリスト",
       href: "/admins/plan-list",
       icon: AcademicCapIcon,
     },
     {
-      name: "Event List",
+      name: "イベントリスト",
       href: "/admins/event-list",
       icon: BellIcon,
     },
     {
-      name: language === "ja" ? "データインポート" : "Data Import",
+      name: "データインポート",
       href: "/admins/data-import",
       icon: ArrowUpOnSquareIcon,
     },

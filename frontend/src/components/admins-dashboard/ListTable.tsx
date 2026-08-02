@@ -60,11 +60,12 @@ function ListTable({
   omitItems,
   linkItems,
   linkUrls,
+  itemNameLabels,
   replaceItems,
   userType,
   categoryType,
-  isAddButton,
-  isViewPastButton,
+  addButton,
+  viewPastButton,
   pastListTableProps,
   linkTarget,
   isFilterActive,
@@ -348,47 +349,44 @@ function ListTable({
               style={{ color: filterColumn === "0" ? "#888888" : "#000000" }}
             >
               <option disabled value="0">
-                Select a column
+                カラムを選択
               </option>
               {filterColumns.map((key) => (
                 <option key={key} value={key}>
-                  {key === ALL_COLUMNS_FILTER ? "All Columns" : key}
+                  {key === ALL_COLUMNS_FILTER ? "全項目" : key}
                 </option>
               ))}
             </select>
             <input
               type="text"
-              placeholder="Enter filter value..."
+              placeholder="検索対象を入力"
               value={filterValue}
               onChange={(e) => setFilterValue(e.target.value)}
             />
           </div>
           <div className={`${styles.buttonsContainer}`}>
-            {isViewPastButton && (
+            {viewPastButton && (
               <ActionButton
-                btnText={`View past ${categoryType ? categoryType : userType}s`}
+                btnText={viewPastButton[1] + "を表示"}
                 className="viewPastBtn"
                 onClick={() => setIsModalOpen([true, "viewPast"])}
                 Icon={EyeIcon}
               />
             )}
-            {isAddButton &&
+            {addButton &&
               (listType === "Class List" ? (
                 <>
                   <FilterButton
                     filterHref={filterHref}
                     clearFilterHref={clearFilterHref}
                     isFilterActive={isFilterActive}
-                    displayNames={[
-                      "Filter Today's Classes",
-                      "Show All Classes",
-                    ]}
+                    displayNames={["本日のクラス表示", "全クラス表示"]}
                   />
                   <GenerateClassesForm />
                 </>
               ) : (
                 <ActionButton
-                  btnText={`Add ${categoryType ? categoryType : userType}`}
+                  btnText={`${addButton[1]}を追加`}
                   className="addBtn"
                   onClick={() => setIsModalOpen([true, "add"])}
                   Icon={PlusIcon}
@@ -441,13 +439,10 @@ function ListTable({
                           : ""
                       }
                     >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                      {itemNameLabels[header.column.id] ?? header.column.id}
                       {{
-                        asc: "▲",
-                        desc: "▼",
+                        asc: " ▲",
+                        desc: " ▼",
                       }[header.column.getIsSorted() as string] ?? "　"}
                     </th>
                   ))}

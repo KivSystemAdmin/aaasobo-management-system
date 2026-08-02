@@ -122,7 +122,7 @@ const StatusSwitcher = ({
                 <p className={styles.userLeaving__text}>
                   {language === "en"
                     ? `${dateInfo.isPast ? "Left" : "Leaving"} on ${getLongMonth(new Date(leavingDate))} ${dateInfo.date}, ${dateInfo.year} (Japan Time)`
-                    : `${dateInfo.year}年${dateInfo.month + 1}月${dateInfo.date}日${dateInfo.isPast ? "退会済み" : "退会予定"} (日本時間)`}
+                    : `${dateInfo.year}年${dateInfo.month + 1}月${dateInfo.date}日${dateInfo.isPast ? "卒業済み" : "卒業予定"} (日本時間)`}
                 </p>
               </div>
             )}

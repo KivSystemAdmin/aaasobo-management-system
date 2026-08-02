@@ -6,6 +6,7 @@ import { UserIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import styles from "./DashboardClient.module.scss";
 import {
   ENGLISH_BACKGROUND_LABELS,
+  ENGLISH_BACKGROUND_LABELS_JP,
   EnglishBackground,
 } from "@/lib/data/englishBackground";
 import { toast } from "react-toastify";
@@ -364,25 +365,33 @@ export default function DashboardClient({
         <article className={styles.kpiCard}>
           <UserIcon className={styles.kpiIcon} />
           <div>
-            <p>{ENGLISH_BACKGROUND_LABELS[EnglishBackground.NonNative]}</p>
-            <strong>{metrics.instructorsByEnglishBackground.nonNative}</strong>
+            <p>{ENGLISH_BACKGROUND_LABELS_JP[EnglishBackground.NonNative]}</p>
+            <div className={styles.kpiValue}>
+              <strong>
+                {metrics.instructorsByEnglishBackground.nonNative}
+              </strong>
+              <span>名</span>
+            </div>
           </div>
         </article>
         <article className={styles.kpiCard}>
           <UserIcon className={styles.kpiIcon} />
           <div>
-            <p>{ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeA]}</p>
-            <strong>{metrics.instructorsByEnglishBackground.nativeA}</strong>
+            <p>{ENGLISH_BACKGROUND_LABELS_JP[EnglishBackground.NativeA]}</p>
+            <div className={styles.kpiValue}>
+              <strong>{metrics.instructorsByEnglishBackground.nativeA}</strong>
+              <span>名</span>
+            </div>
           </div>
         </article>
         <article className={styles.kpiCard}>
           <UserIcon className={styles.kpiIcon} />
           <div>
-            <p>{ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeB]}</p>
-            <article>
+            <p>{ENGLISH_BACKGROUND_LABELS_JP[EnglishBackground.NativeB]}</p>
+            <div className={styles.kpiValue}>
               <strong>{metrics.instructorsByEnglishBackground.nativeB}</strong>
               <span>名</span>
-            </article>
+            </div>
           </div>
         </article>
       </div>

@@ -27,8 +27,17 @@ export default async function Page(props: {
     "/admins/instructor-list/[InstructorID]",
     "/admins/customer-list/[CustomerID]",
   ]; // Set the link URL
+  const itemNameLabels: Record<string, string> = {
+    "Date/Time (JST)": "クラス日時（JST）",
+    Day: "曜日",
+    Instructor: "インストラクター",
+    Children: "お子さま",
+    Customer: "お客さま",
+    Status: "ステータス",
+    "Class Code": "クラスコード",
+  }; // Set the item name labels for the table
   const userType = "admin"; // Set the user type for the registration form (It's not used in this page, but kept for consistency)
-  const isAddButton = true; // Enable the add button
+  const addButton: [boolean, string] = [true, ""]; // Enable the add button and set the button text
   const isFilterActive = searchParams.today === "true"; // Determine if the filter is active based on the search parameter
   const filterHref = "/admins/class-list?today=true"; // URL to apply the filter
   const clearFilterHref = "/admins/class-list"; // URL to clear the filter
@@ -42,9 +51,10 @@ export default async function Page(props: {
         omitItems={omitItems}
         linkItems={linkItems}
         linkUrls={linkUrls}
+        itemNameLabels={itemNameLabels}
         replaceItems={replaceItems}
         userType={userType}
-        isAddButton={isAddButton}
+        addButton={addButton}
         isFilterActive={isFilterActive}
         filterHref={filterHref}
         clearFilterHref={clearFilterHref}

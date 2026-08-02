@@ -18,11 +18,11 @@ export default function PlanTabs({
   userSessionType: UserType;
 }) {
   const planName =
-    typeof plan !== "string" ? getLocalizedText(plan.name, "en") : "Unknown";
+    typeof plan !== "string" ? getLocalizedText(plan.name, "ja") : "Unknown";
   const breadcrumb = [
-    "Plan List",
+    "プランリスト",
     "/admins/plan-list",
-    `Plan Page (${planName})`,
+    `プランページ (${planName})`,
   ];
   const activeTabName = "activePlanTab";
 
@@ -32,7 +32,7 @@ export default function PlanTabs({
   // Tabs with labels and content
   const tabs = [
     {
-      label: "Plan's Profile",
+      label: "プラン",
       content: <PlanProfile plan={plan} userSessionType={userSessionType} />,
     },
   ];

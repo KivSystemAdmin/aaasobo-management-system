@@ -14,7 +14,11 @@ const ListPageRegistrationModal = ({
 }) => {
   return (
     <div className={styles.modalContent} style={{ width }}>
-      <RegisterForm userType={userType} categoryType={categoryType} />
+      <RegisterForm
+        userType={userType}
+        categoryType={categoryType}
+        language={"ja"}
+      />
     </div>
   );
 };

@@ -18,11 +18,11 @@ export default function EventTabs({
   userSessionType: UserType;
 }) {
   const eventName =
-    typeof event !== "string" ? getLocalizedText(event.name, "en") : "Unknown";
+    typeof event !== "string" ? getLocalizedText(event.name, "ja") : "Unknown";
   const breadcrumb = [
-    "Event List",
+    "イベントリスト",
     "/admins/event-list",
-    `Event Page (${eventName})`,
+    `イベントページ (${eventName})`,
   ];
   const activeTabName = "activeEventTab";
 
@@ -32,7 +32,7 @@ export default function EventTabs({
   // Tabs with labels and content
   const tabs = [
     {
-      label: "Event's Profile",
+      label: "イベント",
       content: <EventProfile event={event} userSessionType={userSessionType} />,
     },
   ];
