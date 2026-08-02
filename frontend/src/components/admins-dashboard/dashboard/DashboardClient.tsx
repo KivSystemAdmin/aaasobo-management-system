@@ -382,7 +382,7 @@ export default function DashboardClient({
             <article>
               <strong>{metrics.instructorsByEnglishBackground.nativeB}</strong>
               <span>名</span>
-            </div>
+            </article>
           </div>
         </article>
       </div>
