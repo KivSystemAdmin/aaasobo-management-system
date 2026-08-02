@@ -3,7 +3,9 @@ import { InstructorSlot } from "@/lib/api/instructorsApi";
 import {
   BusinessTime,
   Weekday,
+  Weekday_Ja,
   WEEKDAYS,
+  WEEKDAYS_JA,
   weekdayToDay,
 } from "@/lib/utils/scheduleUtils";
 import {
@@ -58,7 +60,7 @@ export default function EditableScheduleCalendar({
   return (
     <BaseCalendarRoot>
       <TimeColumn />
-      {WEEKDAYS.map((day, weekday) => (
+      {WEEKDAYS_JA.map((day, weekday) => (
         <DayColumn
           key={day}
           day={day}
@@ -77,7 +79,7 @@ function DayColumn({
   getCellType,
   onSlotToggle,
 }: {
-  day: Weekday;
+  day: Weekday_Ja;
   weekday: number;
   getCellType: (weekday: number, time: string) => CellType;
   onSlotToggle: (weekday: number, time: string) => void;

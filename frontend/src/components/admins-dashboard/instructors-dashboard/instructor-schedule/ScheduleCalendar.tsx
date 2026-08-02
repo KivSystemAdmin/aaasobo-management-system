@@ -26,17 +26,17 @@ interface ScheduleCalendarProps {
 export default function ScheduleCalendar({ slots }: ScheduleCalendarProps) {
   const slotsByDay = slots.reduce(
     (acc, slot) => {
-      const day = weekdayToDay(slot.weekday);
+      const day = weekdayToDay(slot.weekday) as Weekday_Ja;
       if (!acc[day]) acc[day] = [];
 
       acc[day].push(slot.startTime);
       return acc;
     },
-    {} as Record<Weekday, string[]>,
+    {} as Record<Weekday_Ja, string[]>,
   );
 
   Object.keys(slotsByDay).forEach((day) => {
-    slotsByDay[day as Weekday].sort();
+    slotsByDay[day as Weekday_Ja].sort();
   });
 
   return (
