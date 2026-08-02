@@ -194,7 +194,7 @@ function EditSubscriptionModal({
     <Modal isOpen={isOpen} onClose={resetAndClose} overlayClosable={true}>
       <div className={styles.progressiveFlow}>
         <div className={styles.modalHeader}>
-          <h2>Edit a plan</h2>
+          <h2>プラン編集</h2>
         </div>
 
         <div className={styles.sectionsContainer}>
@@ -204,7 +204,7 @@ function EditSubscriptionModal({
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <AcademicCapIcon className={styles.sectionIcon} />
-              <h3>Select a new Plan</h3>
+              <h3>新しいプランを選択</h3>
             </div>
             <div className={styles.sectionContent}>
               <select
@@ -230,7 +230,7 @@ function EditSubscriptionModal({
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <PencilIcon className={styles.sectionIcon} />
-              <h3>Change a SelectType URL</h3>
+              <h3>セレクトタイプのURLを変更</h3>
             </div>
             <div className={styles.sectionContent}>
               <InputField
@@ -250,7 +250,7 @@ function EditSubscriptionModal({
             <div className={styles.section}>
               <div className={styles.sectionHeader}>
                 <ClipboardDocumentListIcon className={styles.sectionIcon} />
-                <h3>Select the ones you want to terminate</h3>
+                <h3>終了を希望するクラスを選択</h3>
               </div>
               <div className={styles.sectionContent}>
                 <span className={styles.selectedValue}>
@@ -277,10 +277,10 @@ function EditSubscriptionModal({
           {/* Action Buttons */}
           <div className={styles.confirmationActions}>
             <button onClick={resetAndClose} className={styles.cancelButton}>
-              Cancel
+              キャンセル
             </button>
             <button onClick={handleSubmit} className={styles.confirmButton}>
-              {loading ? "Applying..." : "Apply Changes"}
+              {loading ? "適用中..." : "変更を適用"}
             </button>
           </div>
         </div>

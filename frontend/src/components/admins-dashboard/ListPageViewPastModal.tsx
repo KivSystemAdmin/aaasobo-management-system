@@ -30,6 +30,7 @@ const ListPageViewPastModal = ({
         omitItems={omitItems}
         linkItems={linkItems}
         linkUrls={linkUrls}
+        itemNameLabels={pastListTableProps.itemNameLabels}
         replaceItems={replaceItems}
         userType={userType}
         categoryType={categoryType}

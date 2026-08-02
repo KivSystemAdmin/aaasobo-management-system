@@ -15,8 +15,11 @@ export default async function Page() {
   const linkItems = ["ID"]; // Set the item to be a link
   const replaceItems = ["Customer ID"]; // Replace the item with the value(e.g., ID -> 1,2,3...)
   const linkUrls = ["/admins/customer-list/[Customer ID]"]; // Set the link URL
+  const itemNameLabels: Record<string, string> = {
+    Customer: "お客さま",
+    Children: "お子さま",
+  };
   const userType = "admin"; // Set the user type for the registration form (It's not used in this page, but kept for consistency)
-  const isAddButton = false; // Enable the add button
   const data = await getAllChildren(cookie); // Fetch all children data
 
   return (
@@ -28,8 +31,8 @@ export default async function Page() {
         linkItems={linkItems}
         linkUrls={linkUrls}
         replaceItems={replaceItems}
+        itemNameLabels={itemNameLabels}
         userType={userType}
-        isAddButton={isAddButton}
       />
     </div>
   );

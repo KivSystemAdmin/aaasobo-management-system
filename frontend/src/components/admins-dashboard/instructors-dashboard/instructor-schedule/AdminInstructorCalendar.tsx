@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import type { EventClickArg, EventSourceFuncArg } from "@fullcalendar/core";
 import Calendar from "@/components/features/calendar/Calendar";
 import InstructorSlotCalendar from "@/components/features/instructorSlotCalendar/InstructorSlotCalendar";
+import MessageBoardPanel from "@/components/features/messageBoardPanel/MessageBoardPanel";
 import Modal from "@/components/elements/modal/Modal";
 import ActionButton from "@/components/elements/buttons/actionButton/ActionButton";
 import {
@@ -21,6 +22,7 @@ import type {
   InstructorAbsence,
 } from "@shared/schemas/instructors";
 import { toast } from "react-toastify";
+import { MessageTarget } from "@/types";
 import styles from "./AdminInstructorCalendar.module.scss";
 
 type EditCalendarEvent = {
@@ -39,8 +41,10 @@ type EditCalendarEvent = {
 
 export default function AdminInstructorCalendar({
   instructorId,
+  messageBoardPosts = [],
 }: {
   instructorId: number;
+  messageBoardPosts?: MessageBoardPostItem[];
 }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [modalRefreshKey, setModalRefreshKey] = useState(0);
@@ -52,6 +56,11 @@ export default function AdminInstructorCalendar({
   const [canceledClasses, setCanceledClasses] = useState<
     AbsenceCanceledClassSummary[]
   >([]);
+  const visiblePosts = messageBoardPosts.filter(
+    (post) =>
+      post.target === MessageTarget.instructor ||
+      post.target === MessageTarget.both,
+  );
 
   const formatJSTDate = (date: Date) => {
     const year = date.getFullYear();
@@ -219,6 +228,11 @@ export default function AdminInstructorCalendar({
 
   return (
     <div className={styles.container}>
+      <MessageBoardPanel
+        posts={visiblePosts}
+        storageKey="instructorClassScheduleMessageBoardOpenState"
+        readMessageStorageKey="readInstructorMessageNumber"
+      />
       <InstructorSlotCalendar
         instructorId={instructorId}
         refreshKey={refreshKey}

@@ -6,6 +6,7 @@ import { UserIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import styles from "./DashboardClient.module.scss";
 import {
   ENGLISH_BACKGROUND_LABELS,
+  ENGLISH_BACKGROUND_LABELS_JP,
   EnglishBackground,
 } from "@/lib/data/englishBackground";
 import { toast } from "react-toastify";
@@ -23,9 +24,9 @@ import { confirmAlert } from "@/lib/utils/alertUtils";
 import { MessageTarget } from "@/types";
 
 const messageTargetLabel: Record<MessageTarget, string> = {
-  [MessageTarget.customer]: "Customers",
-  [MessageTarget.instructor]: "Instructors",
-  [MessageTarget.both]: "Both",
+  [MessageTarget.customer]: "お客さま",
+  [MessageTarget.instructor]: "インストラクター",
+  [MessageTarget.both]: "お客さま & インストラクター",
 };
 
 function InstructorAvatar({
@@ -133,7 +134,7 @@ export default function DashboardClient({
     [recentMessages],
   );
   const formatDate = (value: string) =>
-    new Date(value).toLocaleDateString("en-US", {
+    new Date(value).toLocaleDateString("ja-JP", {
       year: "numeric",
       month: "numeric",
       day: "numeric",
@@ -179,7 +180,7 @@ export default function DashboardClient({
 
     let confirmed = false;
     confirmed = await confirmAlert(
-      `Please confirm your message before sending:
+      `送信前にメッセージ内容をご確認ください:
       "${message.trim()}" ( for ${messageTargetLabel[target]} )`,
     );
     if (!confirmed) return;
@@ -202,14 +203,14 @@ export default function DashboardClient({
       setMessage("");
     }
 
-    toast.success(result.successMessage ?? "Message sent successfully.");
+    toast.success(result.successMessage ?? "メッセージ送信成功しました。");
   };
 
   return (
     <section className={styles.dashboardContainer}>
       <div className={styles.messageBoardCard}>
         <div className={styles.messageHeader}>
-          <h3>Message Board</h3>
+          <h3>メッセージボード</h3>
           <button
             type="button"
             className={styles.toggleButton}
@@ -241,7 +242,8 @@ export default function DashboardClient({
                     className={target === option ? styles.activeTarget : ""}
                     onClick={() => setTarget(option)}
                   >
-                    {"For "} {messageTargetLabel[option]}
+                    {messageTargetLabel[option]}
+                    {"宛"}
                   </button>
                 ))}
               </div>
@@ -249,7 +251,7 @@ export default function DashboardClient({
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
                 rows={4}
-                placeholder="Write a message for selected users..."
+                placeholder="メッセージを入力してください..."
                 unstyled
                 withLabelWrapper={false}
                 containerClassName={styles.messageTextAreaField}
@@ -257,15 +259,15 @@ export default function DashboardClient({
                 inputClassName={styles.messageTextAreaInput}
               />
               <div className={styles.messageActions}>
-                <button type="submit">Send</button>
+                <button type="submit">送信</button>
               </div>
             </form>
 
             <aside className={styles.messageHistory}>
-              <h3>Recent Messages</h3>
+              <h3>最近のメッセージ</h3>
               {recentMessages.length === 0 ? (
                 <p className={styles.emptyText}>
-                  No messages sent in this session yet.
+                  送信されたメッセージはありません。
                 </p>
               ) : (
                 <div className={styles.messagePreview}>
@@ -283,7 +285,7 @@ export default function DashboardClient({
                     className={styles.historyButton}
                     onClick={() => setIsRecentMessagesModalOpen(true)}
                   >
-                    View all messages
+                    全メッセージを見る
                   </button>
                 </div>
               )}
@@ -298,10 +300,12 @@ export default function DashboardClient({
       >
         <div className={styles.recentMessagesModal}>
           <header className={styles.recentMessagesModalHeader}>
-            <h3>Message History</h3>
+            <h3>メッセージ履歴</h3>
           </header>
           {recentMessages.length === 0 ? (
-            <p className={styles.emptyText}>No messages posted yet.</p>
+            <p className={styles.emptyText}>
+              投稿されたメッセージはありません。
+            </p>
           ) : (
             <ul className={styles.recentMessagesList}>
               {recentMessages.map((item) => (
@@ -309,7 +313,7 @@ export default function DashboardClient({
                   <article>
                     <div className={styles.recentMessageMeta}>
                       <span className={styles.recentMessageTarget}>
-                        {"For "} {messageTargetLabel[item.target]}
+                        {messageTargetLabel[item.target]} {"宛"}
                       </span>
                       <time>{formatDate(item.createdAt)}</time>
                     </div>
@@ -326,78 +330,94 @@ export default function DashboardClient({
         <article className={styles.kpiCard}>
           <UserGroupIcon className={styles.kpiIcon} />
           <div>
-            <p>Total Customers</p>
-            <strong>{metrics.totalCustomers}</strong>
+            <p>お客さま</p>
+            <div className={styles.kpiValue}>
+              <strong>{metrics.totalCustomers}</strong> <span>名</span>
+            </div>
           </div>
         </article>
 
         <article className={styles.kpiCard}>
           <UserGroupIcon className={styles.kpiIcon} />
           <div>
-            <p>Total Children</p>
-            <strong>{metrics.totalChildren}</strong>
+            <p>お子さま</p>
+            <div className={styles.kpiValue}>
+              <strong>{metrics.totalChildren}</strong> <span>名</span>
+            </div>
           </div>
         </article>
 
         <article className={styles.kpiCard}>
           <UserGroupIcon className={styles.kpiIcon} />
           <div>
-            <p>Total Instructors</p>
-            <strong>
-              {metrics.instructorsByEnglishBackground.nonNative +
-                metrics.instructorsByEnglishBackground.nativeA +
-                metrics.instructorsByEnglishBackground.nativeB}
-            </strong>
+            <p>インストラクター</p>
+            <div className={styles.kpiValue}>
+              <strong>
+                {metrics.instructorsByEnglishBackground.nonNative +
+                  metrics.instructorsByEnglishBackground.nativeA +
+                  metrics.instructorsByEnglishBackground.nativeB}
+              </strong>
+              <span>名</span>
+            </div>
           </div>
         </article>
 
         <article className={styles.kpiCard}>
           <UserIcon className={styles.kpiIcon} />
           <div>
-            <p>{ENGLISH_BACKGROUND_LABELS[EnglishBackground.NonNative]}</p>
-            <strong>{metrics.instructorsByEnglishBackground.nonNative}</strong>
+            <p>{ENGLISH_BACKGROUND_LABELS_JP[EnglishBackground.NonNative]}</p>
+            <div className={styles.kpiValue}>
+              <strong>
+                {metrics.instructorsByEnglishBackground.nonNative}
+              </strong>
+              <span>名</span>
+            </div>
           </div>
         </article>
         <article className={styles.kpiCard}>
           <UserIcon className={styles.kpiIcon} />
           <div>
-            <p>{ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeA]}</p>
-            <strong>{metrics.instructorsByEnglishBackground.nativeA}</strong>
+            <p>{ENGLISH_BACKGROUND_LABELS_JP[EnglishBackground.NativeA]}</p>
+            <div className={styles.kpiValue}>
+              <strong>{metrics.instructorsByEnglishBackground.nativeA}</strong>
+              <span>名</span>
+            </div>
           </div>
         </article>
         <article className={styles.kpiCard}>
           <UserIcon className={styles.kpiIcon} />
           <div>
-            <p>{ENGLISH_BACKGROUND_LABELS[EnglishBackground.NativeB]}</p>
-            <article>
+            <p>{ENGLISH_BACKGROUND_LABELS_JP[EnglishBackground.NativeB]}</p>
+            <div className={styles.kpiValue}>
               <strong>{metrics.instructorsByEnglishBackground.nativeB}</strong>
-            </article>
+              <span>名</span>
+            </div>
           </div>
         </article>
       </div>
 
       <div className={styles.twoColumnCharts}>
         <SimpleBarChart
-          title={`New Customers (${monthRangeLabel})`}
+          title={`入会者数 (${monthRangeLabel})`}
           data={newCustomersByMonth}
           color="blue"
         />
         <SimpleBarChart
-          title={`Churned Customers (${monthRangeLabel})`}
+          title={`退会者数 (${monthRangeLabel})`}
           data={churnCustomersByMonth}
           color="pink"
         />
       </div>
 
       <div className={styles.chartCard}>
-        <h3>Instructor Class Attendance</h3>
+        <h3>インストラクタークラス出席状況</h3>
         <div className={styles.instructorFilters}>
           <InputField
             type="search"
             value={instructorSearch}
             onChange={(event) => setInstructorSearch(event.target.value)}
             className={styles.instructorSearchInput}
-            placeholder="Search instructor name"
+            placeholder="インストラクターを検索"
             required={false}
           />
           <div className={styles.englishBackgroundFilterGroup}>
@@ -466,22 +486,20 @@ export default function DashboardClient({
             aria-label={`${selectedInstructor.nickname} attendance details`}
           >
             <div className={styles.modalHeader}>
-              <h3>
-                Monthly Class Attendance Results ({selectedInstructor.nickname})
-              </h3>
+              <h3>月別クラス出席率 ({selectedInstructor.nickname})</h3>
             </div>
 
             <div className={styles.attendanceTableWrapper}>
               <table className={styles.attendanceTable}>
                 <thead>
                   <tr>
-                    <th>Year</th>
-                    <th>Month</th>
-                    <th>Trial</th>
-                    <th>Regular</th>
-                    <th>Cancel</th>
-                    <th>Cancel Without Notice</th>
-                    <th>Attendance Rate</th>
+                    <th>年</th>
+                    <th>月</th>
+                    <th>無料クラス開催数</th>
+                    <th>レギュラークラス開催数</th>
+                    <th>キャンセル数</th>
+                    <th>連絡なしキャンセル数</th>
+                    <th>出席率</th>
                   </tr>
                 </thead>
                 <tbody>

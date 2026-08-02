@@ -1,4 +1,9 @@
-import { BusinessTime, Weekday, WEEKDAYS } from "@/lib/utils/scheduleUtils";
+import {
+  BusinessTime,
+  Weekday,
+  Weekday_Ja,
+  WEEKDAYS,
+} from "@/lib/utils/scheduleUtils";
 import styles from "./EditableScheduleCalendar.module.scss";
 
 export function TimeColumn() {
@@ -18,7 +23,7 @@ export function BaseDayColumn({
   day,
   children,
 }: {
-  day: Weekday;
+  day: Weekday_Ja;
   children: React.ReactNode;
 }) {
   return (

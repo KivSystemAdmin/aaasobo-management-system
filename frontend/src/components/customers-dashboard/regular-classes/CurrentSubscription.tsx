@@ -147,12 +147,12 @@ function CurrentSubscription({
                     <div className={styles.buttons}>
                       <ActionButton
                         onClick={() => handleEditSubscription(id)}
-                        btnText={"Edit"}
+                        btnText={"編集"}
                         className="editBtn"
                       />
                       <ActionButton
                         onClick={() => handleOpenCancelModal(id)}
-                        btnText={deletingId === id ? "DELETING..." : "Cancel"}
+                        btnText={deletingId === id ? "削除中..." : "キャンセル"}
                         className="deleteBtn"
                         disabled={deletingId === id}
                       />
@@ -252,12 +252,12 @@ const CancelModal = ({
     <Modal isOpen={isOpen} onClose={handleClose} overlayClosable={true}>
       <div className={styles.progressiveFlow}>
         <div className={styles.modalHeader}>
-          <h2>Cancel Subscription</h2>
+          <h2>サブスクリプションキャンセル</h2>
         </div>
 
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
-            <h3>Select Cancellation Date</h3>
+            <h3>キャンセル日を選択</h3>
           </div>
           <div className={styles.sectionContent}>
             <input
@@ -272,14 +272,14 @@ const CancelModal = ({
 
         <div className={styles.confirmationActions}>
           <button className={styles.cancelButton} onClick={handleClose}>
-            Close
+            閉じる
           </button>
           <button
             className={styles.confirmButton}
             onClick={handleConfirm}
             disabled={!date || isLoading}
           >
-            Confirm
+            確認
           </button>
         </div>
       </div>

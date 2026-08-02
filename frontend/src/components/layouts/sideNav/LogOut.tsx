@@ -13,7 +13,7 @@ export default function LogOut({ userType }: { userType: UserType }) {
       <button className={styles.link} type="submit">
         <ArrowLeftStartOnRectangleIcon className={styles.icon} />
         <p className={styles.linkText}>
-          {userType === "customer" && language === "ja"
+          {userType !== "instructor" && language === "ja"
             ? "ログアウト"
             : "Log Out"}
         </p>

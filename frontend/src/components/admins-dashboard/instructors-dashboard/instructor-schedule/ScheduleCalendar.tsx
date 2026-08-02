@@ -3,7 +3,8 @@ import { InstructorSlot } from "@/lib/api/instructorsApi";
 import {
   BusinessTime,
   Weekday,
-  WEEKDAYS,
+  Weekday_Ja,
+  WEEKDAYS_JA,
   weekdayToDay,
 } from "@/lib/utils/scheduleUtils";
 import {
@@ -25,23 +26,23 @@ interface ScheduleCalendarProps {
 export default function ScheduleCalendar({ slots }: ScheduleCalendarProps) {
   const slotsByDay = slots.reduce(
     (acc, slot) => {
-      const day = weekdayToDay(slot.weekday);
+      const day = weekdayToDay(slot.weekday) as Weekday_Ja;
       if (!acc[day]) acc[day] = [];
 
       acc[day].push(slot.startTime);
       return acc;
     },
-    {} as Record<Weekday, string[]>,
+    {} as Record<Weekday_Ja, string[]>,
   );
 
   Object.keys(slotsByDay).forEach((day) => {
-    slotsByDay[day as Weekday].sort();
+    slotsByDay[day as Weekday_Ja].sort();
   });
 
   return (
     <BaseCalendarRoot>
       <TimeColumn />
-      {WEEKDAYS.map((day) => (
+      {WEEKDAYS_JA.map((day) => (
         <DayColumn key={day} day={day} scheduledTimes={slotsByDay[day] || []} />
       ))}
     </BaseCalendarRoot>
@@ -52,7 +53,7 @@ function DayColumn({
   day,
   scheduledTimes,
 }: {
-  day: Weekday;
+  day: Weekday_Ja;
   scheduledTimes: string[];
 }) {
   const disabledTimes = BusinessTime.getDisabledTimes(day);

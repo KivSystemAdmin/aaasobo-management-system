@@ -15,9 +15,9 @@ export default async function Page() {
   const linkItems = ["ID"]; // Set the item to be a link
   const replaceItems = ["ID"]; // Replace the item with the value(e.g., ID -> 1,2,3...)
   const linkUrls = ["/admins/customer-list/[ID]"]; // Set the link URL
+  const itemNameLabels: Record<string, string> = {}; // Set the item name labels for the table
   const userType = "admin"; // Set the user type for the registration form
   const categoryType = "subscription"; // Set the category type for the registration form
-  const isAddButton = false; // Enable the add button
   const data = await getAllSubscriptions(cookie); // Fetch all subscriptions data
 
   return (
@@ -28,10 +28,10 @@ export default async function Page() {
         omitItems={omitItems}
         linkItems={linkItems}
         linkUrls={linkUrls}
+        itemNameLabels={itemNameLabels}
         replaceItems={replaceItems}
         userType={userType}
         categoryType={categoryType}
-        isAddButton={isAddButton}
       />
     </div>
   );

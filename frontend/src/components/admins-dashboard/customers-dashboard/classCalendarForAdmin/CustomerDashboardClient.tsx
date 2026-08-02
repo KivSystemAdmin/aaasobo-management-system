@@ -34,27 +34,27 @@ function CustomerDashboardClient({
     switch (previousListPage) {
       case "class-list":
         return [
-          "Class List",
+          "クラスリスト",
           "/admins/class-list",
-          `Customer Page (${customerProfile.name})`,
+          `お客さまページ (${customerProfile.name})`,
         ];
       case "customer-list":
         return [
-          "Customer List",
+          "お客さまリスト",
           "/admins/customer-list",
-          `Customer Page (${customerProfile.name})`,
+          `お客さまページ (${customerProfile.name})`,
         ];
       case "child-list":
         return [
-          "Child List",
+          "お子さまリスト",
           "/admins/child-list",
-          `Customer Page (${customerProfile.name})`,
+          `お客さまページ (${customerProfile.name})`,
         ];
       case "subscription-list":
         return [
-          "Subscription List",
+          "サブスクリプションリスト",
           "/admins/subscription-list",
-          `Customer Page (${customerProfile.name})`,
+          `お客さまページ (${customerProfile.name})`,
         ];
       default:
         return [];
@@ -70,11 +70,11 @@ function CustomerDashboardClient({
 
   const tabs = [
     {
-      label: "Class Calendar",
+      label: "クラスカレンダー",
       content: classCalendarComponent,
     },
     {
-      label: "Customer's Profile",
+      label: "お客さまプロフィール",
       content: (
         <CustomerProfile
           customerProfile={customerProfile}
@@ -83,7 +83,7 @@ function CustomerDashboardClient({
       ),
     },
     {
-      label: "Children's Profile",
+      label: "お子さまプロフィール",
       content: (
         <ChildrenProfiles
           customerId={customerId}
@@ -94,7 +94,7 @@ function CustomerDashboardClient({
       ),
     },
     {
-      label: "Regular Classes",
+      label: "レギュラークラス",
       content: (
         <RegularClasses
           adminId={adminId}

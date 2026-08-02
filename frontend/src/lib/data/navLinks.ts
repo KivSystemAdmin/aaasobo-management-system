@@ -57,57 +57,57 @@ export function getLinks(
 
   const adminLinks: LinkType[] = [
     {
-      name: "Dashboard",
+      name: "ダッシュボード",
       href: "/admins/dashboard",
       icon: HomeModernIcon,
     },
     {
-      name: "Class Calendar",
+      name: "クラスカレンダー",
       href: "/admins/calendar",
       icon: CalendarDaysIcon,
     },
     {
-      name: "Class List",
+      name: "クラスリスト",
       href: "/admins/class-list",
       icon: ClipboardDocumentListIcon,
     },
     {
-      name: "Customer List",
+      name: "お客さまリスト",
       href: "/admins/customer-list",
       icon: UsersIcon,
     },
     {
-      name: "Instructor List",
+      name: "インストラクター　　リスト",
       href: "/admins/instructor-list",
       icon: UsersIcon,
     },
     {
-      name: "Admin List",
+      name: "管理者リスト",
       href: "/admins/admin-list",
       icon: UserIcon,
     },
     {
-      name: "Instructor Profiles",
+      name: "インストラクター　　　プロフィール",
       href: "/admins/instructor-profiles",
       icon: UsersIcon,
     },
     {
-      name: "AaasoBo! Calendar",
+      name: "アーソボカレンダー",
       href: "/admins/business-calendar",
       icon: CalendarDaysIcon,
     },
     {
-      name: "Plan List",
+      name: "プランリスト",
       href: "/admins/plan-list",
       icon: AcademicCapIcon,
     },
     {
-      name: "Event List",
+      name: "イベントリスト",
       href: "/admins/event-list",
       icon: BellIcon,
     },
     {
-      name: "Data Import",
+      name: "データインポート",
       href: "/admins/data-import",
       icon: ArrowUpOnSquareIcon,
     },

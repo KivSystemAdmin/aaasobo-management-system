@@ -62,10 +62,10 @@ const formatMoneyWithCurrencyCode = (
 
 const formatLastUpdatedLabel = (value: string | null) => {
   if (!value) {
-    return "No payroll classes";
+    return "不明";
   }
 
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat("ja-JP", {
     timeZone: "Asia/Tokyo",
     year: "numeric",
     month: "short",
@@ -77,7 +77,7 @@ const formatLastUpdatedLabel = (value: string | null) => {
 };
 
 const formatDayLabel = (date: string) =>
-  new Intl.DateTimeFormat("en-US", {
+  new Intl.DateTimeFormat("ja-JP", {
     timeZone: "Asia/Tokyo",
     day: "2-digit",
     weekday: "short",
@@ -97,12 +97,12 @@ const formatDayLabel = (date: string) =>
     );
 
 const formatPeriodLabel = (from: string, to: string) => {
-  return `${from} to ${to}`;
+  return `${from} から ${to}`;
 };
 
 const formatFeeCoverageEnd = (value: string | null) => {
   if (!value) {
-    return "Onwards";
+    return "現在";
   }
 
   const date = new Date(`${value}T00:00:00.000Z`);
@@ -122,7 +122,9 @@ function DailyBreakdownTable({
 }) {
   if (rows.length === 0) {
     return (
-      <p className={styles.emptyMessage}>No payable classes in this period.</p>
+      <p className={styles.emptyMessage}>
+        この期間には給与支払い対象のクラスがありません。
+      </p>
     );
   }
 
@@ -157,12 +159,12 @@ function DailyBreakdownTable({
         </colgroup>
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Trial</th>
-            <th>Regular</th>
-            <th>Cancel</th>
-            <th>Cancel Without Notice</th>
-            <th>Day Total</th>
+            <th>日付</th>
+            <th>体験</th>
+            <th>通常</th>
+            <th>キャンセル</th>
+            <th>通知なしキャンセル</th>
+            <th>日計</th>
           </tr>
         </thead>
         <tbody>
@@ -208,10 +210,10 @@ function MonthlyCancelAdjustment({
   return (
     <div className={styles.monthlyCancelAdjustment}>
       <div className={styles.monthlyCancelLabel}>
-        <h5>Monthly Cancel</h5>
+        <h5>月次の合計キャンセル数</h5>
       </div>
       <p className={styles.monthlyCancelFormula}>
-        {monthlyCancelFee.cancelCount} total cancels /{" "}
+        {monthlyCancelFee.cancelCount} 合計キャンセル数 /{" "}
         {monthlyCancelFee.threshold} = {monthlyCancelFee.timesApplied} x{" "}
         {formatMoney(monthlyCancelFee.unitFee, currency)}
       </p>
@@ -241,7 +243,7 @@ function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
 
       <div className={styles.breakdownSection}>
         <h4>
-          Daily Breakdown (Last Update at{" "}
+          日次内訳 (最終更新日時{" "}
           {formatLastUpdatedLabel(period.sourceLastUpdatedAt)})
         </h4>
         <DailyBreakdownTable
@@ -257,9 +259,9 @@ function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
       </div>
 
       <div className={styles.feePeriodsSection}>
-        <h4>Applied Fee Periods</h4>
+        <h4>適用期間</h4>
         {period.appliedFeePeriods.length === 0 ? (
-          <p className={styles.emptyMessage}>No fee periods used.</p>
+          <p className={styles.emptyMessage}>対象期間がありません。</p>
         ) : (
           <div className={styles.feePeriodsList}>
             {period.appliedFeePeriods.map((fee) => (
@@ -275,25 +277,25 @@ function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
                 </div>
                 <dl className={styles.feeGrid}>
                   <div>
-                    <dt>Trial</dt>
+                    <dt>トライアルクラス</dt>
                     <dd>{formatMoney(fee.trialFee, fee.currency)}</dd>
                   </div>
                   <div>
-                    <dt>Regular</dt>
+                    <dt>レギュラークラス</dt>
                     <dd>{formatMoney(fee.regularFee, fee.currency)}</dd>
                   </div>
                   <div>
-                    <dt>Cancel</dt>
+                    <dt>キャンセル</dt>
                     <dd>{formatMoney(fee.cancelFee, fee.currency)}</dd>
                   </div>
                   <div>
-                    <dt>Cancel Without Notice</dt>
+                    <dt>通知なしキャンセル</dt>
                     <dd>
                       {formatMoney(fee.cancelWithoutNoticeFee, fee.currency)}
                     </dd>
                   </div>
                   <div>
-                    <dt>Monthly Cancel / 10</dt>
+                    <dt>月次の合計キャンセル数 / 10</dt>
                     <dd>{formatMoney(fee.monthlyCancelFee, fee.currency)}</dd>
                   </div>
                 </dl>
@@ -372,11 +374,11 @@ export default function InstructorPayroll({
           value={selectedMonth}
           onChange={handleMonthChange}
           className={styles.monthInput}
-          aria-label="Select payroll month"
+          aria-label="給与計算対象月を選択"
         />
       </header>
 
-      {isPending && <p className={styles.pendingMessage}>Loading payroll…</p>}
+      {isPending && <p className={styles.pendingMessage}>給与情報を取得中…</p>}
 
       {error ? (
         <div className={styles.errorBox}>

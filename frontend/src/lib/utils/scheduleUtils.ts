@@ -1,4 +1,5 @@
 export type Weekday = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
+export type Weekday_Ja = "日" | "月" | "火" | "水" | "木" | "金" | "土";
 
 export const WEEKDAYS: Weekday[] = [
   "Sun",
@@ -10,14 +11,28 @@ export const WEEKDAYS: Weekday[] = [
   "Sat",
 ];
 
+export const WEEKDAYS_JA: Weekday_Ja[] = [
+  "日",
+  "月",
+  "火",
+  "水",
+  "木",
+  "金",
+  "土",
+];
+
 export const weekdayToDay = (weekday: number): Weekday => WEEKDAYS[weekday];
 
 export class BusinessTime {
-  public static getDisabledTimes = (day: Weekday) => {
+  public static getDisabledTimes = (day: Weekday | Weekday_Ja) => {
     switch (day) {
       case "Sun":
         return BusinessTime.sundayDisabledTimes;
       case "Sat":
+        return BusinessTime.saturdayDisabledTimes;
+      case "日":
+        return BusinessTime.sundayDisabledTimes;
+      case "土":
         return BusinessTime.saturdayDisabledTimes;
       default:
         return BusinessTime.weekdayDisabledTimes;

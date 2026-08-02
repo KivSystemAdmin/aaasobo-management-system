@@ -172,7 +172,7 @@ function EventProfile({
                 {isEditing ? (
                   <div>
                     <p className={styles.eventName__text}>
-                      Event Name (Japanese)
+                      イベント名 (日本語)
                     </p>
                     <InputField
                       name="eventNameJpn"
@@ -181,9 +181,7 @@ function EventProfile({
                       onChange={(e) => handleInputChange(e, "eventNameJpn")}
                       className={`${styles.eventName__inputField} ${isEditing ? styles.editable : ""}`}
                     />
-                    <p className={styles.eventName__text}>
-                      Event Name (English)
-                    </p>
+                    <p className={styles.eventName__text}>イベント名 (英語)</p>
                     <InputField
                       name="eventNameEng"
                       value={latestEvent.eventNameEng}
@@ -201,7 +199,7 @@ function EventProfile({
               <div className={styles.insideContainer}>
                 <PencilIcon className={styles.icon} />
                 <div>
-                  <p className={styles.eventName__text}>Color</p>
+                  <p className={styles.eventName__text}>カラー</p>
                   {isEditing ? (
                     <div className={styles.eventColor}>
                       <InputField
@@ -242,7 +240,7 @@ function EventProfile({
                     <div className={styles.buttons}>
                       <ActionButton
                         className="cancelEditingEvent"
-                        btnText="Cancel"
+                        btnText="キャンセル"
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
@@ -251,7 +249,7 @@ function EventProfile({
                       />
                       <ActionButton
                         className="saveEvent"
-                        btnText="Save"
+                        btnText="保存"
                         type="submit"
                         Icon={CheckIcon}
                       />
@@ -261,7 +259,7 @@ function EventProfile({
                       <div>
                         <ActionButton
                           className="deleteEvent"
-                          btnText="Delete"
+                          btnText="削除"
                           type="button"
                           onClick={() => handleDeleteClick()}
                           disabled={isEventDisabled}
@@ -270,7 +268,7 @@ function EventProfile({
                       <div>
                         <ActionButton
                           className="editEvent"
-                          btnText="Edit"
+                          btnText="編集"
                           type="button"
                           onClick={handleEditClick}
                           disabled={isEventDisabled}

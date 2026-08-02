@@ -129,13 +129,13 @@ export default function InstructorSchedule({
       <div className={styles.dateInput}>
         <div className={styles.scheduleHeader}>
           <label className={styles.label}>
-            Schedule Period (Japan Time)
+            スケジュール期間 (日本時間)
             <select
               className={styles.input}
               value={selectedScheduleId || ""}
               onChange={(e) => handleScheduleSelection(Number(e.target.value))}
             >
-              <option value="">Select a schedule period</option>
+              <option value="">スケジュール期間を選択</option>
               {schedules.map((schedule) => (
                 <option key={schedule.id} value={schedule.id}>
                   {new Date(schedule.effectiveFrom).toLocaleDateString(
@@ -148,7 +148,7 @@ export default function InstructorSchedule({
                         new Date(schedule.effectiveTo).getTime() -
                           +24 * 60 * 60 * 1000,
                       ).toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" })
-                    : "Onwards"}
+                    : "現在"}
                 </option>
               ))}
             </select>
@@ -156,7 +156,7 @@ export default function InstructorSchedule({
           <ActionButton
             type="button"
             onClick={() => setIsModalOpen(true)}
-            btnText="Add New Schedule"
+            btnText="新しいスケジュールを作成"
             className="addBtn"
           />
         </div>
@@ -166,7 +166,7 @@ export default function InstructorSchedule({
 
       {!selectedSchedule && schedules.length === 0 && (
         <div className={styles.noSchedules}>
-          <p>No schedule versions found for this instructor.</p>
+          <p>登録済みのスケジュールが見つかりません。</p>
         </div>
       )}
 

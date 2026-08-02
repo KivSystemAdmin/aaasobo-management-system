@@ -135,7 +135,7 @@ function AdminProfile({
   }
 
   if (!latestAdmin) {
-    return <p>Admin not found</p>;
+    return <p>管理者が見つかりません</p>;
   }
 
   const adminId = admin.id;
@@ -147,7 +147,7 @@ function AdminProfile({
           <form onSubmit={handleSubmit} className={styles.profileCard}>
             {/* Admin name */}
             <div className={styles.adminName__nameSection}>
-              <p className={styles.adminName__text}>Name</p>
+              <p className={styles.adminName__text}>名前</p>
               {isEditing ? (
                 <InputField
                   name="name"
@@ -164,7 +164,7 @@ function AdminProfile({
             <div className={styles.insideContainer}>
               <EnvelopeIcon className={styles.icon} />
               <div>
-                <p>Email</p>
+                <p>メールアドレス</p>
                 {isEditing ? (
                   <InputField
                     name="email"
@@ -189,7 +189,7 @@ function AdminProfile({
                 <div className={styles.buttons}>
                   <ActionButton
                     className="cancelEditingAdmin"
-                    btnText="Cancel"
+                    btnText="キャンセル"
                     type="button"
                     onClick={(e) => {
                       e.preventDefault();
@@ -198,7 +198,7 @@ function AdminProfile({
                   />
                   <ActionButton
                     className="saveAdmin"
-                    btnText="Save"
+                    btnText="保存"
                     type="submit"
                     Icon={CheckIcon}
                   />
@@ -208,7 +208,7 @@ function AdminProfile({
                   <div>
                     <ActionButton
                       className="deleteAdmin"
-                      btnText="Delete"
+                      btnText="削除"
                       type="button"
                       onClick={() => handleDeleteClick()}
                       disabled={userId === adminId && userId === SUPER_ADMIN_ID}
@@ -217,7 +217,7 @@ function AdminProfile({
                   <div>
                     <ActionButton
                       className="editAdmin"
-                      btnText="Edit"
+                      btnText="編集"
                       type="button"
                       onClick={handleEditClick}
                     />

@@ -90,14 +90,14 @@ export default function AddScheduleModal({
     <Modal isOpen={isOpen} onClose={onClose} maxHeight="90vh">
       <div className={styles.content}>
         <div className={styles.header}>
-          <h2>Add New Schedule Version</h2>
+          <h2>新しいスケジュールを追加する</h2>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className={styles.body}>
             <div className={styles.dateSection}>
               <label htmlFor="effectiveFrom">
-                <strong>Effective From:</strong>
+                <strong>開始日:</strong>
                 <input
                   id="effectiveFrom"
                   type="date"
@@ -112,29 +112,26 @@ export default function AddScheduleModal({
 
             <div className={styles.scheduleSection}>
               <p>
-                <strong>Schedule Configuration:</strong>
+                <strong>スケジュール設定:</strong>
               </p>
-              <p>
-                Click time slots to add or remove them from the new schedule
-                version.
-              </p>
+              <p>時間枠をクリックして予定を追加または削除します。</p>
 
               <div className={styles.legend}>
                 <div className={styles.legendItem}>
                   <div
                     className={`${styles.legendDot} ${styles.unchanged}`}
                   ></div>
-                  <span>Unchanged (from current)</span>
+                  <span>現状</span>
                 </div>
                 <div className={styles.legendItem}>
                   <div className={`${styles.legendDot} ${styles.added}`}></div>
-                  <span>Added (new)</span>
+                  <span>追加</span>
                 </div>
                 <div className={styles.legendItem}>
                   <div
                     className={`${styles.legendDot} ${styles.removed}`}
                   ></div>
-                  <span>Removed</span>
+                  <span>削除</span>
                 </div>
               </div>
 
@@ -154,14 +151,14 @@ export default function AddScheduleModal({
               onClick={handleCancel}
               className={styles.cancelButton}
             >
-              Cancel
+              キャンセル
             </button>
             <button
               type="submit"
               className={styles.submitButton}
               disabled={!effectiveFrom || isSubmitting}
             >
-              {isSubmitting ? "Creating..." : "Create Schedule"}
+              {isSubmitting ? "作成中..." : "スケジュールを作成"}
             </button>
           </div>
         </form>

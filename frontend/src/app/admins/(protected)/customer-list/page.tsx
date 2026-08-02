@@ -15,9 +15,15 @@ export default async function Page() {
   const linkItems = ["Customer"]; // Set the item to be a link
   const replaceItems = ["ID"]; // Replace the item with the value(e.g., ID -> 1,2,3...)
   const linkUrls = ["/admins/customer-list/[ID]"]; // Set the link URL
+  const itemNameLabels: Record<string, string> = {
+    Customer: "お客さま",
+    Children: "お子さま",
+    Email: "メールアドレス",
+    Prefecture: "出身地",
+    "Start Date (JST)": "開始日（JST）",
+  }; // Set the item name labels for the table
   const userType = "customer"; // Set the user type for the registration form (It's not used in this page, but kept for consistency)
-  const isAddButton = false; // Enable the add button
-  const isViewPastButton = true; // Enable the view past information button
+  const viewPastButton: [boolean, string] = [true, "過去のお客さまリスト"]; // Enable the view past information button and set the button text
   const [currentCustomers, pastCustomers] = await Promise.all([
     getAllCustomers(cookie), // Fetch all customers data
     getAllPastCustomers(cookie), // Fetch all past customers data
@@ -29,6 +35,12 @@ export default async function Page() {
     linkItems: ["Past Customer"],
     replaceItems: ["ID"],
     linkUrls: ["/admins/customer-list/[ID]"],
+    itemNameLabels: {
+      "Past Customer": "お客さま",
+      "Past Children": "お子さま",
+      "Start Date (JST)": "入会日（JST）",
+      "End Date (JST)": "退会日（JST）",
+    } as Record<string, string>,
     userType: userType as UserType,
     linkTarget: "_blank",
     width: "100vh",
@@ -43,10 +55,10 @@ export default async function Page() {
         omitItems={omitItems}
         linkItems={linkItems}
         linkUrls={linkUrls}
+        itemNameLabels={itemNameLabels}
         replaceItems={replaceItems}
         userType={userType}
-        isAddButton={isAddButton}
-        isViewPastButton={isViewPastButton}
+        viewPastButton={viewPastButton}
         pastListTableProps={pastListTableProps}
       />
     </div>

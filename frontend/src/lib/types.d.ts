@@ -656,11 +656,12 @@ type CurrentListTableProps = {
   omitItems: string[];
   linkItems: string[];
   linkUrls: string[];
+  itemNameLabels: Record<string, string>;
   replaceItems: string[];
   userType: UserType;
   categoryType?: CategoryType;
-  isAddButton?: boolean;
-  isViewPastButton?: boolean;
+  addButton?: [boolean, string];
+  viewPastButton?: [boolean, string];
   isFilterActive?: boolean;
   filterHref?: string;
   clearFilterHref?: string;
@@ -672,6 +673,7 @@ type PastListTableProps = {
   omitItems: string[];
   linkItems: string[];
   linkUrls: string[];
+  itemNameLabels: Record<string, string>;
   replaceItems: string[];
   userType: UserType;
   categoryType?: CategoryType;
