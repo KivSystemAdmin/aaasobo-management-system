@@ -14,6 +14,7 @@ import type {
 import InstructorDashboardClient from "@/components/admins-dashboard/instructors-dashboard/InstructorDashboardClient";
 import AdminInstructorCalendar from "./instructor-schedule/AdminInstructorCalendar";
 import { getCookie } from "../../../proxy";
+import { getMessageBoardPosts } from "@/lib/api/adminsApi";
 
 export default async function InstructorDashboardForAdmin({
   adminId,
@@ -40,6 +41,7 @@ export default async function InstructorDashboardForAdmin({
   let initialSelectedSchedule: InstructorScheduleWithSlots | null = null;
   let initialInstructorTags: InstructorTagsResponse | null = null;
   let initialTagCatalog: TagCatalogResponse["tags"] = [];
+  let messageBoardPosts: MessageBoardPostItem[] = [];
 
   try {
     const [
@@ -47,11 +49,13 @@ export default async function InstructorDashboardForAdmin({
       schedulesResult,
       instructorTagsResult,
       tagCatalogResult,
+      messageBoardPostsResult,
     ] = await Promise.allSettled([
       getInstructor(instructorId, cookie),
       getInstructorSchedules(instructorId, cookie),
       getInstructorTags(instructorId, cookie),
       getInstructorTagCatalog(cookie),
+      getMessageBoardPosts(cookie),
     ]);
 
     if (instructorResult.status === "fulfilled") {
@@ -94,6 +98,15 @@ export default async function InstructorDashboardForAdmin({
       );
     }
 
+    if (messageBoardPostsResult.status === "fulfilled") {
+      messageBoardPosts = messageBoardPostsResult.value;
+    } else {
+      console.error(
+        "Failed to load message board posts:",
+        messageBoardPostsResult.reason,
+      );
+    }
+
     const activeSchedule = initialSchedules.find(
       (schedule) => schedule.effectiveTo === null,
     );
@@ -123,7 +136,10 @@ export default async function InstructorDashboardForAdmin({
       initialInstructorTags={initialInstructorTags}
       initialTagCatalog={initialTagCatalog}
       classScheduleComponent={
-        <AdminInstructorCalendar instructorId={instructorId} />
+        <AdminInstructorCalendar
+          instructorId={instructorId}
+          messageBoardPosts={messageBoardPosts}
+        />
       }
     />
   );
