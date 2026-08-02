@@ -53,7 +53,7 @@ function parseMonthKey(value: string): string | null {
 function monthYearLabelFromKey(monthKey: string): string {
   const [year, month] = monthKey.split("-").map(Number);
   const date = new Date(year, (month || 1) - 1, 1);
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat("ja-JP", {
     month: "short",
     year: "numeric",
   }).format(date);
@@ -94,7 +94,7 @@ function calcInstructorEnglishBackgroundCounts(
 function monthLabelFromKey(monthKey: string): string {
   const [year, month] = monthKey.split("-").map(Number);
   const date = new Date(year, (month || 1) - 1, 1);
-  return new Intl.DateTimeFormat("en-US", { month: "short" }).format(date);
+  return new Intl.DateTimeFormat("ja-JP", { month: "short" }).format(date);
 }
 
 function toMonthlyData(

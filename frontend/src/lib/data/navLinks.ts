@@ -56,57 +56,61 @@ export function getLinks(
 
   const adminLinks: LinkType[] = [
     {
-      name: "Dashboard",
+      name: language === "ja" ? "ダッシュボード" : "Dashboard",
       href: "/admins/dashboard",
       icon: HomeModernIcon,
     },
     {
-      name: "Class Calendar",
+      name: language === "ja" ? "クラスカレンダー" : "Class Calendar",
       href: "/admins/calendar",
       icon: CalendarDaysIcon,
     },
     {
-      name: "Class List",
+      name: language === "ja" ? "クラスリスト" : "Class List",
       href: "/admins/class-list",
       icon: ClipboardDocumentListIcon,
     },
     {
-      name: "Customer List",
+      name: language === "ja" ? "カスタマーリスト" : "Customer List",
       href: "/admins/customer-list",
       icon: UsersIcon,
     },
     {
-      name: "Instructor List",
+      name:
+        language === "ja" ? "インストラクター　　リスト" : "Instructor List",
       href: "/admins/instructor-list",
       icon: UsersIcon,
     },
     {
-      name: "Plan List",
+      name: language === "ja" ? "プランリスト" : "Plan List",
       href: "/admins/plan-list",
       icon: AcademicCapIcon,
     },
     {
-      name: "Event List",
+      name: language === "ja" ? "イベントリスト" : "Event List",
       href: "/admins/event-list",
       icon: BellIcon,
     },
     {
-      name: "Admin List",
+      name: language === "ja" ? "アドミンリスト" : "Admin List",
       href: "/admins/admin-list",
       icon: UserIcon,
     },
     {
-      name: "Instructor Profiles",
+      name:
+        language === "ja"
+          ? "インストラクター　　　プロフィール"
+          : "Instructor Profiles",
       href: "/admins/instructor-profiles",
       icon: UsersIcon,
     },
     {
-      name: "AaasoBo! Calendar",
+      name: language === "ja" ? "アーソボカレンダー" : "AaasoBo! Calendar",
       href: "/admins/business-calendar",
       icon: CalendarDaysIcon,
     },
     {
-      name: "Data Import",
+      name: language === "ja" ? "データインポート" : "Data Import",
       href: "/admins/data-import",
       icon: ArrowUpOnSquareIcon,
     },
