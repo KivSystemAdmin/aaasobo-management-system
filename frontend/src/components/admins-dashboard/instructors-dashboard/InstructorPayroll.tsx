@@ -28,7 +28,7 @@ const getCurrentJstMonth = () => {
     throw new Error("Failed to determine current JST month");
   }
 
-  return `${year}年${month}月`;
+  return `${year}-${month}`;
 };
 
 const formatMoney = (amount: number, currency: string | null) => {
