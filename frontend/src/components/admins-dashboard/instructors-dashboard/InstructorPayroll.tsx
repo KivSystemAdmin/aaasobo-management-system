@@ -271,7 +271,7 @@ function PeriodCard({ period }: { period: InstructorPayrollPeriod }) {
               >
                 <div className={styles.feeCardHeader}>
                   <strong>
-                    {fee.effectiveFrom} to{" "}
+                    {fee.effectiveFrom} から{" "}
                     {formatFeeCoverageEnd(fee.effectiveTo)}
                   </strong>
                 </div>
