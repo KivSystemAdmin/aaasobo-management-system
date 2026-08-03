@@ -77,7 +77,7 @@ export function getLinks(
       icon: UsersIcon,
     },
     {
-      name: "インストラクター　　リスト",
+      name: "インストラクター\nリスト",
       href: "/admins/instructor-list",
       icon: UsersIcon,
     },
