@@ -35,6 +35,16 @@ import RadioButton from "../../elements/radioButton/RadioButton";
 import TextAreaInput from "../../elements/textAreaInput/TextAreaInput";
 import { ENGLISH_BACKGROUND_LABELS } from "@/lib/data/englishBackground";
 
+const DEFAULT_INSTRUCTOR_SKILL = `Science: [Can you provide a simple experiment?]
+Cooking: [Can you lead a cooking class?]
+Crafting: (Are you good at crafting?)
+Origami: (Are you good at playing Origami?)
+Minecraft: [Account required]
+Roblox: [Account required]
+Pokemon: [Do you know over 10 characters?]
+Disney: [Do you know over 10 characters?]
+Others: [Please specify:]`;
+
 const RegisterForm = ({
   categoryType,
   userType,
@@ -343,7 +353,7 @@ const RegisterForm = ({
                 id="skill"
                 name="skill"
                 label="スキル"
-                defaultValue={persistedValues.skill}
+                defaultValue={persistedValues.skill ?? DEFAULT_INSTRUCTOR_SKILL}
                 placeholder="例: 日本語"
                 maxLength={500}
                 icon={
@@ -352,7 +362,7 @@ const RegisterForm = ({
                 unstyled
                 labelTextClassName={styles.label}
                 inputWrapperClassName={styles.textareaContainer}
-                inputClassName={styles.textarea}
+                inputClassName={`${styles.textarea} ${styles.skillTextarea}`}
               />
 
               {/* English Background Selection (radio button) */}
