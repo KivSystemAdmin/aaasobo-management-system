@@ -2,10 +2,8 @@ import styles from "./ScheduleCalendar.module.scss";
 import { InstructorSlot } from "@/lib/api/instructorsApi";
 import {
   BusinessTime,
-  Weekday,
   Weekday_Ja,
   WEEKDAYS_JA,
-  weekdayToDay,
 } from "@/lib/utils/scheduleUtils";
 import {
   TimeColumn,
@@ -26,7 +24,7 @@ interface ScheduleCalendarProps {
 export default function ScheduleCalendar({ slots }: ScheduleCalendarProps) {
   const slotsByDay = slots.reduce(
     (acc, slot) => {
-      const day = weekdayToDay(slot.weekday) as Weekday_Ja;
+      const day = WEEKDAYS_JA[slot.weekday];
       if (!acc[day]) acc[day] = [];
 
       acc[day].push(slot.startTime);
