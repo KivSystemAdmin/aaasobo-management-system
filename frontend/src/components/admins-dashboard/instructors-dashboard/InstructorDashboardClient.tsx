@@ -103,7 +103,7 @@ export default function InstructorTabs({
     },
     {
       label: "給与管理",
-      content: <InstructorPayroll instructorId={instructorId} />,
+      content: <InstructorPayroll instructorId={instructorId} locale="ja" />,
     },
     {
       label: "タグ設定",
