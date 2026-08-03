@@ -33,6 +33,7 @@ Create the `.env` file in the `backend` directory with the following content:
 # Prisma supports the native connection string format for PostgreSQL, MySQL, SQLite, SQL Server, MongoDB and CockroachDB.
 # See the documentation for all the connection string options: https://pris.ly/d/connection-strings
 
+NODE_ENV="development"
 FRONTEND_ORIGIN="http://localhost:3000"
 POSTGRES_PRISMA_URL="postgresql://postgres:summer@localhost:5432/mydb?schema=public"
 POSTGRES_URL_NON_POOLING="postgresql://postgres:summer@localhost:5432/mydb?schema=public"
@@ -42,6 +43,8 @@ KEY2="<generate_with_openssl_rand_hex_32>"
 RESEND_API_KEY="Dummy Resend API Key"
 AUTH_SECRET="<generate_with_openssl_rand_hex_32>"
 AUTH_SALT="next-auth.session-token"
+CRON_SECRET="<generate_with_openssl_rand_hex_32>"
+BLOB_READ_WRITE_TOKEN="<development_vercel_blob_token>"
 BOOTSTRAP_ADMIN_EMAIL="admin@example.com"
 BOOTSTRAP_ADMIN_NAME="Local Admin"
 BOOTSTRAP_ADMIN_PASSWORD="<local_admin_password>"
@@ -54,6 +57,8 @@ Note that the following variables should be changed to match your local setup:
 - `RESEND_API_KEY` is shared in the development team.
 - `AUTH_SECRET` must match the frontend `AUTH_SECRET` (same value).
 - `AUTH_SALT` must be `next-auth.session-token` (the session cookie name used by the frontend in this repo).
+- `CRON_SECRET` must match the frontend `CRON_SECRET` (same value).
+- `BLOB_READ_WRITE_TOKEN` is required for file uploads and must be a valid Vercel Blob token. Do not commit it.
 - `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_NAME`, and `BOOTSTRAP_ADMIN_PASSWORD` are used by `npm run db:bootstrap` to create the first admin only when it does not already exist. Do not commit real production credentials.
 
 `KEY1` and `KEY2` are used for security purposes. They should be changed to a random string, for example, by running either of the following command:
@@ -145,7 +150,7 @@ Create a `.env` file in the `frontend` directory with the following content:
 ```
 NEXTAUTH_SECRET="<generate_with_openssl_rand_hex_32>"
 AUTH_SECRET="<generate_with_openssl_rand_hex_32>"
-AUTH_SALT="798ceed428885abab905b5291e9eb97b"
+AUTH_SALT="next-auth.session-token"
 AUTH_TRUST_HOST=true
 NEXT_PUBLIC_FRONTEND_ORIGIN="http://localhost:3000"
 
@@ -154,9 +159,11 @@ BACKEND_ORIGIN="http://localhost:4000"
 
 # Optional. Default is http://localhost:4000
 NEXT_PUBLIC_BACKEND_ORIGIN="http://localhost:4000"
+CRON_SECRET="<same_value_as_backend_CRON_SECRET>"
+BLOB_READ_WRITE_TOKEN="<development_vercel_blob_token>"
 ```
 
-`NEXTAUTH_SECRET` and `AUTH_SECRET` should be randomly generated. See the backend section above.
+`NEXTAUTH_SECRET` and `AUTH_SECRET` should be randomly generated. See the backend section above. `AUTH_SECRET`, `AUTH_SALT`, and `CRON_SECRET` must match the backend values. `BLOB_READ_WRITE_TOKEN` is required for file uploads and must not be committed.
 
 #### Start Next.js
 
