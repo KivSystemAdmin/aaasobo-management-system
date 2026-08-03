@@ -587,9 +587,17 @@ export const getAllBusinessSchedules = async (
     if (response.status !== 200) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data: SchedulesListResponse = await response.json();
+    const data: unknown = await response.json();
+    if (
+      typeof data !== "object" ||
+      data === null ||
+      !("organizedData" in data) ||
+      !Array.isArray(data.organizedData)
+    ) {
+      throw new Error("Invalid business schedule response");
+    }
 
-    return data;
+    return data as SchedulesListResponse;
   } catch (error) {
     console.error("Failed to fetch schedules:", error);
     throw error;

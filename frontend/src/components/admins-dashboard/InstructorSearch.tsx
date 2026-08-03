@@ -13,12 +13,15 @@ function InstructorSearch({
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<Instructor[]>([]);
   const [instructors, setInstructors] = useState<Instructor[]>([]);
-  const [selectedInstructorId, setSelectedInstructorId] = useState<number>(0);
+  const [selectedInstructorId, setSelectedInstructorId] = useState<
+    number | null
+  >(null);
 
   // Show the autocomplete list when the user types in the search bar.
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     setSearchTerm(input);
+    setSelectedInstructorId(null);
 
     if (input.length === 0) {
       setSuggestions([]);
@@ -31,22 +34,17 @@ function InstructorSearch({
   };
 
   // Store a selected instructor's ID and name.
-  const handleAutocompleteClick = (value: string) => {
-    const selectedInstructor = instructors.filter((instructor) =>
-      instructor.name.includes(value),
-    );
-
-    if (!selectedInstructor) {
-      return;
-    }
-
-    setSelectedInstructorId(selectedInstructor[0].id);
-    setSearchTerm(selectedInstructor[0].name);
+  const handleAutocompleteClick = (instructor: Instructor) => {
+    setSelectedInstructorId(instructor.id);
+    setSearchTerm(instructor.name);
     setSuggestions([]);
   };
 
   const handleUpdateCalendar = () => {
+    if (selectedInstructorId === null) return;
+
     handleSendInstructor(selectedInstructorId, searchTerm);
+    setSelectedInstructorId(null);
     setSearchTerm("");
   };
 
@@ -58,8 +56,22 @@ function InstructorSearch({
         throw new Error("No instructors found.");
       }
       setInstructors(instructors);
+
+      const storedInstructorId = Number.parseInt(
+        localStorage.getItem("activeInstructor")?.split(",")[0] ?? "",
+        10,
+      );
+      const activeInstructor = instructors.find(
+        (instructor: Instructor) => instructor.id === storedInstructorId,
+      );
+
+      if (activeInstructor) {
+        handleSendInstructor(activeInstructor.id, activeInstructor.name);
+      } else {
+        localStorage.removeItem("activeInstructor");
+      }
     })();
-  }, []);
+  }, [handleSendInstructor]);
 
   return (
     <>
@@ -72,10 +84,10 @@ function InstructorSearch({
         />
         {suggestions.length > 0 && (
           <ul>
-            {suggestions.map((instructor, index) => (
+            {suggestions.map((instructor) => (
               <li
-                key={index}
-                onClick={() => handleAutocompleteClick(instructor.name)}
+                key={instructor.id}
+                onClick={() => handleAutocompleteClick(instructor)}
               >
                 {instructor.name}
               </li>
@@ -86,6 +98,7 @@ function InstructorSearch({
           onClick={() => handleUpdateCalendar()}
           btnText="Display Calendar"
           className="bookBtn"
+          disabled={selectedInstructorId === null}
         />
       </div>
     </>
