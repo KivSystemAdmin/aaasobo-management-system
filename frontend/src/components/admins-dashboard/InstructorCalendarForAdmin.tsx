@@ -9,6 +9,7 @@ import { initialSetup } from "@/lib/utils/initialSetup";
 import InstructorCalendarClient from "../instructors-dashboard/class-schedule/instructorCalendar/InstructorCalendarClient";
 import InstructorSearch from "@/components/admins-dashboard/InstructorSearch";
 import { getAllBusinessSchedules, getAllEvents } from "@/lib/api/adminsApi";
+import type { SchedulesListResponse } from "@shared/schemas/admins";
 
 function InstructorCalendarForAdmin({
   adminId,
@@ -26,16 +27,18 @@ function InstructorCalendarForAdmin({
     start: string;
     end: string;
   } | null>(null);
-  const [schedule, setSchedule] = useState<any>([]);
+  const [schedule, setSchedule] = useState<SchedulesListResponse | null>(null);
   const [colorsForEvents, setColorsForEvents] = useState<
     { event: string; color: string }[]
   >([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
-    if (!instructorId) return;
+    if (instructorId === null) return;
 
+    setIsLoading(true);
+    setError(null);
     try {
       const [classes, schedule, events] = await Promise.all([
         getCalendarClasses(instructorId),
@@ -69,46 +72,46 @@ function InstructorCalendarForAdmin({
     initialSetup("admin");
   }, []);
 
-  const handleSendInstructor = async (id: number, name: string) => {
-    localStorage.setItem("activeInstructor", [String(id), name].join(","));
+  const handleSendInstructor = useCallback((id: number, name: string) => {
+    localStorage.setItem("activeInstructor", String(id));
+    setIsLoading(true);
+    setError(null);
     setInstructorId(id);
-    setInstructorName(name);
-  };
-
-  useEffect(() => {
-    const activeInstructor = localStorage.getItem("activeInstructor");
-    const [id, name] = activeInstructor?.split(",") || ["1", ""];
-    setInstructorId(parseInt(id));
     setInstructorName(name);
   }, []);
 
-  if (error) {
-    return <div>{error}</div>;
-  }
-
   return (
     <div className={styles.calendarContainer}>
+      <InstructorSearch handleSendInstructor={handleSendInstructor} />
       {isLoading && <Loading />}
       {error && <div>{error}</div>}
-      {!isLoading && !error && (
-        <>
-          <InstructorSearch handleSendInstructor={handleSendInstructor} />
-          {userSessionType === "admin" && instructorName ? (
-            <span className={styles.instructorName}>
-              Instructor: &nbsp;{instructorName}
-            </span>
-          ) : null}
-          <InstructorCalendarClient
-            adminId={adminId}
-            instructorId={instructorId}
-            instructorCalendarEvents={instructorCalendarEvents}
-            validRange={calendarValidRange!}
-            userSessionType={userSessionType}
-            businessSchedule={schedule.organizedData}
-            colorsForEvents={colorsForEvents}
-          />
-        </>
+      {!isLoading && !error && instructorId === null && (
+        <p className={styles.emptyState}>
+          Select an instructor to display their calendar.
+        </p>
       )}
+      {!isLoading &&
+        !error &&
+        instructorId !== null &&
+        schedule !== null &&
+        calendarValidRange !== null && (
+          <>
+            {userSessionType === "admin" && instructorName ? (
+              <span className={styles.instructorName}>
+                Instructor: &nbsp;{instructorName}
+              </span>
+            ) : null}
+            <InstructorCalendarClient
+              adminId={adminId}
+              instructorId={instructorId}
+              instructorCalendarEvents={instructorCalendarEvents}
+              validRange={calendarValidRange}
+              userSessionType={userSessionType}
+              businessSchedule={schedule.organizedData}
+              colorsForEvents={colorsForEvents}
+            />
+          </>
+        )}
     </div>
   );
 }
