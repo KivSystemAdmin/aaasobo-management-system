@@ -77,6 +77,11 @@ export function getLinks(
       icon: UsersIcon,
     },
     {
+      name: "受講リスト",
+      href: "/admins/enrollment-status",
+      icon: ClipboardDocumentCheckIcon,
+    },
+    {
       name: "インストラクター\nリスト",
       href: "/admins/instructor-list",
       icon: UsersIcon,

@@ -17,6 +17,7 @@ import {
   type InstructorsListResponse,
   type PastInstructorsListResponse,
   type CustomersListResponse,
+  type EnrollmentStatusResponse,
   type PastCustomersListResponse,
   type ChildrenListResponse,
   type PlansListResponse,
@@ -270,6 +271,32 @@ export const getAllCustomers = async (
     console.error("Failed to fetch customers:", error);
     throw error;
   }
+};
+
+export const getEnrollmentStatus = async (
+  cookie?: string,
+): Promise<EnrollmentStatusResponse["data"]> => {
+  const method = "GET";
+  const response = cookie
+    ? await fetch(`${BASE_URL}/enrollment-status`, {
+        method,
+        headers: { "Content-Type": "application/json", Cookie: cookie },
+        cache: "no-store",
+      })
+    : await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          "backend-endpoint": "/admins/enrollment-status",
+          "no-cache": "no-cache",
+        },
+      });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const result: EnrollmentStatusResponse = await response.json();
+  return result.data;
 };
 
 // GET all past customers data

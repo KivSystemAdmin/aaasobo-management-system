@@ -1,0 +1,152 @@
+@use "@/styles/variables.module.scss" as *;
+
+.container {
+  background: $white-background;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  width: 100%;
+}
+.container h1 {
+  color: $text-dark;
+  font-size: 1.5rem;
+  margin: 0;
+}
+.description {
+  color: #5f6368;
+  font-size: 0.875rem;
+  margin: 0.25rem 0 1rem;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.controls input {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.65rem;
+  width: min(100%, 360px);
+}
+.controlButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+.controls button,
+.pagination button {
+  background: white;
+  border: 1px solid $blue_primary;
+  border-radius: 0.4rem;
+  color: $blue_primary;
+  cursor: pointer;
+  font-size: 0.825rem;
+  padding: 0.45rem 0.7rem;
+}
+.tableScroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.enrollmentTable {
+  border: 1px solid #d9dee5;
+  border-collapse: collapse;
+  font-size: 0.825rem;
+  min-width: 980px;
+  width: 100%;
+}
+.enrollmentTable th {
+  background: $blue_primary;
+  color: white;
+  font-weight: 500;
+  text-align: left;
+}
+.enrollmentTable th,
+.enrollmentTable td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.45rem 0.6rem;
+  white-space: nowrap;
+}
+.customerRow td {
+  background: #eef4fb;
+  border-top: 1px solid #cbd8e7;
+  padding: 0.4rem 0.55rem;
+}
+.customerRow button {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  margin-right: 0.35rem;
+  padding: 0;
+  vertical-align: middle;
+}
+.customerRow svg {
+  color: $blue_primary;
+  height: 1rem;
+  width: 1rem;
+}
+.customerRow a {
+  color: $blue_primary;
+  font-weight: 600;
+}
+.classRow td:first-child,
+.noClassesRow td:first-child {
+  background: #fafbfc;
+  width: 1.5rem;
+}
+.classRow:hover td {
+  background: #f8fafc;
+}
+.planCell {
+  color: $text-dark;
+  font-weight: 600;
+  vertical-align: top;
+}
+.noClassesRow td:last-child {
+  color: #6b7280;
+  font-style: italic;
+}
+.empty {
+  color: #6b7280;
+  margin: 0;
+}
+.empty {
+  border: 1px dashed #d1d5db;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  text-align: center;
+}
+.pagination {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.825rem;
+  margin-top: 0.75rem;
+}
+.pagination .activePage {
+  background: $blue_primary;
+  color: white;
+}
+.pagination label {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+}
+.pagination select {
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  padding: 0.4rem;
+}
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+  .controls {
+    display: block;
+  }
+  .controlButtons {
+    margin-top: 0.75rem;
+  }
+}
