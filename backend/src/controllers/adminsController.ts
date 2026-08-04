@@ -90,6 +90,7 @@ import type {
 } from "../../../shared/schemas/admins";
 import { ENGLISH_BACKGROUND_LABELS } from "../constants/englishBackground";
 import { EnglishBackground } from "../types";
+import { getEnrollmentStatus } from "../services/enrollmentStatusService";
 
 // Register Admin
 export const registerAdminController = async (
@@ -300,6 +301,18 @@ export const getAllCustomersController = async (_: Request, res: Response) => {
 
     res.json({ data });
   } catch (error) {
+    res.status(500).json({ error });
+  }
+};
+
+export const getEnrollmentStatusController = async (
+  _: Request,
+  res: Response,
+) => {
+  try {
+    res.json({ data: await getEnrollmentStatus() });
+  } catch (error) {
+    console.error("Failed to get enrollment status:", error);
     res.status(500).json({ error });
   }
 };

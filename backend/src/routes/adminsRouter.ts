@@ -20,6 +20,7 @@ import {
   deleteLatestInstructorFeeController,
   getAllPastInstructorsController,
   getAllCustomersController,
+  getEnrollmentStatusController,
   getAllPastCustomersController,
   getAllChildrenController,
   getAllPlansController,
@@ -72,6 +73,7 @@ import {
   InstructorsListResponse,
   PastInstructorsListResponse,
   CustomersListResponse,
+  EnrollmentStatusResponse,
   PastCustomersListResponse,
   ChildrenListResponse,
   PlansListResponse,
@@ -561,6 +563,23 @@ const getAllPastCustomersConfig = {
         description: "Internal server error",
         schema: ErrorResponse,
       },
+    },
+  },
+} as const;
+
+const getEnrollmentStatusConfig = {
+  method: "get" as const,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
+  handler: getEnrollmentStatusController,
+  openapi: {
+    summary: "Get active enrollment status",
+    description: "Get active subscriptions and recurring classes by customer",
+    responses: {
+      200: {
+        description: "Enrollment status retrieved successfully",
+        schema: EnrollmentStatusResponse,
+      },
+      500: { description: "Internal server error", schema: ErrorResponse },
     },
   },
 } as const;
@@ -1144,6 +1163,7 @@ const validatedRouteConfigs = {
   "/customer-list": [getAllCustomersConfig],
   "/customer-list/past": [getAllPastCustomersConfig],
   "/customer-list/deactivate/:id": [deactivateCustomerConfig],
+  "/enrollment-status": [getEnrollmentStatusConfig],
   "/event-list": [getAllEventsConfig],
   "/event-list/delete/:id": [deleteEventConfig],
   "/event-list/register": [registerEventConfig],

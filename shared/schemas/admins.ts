@@ -355,6 +355,35 @@ export const CustomersListResponse = z.object({
   data: z.array(CustomerListItem),
 });
 
+export const EnrollmentStatusRecurringClass = z.object({
+  id: z.number().int().positive(),
+  children: z.array(z.string()),
+  instructor: z.string(),
+  weekday: z.string(),
+  time: z.string(),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  endDate: z.union([
+    z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    z.literal("継続中"),
+  ]),
+});
+
+export const EnrollmentStatusSubscription = z.object({
+  id: z.number().int().positive(),
+  planName: z.string(),
+  recurringClasses: z.array(EnrollmentStatusRecurringClass),
+});
+
+export const EnrollmentStatusCustomer = z.object({
+  id: z.number().int().positive(),
+  name: z.string(),
+  subscriptions: z.array(EnrollmentStatusSubscription),
+});
+
+export const EnrollmentStatusResponse = z.object({
+  data: z.array(EnrollmentStatusCustomer),
+});
+
 // Past customer list item for table display
 export const PastCustomerListItem = z.object({
   No: z.number(),
@@ -673,6 +702,14 @@ export type PastInstructorsListResponse = z.infer<
   typeof PastInstructorsListResponse
 >;
 export type CustomersListResponse = z.infer<typeof CustomersListResponse>;
+export type EnrollmentStatusRecurringClass = z.infer<
+  typeof EnrollmentStatusRecurringClass
+>;
+export type EnrollmentStatusSubscription = z.infer<
+  typeof EnrollmentStatusSubscription
+>;
+export type EnrollmentStatusCustomer = z.infer<typeof EnrollmentStatusCustomer>;
+export type EnrollmentStatusResponse = z.infer<typeof EnrollmentStatusResponse>;
 export type PastCustomersListResponse = z.infer<
   typeof PastCustomersListResponse
 >;
