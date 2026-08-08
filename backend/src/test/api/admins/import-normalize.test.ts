@@ -6,6 +6,7 @@ import { server } from "../../../server";
 import { generateNormalizedImportFixture } from "../../../seed/generateNormalizedImportFixture";
 import { validateNormalizedImportFiles } from "../../../services/adminImport";
 import {
+  getCreatedIdsInInputOrder,
   IMPORT_PRESERVED_TABLES,
   IMPORT_RESET_TABLES,
 } from "../../../services/adminImport/execute";
@@ -20,6 +21,20 @@ import { prisma } from "../../setup";
 const RAW_HEADER =
   ",英語村,,2020.10.,name,child name,plan,講師名,date,time,class,お子さま誕生日,兄弟お子さま誕生日,年齢,詳細,備考※月2回の場合は週を記入,favorite,,,";
 const IMPORT_FILE_SIZE_LIMIT_BYTES = 50 * 1024 * 1024;
+
+describe("normalized import bulk insert ID mapping", () => {
+  it("restores input order when createManyAndReturn returns rows out of order", () => {
+    expect(
+      getCreatedIdsInInputOrder([{ id: 103 }, { id: 101 }, { id: 102 }], 3),
+    ).toEqual([101, 102, 103]);
+  });
+
+  it("rejects an incomplete bulk insert result", () => {
+    expect(() => getCreatedIdsInInputOrder([{ id: 101 }], 2)).toThrow(
+      "Bulk insert returned 1 rows; expected 2",
+    );
+  });
+});
 
 function rawRow(columns: string[]) {
   return columns.join(",");
@@ -692,6 +707,29 @@ describe("POST /admins/import/execute", () => {
       generated.rows["recurring_class_attendance.csv"].length,
     );
     expect(classAttendance).toBe(generated.rows["class_attendance.csv"].length);
+
+    const [classRelationshipMismatches, attendanceRelationshipMismatches] =
+      await Promise.all([
+        prisma.$queryRaw<Array<{ count: bigint }>>`
+          SELECT COUNT(*) AS count
+          FROM "Class" c
+          JOIN "Subscription" s ON s.id = c."subscriptionId"
+          JOIN "RecurringClass" rc ON rc.id = c."recurringClassId"
+          WHERE c."customerId" <> s."customerId"
+             OR rc."subscriptionId" <> c."subscriptionId"
+             OR rc."instructorId" <> c."instructorId"
+        `,
+        prisma.$queryRaw<Array<{ count: bigint }>>`
+          SELECT COUNT(*) AS count
+          FROM "ClassAttendance" ca
+          JOIN "Class" c ON c.id = ca."classId"
+          JOIN "Child" child ON child.id = ca."childrenId"
+          WHERE c."customerId" <> child."customerId"
+        `,
+      ]);
+
+    expect(classRelationshipMismatches[0].count).toBe(0n);
+    expect(attendanceRelationshipMismatches[0].count).toBe(0n);
   }, 120_000);
 
   it("scales the deterministic fixture from the instructor count option", async () => {
