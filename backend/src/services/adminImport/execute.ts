@@ -1713,6 +1713,21 @@ function parseTimeAsDate(value: string): Date {
   return new Date(`1970-01-01T${value}:00.000Z`);
 }
 
+export function getCreatedIdsInInputOrder(
+  createdRows: ReadonlyArray<{ id: number }>,
+  expectedCount: number,
+): number[] {
+  if (createdRows.length !== expectedCount) {
+    throw new Error(
+      `Bulk insert returned ${createdRows.length} rows; expected ${expectedCount}`,
+    );
+  }
+
+  // PostgreSQL allocates these sequence-backed IDs in VALUES input order, but
+  // Prisma does not guarantee the order of rows returned by createManyAndReturn.
+  return createdRows.map(({ id }) => id).sort((a, b) => a - b);
+}
+
 async function resetImportTargetData(tx: TxClient) {
   await tx.$executeRawUnsafe(IMPORT_RESET_TRUNCATE_SQL);
 }
@@ -1731,8 +1746,12 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       id: true,
     },
   });
+  const planIds = getCreatedIdsInInputOrder(
+    createdPlans,
+    parsed["plans.csv"].length,
+  );
   parsed["plans.csv"].forEach((row, index) => {
-    planIdByRef.set(row.data.plan_ref, createdPlans[index].id);
+    planIdByRef.set(row.data.plan_ref, planIds[index]);
   });
 
   const customerIdByRef = new Map<string, number>();
@@ -1753,8 +1772,12 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       id: true,
     },
   });
+  const customerIds = getCreatedIdsInInputOrder(
+    createdCustomers,
+    parsed["customers.csv"].length,
+  );
   parsed["customers.csv"].forEach((row, index) => {
-    customerIdByRef.set(row.data.customer_ref, createdCustomers[index].id);
+    customerIdByRef.set(row.data.customer_ref, customerIds[index]);
   });
 
   const childIdByRef = new Map<string, number>();
@@ -1769,8 +1792,12 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       id: true,
     },
   });
+  const childIds = getCreatedIdsInInputOrder(
+    createdChildren,
+    parsed["children.csv"].length,
+  );
   parsed["children.csv"].forEach((row, index) => {
-    childIdByRef.set(row.data.child_ref, createdChildren[index].id);
+    childIdByRef.set(row.data.child_ref, childIds[index]);
   });
 
   const subscriptionIdByRef = new Map<string, number>();
@@ -1786,11 +1813,12 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       id: true,
     },
   });
+  const subscriptionIds = getCreatedIdsInInputOrder(
+    createdSubscriptions,
+    parsed["subscriptions.csv"].length,
+  );
   parsed["subscriptions.csv"].forEach((row, index) => {
-    subscriptionIdByRef.set(
-      row.data.subscription_ref,
-      createdSubscriptions[index].id,
-    );
+    subscriptionIdByRef.set(row.data.subscription_ref, subscriptionIds[index]);
   });
 
   const instructorIdByRef = new Map<string, number>();
@@ -1823,11 +1851,12 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       id: true,
     },
   });
+  const instructorIds = getCreatedIdsInInputOrder(
+    createdInstructors,
+    parsed["instructors.csv"].length,
+  );
   parsed["instructors.csv"].forEach((row, index) => {
-    instructorIdByRef.set(
-      row.data.instructor_ref,
-      createdInstructors[index].id,
-    );
+    instructorIdByRef.set(row.data.instructor_ref, instructorIds[index]);
   });
 
   if (parsed["instructor_fees.csv"].length > 0) {
@@ -1891,10 +1920,14 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       id: true,
     },
   });
+  const scheduleIds = getCreatedIdsInInputOrder(
+    createdSchedules,
+    scheduleRows.length,
+  );
 
   const slotRows = scheduleRows.flatMap((group, index) =>
     group.slots.map((slot) => ({
-      scheduleId: createdSchedules[index].id,
+      scheduleId: scheduleIds[index],
       weekday: slot.weekday,
       startTime: slot.startTime,
     })),
@@ -1924,8 +1957,12 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       id: true,
     },
   });
+  const eventIds = getCreatedIdsInInputOrder(
+    createdEvents,
+    parsed["events.csv"].length,
+  );
   parsed["events.csv"].forEach((row, index) => {
-    eventIdByRef.set(row.data.event_ref, createdEvents[index].id);
+    eventIdByRef.set(row.data.event_ref, eventIds[index]);
   });
 
   if (parsed["schedules.csv"].length > 0) {
@@ -1959,10 +1996,14 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       id: true,
     },
   });
+  const recurringClassIds = getCreatedIdsInInputOrder(
+    createdRecurringClasses,
+    parsed["recurring_classes.csv"].length,
+  );
   parsed["recurring_classes.csv"].forEach((row, index) => {
     recurringClassIdByRef.set(
       row.data.recurring_class_ref,
-      createdRecurringClasses[index].id,
+      recurringClassIds[index],
     );
   });
 
@@ -2002,8 +2043,12 @@ async function insertValidatedRows(tx: TxClient, parsed: ParsedNormalizedRows) {
       id: true,
     },
   });
+  const classIds = getCreatedIdsInInputOrder(
+    createdClasses,
+    parsed["classes.csv"].length,
+  );
   parsed["classes.csv"].forEach((row, index) => {
-    classIdByRef.set(row.data.class_ref, createdClasses[index].id);
+    classIdByRef.set(row.data.class_ref, classIds[index]);
   });
 
   if (parsed["class_attendance.csv"].length > 0) {
