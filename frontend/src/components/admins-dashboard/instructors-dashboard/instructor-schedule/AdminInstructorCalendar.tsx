@@ -8,8 +8,8 @@ import MessageBoardPanel from "@/components/features/messageBoardPanel/MessageBo
 import Modal from "@/components/elements/modal/Modal";
 import ActionButton from "@/components/elements/buttons/actionButton/ActionButton";
 import {
+  getAdminInstructorAvailableSlots,
   getInstructorAbsences,
-  getInstructorAvailableSlots,
 } from "@/lib/api/instructorsApi";
 import {
   batchUpdateInstructorAbsences,
@@ -83,7 +83,12 @@ export default function AdminInstructorCalendar({
 
       try {
         const [slotsResponse, absencesResponse] = await Promise.all([
-          getInstructorAvailableSlots(instructorId, startStr, endStr, false),
+          getAdminInstructorAvailableSlots(
+            instructorId,
+            startStr,
+            endStr,
+            false,
+          ),
           getInstructorAbsences(instructorId),
         ]);
 
