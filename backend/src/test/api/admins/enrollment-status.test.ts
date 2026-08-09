@@ -12,6 +12,9 @@ import {
   generateAuthCookie,
 } from "../../testUtils";
 
+const DAY_MS = 86_400_000;
+const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
 describe("GET /admins/enrollment-status", () => {
   it("requires administrator authentication", async () => {
     await request(server).get("/admins/enrollment-status").expect(401);
@@ -46,22 +49,28 @@ describe("GET /admins/enrollment-status", () => {
     const now = new Date();
     const activeSubscription = await createSubscription(plan.id, customer.id, {
       selectType: "active-enrollment-test",
-      startAt: new Date(now.getTime() - 20 * 86_400_000),
+      startAt: new Date(now.getTime() - 20 * DAY_MS),
       endAt: null,
     });
     await createSubscription(plan.id, customer.id, {
       selectType: "future-enrollment-test",
-      startAt: new Date(now.getTime() + 20 * 86_400_000),
+      startAt: new Date(now.getTime() + 20 * DAY_MS),
       endAt: null,
     });
 
     const startAt = new Date("2026-07-27T23:30:00.000Z");
+    const recurringEndAt = new Date(now.getTime() + 10 * DAY_MS);
+    const displayedRecurringEndDate = new Date(
+      recurringEndAt.getTime() - DAY_MS + JST_OFFSET_MS,
+    )
+      .toISOString()
+      .slice(0, 10);
     const recurringClass = await prisma.recurringClass.create({
       data: {
         subscriptionId: activeSubscription.id,
         instructorId: instructor.id,
         startAt,
-        endAt: new Date("2026-08-05T15:00:00.000Z"),
+        endAt: recurringEndAt,
       },
     });
     await prisma.recurringClassAttendance.createMany({
@@ -80,7 +89,7 @@ describe("GET /admins/enrollment-status", () => {
     await prisma.recurringClass.create({
       data: {
         subscriptionId: activeSubscription.id,
-        startAt: new Date(now.getTime() + 10 * 86_400_000),
+        startAt: new Date(now.getTime() + 10 * DAY_MS),
         endAt: null,
       },
     });
@@ -114,7 +123,7 @@ describe("GET /admins/enrollment-status", () => {
           weekday: "火",
           time: "08:30–08:55",
           startDate: "2026-07-28",
-          endDate: "2026-08-05",
+          endDate: displayedRecurringEndDate,
         },
       ],
     });
