@@ -160,7 +160,9 @@ Field rules:
 - `status`:
   - `completed` when `class.date <= completed-until`
   - `booked` when `class.date > completed-until`
-- `rebookable_until`: empty
+- `rebookable_until`:
+  - `class.date_time + 180 days` when `status = booked`
+  - empty when `status = completed`
 - `is_free_trial`: `false`
 - `class_code`: short deterministic unique string (stable for same inputs)
 

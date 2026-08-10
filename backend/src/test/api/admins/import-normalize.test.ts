@@ -17,6 +17,10 @@ import {
   generateAuthCookie,
 } from "../../testUtils";
 import { prisma } from "../../setup";
+import {
+  cancelClassById,
+  getRebookableClasses,
+} from "../../../services/classesService";
 
 const RAW_HEADER =
   ",英語村,,2020.10.,name,child name,plan,講師名,date,time,class,お子さま誕生日,兄弟お子さま誕生日,年齢,詳細,備考※月2回の場合は週を記入,favorite,,,";
@@ -640,9 +644,9 @@ describe("POST /admins/import/execute", () => {
     const admin = await createAdmin();
     const authCookie = await generateAuthCookie(admin.id, "admin");
     const generated = await generateNormalizedImportFixture({
-      from: "2026-01-01",
-      completedUntil: "2026-01-03",
-      to: "2026-01-07",
+      from: "2099-01-01",
+      completedUntil: "2099-01-03",
+      to: "2099-01-07",
     });
 
     const validation = validateNormalizedImportFiles(generated.files);
@@ -707,6 +711,33 @@ describe("POST /admins/import/execute", () => {
       generated.rows["recurring_class_attendance.csv"].length,
     );
     expect(classAttendance).toBe(generated.rows["class_attendance.csv"].length);
+
+    const [completedClasses, bookedClasses] = await Promise.all([
+      prisma.class.findMany({ where: { status: "completed" } }),
+      prisma.class.findMany({ where: { status: "booked" } }),
+    ]);
+    expect(
+      completedClasses.every(({ rebookableUntil }) => !rebookableUntil),
+    ).toBe(true);
+    expect(bookedClasses.length).toBeGreaterThan(0);
+    expect(
+      bookedClasses.every(
+        ({ dateTime, rebookableUntil }) =>
+          dateTime &&
+          rebookableUntil &&
+          rebookableUntil.getTime() - dateTime.getTime() ===
+            180 * 24 * 60 * 60 * 1000,
+      ),
+    ).toBe(true);
+
+    const classToCancel = bookedClasses[0];
+    await cancelClassById(classToCancel.id);
+    const rebookableClasses = await getRebookableClasses(
+      classToCancel.customerId,
+    );
+    expect(rebookableClasses).toContainEqual(
+      expect.objectContaining({ id: classToCancel.id }),
+    );
 
     const [classRelationshipMismatches, attendanceRelationshipMismatches] =
       await Promise.all([
