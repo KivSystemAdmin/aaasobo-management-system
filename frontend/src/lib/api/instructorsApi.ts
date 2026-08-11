@@ -941,6 +941,40 @@ export const getInstructorAvailableSlots = async (
   }
 };
 
+export const getAdminInstructorAvailableSlots = async (
+  instructorId: number,
+  startDate: string,
+  endDate: string,
+  excludeBookedSlots: boolean,
+) => {
+  const params = new URLSearchParams({
+    start: startDate,
+    end: endDate,
+    timezone: "Asia/Tokyo",
+    excludeBookedSlots: excludeBookedSlots.toString(),
+  } as AvailableSlotsQuery & { excludeBookedSlots: string });
+  const backendEndpoint = `/instructors/${instructorId}/available-slots?${params}`;
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "backend-endpoint": backendEndpoint,
+        "no-cache": "no-cache",
+      },
+    },
+  );
+
+  if (response.status !== 200) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const result = (await response.json()) as { data: AvailableSlot[] };
+
+  return { data: result.data };
+};
+
 export const getInstructorCalendarSlots = async (
   instructorId: number,
   startDate: string,
