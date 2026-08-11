@@ -745,6 +745,10 @@ function classRowsAndAttendance(
       const classRef = ref("CL", classSeq);
       const dateOnly = formatDateOnly(cursor);
       const status = cursor <= completedDate ? "completed" : "booked";
+      const rebookableUntil =
+        status === "booked"
+          ? formatDateTime(formatDateOnly(addDays(cursor, 180)), item.startTime)
+          : "";
       classes.push({
         class_ref: classRef,
         customer_ref: item.customerRef,
@@ -753,7 +757,7 @@ function classRowsAndAttendance(
         subscription_ref: item.subscriptionRef,
         date_time: formatDateTime(dateOnly, item.startTime),
         status,
-        rebookable_until: "",
+        rebookable_until: rebookableUntil,
         class_code: `c${classSeq}`,
         is_free_trial: "false",
       });
