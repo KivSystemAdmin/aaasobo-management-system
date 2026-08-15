@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  getActiveInstructorSchedule,
+  getAdminInstructorAvailableSlots,
   InstructorSlot,
 } from "@/lib/api/instructorsApi";
 import { getTodayInJapanISODate } from "@/lib/utils/dateUtils";
@@ -38,14 +38,39 @@ export default function InstructorSchedule({
       setError("");
 
       try {
-        // Get instructor's active schedule directly
         const today = getTodayInJapanISODate();
-        const response = await getActiveInstructorSchedule(
+        const start = effectiveDate || today;
+        const endDate = new Date(`${start}T00:00:00+09:00`);
+        endDate.setDate(endDate.getDate() + 7);
+        const end = endDate.toLocaleDateString("sv-SE", {
+          timeZone: "Asia/Tokyo",
+        });
+        const response = await getAdminInstructorAvailableSlots(
           instructorId,
-          effectiveDate || today,
+          start,
+          end,
+          true,
         );
-        // Set the slots from the active schedule
-        setSlots(response.schedule?.slots || []);
+        const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        setSlots(
+          response.data.map((slot) => {
+            const date = new Date(slot.dateTime);
+            const weekdayName = new Intl.DateTimeFormat("en-US", {
+              weekday: "short",
+              timeZone: "Asia/Tokyo",
+            }).format(date);
+            return {
+              scheduleId: 0,
+              weekday: weekdayNames.indexOf(weekdayName),
+              startTime: new Intl.DateTimeFormat("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+                timeZone: "Asia/Tokyo",
+              }).format(date),
+            };
+          }),
+        );
       } catch (error) {
         console.error("Failed to fetch instructor schedule:", error);
         setError(messages.scheduleLoadFailed);

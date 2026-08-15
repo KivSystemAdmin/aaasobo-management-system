@@ -3,6 +3,7 @@ import request from "supertest";
 import { server } from "../../server";
 import { prisma } from "../setup";
 import {
+  createAdmin,
   createCustomer,
   createPlan,
   createSubscription,
@@ -16,6 +17,11 @@ import {
   createSchedule,
   generateAuthCookie,
 } from "../testUtils";
+
+async function createAdminAuthCookie() {
+  const admin = await createAdmin();
+  return await generateAuthCookie(admin.id, "admin");
+}
 
 function time(strings: TemplateStringsArray, ...values: any[]): Date {
   const input = strings[0] + (values[0] || "");
@@ -84,6 +90,7 @@ async function setupCore({
 
 describe("POST /recurring-classes", () => {
   it("succeed creating recurring class when slot exists", async () => {
+    const authCookie = await createAdminAuthCookie();
     const { customer, subscription, children, instructor } = await setupCore({
       slotWeekday: 1,
       slotStartTime: "10:00",
@@ -92,6 +99,7 @@ describe("POST /recurring-classes", () => {
 
     await request(server)
       .post("/recurring-classes")
+      .set("Cookie", authCookie)
       .send({
         instructorId: instructor.id,
         weekday: 1,
@@ -121,6 +129,7 @@ describe("POST /recurring-classes", () => {
   });
 
   it("return 400 when instructor slot is missing", async () => {
+    const authCookie = await createAdminAuthCookie();
     const customer = await createCustomer();
     const plan = await createPlan();
     const subscription = await createSubscription(plan.id, customer.id);
@@ -129,6 +138,7 @@ describe("POST /recurring-classes", () => {
 
     await request(server)
       .post("/recurring-classes")
+      .set("Cookie", authCookie)
       .send({
         instructorId: instructor.id,
         weekday: 1,
@@ -143,6 +153,7 @@ describe("POST /recurring-classes", () => {
   });
 
   it("return 400 when conflicting recurring class exists", async () => {
+    const authCookie = await createAdminAuthCookie();
     const { customer, subscription, children, instructor } = await setupCore({
       slotWeekday: 1,
       slotStartTime: "10:00",
@@ -160,6 +171,7 @@ describe("POST /recurring-classes", () => {
 
     const response = await request(server)
       .post("/recurring-classes")
+      .set("Cookie", authCookie)
       .send({
         instructorId: instructor.id,
         weekday: 1,
@@ -179,13 +191,16 @@ describe("POST /recurring-classes", () => {
   });
 
   it("return 400 for validation errors", async () => {
+    const authCookie = await createAdminAuthCookie();
     await request(server)
       .post("/recurring-classes")
+      .set("Cookie", authCookie)
       .send({ instructorId: 1, weekday: 1 })
       .expect(400);
 
     await request(server)
       .post("/recurring-classes")
+      .set("Cookie", authCookie)
       .send({
         instructorId: 1,
         weekday: 7,
@@ -199,6 +214,7 @@ describe("POST /recurring-classes", () => {
 
     await request(server)
       .post("/recurring-classes")
+      .set("Cookie", authCookie)
       .send({
         instructorId: 1,
         weekday: 1,
@@ -212,6 +228,7 @@ describe("POST /recurring-classes", () => {
 
     await request(server)
       .post("/recurring-classes")
+      .set("Cookie", authCookie)
       .send({
         instructorId: 1,
         weekday: 1,
@@ -225,6 +242,7 @@ describe("POST /recurring-classes", () => {
   });
 
   it("cancel created classes that conflict with existing classes", async () => {
+    const authCookie = await createAdminAuthCookie();
     const { customer, subscription, children, instructor } = await setupCore({
       slotWeekday: 1,
       slotStartTime: "10:00",
@@ -238,6 +256,7 @@ describe("POST /recurring-classes", () => {
 
     await request(server)
       .post("/recurring-classes")
+      .set("Cookie", authCookie)
       .send({
         instructorId: instructor.id,
         weekday: 1,
@@ -267,6 +286,7 @@ describe("POST /recurring-classes", () => {
   });
 
   it("cancel created classes that fall on instructor absences", async () => {
+    const authCookie = await createAdminAuthCookie();
     const { customer, subscription, children, instructor } = await setupCore({
       slotWeekday: 1,
       slotStartTime: "10:00",
@@ -278,6 +298,7 @@ describe("POST /recurring-classes", () => {
 
     await request(server)
       .post("/recurring-classes")
+      .set("Cookie", authCookie)
       .send({
         instructorId: instructor.id,
         weekday: 1,
@@ -307,6 +328,7 @@ describe("POST /recurring-classes", () => {
   });
 
   it("does not create classes on no-class business schedule dates", async () => {
+    const authCookie = await createAdminAuthCookie();
     const { customer, subscription, children, instructor } = await setupCore({
       slotWeekday: 1,
       slotStartTime: "10:00",
@@ -324,6 +346,7 @@ describe("POST /recurring-classes", () => {
 
     await request(server)
       .post("/recurring-classes")
+      .set("Cookie", authCookie)
       .send({
         instructorId: instructor.id,
         weekday: 1,
@@ -351,6 +374,7 @@ describe("POST /recurring-classes", () => {
   });
 
   it("creates admin-canceled classes on rebookable no-class dates", async () => {
+    const authCookie = await createAdminAuthCookie();
     const { customer, subscription, children, instructor } = await setupCore({
       slotWeekday: 1,
       slotStartTime: "10:00",
@@ -368,6 +392,7 @@ describe("POST /recurring-classes", () => {
 
     await request(server)
       .post("/recurring-classes")
+      .set("Cookie", authCookie)
       .send({
         instructorId: instructor.id,
         weekday: 1,

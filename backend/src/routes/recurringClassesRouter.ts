@@ -118,6 +118,7 @@ const getByIdConfig = {
 
 const createConfig = {
   method: "post" as const,
+  middleware: [verifyAuthentication(AUTH_ROLES.A)] as RequestHandler[],
   handler: createRegularClassController,
   bodySchema: CreateRecurringClassRequest,
   openapi: {

@@ -401,6 +401,11 @@ describe("POST /customers/:id/subscription", () => {
       where: { customerId: customer.id, planId: plan.id },
     });
     expect(subscription).toBeTruthy();
+    expect(
+      await prisma.recurringClass.count({
+        where: { subscriptionId: subscription!.id },
+      }),
+    ).toBe(0);
   });
 
   it("fail for invalid planId type", async () => {

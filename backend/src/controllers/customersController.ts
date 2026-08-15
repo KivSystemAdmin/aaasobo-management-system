@@ -14,7 +14,6 @@ import {
   createNewSubscription,
 } from "../services/subscriptionsService";
 import { getWeeklyClassTimes } from "../services/plansService";
-import { createNewRecurringClass } from "../services/recurringClassesService";
 import {
   createFreeTrialClass,
   declineFreeTrialClass,
@@ -249,9 +248,6 @@ export const registerSubscriptionController = async (
       res.status(404).json({ error: "Weekly class times not found" });
       return;
     }
-    const { weeklyClassTimes } = data;
-
-    // Create new subscription record.
     const subscriptionData = {
       planId,
       customerId,
@@ -263,22 +259,6 @@ export const registerSubscriptionController = async (
       res.status(500).json({ error: "Failed to create subscription" });
       return;
     }
-    const subscriptionId = newSubscription.id;
-
-    await prisma.$transaction(async (tx) => {
-      // Create the same number of recurring class records as weekly class times
-      for (let i = 0; i < weeklyClassTimes; i++) {
-        const newRecurringClass = await createNewRecurringClass(
-          tx,
-          subscriptionId,
-        );
-        if (!newRecurringClass) {
-          res.status(500).json({ error: "Failed to create recurring class" });
-          return;
-        }
-      }
-    });
-
     res.status(200).json({ newSubscription });
   } catch (error) {
     res.status(500).json({ error });
