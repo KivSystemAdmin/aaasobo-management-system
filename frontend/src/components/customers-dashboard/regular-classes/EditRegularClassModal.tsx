@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Modal from "../../elements/modal/Modal";
-import { editRecurringClass } from "@/lib/api/recurringClassesApi";
+import {
+  createRecurringClass,
+  editRecurringClass,
+} from "@/lib/api/recurringClassesApi";
 import InstructorSelection from "../classes/classActions/bookingActions/InstructorSelection";
 import InstructorSchedule from "./InstructorSchedule";
 import { EnglishBackground } from "@/types";
@@ -17,7 +20,8 @@ import styles from "./EditRegularClassModal.module.scss";
 interface EditRegularClassModalProps {
   isOpen: boolean;
   onClose: () => void;
-  recurringClass: RecurringClass;
+  recurringClass?: RecurringClass;
+  subscriptionId?: number;
   customerId: number;
   allChildren: Child[];
   userSessionType?: UserType;
@@ -31,6 +35,7 @@ export default function EditRegularClassModal({
   isOpen,
   onClose,
   recurringClass,
+  subscriptionId,
   customerId,
   allChildren,
   userSessionType,
@@ -75,7 +80,7 @@ export default function EditRegularClassModal({
     setStartDate(minDateString);
 
     // Set current instructor as default
-    if (recurringClass.instructor?.id) {
+    if (recurringClass?.instructor?.id) {
       setSelectedInstructorId(recurringClass.instructor.id);
       const currentInstructor = {
         id: recurringClass.instructor.id,
@@ -94,7 +99,7 @@ export default function EditRegularClassModal({
     }
 
     // Set current children as default
-    if (recurringClass.recurringClassAttendance) {
+    if (recurringClass?.recurringClassAttendance) {
       const currentChildrenIds = recurringClass.recurringClassAttendance.map(
         (att) => att.children.id,
       );
@@ -102,7 +107,7 @@ export default function EditRegularClassModal({
     }
 
     // Set current schedule slot as default
-    const scheduleDate = recurringClass.dateTime || recurringClass.startAt;
+    const scheduleDate = recurringClass?.dateTime || recurringClass?.startAt;
     if (scheduleDate) {
       const classDate = new Date(scheduleDate);
       const jstWeekday = classDate.getDay();
@@ -156,25 +161,34 @@ export default function EditRegularClassModal({
       return;
     }
 
-    const finalInstructor = selectedInstructor || {
-      id: recurringClass.instructor!.id,
-      nickname: recurringClass.instructor!.nickname || "Unknown",
-      name: recurringClass.instructor!.nickname || "Unknown",
-      icon: (recurringClass.instructor!.icon as any)?.url || "",
-      introduction: "",
-      classURL: recurringClass.instructor!.classURL || "",
-      meetingId: recurringClass.instructor!.meetingId || "",
-      passcode: recurringClass.instructor!.passcode || "",
-      englishBackground:
-        recurringClass.instructor!.englishBackground ||
-        EnglishBackground.NonNative,
-    };
+    const finalInstructor =
+      selectedInstructor ||
+      (recurringClass?.instructor
+        ? {
+            id: recurringClass.instructor.id,
+            nickname: recurringClass.instructor.nickname || "Unknown",
+            name: recurringClass.instructor.nickname || "Unknown",
+            icon: (recurringClass.instructor.icon as any)?.url || "",
+            introduction: "",
+            classURL: recurringClass.instructor.classURL || "",
+            meetingId: recurringClass.instructor.meetingId || "",
+            passcode: recurringClass.instructor.passcode || "",
+            englishBackground:
+              recurringClass.instructor.englishBackground ||
+              EnglishBackground.NonNative,
+          }
+        : null);
+
+    if (!finalInstructor) {
+      setError(messages.scheduleRequired);
+      return;
+    }
 
     let finalWeekday = selectedWeekday;
     let finalStartTime = selectedStartTime;
 
     if (finalWeekday === null || !finalStartTime) {
-      const scheduleDate = recurringClass.dateTime || recurringClass.startAt;
+      const scheduleDate = recurringClass?.dateTime || recurringClass?.startAt;
       if (scheduleDate) {
         const classDate = new Date(scheduleDate);
         finalWeekday = classDate.getDay();
@@ -195,7 +209,9 @@ export default function EditRegularClassModal({
     const finalChildrenIds =
       selectedChildrenIds.length > 0
         ? selectedChildrenIds
-        : recurringClass.recurringClassAttendance.map((att) => att.children.id);
+        : recurringClass?.recurringClassAttendance.map(
+            (att) => att.children.id,
+          ) || [];
 
     if (finalChildrenIds.length === 0) {
       setError(messages.childRequired);
@@ -206,7 +222,7 @@ export default function EditRegularClassModal({
     setError("");
 
     try {
-      const updateData = {
+      const scheduleData = {
         instructorId: finalInstructor.id,
         customerId: customerId,
         childrenIds: finalChildrenIds,
@@ -216,7 +232,13 @@ export default function EditRegularClassModal({
         timezone: "Asia/Tokyo",
       };
 
-      await editRecurringClass(recurringClass.id, updateData);
+      if (recurringClass) {
+        await editRecurringClass(recurringClass.id, scheduleData);
+      } else if (subscriptionId) {
+        await createRecurringClass({ ...scheduleData, subscriptionId });
+      } else {
+        throw new Error("Subscription is required");
+      }
       onSuccess?.();
       onClose();
     } catch (error: any) {
@@ -241,7 +263,13 @@ export default function EditRegularClassModal({
     <Modal isOpen={isOpen} onClose={resetAndClose} overlayClosable={true}>
       <div className={styles.progressiveFlow}>
         <div className={styles.modalHeader}>
-          <h2>{messages.title}</h2>
+          <h2>
+            {recurringClass
+              ? messages.title
+              : language === "ja"
+                ? "レギュラークラスを追加"
+                : "Add Regular Class Schedule"}
+          </h2>
         </div>
 
         <div className={styles.sectionsContainer}>
@@ -331,12 +359,12 @@ export default function EditRegularClassModal({
                         ? `${selectedChildrenIds.length}人`
                         : `${selectedChildrenIds.length} child${selectedChildrenIds.length !== 1 ? "ren" : ""}`
                     })`
-                  : `${recurringClass.recurringClassAttendance
+                  : `${(recurringClass?.recurringClassAttendance || [])
                       .map((att) => att.children.name)
                       .join(", ")} (${
                       language === "ja"
-                        ? `${recurringClass.recurringClassAttendance.length}人`
-                        : `${recurringClass.recurringClassAttendance.length} child${recurringClass.recurringClassAttendance.length !== 1 ? "ren" : ""}`
+                        ? `${recurringClass?.recurringClassAttendance.length || 0}人`
+                        : `${recurringClass?.recurringClassAttendance.length || 0} child${recurringClass?.recurringClassAttendance.length !== 1 ? "ren" : ""}`
                     })`}
               </span>
               <button

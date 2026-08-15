@@ -1,8 +1,38 @@
-import type { UpdateRecurringClassRequest } from "@shared/schemas/recurringClasses";
+import type {
+  CreateRecurringClassRequest,
+  UpdateRecurringClassRequest,
+} from "@shared/schemas/recurringClasses";
 
 const BACKEND_ORIGIN =
   process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
 const BASE_URL = `${BACKEND_ORIGIN}/recurring-classes`;
+
+export const createRecurringClass = async (
+  recurringClassData: CreateRecurringClassRequest,
+) => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "backend-endpoint": "/recurring-classes",
+      },
+      body: JSON.stringify(recurringClassData),
+    },
+  );
+
+  if (response.status !== 201) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.message ||
+        errorData.error ||
+        "Failed to create recurring class",
+    );
+  }
+
+  return await response.json();
+};
 
 // GET recurring classes by subscription id
 export const getRecurringClassesBySubscriptionId = async (

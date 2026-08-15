@@ -918,12 +918,17 @@ export const getInstructorAvailableSlots = async (
         cache: "no-store",
       });
     } else {
-      // From client component use the backend directly so instructor-first
-      // availability is not blocked by the proxy request lifecycle.
-      apiURL = `${BASE_URL}/${instructorId}/available-slots?${params}`;
+      // Client authentication is held by the frontend session, so route the
+      // request through the authenticated proxy.
+      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+      headers = {
+        "Content-Type": "application/json",
+        "backend-endpoint": `/instructors/${instructorId}/available-slots?${params}`,
+        "no-cache": "no-cache",
+      };
       response = await fetch(apiURL, {
         method,
-        credentials: "include",
+        headers,
         cache: "no-store",
       });
     }
@@ -1057,12 +1062,15 @@ export const getAllInstructorAvailableSlots = async (
         cache: "no-store",
       });
     } else {
-      // From client component use the backend directly so date-first
-      // availability is not blocked by the proxy request lifecycle.
-      apiURL = `${BASE_URL}/available-slots?${params}`;
+      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+      headers = {
+        "Content-Type": "application/json",
+        "backend-endpoint": `/instructors/available-slots?${params}`,
+        "no-cache": "no-cache",
+      };
       response = await fetch(apiURL, {
         method,
-        credentials: "include",
+        headers,
         cache: "no-store",
       });
     }
@@ -1107,12 +1115,15 @@ export const getInstructorAvailableSlotsByType = async (
         cache: "no-store",
       });
     } else {
-      // From client component use the backend directly so date-first
-      // booking availability behaves the same as instructor-first.
-      apiURL = `${BASE_URL}/available-slots/by-type?${params}&englishBackground=${englishBackground}`;
+      apiURL = `${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/api/proxy`;
+      headers = {
+        "Content-Type": "application/json",
+        "backend-endpoint": `/instructors/available-slots/by-type?${params}&englishBackground=${englishBackground}`,
+        "no-cache": "no-cache",
+      };
       response = await fetch(apiURL, {
         method,
-        credentials: "include",
+        headers,
         cache: "no-store",
       });
     }

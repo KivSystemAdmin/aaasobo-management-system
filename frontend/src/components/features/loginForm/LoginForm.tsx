@@ -27,6 +27,7 @@ export default function LoginForm({
         name="email"
         placeholder={language === "ja" ? "メール" : "e-mail"}
         icon={<EnvelopeIcon className={styles.icon} />}
+        autoComplete="email"
         required={true}
       />
 
@@ -36,6 +37,7 @@ export default function LoginForm({
         name="password"
         placeholder={language === "ja" ? "パスワード" : "password"}
         icon={<LockClosedIcon className={styles.icon} />}
+        autoComplete="current-password"
         required={true}
         showPassword={showPassword}
         onTogglePasswordVisibility={() => setShowPassword((prev) => !prev)}

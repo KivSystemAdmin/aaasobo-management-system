@@ -448,6 +448,8 @@ export const getRegularClassesBySubscriptionId = async (
 ) => {
   const whereCondition = {
     subscriptionId,
+    instructorId: { not: null },
+    startAt: { not: null },
     ...(status === "active" && { endAt: null }),
     ...(status === "history" && { endAt: { not: null } }),
   };
@@ -496,6 +498,8 @@ export const getRecurringClassesHistoryCountBySubscriptionId = async (
   return prisma.recurringClass.count({
     where: {
       subscriptionId,
+      instructorId: { not: null },
+      startAt: { not: null },
       endAt: { not: null },
     },
   });
