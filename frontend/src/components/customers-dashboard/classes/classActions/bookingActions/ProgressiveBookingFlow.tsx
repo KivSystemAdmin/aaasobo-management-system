@@ -42,16 +42,24 @@ interface StepState {
   confirmation: StepStatus;
 }
 
-const formatSelectedDateTime = (dateTime: string, language: LanguageType) =>
-  new Intl.DateTimeFormat(language === "ja" ? "ja-JP" : "en-US", {
-    timeZone: "Asia/Tokyo",
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: language !== "ja",
-  }).format(new Date(dateTime));
+const formatSelectedDateTime = (dateTime: string, language: LanguageType) => {
+  const formattedDateTime = new Intl.DateTimeFormat(
+    language === "ja" ? "ja-JP" : "en-US",
+    {
+      timeZone: "Asia/Tokyo",
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: language !== "ja",
+    },
+  ).format(new Date(dateTime));
+
+  return language === "ja"
+    ? `${formattedDateTime}（日本時間）`
+    : `${formattedDateTime} (Japan time)`;
+};
 
 export default function ProgressiveBookingFlow({
   classId,
@@ -554,17 +562,7 @@ export default function ProgressiveBookingFlow({
                     <strong>
                       {language === "ja" ? "日時:" : "Date & Time:"}
                     </strong>{" "}
-                    {new Date(selectedDateTime).toLocaleString(
-                      language === "ja" ? "ja-JP" : "en-US",
-                      {
-                        year: "numeric",
-                        month: "numeric",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                        hour12: true,
-                      },
-                    )}
+                    {formatSelectedDateTime(selectedDateTime, language)}
                   </p>
                 </div>
 

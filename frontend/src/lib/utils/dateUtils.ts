@@ -112,6 +112,20 @@ export const formatBirthdateToISO = (dateString?: string) => {
   return date.toISOString().split("T")[0];
 };
 
+export const formatBirthdateMonthDay = (
+  dateString: string,
+  locale: string = "en-US",
+): string => {
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "";
+
+  return new Intl.DateTimeFormat(locale, {
+    timeZone: "UTC",
+    month: "long",
+    day: "numeric",
+  }).format(date);
+};
+
 // e.g., Monday, Tuesday ...
 export const getDayOfWeek = (date: Date, locale: string = "en-US"): string => {
   const formatter = new Intl.DateTimeFormat(locale, { weekday: "long" });

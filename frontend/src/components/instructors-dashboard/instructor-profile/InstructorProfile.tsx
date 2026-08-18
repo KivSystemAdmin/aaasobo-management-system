@@ -7,7 +7,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import StatusSwitcher from "@/components/elements/StatusSwitcher/StatusSwitcher";
 import InputField from "../../elements/inputField/InputField";
 import ActionButton from "../../elements/buttons/actionButton/ActionButton";
-import { formatBirthdateToISO, getLongMonth } from "@/lib/utils/dateUtils";
+import {
+  formatBirthdateMonthDay,
+  formatBirthdateToISO,
+} from "@/lib/utils/dateUtils";
 import {
   CakeIcon,
   CheckIcon,
@@ -373,16 +376,11 @@ function InstructorProfile({
                   />
                 ) : (
                   <h4 className={styles.birthdate__text}>
-                    {latestInstructor.birthdate ? (
-                      latestInstructor.birthdate.includes(MASKED_BIRTHDATE) ? (
-                        MASKED_HEAD_LETTERS
-                      ) : (
-                        <>
-                          {getLongMonth(new Date(latestInstructor.birthdate))}{" "}
-                          {new Date(latestInstructor.birthdate).getDate()}
-                        </>
-                      )
-                    ) : null}
+                    {latestInstructor.birthdate
+                      ? latestInstructor.birthdate.includes(MASKED_BIRTHDATE)
+                        ? MASKED_HEAD_LETTERS
+                        : formatBirthdateMonthDay(latestInstructor.birthdate)
+                      : null}
                   </h4>
                 )}
               </div>

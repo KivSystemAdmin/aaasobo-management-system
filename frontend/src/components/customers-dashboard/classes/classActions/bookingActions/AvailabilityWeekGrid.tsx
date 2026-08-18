@@ -267,7 +267,8 @@ export default function AvailabilityWeekGrid({
           </button>
         </div>
         <div className={styles.weekRange}>
-          {formatWeekRange(weekDates, language)}
+          {formatWeekRange(weekDates, language)}{" "}
+          {language === "ja" ? "（日本時間）" : "(Japan time)"}
         </div>
       </div>
 
