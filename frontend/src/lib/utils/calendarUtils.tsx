@@ -44,10 +44,13 @@ export const getDayNumberInTimeZone = (
   }).format(date);
 };
 
-export const createRenderEventContent = (userType: UserType) => {
+export const createRenderEventContent = (
+  userType: UserType,
+  timeZone?: string,
+) => {
   const RenderEventContent = (eventInfo: EventContentArg) => {
     const classDateTime = new Date(eventInfo.event.startStr);
-    const classTime = formatTime24Hour(classDateTime);
+    const classTime = formatTime24Hour(classDateTime, timeZone);
 
     const { title } = eventInfo.event;
     const { instructorIcon, instructorNickname, classStatus } =
