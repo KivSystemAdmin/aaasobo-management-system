@@ -10,6 +10,7 @@ import { useMemo } from "react";
 import StepIndicator from "@/components/elements/stepIndicator/StepIndicator";
 import RebookableInstructorItem from "./rebookableInstructorItem/RebookableInstructorItem";
 import { CalendarDaysIcon } from "@heroicons/react/24/solid";
+import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
 
 export default function RebookableInstructorsList({
   instructorProfiles,
@@ -23,6 +24,7 @@ export default function RebookableInstructorsList({
   adminId,
   customerId,
 }: RebookableInstructorsListProps) {
+  const timeZone = useCustomerTimeZone();
   const previousRebookingStep =
     rebookingOption === "instructor" ? "selectOption" : "selectDateTime";
 
@@ -52,6 +54,8 @@ export default function RebookableInstructorsList({
     setRebookingStep(nextRebookingStep);
   };
 
+  if (!timeZone) return null;
+
   return (
     <div className={styles.rebookableInstructors}>
       <StepIndicator currentStep={currentStep} totalSteps={3} />
@@ -62,8 +66,9 @@ export default function RebookableInstructorsList({
           {`${formatYearDateTime(
             new Date(dateTimeToRebook!),
             language === "ja" ? "ja-JP" : "en-US",
+            timeZone,
           )} - 
-          ${formatTimeWithAddedMinutes(new Date(dateTimeToRebook!), 25)}`}
+          ${formatTimeWithAddedMinutes(new Date(dateTimeToRebook!), 25, timeZone)}`}
         </div>
       )}
       <div className={styles.rebookableInstructors__list}>

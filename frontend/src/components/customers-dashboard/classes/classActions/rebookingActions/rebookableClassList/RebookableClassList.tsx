@@ -20,6 +20,7 @@ import {
 import BookingModal from "../../bookingActions/BookingModal";
 import { errorAlert } from "@/lib/utils/alertUtils";
 import { useBookingSuccess } from "../rebookingModalController/RebookingModalController";
+import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
 
 export default function RebookableClassList({
   customerId,
@@ -30,6 +31,7 @@ export default function RebookableClassList({
   childProfiles,
 }: RebookableClassListProps) {
   const onBookingSuccess = useBookingSuccess();
+  const timeZone = useCustomerTimeZone();
 
   const handleRebook = (
     id: number,
@@ -70,6 +72,8 @@ export default function RebookableClassList({
   const [selectedClassCode, setSelectedClassCode] = useState<string>("");
   const [plan, setPlan] = useState<Plan>();
 
+  if (!timeZone) return null;
+
   return (
     <ul className={styles.modal__list}>
       {rebookableClasses?.map((classItem) => {
@@ -77,8 +81,12 @@ export default function RebookableClassList({
         const date = formatShortDate(
           new Date(classItem.rebookableUntil),
           locale,
+          timeZone,
         );
-        const time = formatTime24Hour(new Date(classItem.rebookableUntil));
+        const time = formatTime24Hour(
+          new Date(classItem.rebookableUntil),
+          timeZone,
+        );
         const isFreeTrial = classItem.isFreeTrial;
 
         const dateTimeText = <span>{`${date} ${time}`}</span>;

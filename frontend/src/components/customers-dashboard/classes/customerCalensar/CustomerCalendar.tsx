@@ -17,6 +17,7 @@ import {
   getDayCellColorHandler,
 } from "@/lib/utils/calendarUtils";
 import CalendarLegend from "@/components/features/calendarLegend/CalendarLegend";
+import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
 
 export default function CustomerCalendar({
   customerId,
@@ -28,6 +29,7 @@ export default function CustomerCalendar({
   const [isClassDetailModalOpen, setIsClassDetailModalOpen] = useState(false);
   const [classDetail, setClassDetail] = useState<CustomerClass | null>(null);
   const { language } = useLanguage();
+  const timeZone = useCustomerTimeZone();
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     const classId = clickInfo.event.extendedProps.classId;
@@ -47,6 +49,8 @@ export default function CustomerCalendar({
   };
 
   const dayCellColors = getDayCellColorHandler(businessSchedule);
+
+  if (!timeZone) return null;
 
   return (
     <>
@@ -79,6 +83,7 @@ export default function CustomerCalendar({
           eventDisplay="block"
           allDaySlot={false}
           dayCellDidMount={dayCellColors}
+          timeZone="local"
         />
 
         {colorsForEvents.length > 0 && (

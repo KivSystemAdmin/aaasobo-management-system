@@ -11,7 +11,7 @@ import { getAllInstructorAvailableSlots } from "@/lib/api/instructorsApi";
 import Loading from "@/components/elements/loading/Loading";
 import RebookingCompleteMessage from "./rebookingCompleteMessage/RebookingCompleteMessage";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { nHoursLater } from "@/lib/utils/dateUtils";
+import { formatDateToISOInTimeZone, nHoursLater } from "@/lib/utils/dateUtils";
 import { EnglishBackground } from "@/types";
 
 export default function RebookingForm({
@@ -65,12 +65,17 @@ export default function RebookingForm({
       // Get date range for next 30 days for rebooking
       const REGULAR_REBOOKING_HOURS = 3;
       const INSTRUCTOR_AVAILABILITY_WINDOW_HOURS = 30 * 24;
-      const startDate = nHoursLater(REGULAR_REBOOKING_HOURS);
-      const endDate = nHoursLater(INSTRUCTOR_AVAILABILITY_WINDOW_HOURS);
+      const API_BOUNDARY_BUFFER_HOURS = 24;
+      const startDate = nHoursLater(
+        REGULAR_REBOOKING_HOURS - API_BOUNDARY_BUFFER_HOURS,
+      );
+      const endDate = nHoursLater(
+        INSTRUCTOR_AVAILABILITY_WINDOW_HOURS + API_BOUNDARY_BUFFER_HOURS,
+      );
 
       const result = await getAllInstructorAvailableSlots(
-        startDate.toISOString().split("T")[0],
-        endDate.toISOString().split("T")[0],
+        formatDateToISOInTimeZone(startDate, "Asia/Tokyo"),
+        formatDateToISOInTimeZone(endDate, "Asia/Tokyo"),
         englishBackground,
       );
 

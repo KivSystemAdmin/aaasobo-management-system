@@ -21,6 +21,7 @@ import ClassInstructor from "@/components/features/classDetail/classInstructor/C
 import { CalendarDaysIcon, UsersIcon } from "@heroicons/react/24/solid";
 import StepIndicator from "@/components/elements/stepIndicator/StepIndicator";
 import { errorAlert, warningAlert, confirmAlert } from "@/lib/utils/alertUtils";
+import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
 
 export default function ConfirmRebooking({
   instructorToRebook,
@@ -39,6 +40,7 @@ export default function ConfirmRebooking({
     childProfiles.map((child) => child.id),
   );
   const [isLoading, setIsLoading] = useState(false);
+  const timeZone = useCustomerTimeZone();
 
   const previousRebookingStep =
     rebookingOption === "instructor" ? "selectDateTime" : "selectInstructor";
@@ -138,6 +140,8 @@ export default function ConfirmRebooking({
     setRebookingStep("complete");
   };
 
+  if (!timeZone) return null;
+
   return (
     <div className={styles.rebookingConfirm}>
       <StepIndicator currentStep={3} totalSteps={3} />
@@ -156,8 +160,9 @@ export default function ConfirmRebooking({
           {`${formatYearDateTime(
             new Date(dateTimeToRebook!),
             language === "ja" ? "ja-JP" : "en-US",
+            timeZone,
           )} - 
-          ${formatTimeWithAddedMinutes(new Date(dateTimeToRebook!), 25)}`}
+          ${formatTimeWithAddedMinutes(new Date(dateTimeToRebook!), 25, timeZone)}`}
         </div>
 
         <div className={styles.rebookingConfirm__children}>

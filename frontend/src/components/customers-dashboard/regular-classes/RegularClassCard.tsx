@@ -14,6 +14,7 @@ import {
   EDIT_CLASS_ARIA_LABEL,
 } from "@/lib/messages/customerDashboard";
 import { MouseEvent } from "react";
+import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
 
 interface RegularClassCardProps {
   recurringClass: RecurringClass;
@@ -36,7 +37,11 @@ function RegularClassCard({
   selected,
   onToggle,
 }: RegularClassCardProps) {
-  const timeZone = "Asia/Tokyo"; // Use JST for consistency
+  const customerTimeZone = useCustomerTimeZone();
+  const timeZone =
+    userSessionType === "customer" ? customerTimeZone : "Asia/Tokyo";
+
+  if (!timeZone) return null;
 
   const classDateTime = new Date(recurringClass.dateTime);
   const startTime = formatTime(classDateTime, timeZone);

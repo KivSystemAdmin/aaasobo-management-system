@@ -13,6 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { confirmAlert, errorAlert, warningAlert } from "@/lib/utils/alertUtils";
 import { EnglishBackground } from "@/types";
 import { rebookClassWithValidation } from "@/app/actions/rebooking";
+import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
 import {
   CONFIRM_BOOKING_WITH_CONFLICT_MESSAGE,
   DOUBLE_BOOKING_CONFIRMATION_MESSAGE,
@@ -42,11 +43,15 @@ interface StepState {
   confirmation: StepStatus;
 }
 
-const formatSelectedDateTime = (dateTime: string, language: LanguageType) => {
+const formatSelectedDateTime = (
+  dateTime: string,
+  language: LanguageType,
+  timeZone: string,
+) => {
   const formattedDateTime = new Intl.DateTimeFormat(
     language === "ja" ? "ja-JP" : "en-US",
     {
-      timeZone: "Asia/Tokyo",
+      timeZone,
       year: "numeric",
       month: "numeric",
       day: "numeric",
@@ -56,9 +61,7 @@ const formatSelectedDateTime = (dateTime: string, language: LanguageType) => {
     },
   ).format(new Date(dateTime));
 
-  return language === "ja"
-    ? `${formattedDateTime}（日本時間）`
-    : `${formattedDateTime} (Japan time)`;
+  return formattedDateTime;
 };
 
 export default function ProgressiveBookingFlow({
@@ -73,6 +76,7 @@ export default function ProgressiveBookingFlow({
   plan,
   onBookingSuccess,
 }: ProgressiveBookingFlowProps) {
+  const timeZone = useCustomerTimeZone();
   // All hooks must be called at the top level
   const [selectedMode, setSelectedMode] = useState<
     "instructor" | "datetime" | null
@@ -204,6 +208,8 @@ export default function ProgressiveBookingFlow({
       return updated;
     });
   }, []);
+
+  if (!timeZone) return null;
 
   // Early return if no child profiles are available
   if (childProfiles.length === 0) {
@@ -445,7 +451,11 @@ export default function ProgressiveBookingFlow({
               {stepStatus.datetime === "completed" && selectedDateTime && (
                 <>
                   <span className={styles.selectedValue}>
-                    {formatSelectedDateTime(selectedDateTime, language)}
+                    {formatSelectedDateTime(
+                      selectedDateTime,
+                      language,
+                      timeZone,
+                    )}
                   </span>
                   <button
                     onClick={handleChangeDateTime}
@@ -479,7 +489,11 @@ export default function ProgressiveBookingFlow({
               {stepStatus.datetime === "completed" && selectedDateTime && (
                 <>
                   <span className={styles.selectedValue}>
-                    {formatSelectedDateTime(selectedDateTime, language)}
+                    {formatSelectedDateTime(
+                      selectedDateTime,
+                      language,
+                      timeZone,
+                    )}
                   </span>
                   <button
                     onClick={handleChangeDateTime}
@@ -562,7 +576,11 @@ export default function ProgressiveBookingFlow({
                     <strong>
                       {language === "ja" ? "日時:" : "Date & Time:"}
                     </strong>{" "}
-                    {formatSelectedDateTime(selectedDateTime, language)}
+                    {formatSelectedDateTime(
+                      selectedDateTime,
+                      language,
+                      timeZone,
+                    )}
                   </p>
                 </div>
 

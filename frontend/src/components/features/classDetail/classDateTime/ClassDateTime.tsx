@@ -11,20 +11,27 @@ import { CalendarDaysIcon } from "@heroicons/react/24/solid";
 const ClassDateTime = ({
   classStart,
   language,
+  timeZone,
 }: {
   classStart: string;
   language?: LanguageType;
+  timeZone?: string;
 }) => {
   const classDateTime = new Date(classStart);
   const classDate = formatYearDate(
     classDateTime,
     language == "ja" ? "ja-JP" : "en-US",
+    timeZone,
   );
-  const classMonth = getShortMonth(classDateTime);
-  const classDay = classDateTime.getDate();
-  const classDayOfWeek = getDayOfWeek(classDateTime);
-  const classStartTime = formatTime24Hour(classDateTime);
-  const classEndTime = formatTimeWithAddedMinutes(classDateTime, 25);
+  const classMonth = getShortMonth(classDateTime, "en-US", timeZone);
+  const classDay = Number(
+    new Intl.DateTimeFormat("en-US", { day: "numeric", timeZone }).format(
+      classDateTime,
+    ),
+  );
+  const classDayOfWeek = getDayOfWeek(classDateTime, "en-US", timeZone);
+  const classStartTime = formatTime24Hour(classDateTime, timeZone);
+  const classEndTime = formatTimeWithAddedMinutes(classDateTime, 25, timeZone);
 
   return (
     <div className={styles.dateTime}>

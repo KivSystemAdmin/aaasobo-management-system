@@ -6,6 +6,7 @@ import { LanguageProvider } from "../contexts/LanguageContext";
 import { getSystemStatus } from "@/lib/api/maintenanceApi";
 import SystemStatusWatcher from "@/components/features/systemStatusWatcher/SystemStatusWatcher";
 import MaintenancePage from "@/components/elements/maintenancePage/MaintenancePage";
+import { CustomerTimeZoneProvider } from "@/contexts/CustomerTimeZoneContext";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -41,9 +42,11 @@ export default async function RootLayout({
     <html lang="en">
       <body className={poppins.className}>
         <LanguageProvider>
-          <ToastContainer />
-          <SystemStatusWatcher />
-          {isStop ? <MaintenancePage /> : children}
+          <CustomerTimeZoneProvider>
+            <ToastContainer />
+            <SystemStatusWatcher />
+            {isStop ? <MaintenancePage /> : children}
+          </CustomerTimeZoneProvider>
         </LanguageProvider>
       </body>
     </html>
