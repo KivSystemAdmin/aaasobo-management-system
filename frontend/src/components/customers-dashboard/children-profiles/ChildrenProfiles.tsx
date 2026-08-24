@@ -234,7 +234,7 @@ function ChildrenProfiles({
 
                   {editingChildId === child.id ? (
                     <TextAreaInput
-                      defaultValue={child.personalInfo}
+                      defaultValue={child.personalInfo ?? undefined}
                       placeholder={
                         language === "ja"
                           ? "例. 5 years old, Beginner, Car, Peppapig"

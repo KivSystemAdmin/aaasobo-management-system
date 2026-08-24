@@ -89,7 +89,7 @@ type Child = {
   customerId?: number;
   name: string;
   birthdate?: string;
-  personalInfo?: string;
+  personalInfo?: string | null;
 };
 
 type Plans = Plan[];

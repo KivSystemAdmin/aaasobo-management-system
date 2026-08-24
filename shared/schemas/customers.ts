@@ -176,7 +176,10 @@ export const ChildProfilesResponse = z
       id: z.number().describe("Child ID"),
       name: z.string().describe("Child name"),
       birthdate: z.iso.datetime().describe("Child birthdate"),
-      personalInfo: z.string().describe("Child personal information"),
+      personalInfo: z
+        .string()
+        .nullable()
+        .describe("Child personal information"),
     }),
   )
   .describe("List of child profiles");

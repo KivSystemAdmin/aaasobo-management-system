@@ -12,7 +12,7 @@
     "db:bootstrap": "ts-node ./src/seed/bootstrap.ts",
     "seed:dummy": "ts-node ./src/seed/dummy.ts",
     "beta:generate-import": "ts-node ./src/seed/generateBetaImportFromRawSchedule.ts",
-    "prisma:init": "prisma generate && npx prisma migrate reset && npm run db:bootstrap",
+    "prisma:init": "prisma generate && npx prisma migrate reset --force && npm run db:bootstrap",
     "fixture:generate:normalized-import": "ts-node ./src/seed/generateNormalizedImportFixture.ts",
     "fixture:generate:incremental-import": "ts-node ./src/seed/generateIncrementalImportFixture.ts",
     "test": "prisma generate && vitest run src/test/api",
