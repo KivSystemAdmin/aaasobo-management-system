@@ -14,25 +14,35 @@ export const formatTime = (date: Date, timeZone: string) => {
 };
 
 // Formats year and date (e.g., "Thu, Jan 11, 2025", "2025年1月11日(木)")
-export const formatYearDate = (date: Date, locale: string = "en-US") => {
+export const formatYearDate = (
+  date: Date,
+  locale: string = "en-US",
+  timeZone?: string,
+) => {
   return new Intl.DateTimeFormat(locale, {
     weekday: "short",
     year: "numeric",
     month: "short",
     day: "numeric",
+    ...(timeZone && { timeZone }),
   }).format(date);
 };
 
 // Formats year,date, and time (e.g., "Thu, January 11, 2025 at 09:30", "2025年1月11日(木) 9:30")
-export const formatYearDateTime = (date: Date, locale: string = "en-US") => {
+export const formatYearDateTime = (
+  date: Date,
+  locale: string = "en-US",
+  timeZone?: string,
+) => {
   const datePart = new Intl.DateTimeFormat(locale, {
     weekday: "short",
     year: "numeric",
     month: "long",
     day: "numeric",
+    ...(timeZone && { timeZone }),
   }).format(date);
 
-  const timePart = formatTime24Hour(date);
+  const timePart = formatTime24Hour(date, timeZone);
   const formatted =
     locale === "en-US"
       ? `${datePart} at ${timePart}`
@@ -45,9 +55,10 @@ export const formatYearDateTime = (date: Date, locale: string = "en-US") => {
 export const formatTimeWithAddedMinutes = (
   date: Date,
   minutesToAdd: number,
+  timeZone?: string,
 ): string => {
   const updatedDate = addMinutes(date, minutesToAdd);
-  return formatTime24Hour(updatedDate);
+  return formatTime24Hour(updatedDate, timeZone);
 };
 
 export const isPastPreviousDayDeadline = (classDateUTC: string): boolean => {
@@ -64,7 +75,10 @@ export const isPastPreviousDayDeadline = (classDateUTC: string): boolean => {
   return !isAfter(classDayStart, todayInJapan);
 };
 
-const formatDateToISOInTimeZone = (date: Date, timeZone: string): string => {
+export const formatDateToISOInTimeZone = (
+  date: Date,
+  timeZone: string,
+): string => {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone,
     year: "numeric",
@@ -127,22 +141,41 @@ export const formatBirthdateMonthDay = (
 };
 
 // e.g., Monday, Tuesday ...
-export const getDayOfWeek = (date: Date, locale: string = "en-US"): string => {
-  const formatter = new Intl.DateTimeFormat(locale, { weekday: "long" });
+export const getDayOfWeek = (
+  date: Date,
+  locale: string = "en-US",
+  timeZone?: string,
+): string => {
+  const formatter = new Intl.DateTimeFormat(locale, {
+    weekday: "long",
+    ...(timeZone && { timeZone }),
+  });
   return formatter.format(date);
 };
 
 // e.g., "en-US": Jan, Feb ..., "ja-JP": 1, 2 ...
-export const getShortMonth = (date: Date, locale: string = "en-US"): string => {
+export const getShortMonth = (
+  date: Date,
+  locale: string = "en-US",
+  timeZone?: string,
+): string => {
   if (!(date instanceof Date) || isNaN(date.getTime())) {
     return "";
   }
 
   if (locale === "ja-JP") {
-    return String(date.getMonth() + 1);
+    return new Intl.DateTimeFormat("ja-JP", {
+      month: "numeric",
+      ...(timeZone && { timeZone }),
+    })
+      .format(date)
+      .replace("月", "");
   }
 
-  const formatter = new Intl.DateTimeFormat(locale, { month: "short" });
+  const formatter = new Intl.DateTimeFormat(locale, {
+    month: "short",
+    ...(timeZone && { timeZone }),
+  });
   return formatter.format(date).toUpperCase();
 };
 

@@ -8,6 +8,7 @@ import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
 
 export default function UpcomingClasses({
   upcomingClasses,
@@ -16,6 +17,7 @@ export default function UpcomingClasses({
   isCancelingModalOpen,
 }: UpcomingClassesProps) {
   const { language } = useLanguage();
+  const timeZone = useCustomerTimeZone();
   useEffect(() => {
     if (!isCancelingModalOpen) setSelectedClasses([]);
   }, [isCancelingModalOpen, setSelectedClasses]);
@@ -30,15 +32,17 @@ export default function UpcomingClasses({
     });
   };
 
+  if (!timeZone) return null;
+
   return (
     <>
       {upcomingClasses.map((eachClass) => {
         const classDateTime = new Date(eachClass.dateTime);
         const classDate =
           language === "ja"
-            ? formatYearDate(classDateTime, "ja-JP")
-            : formatYearDate(classDateTime);
-        const classTime = formatTime24Hour(classDateTime);
+            ? formatYearDate(classDateTime, "ja-JP", timeZone)
+            : formatYearDate(classDateTime, "en-US", timeZone);
+        const classTime = formatTime24Hour(classDateTime, timeZone);
 
         const pastPrevDayDeadline = isPastPreviousDayDeadline(
           eachClass.dateTime,

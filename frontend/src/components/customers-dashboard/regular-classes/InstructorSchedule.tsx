@@ -9,11 +9,17 @@ import { getTodayInJapanISODate } from "@/lib/utils/dateUtils";
 import { WEEKDAYS } from "@/lib/utils/scheduleUtils";
 import { EDIT_REGULAR_CLASS_MESSAGES } from "@/lib/messages/customerDashboard";
 import styles from "./InstructorSchedule.module.scss";
+import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
 
 interface InstructorScheduleProps {
   instructorId: number;
   effectiveDate: string;
-  onSlotSelect: (weekday: number, startTime: string) => void;
+  onSlotSelect: (
+    weekday: number,
+    startTime: string,
+    displayWeekday: number,
+    displayTime: string,
+  ) => void;
   selectedWeekday: number | null;
   selectedStartTime: string;
   language: LanguageType;
@@ -28,7 +34,10 @@ export default function InstructorSchedule({
   language,
 }: InstructorScheduleProps) {
   const messages = EDIT_REGULAR_CLASS_MESSAGES[language];
-  const [slots, setSlots] = useState<InstructorSlot[]>([]);
+  const timeZone = useCustomerTimeZone();
+  const [slots, setSlots] = useState<
+    Array<InstructorSlot & { dateTime: string }>
+  >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
@@ -68,6 +77,7 @@ export default function InstructorSchedule({
                 hour12: false,
                 timeZone: "Asia/Tokyo",
               }).format(date),
+              dateTime: slot.dateTime,
             };
           }),
         );
@@ -84,16 +94,37 @@ export default function InstructorSchedule({
     }
   }, [instructorId, effectiveDate, messages.scheduleLoadFailed]);
 
-  // Group JST slots by weekday
+  if (!timeZone) return null;
+
+  // Display each instant locally while retaining its original JST API values.
   const slotsByWeekday = (slots || []).reduce(
     (acc, slot) => {
-      if (!acc[slot.weekday]) {
-        acc[slot.weekday] = [];
+      const slotDate = new Date(slot.dateTime);
+      const localWeekdayName = new Intl.DateTimeFormat("en-US", {
+        weekday: "short",
+        timeZone,
+      }).format(slotDate);
+      const localWeekday = [
+        "Sun",
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+      ].indexOf(localWeekdayName);
+      if (!acc[localWeekday]) {
+        acc[localWeekday] = [];
       }
 
-      // Display JST times directly
-      acc[slot.weekday].push({
-        displayTime: slot.startTime,
+      acc[localWeekday].push({
+        displayTime: new Intl.DateTimeFormat("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone,
+        }).format(slotDate),
+        displayWeekday: localWeekday,
         originalWeekday: slot.weekday,
         originalTime: slot.startTime,
       });
@@ -104,6 +135,7 @@ export default function InstructorSchedule({
       number,
       Array<{
         displayTime: string;
+        displayWeekday: number;
         originalWeekday: number;
         originalTime: string;
       }>
@@ -172,6 +204,8 @@ export default function InstructorSchedule({
                     onSlotSelect(
                       slotInfo.originalWeekday,
                       slotInfo.originalTime,
+                      slotInfo.displayWeekday,
+                      slotInfo.displayTime,
                     )
                   }
                 >

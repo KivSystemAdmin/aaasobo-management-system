@@ -17,11 +17,7 @@ import {
   getDayCellColorHandler,
 } from "@/lib/utils/calendarUtils";
 import CalendarLegend from "@/components/features/calendarLegend/CalendarLegend";
-
-const japanDayFormatter = new Intl.DateTimeFormat("en", {
-  timeZone: "Asia/Tokyo",
-  day: "numeric",
-});
+import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
 
 export default function CustomerCalendar({
   customerId,
@@ -33,6 +29,7 @@ export default function CustomerCalendar({
   const [isClassDetailModalOpen, setIsClassDetailModalOpen] = useState(false);
   const [classDetail, setClassDetail] = useState<CustomerClass | null>(null);
   const { language } = useLanguage();
+  const timeZone = useCustomerTimeZone();
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     const classId = clickInfo.event.extendedProps.classId;
@@ -46,7 +43,7 @@ export default function CustomerCalendar({
   const validRange = () => getCurrentMonthValidRange(3);
   const renderCustomerEventContent = createRenderEventContent(
     "customer",
-    "Asia/Tokyo",
+    timeZone ?? undefined,
   );
 
   const handleModalClose = () => {
@@ -55,6 +52,8 @@ export default function CustomerCalendar({
   };
 
   const dayCellColors = getDayCellColorHandler(businessSchedule);
+
+  if (!timeZone) return null;
 
   return (
     <>
@@ -78,7 +77,7 @@ export default function CustomerCalendar({
           validRange={validRange}
           locale={language === "ja" ? "ja" : "en"}
           dayCellContent={(arg) => {
-            return { html: japanDayFormatter.format(arg.date) };
+            return { html: String(arg.date.getDate()) };
           }}
           contentHeight="auto"
           dayMaxEvents={true}
@@ -86,8 +85,8 @@ export default function CustomerCalendar({
           selectable={false}
           eventDisplay="block"
           allDaySlot={false}
-          timeZone="Asia/Tokyo"
           dayCellDidMount={dayCellColors}
+          timeZone="local"
         />
 
         {colorsForEvents.length > 0 && (

@@ -18,12 +18,14 @@ const ClassNotification = ({
   classEnd,
   rebookableUntil,
   language,
+  timeZone,
 }: {
   classStatus: ClassStatus;
   classStart: string;
   classEnd: string;
   rebookableUntil: string;
   language: LanguageType;
+  timeZone?: string;
 }) => {
   const isBookedOrRebooked =
     classStatus === "booked" || classStatus === "rebooked";
@@ -49,7 +51,7 @@ const ClassNotification = ({
           <p>
             キャンセルが前日まで（日本時間基準）に行われた場合、{" "}
             <span>
-              {formatYearDateTime(new Date(rebookableUntil), "ja-JP")}
+              {formatYearDateTime(new Date(rebookableUntil), "ja-JP", timeZone)}
             </span>
             のクラスまで振替できます。
           </p>
@@ -57,7 +59,10 @@ const ClassNotification = ({
           <p>
             If the cancellation is made by the day before (based on Japan time),
             you can rebook up to the class on{" "}
-            <span>{formatYearDateTime(new Date(rebookableUntil))}</span>.
+            <span>
+              {formatYearDateTime(new Date(rebookableUntil), "en-US", timeZone)}
+            </span>
+            .
           </p>
         );
 

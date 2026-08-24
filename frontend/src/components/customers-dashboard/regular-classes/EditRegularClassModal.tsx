@@ -16,6 +16,16 @@ import {
 } from "@heroicons/react/24/solid";
 import { EDIT_REGULAR_CLASS_MESSAGES } from "@/lib/messages/customerDashboard";
 import styles from "./EditRegularClassModal.module.scss";
+import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
+
+const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const getWeekdayInTimeZone = (date: Date, timeZone: string) =>
+  WEEKDAY_NAMES.indexOf(
+    new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone }).format(
+      date,
+    ),
+  );
 
 interface EditRegularClassModalProps {
   isOpen: boolean;
@@ -45,6 +55,7 @@ export default function EditRegularClassModal({
   language,
 }: EditRegularClassModalProps) {
   const messages = EDIT_REGULAR_CLASS_MESSAGES[language];
+  const timeZone = useCustomerTimeZone();
 
   // Form state
   const [startDate, setStartDate] = useState("");
@@ -54,6 +65,8 @@ export default function EditRegularClassModal({
   >(null);
   const [selectedWeekday, setSelectedWeekday] = useState<number | null>(null);
   const [selectedStartTime, setSelectedStartTime] = useState<string>("");
+  const [displayWeekday, setDisplayWeekday] = useState<number | null>(null);
+  const [displayStartTime, setDisplayStartTime] = useState("");
   const [selectedChildrenIds, setSelectedChildrenIds] = useState<number[]>([]);
   const [selectedInstructor, setSelectedInstructor] =
     useState<InstructorRebookingProfile | null>(null);
@@ -110,7 +123,7 @@ export default function EditRegularClassModal({
     const scheduleDate = recurringClass?.dateTime || recurringClass?.startAt;
     if (scheduleDate) {
       const classDate = new Date(scheduleDate);
-      const jstWeekday = classDate.getDay();
+      const jstWeekday = getWeekdayInTimeZone(classDate, "Asia/Tokyo");
       const startTime = new Intl.DateTimeFormat("en-US", {
         hour: "2-digit",
         minute: "2-digit",
@@ -119,8 +132,17 @@ export default function EditRegularClassModal({
       }).format(classDate);
       setSelectedWeekday(jstWeekday);
       setSelectedStartTime(startTime);
+      setDisplayWeekday(getWeekdayInTimeZone(classDate, timeZone || "UTC"));
+      setDisplayStartTime(
+        new Intl.DateTimeFormat("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone: timeZone || "UTC",
+        }).format(classDate),
+      );
     }
-  }, [isOpen, recurringClass]);
+  }, [isOpen, recurringClass, timeZone]);
 
   const handleInstructorSelect = (instructor: InstructorRebookingProfile) => {
     setSelectedInstructor(instructor);
@@ -130,9 +152,16 @@ export default function EditRegularClassModal({
     setModalStep("schedule");
   };
 
-  const handleScheduleSlotSelect = (weekday: number, startTime: string) => {
+  const handleScheduleSlotSelect = (
+    weekday: number,
+    startTime: string,
+    localWeekday: number,
+    localStartTime: string,
+  ) => {
     setSelectedWeekday(weekday);
     setSelectedStartTime(startTime);
+    setDisplayWeekday(localWeekday);
+    setDisplayStartTime(localStartTime);
     setEditingInstructor(false);
   };
 
@@ -191,7 +220,7 @@ export default function EditRegularClassModal({
       const scheduleDate = recurringClass?.dateTime || recurringClass?.startAt;
       if (scheduleDate) {
         const classDate = new Date(scheduleDate);
-        finalWeekday = classDate.getDay();
+        finalWeekday = getWeekdayInTimeZone(classDate, "Asia/Tokyo");
         finalStartTime = new Intl.DateTimeFormat("en-US", {
           hour: "2-digit",
           minute: "2-digit",
@@ -257,7 +286,7 @@ export default function EditRegularClassModal({
     onClose();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !timeZone) return null;
 
   return (
     <Modal isOpen={isOpen} onClose={resetAndClose} overlayClosable={true}>
@@ -304,7 +333,8 @@ export default function EditRegularClassModal({
                   <>
                     <span className={styles.selectedValue}>
                       {selectedInstructor.nickname} -{" "}
-                      {messages.weekdays[selectedWeekday]} {selectedStartTime}
+                      {messages.weekdays[displayWeekday ?? selectedWeekday]}{" "}
+                      {displayStartTime || selectedStartTime}
                     </span>
                     <button
                       onClick={handleEditInstructor}

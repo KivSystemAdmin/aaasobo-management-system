@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./AvailabilityWeekGrid.module.scss";
+import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
 
-const JST_TIME_ZONE = "Asia/Tokyo";
 const DATE_KEY_TIME_ZONE = "UTC";
 const LOAD_TIMEOUT_MS = 30000;
 const WEEKDAY_LABELS = {
@@ -41,7 +41,7 @@ const getDateParts = (date: Date, timeZone: string) => {
   };
 };
 
-const getDateKey = (date: Date, timeZone = JST_TIME_ZONE) => {
+const getDateKey = (date: Date, timeZone: string) => {
   const { year, month, day } = getDateParts(date, timeZone);
   return `${year}-${month}-${day}`;
 };
@@ -94,9 +94,9 @@ const formatHeaderLabel = (
   )}`;
 };
 
-const formatSlotTime = (dateTime: string) =>
+const formatSlotTime = (dateTime: string, timeZone: string) =>
   new Intl.DateTimeFormat("en-GB", {
-    timeZone: JST_TIME_ZONE,
+    timeZone,
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -121,9 +121,11 @@ export default function AvailabilityWeekGrid({
   language,
   showInstructorCount = false,
 }: AvailabilityWeekGridProps) {
-  const todayDateKey = getDateKey(new Date());
+  const timeZone = useCustomerTimeZone();
+  const resolvedTimeZone = timeZone || DATE_KEY_TIME_ZONE;
+  const todayDateKey = getDateKey(new Date(), resolvedTimeZone);
   const [weekStart, setWeekStart] = useState(() =>
-    getWeekStart(getDateKey(new Date())),
+    getWeekStart(getDateKey(new Date(), resolvedTimeZone)),
   );
   const [slots, setSlots] = useState<AvailabilityWeekGridSlot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -137,8 +139,8 @@ export default function AvailabilityWeekGrid({
 
     const loadSlots = async () => {
       const requestStart = Date.now();
-      const startDate = weekDates[0];
-      const endDateExclusive = addDays(weekDates[6], 1);
+      const startDate = addDays(weekDates[0], -1);
+      const endDateExclusive = addDays(weekDates[6], 2);
 
       console.log("[availability-week-grid][load:start]", {
         startDate,
@@ -205,7 +207,7 @@ export default function AvailabilityWeekGrid({
   const slotsByDate = useMemo(() => {
     const grouped = slots.reduce<Record<string, AvailabilityWeekGridSlot[]>>(
       (groupedSlots, slot) => {
-        const dateKey = getDateKey(new Date(slot.dateTime));
+        const dateKey = getDateKey(new Date(slot.dateTime), resolvedTimeZone);
         if (!groupedSlots[dateKey]) {
           groupedSlots[dateKey] = [];
         }
@@ -224,7 +226,7 @@ export default function AvailabilityWeekGrid({
     });
 
     return grouped;
-  }, [slots]);
+  }, [resolvedTimeZone, slots]);
 
   const goToPreviousWeek = useCallback(() => {
     setWeekStart((currentWeekStart) => addDays(currentWeekStart, -7));
@@ -235,8 +237,17 @@ export default function AvailabilityWeekGrid({
   }, []);
 
   const goToCurrentWeek = useCallback(() => {
-    setWeekStart(getWeekStart(getDateKey(new Date())));
-  }, []);
+    setWeekStart(getWeekStart(getDateKey(new Date(), resolvedTimeZone)));
+  }, [resolvedTimeZone]);
+
+  useEffect(() => {
+    if (timeZone) {
+      // Reset the date-key state when the post-hydration browser zone arrives.
+      setWeekStart(getWeekStart(getDateKey(new Date(), timeZone)));
+    }
+  }, [timeZone]);
+
+  if (!timeZone) return null;
 
   return (
     <div className={styles.gridShell}>
@@ -267,8 +278,7 @@ export default function AvailabilityWeekGrid({
           </button>
         </div>
         <div className={styles.weekRange}>
-          {formatWeekRange(weekDates, language)}{" "}
-          {language === "ja" ? "（日本時間）" : "(Japan time)"}
+          {formatWeekRange(weekDates, language)}
         </div>
       </div>
 
@@ -310,7 +320,7 @@ export default function AvailabilityWeekGrid({
                         onClick={() => onSlotSelect(slot)}
                       >
                         <span className={styles.slotTime}>
-                          {formatSlotTime(slot.dateTime)}
+                          {formatSlotTime(slot.dateTime, timeZone)}
                         </span>
                         {showInstructorCount && (
                           <span className={styles.instructorCount}>

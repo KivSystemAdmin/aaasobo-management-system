@@ -20,6 +20,7 @@ import {
 } from "@/lib/messages/customerDashboard";
 import { cancelClassAction } from "@/app/actions/cancelSelectedClasses";
 import { confirmAlert, errorAlert } from "@/lib/utils/alertUtils";
+import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
 
 const ClassDetail = ({
   customerId,
@@ -28,6 +29,8 @@ const ClassDetail = ({
   language,
   userSessionType,
 }: ClassDetailProps) => {
+  const customerTimeZone = useCustomerTimeZone();
+
   if (!classDetail) {
     return <div>{NO_CLASS_DETAILS[language]}</div>;
   }
@@ -87,7 +90,11 @@ const ClassDetail = ({
         instructorNickname={classDetail.instructorNickname}
       />
 
-      <ClassDateTime classStart={classDetail.start} language={language} />
+      <ClassDateTime
+        classStart={classDetail.start}
+        language={language}
+        timeZone={customerTimeZone || undefined}
+      />
 
       {/* Children Attendance */}
       {statusesForAttendance.includes(classDetail.classStatus) && (
@@ -131,6 +138,7 @@ const ClassDetail = ({
         classEnd={classDetail.end}
         rebookableUntil={classDetail.rebookableUntil}
         language={language}
+        timeZone={customerTimeZone || undefined}
       />
 
       <div className={styles.footer}>
