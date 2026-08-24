@@ -19,11 +19,6 @@ import {
 import CalendarLegend from "@/components/features/calendarLegend/CalendarLegend";
 import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
 
-const japanDayFormatter = new Intl.DateTimeFormat("en", {
-  timeZone: "Asia/Tokyo",
-  day: "numeric",
-});
-
 export default function CustomerCalendar({
   customerId,
   classes,
@@ -48,7 +43,7 @@ export default function CustomerCalendar({
   const validRange = () => getCurrentMonthValidRange(3);
   const renderCustomerEventContent = createRenderEventContent(
     "customer",
-    "Asia/Tokyo",
+    timeZone ?? undefined,
   );
 
   const handleModalClose = () => {
@@ -82,7 +77,7 @@ export default function CustomerCalendar({
           validRange={validRange}
           locale={language === "ja" ? "ja" : "en"}
           dayCellContent={(arg) => {
-            return { html: japanDayFormatter.format(arg.date) };
+            return { html: String(arg.date.getDate()) };
           }}
           contentHeight="auto"
           dayMaxEvents={true}
@@ -90,7 +85,6 @@ export default function CustomerCalendar({
           selectable={false}
           eventDisplay="block"
           allDaySlot={false}
-          timeZone="Asia/Tokyo"
           dayCellDidMount={dayCellColors}
           timeZone="local"
         />
