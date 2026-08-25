@@ -123,4 +123,5 @@ jobs:
             frontend/test-results/
             frontend/e2e/.runtime/*.log
           if-no-files-found: ignore
+          include-hidden-files: true
           retention-days: 14

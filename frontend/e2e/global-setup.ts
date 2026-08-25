@@ -27,9 +27,22 @@ export default async function globalSetup(config: FullConfig) {
     .getByRole("button", { name: /confirm|execute/i })
     .last()
     .click();
-  await expect(
-    page.getByRole("heading", { name: "Import Result" }),
-  ).toBeVisible({ timeout: 180_000 });
+  try {
+    await expect(
+      page.getByRole("heading", { name: "Import Result" }),
+    ).toBeVisible({ timeout: 180_000 });
+  } catch (error) {
+    await page.screenshot({
+      path: path.resolve(process.cwd(), "test-results/global-setup-import.png"),
+      fullPage: true,
+    });
+    const visiblePageText = (await page.locator("body").innerText()).slice(
+      -4_000,
+    );
+    throw new Error(
+      `Fixture import did not complete. Visible page text:\n${visiblePageText}\n\n${String(error)}`,
+    );
+  }
   await expect(
     page.getByText("Normalized import executed successfully"),
   ).toBeVisible();
