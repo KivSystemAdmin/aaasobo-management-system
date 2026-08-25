@@ -227,6 +227,28 @@ describe("GET /customers/:id/child-profiles", () => {
 
     expect(response.body).toHaveLength(2);
   });
+
+  it("returns imported child profiles without personal information", async () => {
+    const authCookie = await createAdminAuthCookie();
+    const customer = await createCustomer();
+    const child = await prisma.child.create({
+      data: {
+        customerId: customer.id,
+        name: faker.person.fullName(),
+        birthdate: faker.date.past({ years: 10 }),
+        personalInfo: null,
+      },
+    });
+
+    const response = await request(server)
+      .get(`/customers/${customer.id}/child-profiles`)
+      .set("Cookie", authCookie)
+      .expect(200);
+
+    expect(response.body).toEqual([
+      expect.objectContaining({ id: child.id, personalInfo: null }),
+    ]);
+  });
 });
 
 describe("GET /customers/:id/classes", () => {
