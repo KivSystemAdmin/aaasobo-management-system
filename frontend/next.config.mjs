@@ -4,8 +4,10 @@ const scriptSrc = isProduction
   ? "script-src 'self' 'unsafe-inline'"
   : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
 
+const configuredBackendOrigin = process.env.NEXT_PUBLIC_BACKEND_ORIGIN;
+
 const connectSrc = isProduction
-  ? "connect-src 'self' https:"
+  ? `connect-src 'self' https:${configuredBackendOrigin ? ` ${configuredBackendOrigin}` : ""}`
   : "connect-src 'self' http://localhost:4000 http://127.0.0.1:4000 https:";
 
 const securityHeaders = [
