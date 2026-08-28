@@ -19,7 +19,7 @@ export default async function globalSetup(config: FullConfig) {
     .locator("#password")
     .fill(process.env.E2E_ADMIN_PASSWORD ?? "E2e-Admin-Password!");
   await page.getByRole("button", { name: "Login" }).click();
-  await expect(page).toHaveURL(/\/admins\/(?!login)/);
+  await expect(page).toHaveURL(/\/admins\/(?!login)/, { timeout: 60_000 });
   await page.goto("/admins/data-import");
   await page.locator("#normalized-zip-file").setInputFiles(fixtureZip);
   await page.getByRole("button", { name: "Execute import" }).click();

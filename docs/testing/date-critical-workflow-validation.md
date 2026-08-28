@@ -12,7 +12,7 @@ Validation date: 2026-08-28 JST
 | UI workflow          | Disposable local PostgreSQL; desktop Chromium; Canada/Eastern and Asia/Tokyo | Fixture import, regular-class replacement, recurrence/history persistence, monthly generation repeated twice, customer cancellation, instructor cross-role verification, schedule-version creation with half-open boundaries, unrelated-record isolation, and historical/upcoming state                      | Pass (5/5 desktop journeys)                                                             |
 | UI workflow          | Disposable local PostgreSQL; Mobile Safari iPhone profile on Chromium; UTC   | Customer cancellation and persisted state after reload                                                                                                                                                                                                                                                      | Pass (1/1 mobile journey)                                                               |
 | Full local pipeline  | Shared, frontend, and backend                                                | Format, lint, unused exports, production build, and complete API suite                                                                                                                                                                                                                                      | Pass                                                                                    |
-| Deployed UI workflow | Isolated resettable test environment                                         | Same deterministic fixture and workflow suite                                                                                                                                                                                                                                                               | Not run: `E2E_BASE_URL`, `E2E_ADMIN_EMAIL`, and `E2E_ADMIN_PASSWORD` were not available |
+| Deployed UI workflow | Vercel dev frontend/backend; desktop Chromium and Mobile Safari iPhone profile | Same deterministic fixture import, UI mutations, cross-role persistence, reloads, Canada/Eastern, Asia/Tokyo, and UTC                                                                                                                                                                                        | Pass (6/6)                                                                              |
 
 Browser console errors and failed requests fail the Playwright suite. Screenshots
 and traces are retained only for failures.
@@ -35,6 +35,11 @@ and traces are retained only for failures.
   instead of the JST business date for their defaults and minimum values.
 - The deterministic acceptance fixture generated 110 rather than the required
   120 children.
+- Deployed authentication could pass through the expected server-side
+  `/auth/post-login` transition for longer than the setup's five-second wait.
+- Role-login tests navigated away from the authenticated landing page while its
+  calendar request was still in flight, producing false console failures on a
+  slower deployed backend.
 
 ## Regression coverage added
 
@@ -53,12 +58,11 @@ and traces are retained only for failures.
   cancellation, with API reads used only for persistence verification.
 - Customer cancellation on a Mobile Safari device profile with persistence
   verified after reload.
+- Bounded serverless login waits and network-idle role transitions, preserving
+  the console/network failure gate without suppressing genuine failures.
 
 ## Residual risk
 
-- The deployed suite still requires an isolated URL and test-admin credentials;
-  its reset/import is intentionally not allowed to target production or a
-  preserved developer database.
 - The Mobile Safari device profile validates viewport, touch behavior, and user
   agent on Chromium. Native WebKit is not exercised on this Linux host.
 - The current E2E suite mutates regular-class replacement, schedule-version
@@ -66,5 +70,6 @@ and traces are retained only for failures.
   creation, schedule insertion between two existing versions, slot-level
   add/remove/retain combinations, and both rebooking orderings remain primarily
   covered at the API/service layer rather than as browser journeys.
-- Email and external integrations use local test configuration; deployed test
-  sinks must be confirmed before executing the deployed suite.
+- The deployed environment completed the fixture import and workflows without
+  visible integration errors, but its email/test-sink configuration was not
+  independently inspected.
