@@ -9,6 +9,7 @@
     "build": "next build",
     "start": "next start",
     "test:e2e": "bash ./e2e/run-e2e.sh",
+    "test:e2e:deployed": "E2E_TARGET=deployed bash ./e2e/run-e2e.sh",
     "test:e2e:playwright": "playwright test",
     "lint": "eslint .",
     "lint:unused": "knip"

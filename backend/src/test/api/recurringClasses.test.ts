@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import request from "supertest";
 import { server } from "../../server";
 import { prisma } from "../setup";
@@ -45,12 +45,7 @@ function nextWeekdayOccurrenceUTC(
 
   const currentWeekday = result.getUTCDay();
   const daysUntilTarget = (targetWeekday - currentWeekday + 7) % 7;
-
-  if (daysUntilTarget === 0 && result.getUTCHours() >= hours) {
-    result.setUTCDate(result.getUTCDate() + 7);
-  } else {
-    result.setUTCDate(result.getUTCDate() + daysUntilTarget);
-  }
+  result.setUTCDate(result.getUTCDate() + daysUntilTarget);
 
   result.setUTCHours(hours - 9, minutes, 0, 0);
   return result;
@@ -87,6 +82,10 @@ async function setupCore({
 
   return { customer, subscription, children, instructor, schedule };
 }
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 describe("POST /recurring-classes", () => {
   it("succeed creating recurring class when slot exists", async () => {
@@ -599,6 +598,148 @@ describe("GET /recurring-classes/by-instructorId", () => {
 });
 
 describe("PUT /recurring-classes/:id", () => {
+  it("replaces the same slot without a gap or overlap and preserves past attendance", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
+
+    const customer = await createCustomer();
+    const authCookie = await generateAuthCookie(customer.id, "customer");
+    const plan = await createPlan();
+    const subscription = await createSubscription(plan.id, customer.id, {
+      startAt: new Date("2025-01-01T00:00:00.000Z"),
+      endAt: new Date("2027-01-01T00:00:00.000Z"),
+    });
+    const child = await createChild(customer.id);
+    const instructor = await createInstructor();
+    const schedule = await createInstructorSchedule(instructor.id, {
+      effectiveFrom: new Date("2025-01-01T00:00:00.000Z"),
+      effectiveTo: null,
+      timezone: "Asia/Tokyo",
+    });
+    await createInstructorSlot(schedule.id, 4, time`10:00`);
+    const oldRecurringClass = await prisma.recurringClass.create({
+      data: {
+        instructorId: instructor.id,
+        subscriptionId: subscription.id,
+        startAt: new Date("2026-01-01T01:00:00.000Z"),
+        recurringClassAttendance: { create: { childrenId: child.id } },
+      },
+    });
+    const pastClass = await createClass(
+      customer.id,
+      instructor.id,
+      new Date("2026-01-01T01:00:00.000Z"),
+      {
+        recurringClassId: oldRecurringClass.id,
+        subscriptionId: subscription.id,
+      },
+    );
+    await prisma.classAttendance.create({
+      data: { classId: pastClass.id, childrenId: child.id },
+    });
+    await createClass(
+      customer.id,
+      instructor.id,
+      new Date("2026-01-08T01:00:00.000Z"),
+      {
+        recurringClassId: oldRecurringClass.id,
+        subscriptionId: subscription.id,
+      },
+    );
+
+    const response = await request(server)
+      .put(`/recurring-classes/${oldRecurringClass.id}`)
+      .set("Cookie", authCookie)
+      .send({
+        instructorId: instructor.id,
+        weekday: 4,
+        startTime: "10:00",
+        customerId: customer.id,
+        childrenIds: [child.id],
+        startDate: "2026-01-08",
+        timezone: "Asia/Tokyo",
+      })
+      .expect(200);
+
+    expect(response.body.oldRecurringClass.endAt).toBe(
+      "2026-01-08T01:00:00.000Z",
+    );
+    expect(response.body.newRecurringClass.startAt).toBe(
+      "2026-01-08T01:00:00.000Z",
+    );
+    expect(
+      await prisma.classAttendance.count({
+        where: { classId: pastClass.id, childrenId: child.id },
+      }),
+    ).toBe(1);
+    const boundaryClasses = await prisma.class.findMany({
+      where: { dateTime: new Date("2026-01-08T01:00:00.000Z") },
+    });
+    expect(boundaryClasses).toHaveLength(1);
+    expect(boundaryClasses[0].recurringClassId).toBe(
+      response.body.newRecurringClass.id,
+    );
+  });
+
+  it.each([
+    ["2026-01-01T14:59:59.999Z", 200],
+    ["2026-01-01T15:00:00.000Z", 400],
+  ])(
+    "enforces the exact seven-day update boundary in JST at %s",
+    async (systemTime, expectedStatus) => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(new Date(systemTime));
+
+      const customer = await createCustomer();
+      const authCookie = await generateAuthCookie(customer.id, "customer");
+      const plan = await createPlan();
+      const subscription = await createSubscription(plan.id, customer.id, {
+        startAt: new Date("2025-01-01T00:00:00.000Z"),
+        endAt: new Date("2027-01-01T00:00:00.000Z"),
+      });
+      const child = await createChild(customer.id);
+      const oldInstructor = await createInstructor();
+      const oldRecurringClass = await prisma.recurringClass.create({
+        data: {
+          instructorId: oldInstructor.id,
+          subscriptionId: subscription.id,
+          startAt: new Date("2025-12-25T01:00:00.000Z"),
+        },
+      });
+      const newInstructor = await createInstructor();
+      const boundedSchedule = await createInstructorSchedule(newInstructor.id, {
+        effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
+        effectiveTo: new Date("2026-02-01T00:00:00.000Z"),
+        timezone: "Asia/Tokyo",
+      });
+      await createInstructorSlot(boundedSchedule.id, 4, time`00:30`);
+
+      const response = await request(server)
+        .put(`/recurring-classes/${oldRecurringClass.id}`)
+        .set("Cookie", authCookie)
+        .send({
+          instructorId: newInstructor.id,
+          weekday: 4,
+          startTime: "00:30",
+          customerId: customer.id,
+          childrenIds: [child.id],
+          startDate: "2026-01-08",
+          timezone: "Asia/Tokyo",
+        });
+
+      expect(response.status).toBe(expectedStatus);
+      if (expectedStatus === 200) {
+        expect(response.body.newRecurringClass.startAt).toBe(
+          "2026-01-07T15:30:00.000Z",
+        );
+      } else {
+        expect(response.body.message).toBe(
+          "Start date must be at least one week from today",
+        );
+      }
+    },
+  );
+
   it("succeed updating recurring class (customer auth)", async () => {
     const customer = await createCustomer();
     const authCookie = await generateAuthCookie(customer.id, "customer");

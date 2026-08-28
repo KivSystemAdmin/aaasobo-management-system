@@ -4,6 +4,7 @@ import EditableScheduleCalendar from "./EditableScheduleCalendar";
 import { InstructorSlot } from "@/lib/api/instructorsApi";
 import { slotToKey, keyToSlot } from "@/lib/utils/scheduleUtils";
 import styles from "./AddScheduleModal.module.scss";
+import { getTodayInJapanISODate } from "@/lib/utils/dateUtils";
 
 interface AddScheduleModalProps {
   isOpen: boolean;
@@ -42,8 +43,8 @@ export default function AddScheduleModal({
   };
 
   const [effectiveFrom, setEffectiveFrom] = useState(() => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrow = new Date(`${getTodayInJapanISODate()}T00:00:00.000Z`);
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
     return tomorrow.toISOString().split("T")[0];
   });
   const [editedSlots, setEditedSlots] = useState<Set<string>>(() =>
@@ -103,7 +104,7 @@ export default function AddScheduleModal({
                   type="date"
                   value={effectiveFrom}
                   onChange={(e) => setEffectiveFrom(e.target.value)}
-                  min={new Date().toISOString().split("T")[0]}
+                  min={getTodayInJapanISODate()}
                   required
                   className={styles.dateInput}
                 />

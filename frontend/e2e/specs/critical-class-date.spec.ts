@@ -1,4 +1,10 @@
-import { expect, test, type Page, type TestInfo } from "@playwright/test";
+import {
+  devices,
+  expect,
+  test,
+  type Page,
+  type TestInfo,
+} from "@playwright/test";
 import { ADMIN_STATE } from "../global-setup";
 
 type ClassRecord = {
@@ -13,11 +19,25 @@ type ClassRecord = {
 };
 
 type ClassesResponse = { classes: ClassRecord[] };
+type RecurringClassesResponse = {
+  recurringClasses: Array<{
+    id: number;
+    dateTime: string;
+    endAt?: string | null;
+  }>;
+};
+type SchedulesResponse = {
+  data: Array<{
+    id: number;
+    effectiveFrom: string;
+    effectiveTo: string | null;
+  }>;
+};
 
 const monitoredErrors = new WeakMap<TestInfo, string[]>();
 
 function monitor(page: Page, testInfo: TestInfo) {
-  const errors: string[] = [];
+  const errors = monitoredErrors.get(testInfo) ?? [];
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(`console: ${message.text()}`);
   });
@@ -82,6 +102,36 @@ async function backend<T>(
   return result.body as T;
 }
 
+async function cancelFirstFutureClassThroughUi(page: Page) {
+  const cancelable = page.getByRole("button", {
+    name: /Cancel Classes|予約をキャンセル/i,
+    exact: true,
+  });
+  await page.goto("/customers/classes");
+  const welcomeButton = page.getByRole("button", { name: "Get Started" });
+  if (await welcomeButton.isVisible()) await welcomeButton.click();
+  await cancelable.click();
+  await page.locator('input[type="checkbox"]').first().check();
+  await page
+    .getByRole("button", {
+      name: /Cancel Classes \(1\)|予約をキャンセル \(1\)/i,
+    })
+    .click();
+  await page.getByRole("button", { name: "OK", exact: true }).click();
+  await expect(
+    page.getByText(/successfully canceled|キャンセルが完了/i),
+  ).toBeVisible();
+}
+
+function jstDateDaysFromNow(days: number) {
+  const dateKey = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Tokyo",
+  });
+  const result = new Date(`${dateKey}T00:00:00.000Z`);
+  result.setUTCDate(result.getUTCDate() + days);
+  return result.toISOString().slice(0, 10);
+}
+
 test.describe("critical class/date workflows", () => {
   test.afterEach(async ({}, testInfo) => {
     expect(
@@ -95,7 +145,6 @@ test.describe("critical class/date workflows", () => {
   }, testInfo) => {
     const context = await browser.newContext({
       timezoneId: "Canada/Eastern",
-      viewport: { width: 390, height: 844 },
     });
     const page = await context.newPage();
     monitor(page, testInfo);
@@ -107,6 +156,48 @@ test.describe("critical class/date workflows", () => {
     await expect(
       page.locator('[aria-label^="Recurring class "]').first(),
     ).toBeVisible();
+    const card = page.locator('[aria-label^="Recurring class "]').first();
+    const oldRecurringClassId = Number(
+      (await card.getAttribute("aria-label"))?.split(" ").at(-1),
+    );
+    const before = await backend<RecurringClassesResponse>(
+      page,
+      "/recurring-classes?subscriptionId=1&status=active",
+    );
+    expect(before.recurringClasses.map((item) => item.id)).toContain(
+      oldRecurringClassId,
+    );
+
+    await card
+      .getByRole("button", { name: /edit class|クラスを編集/i })
+      .click();
+    await page.locator('input[type="date"]').fill(jstDateDaysFromNow(8));
+    await page
+      .getByRole("button", { name: /Apply Changes|変更を適用/i })
+      .click();
+    await expect(
+      page.getByRole("heading", {
+        name: /Edit Regular Class Schedule|レギュラークラスのスケジュールを編集/i,
+      }),
+    ).toBeHidden();
+
+    const activeAfter = await backend<RecurringClassesResponse>(
+      page,
+      "/recurring-classes?subscriptionId=1&status=active",
+    );
+    const historyAfter = await backend<RecurringClassesResponse>(
+      page,
+      "/recurring-classes?subscriptionId=1&status=history",
+    );
+    expect(activeAfter.recurringClasses).toHaveLength(
+      before.recurringClasses.length,
+    );
+    expect(activeAfter.recurringClasses.map((item) => item.id)).not.toContain(
+      oldRecurringClassId,
+    );
+    expect(historyAfter.recurringClasses.map((item) => item.id)).toContain(
+      oldRecurringClassId,
+    );
     const { classes } = await backend<ClassesResponse>(page, "/classes/1");
     const recurring = classes.filter((item) => item.recurringClassId);
     expect(recurring.length).toBeGreaterThan(20);
@@ -182,8 +273,7 @@ test.describe("critical class/date workflows", () => {
         new Date(item.dateTime) > new Date() && item.status === "booked",
     );
     expect(target).toBeTruthy();
-    await backend(page, `/classes/${target!.id}/cancel`, "PATCH");
-    await page.goto("/customers/classes");
+    await cancelFirstFutureClassThroughUi(page);
     await page.reload();
     const { classes: after } = await backend<ClassesResponse>(
       page,
@@ -215,7 +305,37 @@ test.describe("critical class/date workflows", () => {
     await instructor.close();
   });
 
-  test("4. instructor schedule versions expose effective boundaries and slots", async ({
+  test("3b. Mobile Safari profile cancellation persists after reload", async ({
+    browser,
+  }, testInfo) => {
+    const { defaultBrowserType: _, ...mobileSafari } = devices["iPhone 13"];
+    const context = await browser.newContext({
+      ...mobileSafari,
+      timezoneId: "UTC",
+    });
+    const page = await context.newPage();
+    monitor(page, testInfo);
+    await login(page, "customer", 22);
+    const { classes } = await backend<ClassesResponse>(page, "/classes/22");
+    const target = classes.find(
+      (item) =>
+        new Date(item.dateTime) > new Date() && item.status === "booked",
+    );
+    expect(target).toBeTruthy();
+
+    await cancelFirstFutureClassThroughUi(page);
+    await page.reload();
+    const { classes: after } = await backend<ClassesResponse>(
+      page,
+      "/classes/22",
+    );
+    expect(after.find((item) => item.id === target!.id)?.status).toBe(
+      "canceledByCustomer",
+    );
+    await context.close();
+  });
+
+  test("4. instructor schedule version creation persists half-open boundaries", async ({
     browser,
   }, testInfo) => {
     const context = await browser.newContext({
@@ -225,6 +345,19 @@ test.describe("critical class/date workflows", () => {
     const page = await context.newPage();
     monitor(page, testInfo);
     await page.goto("/admins/instructor-list/4");
+    const before = await backend<SchedulesResponse>(
+      page,
+      "/instructors/4/schedules",
+    );
+    const unrelatedBefore = await backend<SchedulesResponse>(
+      page,
+      "/instructors/5/schedules",
+    );
+    const previouslyActive = before.data.find(
+      (schedule) => schedule.effectiveTo === null,
+    );
+    expect(previouslyActive).toBeTruthy();
+
     await page.getByRole("button", { name: "スケジュール" }).click();
     await expect(page.getByText("スケジュール期間 (日本時間)")).toBeVisible();
     await expect(
@@ -233,7 +366,38 @@ test.describe("critical class/date workflows", () => {
     const selector = page
       .getByText("スケジュール期間 (日本時間)")
       .locator("select");
-    expect(await selector.locator("option").count()).toBeGreaterThan(1);
+    const optionCountBefore = await selector.locator("option").count();
+    const effectiveFrom = jstDateDaysFromNow(14);
+    await page
+      .getByRole("button", { name: "新しいスケジュールを作成" })
+      .click();
+    await page.locator("#effectiveFrom").fill(effectiveFrom);
+    await page
+      .getByRole("button", { name: "スケジュールを作成", exact: true })
+      .click();
+    await expect(
+      page.getByText("Schedule created successfully."),
+    ).toBeVisible();
+    await expect(selector.locator("option")).toHaveCount(optionCountBefore + 1);
+
+    const after = await backend<SchedulesResponse>(
+      page,
+      "/instructors/4/schedules",
+    );
+    const unrelatedAfter = await backend<SchedulesResponse>(
+      page,
+      "/instructors/5/schedules",
+    );
+    expect(after.data).toHaveLength(before.data.length + 1);
+    expect(
+      after.data.find((schedule) => schedule.id === previouslyActive!.id)
+        ?.effectiveTo,
+    ).toContain(effectiveFrom);
+    expect(
+      after.data.find((schedule) => schedule.effectiveTo === null)
+        ?.effectiveFrom,
+    ).toContain(effectiveFrom);
+    expect(unrelatedAfter.data).toEqual(unrelatedBefore.data);
     await page.reload();
     await expect(page.getByText("スケジュール期間 (日本時間)")).toBeVisible();
     await context.close();
