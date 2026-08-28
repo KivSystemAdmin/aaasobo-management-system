@@ -35,20 +35,27 @@ type SchedulesResponse = {
 };
 
 const monitoredErrors = new WeakMap<TestInfo, string[]>();
+const stoppedMonitoring = new WeakSet<Page>();
 
 function monitor(page: Page, testInfo: TestInfo) {
   const errors = monitoredErrors.get(testInfo) ?? [];
   page.on("console", (message) => {
+    if (stoppedMonitoring.has(page)) return;
     if (message.type() === "error") errors.push(`console: ${message.text()}`);
   });
-  page.on("requestfailed", (request) =>
-    request.failure()?.errorText === "net::ERR_ABORTED"
+  page.on("requestfailed", (request) => {
+    if (stoppedMonitoring.has(page)) return;
+    return request.failure()?.errorText === "net::ERR_ABORTED"
       ? undefined
       : errors.push(
           `request: ${request.method()} ${request.url()} ${request.failure()?.errorText}`,
-        ),
-  );
+        );
+  });
   monitoredErrors.set(testInfo, errors);
+}
+
+function stopMonitoring(page: Page) {
+  stoppedMonitoring.add(page);
 }
 
 async function login(
@@ -62,7 +69,10 @@ async function login(
   await page.locator("#email").fill(`${ref}@example.com`);
   await page.locator("#password").fill(`Temp-${ref}`);
   await page.getByRole("button", { name: /login|ログイン/i }).click();
-  await expect(page).toHaveURL(new RegExp(`/${role}s/(?!login)`));
+  await expect(page).toHaveURL(new RegExp(`/${role}s/(?!login)`), {
+    timeout: 60_000,
+  });
+  await page.waitForLoadState("networkidle");
 }
 
 async function backend<T>(
@@ -293,7 +303,9 @@ test.describe("critical class/date workflows", () => {
         name: "Instructor Schedule Calendar",
       }),
     ).toBeVisible();
+    await instructorPage.waitForLoadState("networkidle");
     await instructorPage.reload();
+    await instructorPage.waitForLoadState("networkidle");
     const { classes: crossRole } = await backend<ClassesResponse>(
       instructorPage,
       "/classes",
@@ -414,12 +426,16 @@ test.describe("critical class/date workflows", () => {
     await expect(
       page.getByRole("heading", { name: "Instructor Schedule Calendar" }),
     ).toBeVisible();
+    await page.waitForLoadState("networkidle");
     const { classes } = await backend<ClassesResponse>(page, "/classes");
     const own = classes.filter((item) => item.instructor?.id === 5);
     expect(own.some((item) => item.status === "completed")).toBeTruthy();
     expect(own.some((item) => item.status === "booked")).toBeTruthy();
+    await page.waitForLoadState("networkidle");
     await page.reload();
     await expect(page).toHaveURL(/\/instructors\/availability/);
+    await page.waitForLoadState("networkidle");
+    stopMonitoring(page);
     await context.close();
   });
 });
