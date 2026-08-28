@@ -43,11 +43,11 @@ import {
   createDatesBetween,
   days,
   formatYearDateTime,
-  getFirstDateInMonths,
+  getJstMonthRange,
   getMonthNumber,
   isSameLocalDate,
   nHoursBefore,
-  toDateKey,
+  toJstDateKey,
 } from "../utils/dateUtils";
 import { getInstructorContactById } from "../services/instructorsService";
 import { getCustomerContactById } from "../services/customersService";
@@ -539,10 +539,10 @@ export const createClassesForMonthController = async (
         // First date of the given month
         const monthNum = getMonthNumber(month);
         if (monthNum === -1) throw new Error("Invalid month");
-        const firstDateOfMonth = new Date(Date.UTC(year, monthNum, 1));
-
-        // Define until when schedule should be created
-        const until = getFirstDateInMonths(firstDateOfMonth, 1);
+        const { start: firstDateOfMonth, end: until } = getJstMonthRange(
+          year,
+          monthNum,
+        );
 
         // Get valid recurring classes.
         const recurringClasses = await getValidRecurringClasses(
@@ -598,23 +598,20 @@ export const createClassesForMonthController = async (
           ),
         );
 
-        // TEMP: Adjust timezone. Remove once timezone handling is fixed.
         const absenceSet = new Set(
           instructorAbsences.map(
             (absence) =>
-              `${absence.instructorId}-${new Date(
-                absence.absentAt.getTime() + 9 * 60 * 60 * 1000,
-              ).toISOString()}`,
+              `${absence.instructorId}-${absence.absentAt.toISOString()}`,
           ),
         );
 
         const noClassSet = new Set(
-          noClasses.map((schedule) => toDateKey(new Date(schedule.date!))),
+          noClasses.map((schedule) => schedule.date.toISOString().slice(0, 10)),
         );
 
         const rebookableSet = new Set(
           rebookableNoClasses.map((schedule) =>
-            toDateKey(new Date(schedule.date!)),
+            schedule.date.toISOString().slice(0, 10),
           ),
         );
 
@@ -672,7 +669,7 @@ export const createClassesForMonthController = async (
 
             // Exclude the no class.
             filtered = filtered.filter(
-              (date) => !noClassSet.has(toDateKey(date)),
+              (date) => !noClassSet.has(toJstDateKey(date)),
             );
 
             if (filtered.length === 0) return;
@@ -702,7 +699,7 @@ export const createClassesForMonthController = async (
                 );
 
                 const isRebookableNoClass = rebookableSet.has(
-                  toDateKey(createdClass.dateTime),
+                  toJstDateKey(createdClass.dateTime),
                 );
 
                 if (isInstructorAbsent) {

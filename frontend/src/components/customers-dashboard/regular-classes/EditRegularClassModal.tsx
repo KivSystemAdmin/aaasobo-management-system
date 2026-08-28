@@ -17,6 +17,7 @@ import {
 import { EDIT_REGULAR_CLASS_MESSAGES } from "@/lib/messages/customerDashboard";
 import styles from "./EditRegularClassModal.module.scss";
 import { useCustomerTimeZone } from "@/contexts/CustomerTimeZoneContext";
+import { getTodayInJapanISODate } from "@/lib/utils/dateUtils";
 
 const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -85,9 +86,10 @@ export default function EditRegularClassModal({
     if (!isOpen) return;
 
     // Set minimum date to one week from today
-    const today = new Date();
-    const oneWeekFromNow = new Date(today);
-    oneWeekFromNow.setDate(today.getDate() + 7);
+    const oneWeekFromNow = new Date(
+      `${getTodayInJapanISODate()}T00:00:00.000Z`,
+    );
+    oneWeekFromNow.setUTCDate(oneWeekFromNow.getUTCDate() + 7);
     const minDateString = oneWeekFromNow.toISOString().split("T")[0];
     setMinDate(minDateString);
     setStartDate(minDateString);

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import request from "supertest";
 import { server } from "../../server";
 import { prisma } from "../setup";
@@ -40,6 +40,10 @@ const ensureInstructorSlotAt = async (instructorId: number, dateTime: Date) => {
     new Date(`1970-01-01T${jstHour}:${jstMinute}:00.000Z`),
   );
 };
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 describe("GET /classes", () => {
   it("succeed returning classes summary for authenticated user", async () => {
@@ -167,6 +171,74 @@ describe("DELETE /classes/:id", () => {
 });
 
 describe("POST /classes/:id/rebook", () => {
+  it.each([
+    ["regular", "2026-01-07T23:59:59.999Z", 201],
+    ["regular", "2026-01-08T00:00:00.000Z", 201],
+    ["regular", "2026-01-08T00:00:00.001Z", 403],
+    ["freeTrial", "2026-01-07T23:59:59.999Z", 201],
+    ["freeTrial", "2026-01-08T00:00:00.000Z", 201],
+    ["freeTrial", "2026-01-08T00:00:00.001Z", 403],
+  ])(
+    "enforces the %s cutoff at frozen time %s",
+    async (bookingType, systemTime, expectedStatus) => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(new Date(systemTime));
+
+      const admin = await createAdmin();
+      const customer = await createCustomer();
+      const instructor = await createInstructor();
+      const child = await createChild(customer.id);
+      const targetDate = new Date(
+        bookingType === "freeTrial"
+          ? "2026-01-11T00:00:00.000Z"
+          : "2026-01-08T03:00:00.000Z",
+      );
+      await ensureInstructorSlotAt(instructor.id, targetDate);
+
+      const classOverrides: Parameters<typeof createClass>[3] = {
+        isFreeTrial: bookingType === "freeTrial",
+        rebookableUntil: new Date("2026-12-31T00:00:00.000Z"),
+      };
+      if (bookingType === "regular") {
+        const plan = await createPlan();
+        const subscription = await createSubscription(plan.id, customer.id, {
+          startAt: new Date("2025-01-01T00:00:00.000Z"),
+          endAt: null,
+        });
+        const recurringClass = await prisma.recurringClass.create({
+          data: {
+            instructorId: instructor.id,
+            subscriptionId: subscription.id,
+            startAt: new Date("2025-01-01T00:00:00.000Z"),
+          },
+        });
+        classOverrides.subscriptionId = subscription.id;
+        classOverrides.recurringClassId = recurringClass.id;
+      }
+      const originalClass = await createClass(
+        customer.id,
+        instructor.id,
+        new Date("2026-01-01T00:00:00.000Z"),
+        classOverrides,
+      );
+
+      const response = await request(server)
+        .post(`/classes/${originalClass.id}/rebook`)
+        .set("Cookie", await generateAuthCookie(admin.id, "admin"))
+        .send({
+          dateTime: targetDate.toISOString(),
+          instructorId: instructor.id,
+          customerId: customer.id,
+          childrenIds: [child.id],
+        });
+
+      expect(response.status).toBe(expectedStatus);
+      if (expectedStatus === 403) {
+        expect(response.body.errorType).toBe("past rebooking deadline");
+      }
+    },
+  );
+
   it("succeed rebooking a free trial class", async () => {
     const admin = await createAdmin();
     const customer = await createCustomer();
@@ -485,6 +557,53 @@ describe("PATCH /classes/:id/status", () => {
 });
 
 describe("POST /classes/create-classes", () => {
+  it("includes pre-09:00 JST month boundaries and is duplicate safe", async () => {
+    const admin = await createAdmin();
+    const customer = await createCustomer();
+    const instructor = await createInstructor();
+    const child = await createChild(customer.id);
+    const plan = await createPlan();
+    const subscription = await createSubscription(plan.id, customer.id, {
+      startAt: new Date("2025-12-01T00:00:00.000Z"),
+      endAt: null,
+    });
+    const recurringClass = await prisma.recurringClass.create({
+      data: {
+        instructorId: instructor.id,
+        subscriptionId: subscription.id,
+        // Thursday, January 1 at 00:30 JST.
+        startAt: new Date("2025-12-31T15:30:00.000Z"),
+        recurringClassAttendance: { create: { childrenId: child.id } },
+      },
+    });
+    await createInstructorAbsence(
+      instructor.id,
+      new Date("2026-01-07T15:30:00.000Z"),
+    );
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      await request(server)
+        .post("/classes/create-classes")
+        .set("Cookie", authCookie)
+        .send({ year: 2026, month: "January" })
+        .expect(201);
+    }
+
+    const created = await prisma.class.findMany({
+      where: { recurringClassId: recurringClass.id },
+      orderBy: { dateTime: "asc" },
+    });
+    expect(created.map((item) => item.dateTime?.toISOString())).toEqual([
+      "2025-12-31T15:30:00.000Z",
+      "2026-01-07T15:30:00.000Z",
+      "2026-01-14T15:30:00.000Z",
+      "2026-01-21T15:30:00.000Z",
+      "2026-01-28T15:30:00.000Z",
+    ]);
+    expect(created[1].status).toBe("canceledByInstructor");
+  });
+
   it("succeed generating classes for month", async () => {
     const admin = await createAdmin();
     const customer = await createCustomer();

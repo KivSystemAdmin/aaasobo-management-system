@@ -2,6 +2,7 @@ type Day = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 
 export const days: Day[] = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export const JAPAN_TIME_DIFF = 9;
+const HOURS_IN_MILLISECONDS = 60 * 60 * 1000;
 
 type Month =
   | "January"
@@ -32,12 +33,34 @@ const months: Month[] = [
   "December",
 ];
 
-// Get the first Date of the month after `months` months from `date`.
-export function getFirstDateInMonths(date: Date, months: number): Date {
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth();
-  const d = new Date(Date.UTC(year, month + months, 1));
-  return d;
+/** Return the UTC instants bounding a calendar month in JST. */
+export function getJstMonthRange(
+  year: number,
+  month: number,
+): {
+  start: Date;
+  end: Date;
+} {
+  return {
+    start: new Date(
+      Date.UTC(year, month, 1) - JAPAN_TIME_DIFF * HOURS_IN_MILLISECONDS,
+    ),
+    end: new Date(
+      Date.UTC(year, month + 1, 1) - JAPAN_TIME_DIFF * HOURS_IN_MILLISECONDS,
+    ),
+  };
+}
+
+/** Return YYYY-MM-DD for an instant as observed in Asia/Tokyo. */
+export function toJstDateKey(date: Date): string {
+  return new Date(date.getTime() + JAPAN_TIME_DIFF * HOURS_IN_MILLISECONDS)
+    .toISOString()
+    .slice(0, 10);
+}
+
+/** Encode the current JST calendar date as a UTC-midnight date-only value. */
+export function getJstDateAtUtcMidnight(date: Date = new Date()): Date {
+  return new Date(`${toJstDateKey(date)}T00:00:00.000Z`);
 }
 
 // Generate the data between `start` and `end` dates including `end`.
@@ -222,6 +245,3 @@ export function convertToUTCDate(date: Date, timezoneFrom: string): Date {
       return date;
   }
 }
-
-// Extract only the date (e.g., "2026-05-21")
-export const toDateKey = (d: Date) => d.toISOString().split("T")[0];

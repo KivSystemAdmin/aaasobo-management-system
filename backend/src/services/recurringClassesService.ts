@@ -1,6 +1,11 @@
 import { prisma } from "../../prisma/prismaClient";
 import { Prisma, RecurringClass, Class } from "@prisma/client";
-import { JAPAN_TIME_DIFF, nDaysLater, nHoursBefore } from "../utils/dateUtils";
+import {
+  getJstDateAtUtcMidnight,
+  JAPAN_TIME_DIFF,
+  nDaysLater,
+  nHoursBefore,
+} from "../utils/dateUtils";
 import {
   NO_CLASS_EVENT_NAME,
   REBOOKABLE_NO_CLASS_EVENT_NAME,
@@ -61,12 +66,7 @@ function getNextWeekdayOccurrence(
 
   const currentWeekday = result.getUTCDay();
   const daysUntilTarget = (targetWeekday - currentWeekday + 7) % 7;
-
-  if (daysUntilTarget === 0 && result.getUTCHours() >= hours) {
-    result.setUTCDate(result.getUTCDate() + 7);
-  } else {
-    result.setUTCDate(result.getUTCDate() + daysUntilTarget);
-  }
+  result.setUTCDate(result.getUTCDate() + daysUntilTarget);
 
   result.setUTCHours(hours - JAPAN_TIME_DIFF, minutes, 0, 0);
 
@@ -89,7 +89,7 @@ async function conflictingRegularClassExists(
       SELECT 1
       FROM "RecurringClass"
       WHERE "instructorId" = ${instructorId}
-        AND ("endAt" >= ${startDate} OR "endAt" IS NULL)
+        AND ("endAt" > ${startDate} OR "endAt" IS NULL)
         AND EXTRACT(DOW FROM (("startAt" AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Tokyo')) = ${weekday}
         AND EXTRACT(HOUR FROM (("startAt" AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Tokyo')) = ${requestedHours}
         AND EXTRACT(MINUTE FROM (("startAt" AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Tokyo')) = ${requestedMinutes}
@@ -159,7 +159,7 @@ async function findAvailableInstructorSlot(
       schedule: {
         instructorId,
         effectiveFrom: { lte: effectiveDate },
-        effectiveTo: null,
+        OR: [{ effectiveTo: null }, { effectiveTo: { gt: effectiveDate } }],
       },
     },
     include: {
@@ -202,25 +202,25 @@ async function createRecurringClass(
     throw new Error("Instructor is not available at the requested time slot");
   }
 
-  // Check for conflicting regular classes
-  const hasConflict = await conflictingRegularClassExists(
-    tx,
-    instructorId,
-    weekday,
-    startTime,
-    startDateObj,
-  );
-
-  if (hasConflict) {
-    throw new Error("Regular class already exists at this time slot");
-  }
-
   // Calculate first occurrence for startAt
   const firstOccurrence = getNextWeekdayOccurrence(
     startDateObj,
     weekday,
     startTime,
   );
+
+  // Check for conflicting regular classes
+  const hasConflict = await conflictingRegularClassExists(
+    tx,
+    instructorId,
+    weekday,
+    startTime,
+    firstOccurrence,
+  );
+
+  if (hasConflict) {
+    throw new Error("Regular class already exists at this time slot");
+  }
 
   const recurringClass = await tx.recurringClass.create({
     data: {
@@ -537,8 +537,7 @@ export const updateRegularClass = async (params: UpdateRegularClassParams) => {
 
     // Validate that the start date is at least one week from now
     const startDateObj = new Date(startDate);
-    const inOneWeek = nDaysLater(7);
-    inOneWeek.setUTCHours(0, 0, 0, 0);
+    const inOneWeek = nDaysLater(7, getJstDateAtUtcMidnight());
     if (startDateObj < inOneWeek) {
       throw new Error("Start date must be at least one week from today");
     }

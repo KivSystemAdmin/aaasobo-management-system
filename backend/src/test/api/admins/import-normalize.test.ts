@@ -779,12 +779,12 @@ describe("POST /admins/import/execute", () => {
       ",/images/default-user-icon.jpg?id=in0001,",
     );
     expect(generated.rows["customers.csv"]).toHaveLength(50);
-    expect(generated.rows["children.csv"]).toHaveLength(55);
+    expect(generated.rows["children.csv"]).toHaveLength(60);
     expect(generated.rows["subscriptions.csv"]).toHaveLength(50);
-    expect(generated.rows["recurring_classes.csv"]).toHaveLength(55);
-    expect(generated.rows["recurring_class_attendance.csv"]).toHaveLength(65);
-    expect(generated.rows["classes.csv"]).toHaveLength(55);
-    expect(generated.rows["class_attendance.csv"]).toHaveLength(65);
+    expect(generated.rows["recurring_classes.csv"]).toHaveLength(60);
+    expect(generated.rows["recurring_class_attendance.csv"]).toHaveLength(80);
+    expect(generated.rows["classes.csv"]).toHaveLength(60);
+    expect(generated.rows["class_attendance.csv"]).toHaveLength(80);
     expect(generated.rows["instructor_schedules.csv"]).toHaveLength(77);
   });
 

@@ -13,6 +13,7 @@ const FAKER_SEED = 20250301;
 
 const DEFAULT_INSTRUCTOR_COUNT = 10;
 const CUSTOMERS_PER_INSTRUCTOR = 10;
+const CHILDREN_PER_INSTRUCTOR = 12;
 const DEFAULT_DUMMY_INSTRUCTOR_ICON = "/images/default-user-icon.jpg";
 
 const PATTERN_A_SLOTS: SlotDef[] = buildPatternSlots(
@@ -824,7 +825,8 @@ export async function generateNormalizedImportFixture(
     throw new Error("instructorCount must be a positive integer");
   }
   const customerCount = instructorCount * CUSTOMERS_PER_INSTRUCTOR;
-  const singleChildCustomerCount = customerCount - instructorCount;
+  const singleChildCustomerCount =
+    customerCount * 2 - instructorCount * CHILDREN_PER_INSTRUCTOR;
 
   const { fakerEN_US, fakerJA } = (await import("@faker-js/faker")) as {
     fakerEN_US: FakerLike;
