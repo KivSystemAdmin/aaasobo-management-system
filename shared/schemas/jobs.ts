@@ -3,6 +3,7 @@ import { z } from "zod";
 // Request body schemas
 export const UpdateSundayColorRequest = z.object({
   eventId: z.number().int().positive("Event ID must be a positive integer"),
+  year: z.number().int().min(2000).max(2100).optional(),
 });
 
 // Response schemas
@@ -21,6 +22,12 @@ export const UpdateSystemStatusResponse = z.object({
 
 export const UpdateSundayColorResponse = z.object({
   message: z.string().describe("Whether the operation was successful"),
+  year: z.number().int().describe("Year whose Sundays were processed"),
+  createdCount: z
+    .number()
+    .int()
+    .nonnegative()
+    .describe("Number of schedules created"),
 });
 
 export const MaskInstructorsResponse = z.array(

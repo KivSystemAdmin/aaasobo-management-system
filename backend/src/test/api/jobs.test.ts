@@ -21,14 +21,13 @@ function cronAuthHeader() {
   return `Bearer ${process.env.CRON_SECRET}`;
 }
 
-function listAllSundaysOfNextYear(now: Date): string[] {
-  const nextYear = now.getFullYear() + 1;
-  const firstSunday = getFirstDesignatedDayOfYear(nextYear, "Sun");
+function listAllSundaysOfYear(year: number): string[] {
+  const firstSunday = getFirstDesignatedDayOfYear(year, "Sun");
   const dates: string[] = [];
 
   for (
     let d = new Date(firstSunday);
-    d.getFullYear() === nextYear;
+    d.getFullYear() === year;
     d = new Date(d.setDate(d.getDate() + 7))
   ) {
     dates.push(convertToISOString(d.toISOString().split("T")[0]));
@@ -112,9 +111,11 @@ describe("/jobs", () => {
 
       expect(response.body).toEqual({
         message: "Sunday colors updated successfully.",
+        year: 2026,
+        createdCount: 52,
       });
 
-      const expectedDates = listAllSundaysOfNextYear(new Date());
+      const expectedDates = listAllSundaysOfYear(2026);
       const schedules = await prisma.schedule.findMany({
         where: { eventId: event.id },
         orderBy: { date: "asc" },
@@ -123,6 +124,97 @@ describe("/jobs", () => {
       expect(schedules).toHaveLength(expectedDates.length);
       expect(schedules[0].date.toISOString()).toBe(expectedDates[0]);
       expect(schedules.at(-1)?.date.toISOString()).toBe(expectedDates.at(-1));
+    });
+
+    it("creates Sunday schedules for an explicitly requested year", async () => {
+      const event = await createEvent();
+
+      const response = await request(server)
+        .post("/jobs/business-schedule/update-sunday-color")
+        .set("Authorization", cronAuthHeader())
+        .send({ eventId: event.id, year: 2026 })
+        .expect(200);
+
+      const expectedDates = listAllSundaysOfYear(2026);
+      expect(response.body).toEqual({
+        message: "Sunday colors updated successfully.",
+        year: 2026,
+        createdCount: expectedDates.length,
+      });
+
+      const schedules = await prisma.schedule.findMany({
+        where: { eventId: event.id },
+        orderBy: { date: "asc" },
+      });
+      expect(schedules.map(({ date }) => date.toISOString())).toEqual(
+        expectedDates,
+      );
+    });
+
+    it.each([1999, 2101, 2026.5, "2026"])(
+      "rejects invalid year %s",
+      async (year) => {
+        const event = await createEvent();
+
+        const response = await request(server)
+          .post("/jobs/business-schedule/update-sunday-color")
+          .set("Authorization", cronAuthHeader())
+          .send({ eventId: event.id, year })
+          .expect(400);
+
+        expect(response.body.message).toBe("Validation failed");
+        expect(await prisma.schedule.count()).toBe(0);
+      },
+    );
+
+    it("does not create duplicate Sunday schedules when rerun", async () => {
+      const event = await createEvent();
+      const sendRequest = () =>
+        request(server)
+          .post("/jobs/business-schedule/update-sunday-color")
+          .set("Authorization", cronAuthHeader())
+          .send({ eventId: event.id, year: 2026 });
+
+      const firstResponse = await sendRequest().expect(200);
+      const secondResponse = await sendRequest().expect(200);
+
+      expect(firstResponse.body.createdCount).toBe(52);
+      expect(secondResponse.body).toEqual({
+        message: "Sunday colors updated successfully.",
+        year: 2026,
+        createdCount: 0,
+      });
+      expect(await prisma.schedule.count()).toBe(52);
+    });
+
+    it("does not overwrite an existing event on a Sunday", async () => {
+      const sundayEvent = await createEvent({
+        name: "Existing Sunday event",
+        color: "#123456",
+      });
+      const holidayEvent = await createEvent({
+        name: "No Class",
+        color: "#654321",
+      });
+      const existingSunday = listAllSundaysOfYear(2026)[0];
+      await prisma.schedule.create({
+        data: { date: existingSunday, eventId: sundayEvent.id },
+      });
+
+      const response = await request(server)
+        .post("/jobs/business-schedule/update-sunday-color")
+        .set("Authorization", cronAuthHeader())
+        .send({ eventId: holidayEvent.id, year: 2026 })
+        .expect(200);
+
+      expect(response.body.createdCount).toBe(51);
+      const preservedSchedule = await prisma.schedule.findUnique({
+        where: { date: existingSunday },
+      });
+      expect(preservedSchedule?.eventId).toBe(sundayEvent.id);
+      expect(
+        await prisma.schedule.count({ where: { eventId: holidayEvent.id } }),
+      ).toBe(51);
     });
 
     it("return 401 when cron auth is missing", async () => {

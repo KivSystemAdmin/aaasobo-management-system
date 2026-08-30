@@ -68,16 +68,16 @@ const validatedRouteConfigs = {
       middleware: [verifyCronJobAuthorization],
       handler: updateSundayColorController,
       openapi: {
-        summary: "Update Sunday color for next year",
+        summary: "Update Sunday color for a year",
         description:
-          "Updates all Sundays in the next year with the specified event color. This is a scheduled cron job endpoint.",
+          "Updates all Sundays in the specified year, or the next year when omitted, with the specified event color. This is a scheduled cron job endpoint.",
         responses: {
           "200": {
             description: "Sunday colors updated successfully",
             schema: UpdateSundayColorResponse,
           },
           "400": {
-            description: "Invalid event ID",
+            description: "Invalid event ID or year",
             schema: MessageErrorResponse,
           },
           "500": {
