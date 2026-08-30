@@ -1,5 +1,6 @@
 import { GENERAL_ERROR_MESSAGE } from "../messages/formValidation";
 import { holidayEventId } from "../data/data";
+import type { UpdateSundayColorResponse } from "@shared/schemas/jobs";
 
 const BACKEND_ORIGIN =
   process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:4000";
@@ -44,10 +45,20 @@ export const updateBusinessSchedule = async (
   }
 };
 
-// Update next year's all Sunday's color (Only for Vercel cron job)
+export class SundayColorUpdateError extends Error {
+  constructor(
+    public readonly status: number,
+    public readonly responseBody: unknown,
+  ) {
+    super("Failed to update Sunday colors");
+  }
+}
+
+// Update all Sundays in the requested year, or next year by default
 export const updateSundayColor = async (
   authorization: string,
-): Promise<string> => {
+  year?: number,
+): Promise<UpdateSundayColorResponse> => {
   try {
     // From server component
     // Define the item to be sent to the server side.
@@ -59,6 +70,7 @@ export const updateSundayColor = async (
     };
     const body = JSON.stringify({
       eventId: holidayEventId,
+      year,
     });
     const response = await fetch(apiURL, {
       method,
@@ -68,14 +80,17 @@ export const updateSundayColor = async (
 
     const data = await response.json();
 
-    if (response.status !== 200) {
-      return data.error;
+    if (!response.ok) {
+      throw new SundayColorUpdateError(response.status, data);
     }
 
     return data;
   } catch (error) {
     console.error("API error while updating Sunday color:", error);
-    return GENERAL_ERROR_MESSAGE;
+    if (error instanceof SundayColorUpdateError) {
+      throw error;
+    }
+    throw new Error(GENERAL_ERROR_MESSAGE, { cause: error });
   }
 };
 

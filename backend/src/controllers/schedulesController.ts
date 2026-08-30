@@ -84,28 +84,25 @@ export const updateBusinessScheduleController = async (
   }
 };
 
-// Update next year's all Sunday's color
+// Register an event for every Sunday in the requested year, or next year by default
 export const updateSundayColorController = async (
   req: RequestWithBody<UpdateSundayColorRequest>,
   res: Response,
 ) => {
-  const { eventId } = req.body;
+  const { eventId, year } = req.body;
 
   try {
     // Create date & data list to be sent to the service layer
     const dateList = [];
 
-    // Get the current year and next year
-    const currentYear = new Date().getFullYear();
-    const nextYear = currentYear + 1;
+    const targetYear = year ?? new Date().getFullYear() + 1;
 
-    // Get the first Sunday of the next year
-    const firstSunday = getFirstDesignatedDayOfYear(nextYear, "Sun");
+    const firstSunday = getFirstDesignatedDayOfYear(targetYear, "Sun");
 
-    // Generate all Sundays of the next year
+    // Generate all Sundays of the target year
     for (
       let d = new Date(firstSunday);
-      d.getFullYear() === nextYear;
+      d.getFullYear() === targetYear;
       d = new Date(d.setDate(d.getDate() + 7))
     ) {
       dateList.push(convertToISOString(d.toISOString().split("T")[0]));
@@ -125,7 +122,11 @@ export const updateSundayColorController = async (
       });
     }
 
-    res.status(200).json({ message: "Sunday colors updated successfully." });
+    res.status(200).json({
+      message: "Sunday colors updated successfully.",
+      year: targetYear,
+      createdCount: result.count,
+    });
   } catch (error) {
     res.status(500).json({ message: `${error}` });
   }

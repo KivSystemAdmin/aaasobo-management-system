@@ -47,11 +47,12 @@ else
 fi
 
 today_jst="$(TZ=Asia/Tokyo date +%F)"
+yesterday_jst="$(TZ=Asia/Tokyo date -d "$today_jst - 1 day" +%F)"
 from_jst="$(TZ=Asia/Tokyo date -d "$today_jst - 3 months" +%F)"
 to_jst="$(TZ=Asia/Tokyo date -d "$today_jst + 7 months" +%F)"
 export E2E_FIXTURE_ZIP="$fixture_dir/normalized-import-${from_jst}_to_${to_jst}.zip"
 rm -rf "$fixture_dir"/*
-(cd "$repo_dir/backend" && npm run fixture:generate:normalized-import -- --from "$from_jst" --completed-until "$today_jst" --to "$to_jst" --instructors 10 --out-dir "$fixture_dir")
+(cd "$repo_dir/backend" && npm run fixture:generate:normalized-import -- --from "$from_jst" --completed-until "$yesterday_jst" --to "$to_jst" --instructors 10 --out-dir "$fixture_dir")
 
 if [[ "$e2e_target" == "local" ]]; then
   (cd "$repo_dir/backend" && npx prisma generate && npx prisma migrate deploy && npm run db:bootstrap)
