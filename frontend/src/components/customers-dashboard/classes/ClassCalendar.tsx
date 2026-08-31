@@ -72,7 +72,7 @@ export default async function ClassCalendar({
         userSessionType={userSessionType}
       />
 
-      {!hasSeenWelcomeModal && (
+      {userSessionType === "customer" && !hasSeenWelcomeModal && (
         <WelcomeModalController
           userSessionType={userSessionType}
           customerId={customerId}

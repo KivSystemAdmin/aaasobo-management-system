@@ -230,11 +230,7 @@ export default function DashboardClient({
             <form onSubmit={submitMessage} className={styles.messageForm}>
               <div className={styles.segmentedControl}>
                 {(
-                  [
-                    MessageTarget.customer,
-                    MessageTarget.instructor,
-                    MessageTarget.both,
-                  ] as const
+                  [MessageTarget.customer, MessageTarget.instructor] as const
                 ).map((option) => (
                   <button
                     key={option}

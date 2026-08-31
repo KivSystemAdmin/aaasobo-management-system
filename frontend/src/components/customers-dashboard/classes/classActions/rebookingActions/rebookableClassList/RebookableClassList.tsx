@@ -117,6 +117,11 @@ export default function RebookableClassList({
               <>
                 {bookableDateTime}
                 {isFreeTrial && (
+                  <span className={styles.listItem__freeTrialBadge}>
+                    {language === "ja" ? "無料トライアル" : "Free Trial"}
+                  </span>
+                )}
+                {isFreeTrial && (
                   <p className={styles.listItem__declineClass}>
                     {language === "ja"
                       ? "※ 無料トライアルが不要な方は、"
@@ -138,15 +143,6 @@ export default function RebookableClassList({
                   </p>
                 )}
               </>
-            </div>
-            <div className={styles.listItem__classId}>
-              <p>{classItem.classCode}</p>
-              {isFreeTrial &&
-                (language === "ja" ? (
-                  <span>無料トライアル</span>
-                ) : (
-                  <span>Free Trial</span>
-                ))}
             </div>
             <div className={styles.listItem__button}>
               <ActionButton

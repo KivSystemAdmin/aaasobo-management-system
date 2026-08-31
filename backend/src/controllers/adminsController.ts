@@ -1164,6 +1164,7 @@ export const getClassesWithinPeriodController = async (
     const classes = await getClassesWithinPeriod(
       designatedPeriodBefore,
       designatedPeriodAfter,
+      !shouldFetchTodayOnly,
     );
 
     // Transform the data structure.
@@ -1239,7 +1240,7 @@ export const getClassesWithinPeriodController = async (
       return {
         No: number + 1,
         ID: id,
-        "Date/Time (JST)": date ? `${date} ${time}` : "Not Set",
+        "Date/Time (JST)": dateTime ? `${date} ${time}` : "Not Set",
         Day: dayOfWeekStr,
         Instructor: instructorName,
         InstructorID: instructor?.id ?? null,

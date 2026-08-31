@@ -62,6 +62,11 @@ export function getLinks(
       icon: HomeModernIcon,
     },
     {
+      name: "カスタマーリスト",
+      href: "/admins/enrollment-status",
+      icon: ClipboardDocumentCheckIcon,
+    },
+    {
       name: "クラスカレンダー",
       href: "/admins/calendar",
       icon: CalendarDaysIcon,
@@ -70,16 +75,6 @@ export function getLinks(
       name: "クラスリスト",
       href: "/admins/class-list",
       icon: ClipboardDocumentListIcon,
-    },
-    {
-      name: "お客さまリスト",
-      href: "/admins/customer-list",
-      icon: UsersIcon,
-    },
-    {
-      name: "受講リスト",
-      href: "/admins/enrollment-status",
-      icon: ClipboardDocumentCheckIcon,
     },
     {
       name: "インストラクター\nリスト",

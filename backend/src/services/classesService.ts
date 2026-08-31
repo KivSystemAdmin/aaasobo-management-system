@@ -125,15 +125,18 @@ export const getAllClasses = async () => {
 export const getClassesWithinPeriod = async (
   startDate: Date,
   endDate: Date,
+  includeUnscheduled = false,
 ) => {
   try {
     const classes: AdminClassPeriodListItem[] = await prisma.class.findMany({
-      where: {
-        dateTime: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
+      where: includeUnscheduled
+        ? {
+            OR: [
+              { dateTime: { gte: startDate, lte: endDate } },
+              { dateTime: null },
+            ],
+          }
+        : { dateTime: { gte: startDate, lte: endDate } },
       select: {
         id: true,
         dateTime: true,
@@ -163,7 +166,10 @@ export const getClassesWithinPeriod = async (
           },
         },
       },
-      orderBy: { dateTime: "asc" },
+      orderBy: [
+        { instructorId: { sort: "asc", nulls: "last" } },
+        { dateTime: { sort: "asc", nulls: "last" } },
+      ],
     });
 
     return classes;

@@ -8,6 +8,7 @@ import {
   createClass,
   generateAuthCookie,
 } from "../../testUtils";
+import { getJstDayRange } from "../../../utils/dateUtils";
 
 describe("GET /admins/class-list", () => {
   it("succeed with multiple classes", async () => {
@@ -77,5 +78,94 @@ describe("GET /admins/class-list", () => {
         "Canceled At": null,
       },
     ]);
+  });
+
+  it("returns only today's JST classes when today=true", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+    const customer = await createCustomer();
+    const firstInstructor = await createInstructor();
+    const secondInstructor = await createInstructor();
+    const { startOfDay, endOfDay } = getJstDayRange(new Date());
+
+    const secondInstructorClass = await createClass(
+      customer.id,
+      secondInstructor.id,
+      new Date(startOfDay.getTime() + 60_000),
+    );
+    const firstInstructorClass = await createClass(
+      customer.id,
+      firstInstructor.id,
+      new Date(startOfDay.getTime() + 120_000),
+    );
+    await createClass(
+      customer.id,
+      firstInstructor.id,
+      new Date(startOfDay.getTime() - 1),
+    );
+    await createClass(
+      customer.id,
+      firstInstructor.id,
+      new Date(endOfDay.getTime() + 1),
+    );
+    await createClass(customer.id);
+
+    const response = await request(server)
+      .get("/admins/class-list?today=true")
+      .set("Cookie", authCookie)
+      .expect(200);
+
+    expect(response.body.data.map(({ ID }: { ID: number }) => ID)).toEqual([
+      firstInstructorClass.id,
+      secondInstructorClass.id,
+    ]);
+  });
+
+  it("sorts by instructor ID and class time with null values last", async () => {
+    const admin = await createAdmin();
+    const authCookie = await generateAuthCookie(admin.id, "admin");
+    const customer = await createCustomer();
+    const firstInstructor = await createInstructor();
+    const secondInstructor = await createInstructor();
+    const baseTime = Date.now() + 24 * 60 * 60 * 1000;
+
+    const secondInstructorClass = await createClass(
+      customer.id,
+      secondInstructor.id,
+      new Date(baseTime),
+    );
+    const firstInstructorLaterClass = await createClass(
+      customer.id,
+      firstInstructor.id,
+      new Date(baseTime + 60_000),
+    );
+    const firstInstructorEarlierClass = await createClass(
+      customer.id,
+      firstInstructor.id,
+      new Date(baseTime - 60_000),
+    );
+    const unassignedScheduledClass = await createClass(
+      customer.id,
+      undefined,
+      new Date(baseTime - 120_000),
+    );
+    const unassignedUnscheduledClass = await createClass(customer.id);
+
+    const response = await request(server)
+      .get("/admins/class-list?today=false")
+      .set("Cookie", authCookie)
+      .expect(200);
+
+    expect(response.body.data.map(({ ID }: { ID: number }) => ID)).toEqual([
+      firstInstructorEarlierClass.id,
+      firstInstructorLaterClass.id,
+      secondInstructorClass.id,
+      unassignedScheduledClass.id,
+      unassignedUnscheduledClass.id,
+    ]);
+    expect(response.body.data.at(-1)).toMatchObject({
+      InstructorID: null,
+      "Date/Time (JST)": "Not Set",
+    });
   });
 });

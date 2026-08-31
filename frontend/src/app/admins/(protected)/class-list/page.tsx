@@ -14,6 +14,7 @@ export default async function Page(props: {
   // Define table configuration
   const listType = "Class List";
   const omitItems = [
+    "No",
     "ID",
     "InstructorID",
     "CustomerID",
@@ -38,9 +39,18 @@ export default async function Page(props: {
   }; // Set the item name labels for the table
   const userType = "admin"; // Set the user type for the registration form (It's not used in this page, but kept for consistency)
   const addButton: [boolean, string] = [true, ""]; // Enable the add button and set the button text
-  const isFilterActive = searchParams.today === "true"; // Determine if the filter is active based on the search parameter
+  const isFilterActive = searchParams.today !== "false"; // Today's classes are the default view.
   const filterHref = "/admins/class-list?today=true"; // URL to apply the filter
-  const clearFilterHref = "/admins/class-list"; // URL to clear the filter
+  const clearFilterHref = "/admins/class-list?today=false"; // URL to show the bounded all-classes view
+  const columnOrder = [
+    "Instructor",
+    "Date/Time (JST)",
+    "Day",
+    "Children",
+    "Customer",
+    "Status",
+    "Class Code",
+  ];
   const data = await getAllClasses(isFilterActive, cookie); // Fetch class list data
 
   return (
@@ -58,6 +68,7 @@ export default async function Page(props: {
         isFilterActive={isFilterActive}
         filterHref={filterHref}
         clearFilterHref={clearFilterHref}
+        columnOrder={columnOrder}
       />
     </div>
   );
