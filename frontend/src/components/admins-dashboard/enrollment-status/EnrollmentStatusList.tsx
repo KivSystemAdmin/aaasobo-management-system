@@ -79,7 +79,7 @@ export default function EnrollmentStatusList({
 
   return (
     <main className={styles.container}>
-      <h1>受講リスト</h1>
+      <h1>カスタマーリスト</h1>
       <p className={styles.description}>
         お客さまごとの契約プランと、現在有効な定期クラスの割当状況を表示します。
       </p>

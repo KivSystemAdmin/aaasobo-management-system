@@ -666,6 +666,7 @@ type CurrentListTableProps = {
   filterHref?: string;
   clearFilterHref?: string;
   linkTarget?: string;
+  columnOrder?: string[];
 };
 
 type PastListTableProps = {

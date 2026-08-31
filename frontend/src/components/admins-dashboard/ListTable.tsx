@@ -71,6 +71,7 @@ function ListTable({
   isFilterActive,
   filterHref,
   clearFilterHref,
+  columnOrder,
 }: ListTableProps) {
   const [currentData, setCurrentData] = useState<any[]>(fetchedData);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -183,74 +184,89 @@ function ListTable({
   }, [currentData]);
 
   // Define the displays of the table
+  const availableColumnKeys = useMemo(() => {
+    if (currentData.length === 0) return [];
+
+    const keys = Object.keys(currentData[0]).filter(
+      (key) => !omitItems.includes(key),
+    );
+    if (!columnOrder) return keys;
+
+    return [
+      ...columnOrder.filter((key) => keys.includes(key)),
+      ...keys.filter((key) => !columnOrder.includes(key)),
+    ];
+  }, [columnOrder, currentData, omitItems]);
+
   const columns = useMemo<ColumnDef<any>[]>(
     () =>
       currentData.length > 0
-        ? Object.keys(currentData[0])
-            // Omit the item from the table
-            .filter((key) => !omitItems.includes(key))
-            // Set the item to be a link
-            .map((key) => ({
-              accessorKey: key,
-              header: key,
-              cell: (data) => {
-                const value = data.getValue() as any;
+        ? availableColumnKeys.map((key) => ({
+            accessorKey: key,
+            header: key,
+            cell: (data) => {
+              const value = data.getValue() as any;
 
-                // Only for Event List page
-                // If the item is a color code, display it as a colored box
-                if (key === "Color Code" && typeof value === "string") {
-                  return (
-                    <div className={styles.eventColor}>
-                      <div
-                        className={styles.eventColor__colorBox}
-                        style={{
-                          backgroundColor: value,
-                        }}
-                      />
-                      <span>{value.toUpperCase().replace(/,\s*/g, ", ")}</span>
-                    </div>
-                  );
-                }
-
-                // If the item is not a link item, return the value
-                if (!linkItems.includes(key)) {
-                  return value;
-                }
-
-                // Set the link URL
-                let linkUrl = linkUrls[linkItems.indexOf(key)];
-
-                // Replace the item with the value (e.g., [ID] -> 1, 2, 3...)
-                replaceItems.forEach((replaceItem) => {
-                  linkUrl = linkUrl.replace(
-                    `[${replaceItem}]`,
-                    data.row.original[replaceItem],
-                  );
-                });
-
-                // Only for Class List page
-                // If the class status is in the OMIT_CLASS_STATUSES list, do not set the link URL
-                if (OMIT_CLASS_STATUSES.includes(data.row.original.Status)) {
-                  linkUrl = "";
-                }
-
+              // Only for Event List page
+              // If the item is a color code, display it as a colored box
+              if (key === "Color Code" && typeof value === "string") {
                 return (
-                  <Link href={linkUrl} target={linkTarget}>
-                    {value}
-                  </Link>
+                  <div className={styles.eventColor}>
+                    <div
+                      className={styles.eventColor__colorBox}
+                      style={{
+                        backgroundColor: value,
+                      }}
+                    />
+                    <span>{value.toUpperCase().replace(/,\s*/g, ", ")}</span>
+                  </div>
                 );
-              },
-            }))
+              }
+
+              // If the item is not a link item, return the value
+              if (!linkItems.includes(key)) {
+                return value;
+              }
+
+              // Set the link URL
+              let linkUrl = linkUrls[linkItems.indexOf(key)];
+
+              // Replace the item with the value (e.g., [ID] -> 1, 2, 3...)
+              replaceItems.forEach((replaceItem) => {
+                linkUrl = linkUrl.replace(
+                  `[${replaceItem}]`,
+                  data.row.original[replaceItem],
+                );
+              });
+
+              // Only for Class List page
+              // If the class status is in the OMIT_CLASS_STATUSES list, do not set the link URL
+              if (OMIT_CLASS_STATUSES.includes(data.row.original.Status)) {
+                linkUrl = "";
+              }
+
+              return (
+                <Link href={linkUrl} target={linkTarget}>
+                  {value}
+                </Link>
+              );
+            },
+          }))
         : [],
-    [currentData, omitItems, linkItems, linkUrls, replaceItems, linkTarget],
+    [
+      availableColumnKeys,
+      currentData.length,
+      linkItems,
+      linkUrls,
+      replaceItems,
+      linkTarget,
+    ],
   );
 
   const filterColumns = useMemo(() => {
     if (currentData.length === 0) return [];
 
-    const availableColumns = Object.keys(currentData[0]).filter(
-      (key) => !omitItems.includes(key),
-    );
+    const availableColumns = availableColumnKeys;
 
     if (listType !== "Customer List") return availableColumns;
 
@@ -263,7 +279,7 @@ function ListTable({
         (key) => key !== "No" && !prioritizedColumns.includes(key),
       ),
     ];
-  }, [currentData, omitItems, listType]);
+  }, [availableColumnKeys, currentData.length, listType]);
 
   // Configure the filter
   const filteredData = useMemo(

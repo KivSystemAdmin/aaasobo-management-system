@@ -14,7 +14,7 @@
 .listItem {
   margin-top: 0.2rem;
   display: grid;
-  grid-template-columns: 1.3fr 0.4fr 0.35fr;
+  grid-template-columns: 1.65fr 0.35fr;
   align-items: center;
 
   transition: background-color 0.3s ease;
@@ -35,6 +35,14 @@
     padding-left: 1rem;
   }
 
+  &__freeTrialBadge {
+    display: block;
+    width: fit-content;
+    margin-top: 0.25rem;
+    color: #555;
+    font-size: 12px;
+  }
+
   &__declineClass {
     font-size: 13px;
     color: #666;
@@ -53,16 +61,6 @@
 
     &:hover {
       opacity: 0.8;
-    }
-  }
-
-  &__classId {
-    text-align: center;
-    font-size: 14px;
-
-    span {
-      color: #555;
-      font-size: 12px;
     }
   }
 

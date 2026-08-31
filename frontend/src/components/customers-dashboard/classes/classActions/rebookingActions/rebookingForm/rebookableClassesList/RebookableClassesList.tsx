@@ -47,11 +47,11 @@ export default function RebookableClassesList({
   const headItems =
     language === "ja"
       ? hasFreeTrial
-        ? ["予約可能クラス", "クラスコード", ""]
-        : ["振替可能クラス", "クラスコード", ""]
+        ? ["予約可能クラス", ""]
+        : ["振替可能クラス", ""]
       : hasFreeTrial
-        ? ["Bookable Classes", "Class Code", ""]
-        : ["Rebookable Classes", "Class Code", ""];
+        ? ["Bookable Classes", ""]
+        : ["Rebookable Classes", ""];
 
   return (
     <div className={styles.modal}>

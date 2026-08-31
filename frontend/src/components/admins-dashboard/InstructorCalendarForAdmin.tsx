@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./InstructorCalendarForAdmin.module.scss";
 import { getCalendarClasses } from "@/lib/api/instructorsApi";
 import Loading from "../elements/loading/Loading";
@@ -33,10 +33,12 @@ function InstructorCalendarForAdmin({
   >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const requestIdRef = useRef(0);
 
   const fetchData = useCallback(async () => {
     if (instructorId === null) return;
 
+    const requestId = ++requestIdRef.current;
     setIsLoading(true);
     setError(null);
     try {
@@ -45,6 +47,8 @@ function InstructorCalendarForAdmin({
         getAllBusinessSchedules(),
         getAllEvents(),
       ]);
+
+      if (requestId !== requestIdRef.current) return;
 
       setInstructorCalendarEvents(classes);
       setCalendarValidRange(getCurrentMonthValidRange(3));
@@ -57,9 +61,12 @@ function InstructorCalendarForAdmin({
         .filter((e: { event: string; color: string }) => e.color !== "#FFFFFF"); // Filter out events with white color (#FFFFFF)
       setColorsForEvents(colorsForEvents);
     } catch (error) {
+      if (requestId !== requestIdRef.current) return;
       setError("Failed to load classes. Please try again.");
     } finally {
-      setIsLoading(false);
+      if (requestId === requestIdRef.current) {
+        setIsLoading(false);
+      }
     }
   }, [instructorId]);
 
@@ -73,16 +80,21 @@ function InstructorCalendarForAdmin({
   }, []);
 
   const handleSendInstructor = useCallback((id: number, name: string) => {
+    requestIdRef.current += 1;
     localStorage.setItem("activeInstructor", String(id));
     setIsLoading(true);
     setError(null);
+    setInstructorCalendarEvents([]);
     setInstructorId(id);
     setInstructorName(name);
   }, []);
 
   return (
     <div className={styles.calendarContainer}>
-      <InstructorSearch handleSendInstructor={handleSendInstructor} />
+      <InstructorSearch
+        handleSendInstructor={handleSendInstructor}
+        activeInstructorId={instructorId}
+      />
       {isLoading && <Loading />}
       {error && <div>{error}</div>}
       {!isLoading && !error && instructorId === null && (
