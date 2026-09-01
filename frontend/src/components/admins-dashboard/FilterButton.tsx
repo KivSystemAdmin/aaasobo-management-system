@@ -5,7 +5,7 @@ type FilterButtonProps = {
   filterHref?: string;
   clearFilterHref?: string;
   isFilterActive?: boolean;
-  displayNames?: [string, string]; // [filter active, filter inactive]
+  displayNames?: [string, string]; // [filtered view, unfiltered view]
 };
 
 function FilterButton({
@@ -19,14 +19,30 @@ function FilterButton({
   }
 
   return (
-    <Link
-      href={isFilterActive ? clearFilterHref : filterHref}
-      className={`${styles.filterButton} ${
-        isFilterActive ? "" : styles.filterButtonInactive
-      }`}
+    <div
+      className={styles.filterToggle}
+      role="group"
+      aria-label="クラスの表示範囲"
     >
-      {isFilterActive ? displayNames?.[1] : displayNames?.[0]}
-    </Link>
+      <Link
+        href={filterHref}
+        className={`${styles.filterToggleOption} ${
+          isFilterActive ? styles.filterToggleOptionActive : ""
+        }`}
+        aria-current={isFilterActive ? "page" : undefined}
+      >
+        {displayNames?.[0]}
+      </Link>
+      <Link
+        href={clearFilterHref}
+        className={`${styles.filterToggleOption} ${
+          !isFilterActive ? styles.filterToggleOptionActive : ""
+        }`}
+        aria-current={!isFilterActive ? "page" : undefined}
+      >
+        {displayNames?.[1]}
+      </Link>
+    </div>
   );
 }
 

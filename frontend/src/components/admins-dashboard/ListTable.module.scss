@@ -80,31 +80,50 @@ $font_size: 0.9rem;
   }
 }
 
-.filterButton {
+.filterToggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem;
+  border: 1px solid #e5e7eb;
+  border-radius: $border_radius;
+  background-color: #f3f4f6;
+}
+
+.filterToggleOption {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 0.875rem;
-  border: 1px solid $blue_primary;
-  border-radius: $border_radius;
-  background-color: #ffffff;
-  color: $blue_primary;
+  min-height: 2rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: calc($border_radius - 0.15rem);
+  color: $text-medium;
   font-size: $font_size;
   font-weight: 500;
+  line-height: 1;
   text-decoration: none;
-  transition: all 0.2s ease;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
-    background-color: rgba(59, 130, 246, 0.1);
+    color: $blue_primary;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $blue_primary;
+    outline-offset: 2px;
   }
 }
 
-.filterButtonInactive {
+.filterToggleOptionActive {
   background-color: $blue_primary;
   color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 
   &:hover {
-    background-color: $blue_primary_hover;
+    color: #ffffff;
   }
 }
 
