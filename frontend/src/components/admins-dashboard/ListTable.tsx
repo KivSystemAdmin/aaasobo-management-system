@@ -396,7 +396,7 @@ function ListTable({
                     filterHref={filterHref}
                     clearFilterHref={clearFilterHref}
                     isFilterActive={isFilterActive}
-                    displayNames={["本日のクラス表示", "全クラス表示"]}
+                    displayNames={["本日のクラス", "全クラス"]}
                   />
                   <GenerateClassesForm />
                 </>
