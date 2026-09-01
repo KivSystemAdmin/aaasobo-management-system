@@ -246,9 +246,9 @@ test.describe("critical class/date workflows", () => {
     for (let attempt = 0; attempt < 2; attempt += 1) {
       await page.goto("/admins/class-list");
       await page.getByRole("button", { name: "レギュラークラス生成" }).click();
-      await page.locator("#yearMonth").selectOption({ label: month });
-      await page.getByRole("button", { name: "Generate", exact: true }).click();
-      await expect(page.getByText(/success|created/i).last()).toBeVisible();
+      await page.locator("#yearMonth").selectOption({ value: month });
+      await page.getByRole("button", { name: "生成する", exact: true }).click();
+      await expect(page.getByText("クラスを生成しました。")).toBeVisible();
     }
     const { classes } = await backend<ClassesResponse>(page, "/classes");
     const keys = classes.map(
