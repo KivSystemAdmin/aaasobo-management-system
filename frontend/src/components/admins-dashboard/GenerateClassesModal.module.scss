@@ -12,7 +12,13 @@
     text-align: center;
     font-size: 1.6rem;
     font-weight: 600;
-    margin: 0 0 10px 0;
+    margin: 0 0 12px;
+  }
+
+  .description {
+    max-width: 480px;
+    line-height: 1.5;
+    margin: 0 0 12px;
   }
 
   .actionButton {

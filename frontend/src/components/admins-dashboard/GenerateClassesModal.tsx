@@ -12,9 +12,9 @@ type GenerateClassesModalProps = {
 };
 
 function GenerateClassesModal({ error, success }: GenerateClassesModalProps) {
-  const defaultValue = "Select Month";
+  const defaultValue = "";
   const [selectedMonth, setSelectedMonth] = useState(defaultValue);
-  const isSelectMonth = selectedMonth === "" || selectedMonth === defaultValue;
+  const isSelectMonth = selectedMonth === defaultValue;
 
   const selectableMonths = useMemo(() => {
     const now = new Date();
@@ -22,11 +22,12 @@ function GenerateClassesModal({ error, success }: GenerateClassesModalProps) {
 
     for (let i = 0; i < 3; i++) {
       const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
-      const value = date.toLocaleString("default", {
+      const value = date.toLocaleString("en-US", {
         year: "numeric",
         month: "long",
       });
-      months.push(value);
+      const label = `${date.getFullYear()}年${date.getMonth() + 1}月`;
+      months.push({ value, label });
     }
 
     return months;
@@ -38,7 +39,10 @@ function GenerateClassesModal({ error, success }: GenerateClassesModalProps) {
 
   return (
     <div className={styles.modalContent}>
-      <h2>Generate Classes</h2>
+      <h2>レギュラークラスを生成</h2>
+      <p className={styles.description}>
+        選択した月の有効なレギュラークラス設定をもとに、各開催日のクラスを一括生成します。
+      </p>
       <div className={styles.dateInfo}>
         <label htmlFor="yearMonth">
           <CalendarDaysIcon className={styles.icon} />
@@ -51,11 +55,11 @@ function GenerateClassesModal({ error, success }: GenerateClassesModalProps) {
           style={{ color: isSelectMonth ? "gray" : "black" }}
         >
           <option value={defaultValue} className={styles.grayOption} disabled>
-            {defaultValue}
+            対象月を選択
           </option>
-          {selectableMonths.map((month, index) => (
-            <option key={index} value={month}>
-              {month}
+          {selectableMonths.map((month) => (
+            <option key={month.value} value={month.value}>
+              {month.label}
             </option>
           ))}
         </select>
@@ -63,7 +67,7 @@ function GenerateClassesModal({ error, success }: GenerateClassesModalProps) {
       {error && <FormValidationMessage type="error" message={error} />}
       {success && <FormValidationMessage type="success" message={success} />}
       <div className={styles.actionButton}>
-        <ActionButton className="bookBtn" btnText="Generate" type="submit" />
+        <ActionButton className="bookBtn" btnText="生成する" type="submit" />
       </div>
     </div>
   );
