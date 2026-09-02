@@ -860,6 +860,8 @@ describe("POST /admins/import/execute", () => {
     );
     const recurringCountBySubscription = new Map<string, number>();
     const recurringCountByInstructor = new Map<string, number>();
+    const instructorBySubscription = new Map<string, string>();
+    const dateTimesBySubscription = new Map<string, Set<string>>();
     const assignedSlotKeys = new Set<string>();
     for (const recurringClass of recurringClasses) {
       const subscription = subscriptionByRef.get(
@@ -878,6 +880,26 @@ describe("POST /admins/import/execute", () => {
         recurringClass.instructor_ref,
         (recurringCountByInstructor.get(recurringClass.instructor_ref) ?? 0) +
           1,
+      );
+      const assignedInstructor = instructorBySubscription.get(
+        recurringClass.subscription_ref,
+      );
+      expect(
+        assignedInstructor === undefined ||
+          assignedInstructor === recurringClass.instructor_ref,
+      ).toBe(true);
+      instructorBySubscription.set(
+        recurringClass.subscription_ref,
+        recurringClass.instructor_ref,
+      );
+      const subscriptionDateTimes =
+        dateTimesBySubscription.get(recurringClass.subscription_ref) ??
+        new Set<string>();
+      expect(subscriptionDateTimes.has(recurringClass.start_at)).toBe(false);
+      subscriptionDateTimes.add(recurringClass.start_at);
+      dateTimesBySubscription.set(
+        recurringClass.subscription_ref,
+        subscriptionDateTimes,
       );
 
       const localDate = recurringClass.start_at.slice(0, 10);

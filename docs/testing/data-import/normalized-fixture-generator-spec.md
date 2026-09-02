@@ -126,7 +126,8 @@ Rule:
 
 - Program Original recurring classes use odd-indexed instructors.
 - Native A recurring classes use even-indexed instructors.
-- Within each background pool, assign candidates in strict round-robin order.
+- Within each background pool, assign subscriptions in strict round-robin order.
+- Assign both recurring classes in a subscription to different slots for the same instructor.
 - Candidates are sorted by `subscription_ref`, then class sequence index.
 - Each instructor has 30 unique schedule slots. Never reuse a slot; fail generation if a pool exceeds capacity.
 - With the default 10 instructors, every instructor receives 20 recurring classes and retains 10 open slots for rebooking.

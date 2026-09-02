@@ -676,7 +676,8 @@ function assignRecurringClasses(
     instructorIndexesByBackground.set(englishBackground, indexes);
   }
 
-  const assignmentCountByBackground = new Map<string, number>();
+  const subscriptionCountByBackground = new Map<string, number>();
+  const instructorIndexBySubscription = new Map<string, number>();
   const assignmentCountByInstructor = new Map<string, number>();
   const rows: RecurringAssignment[] = [];
 
@@ -689,10 +690,23 @@ function assignRecurringClasses(
         `No instructor for English background ${candidate.englishBackground}`,
       );
     }
-    const assignedBackgroundCount =
-      assignmentCountByBackground.get(candidate.englishBackground) ?? 0;
-    const instructorIndex =
-      instructorIndexes[assignedBackgroundCount % instructorIndexes.length];
+    let instructorIndex = instructorIndexBySubscription.get(
+      candidate.subscriptionRef,
+    );
+    if (instructorIndex === undefined) {
+      const assignedSubscriptionCount =
+        subscriptionCountByBackground.get(candidate.englishBackground) ?? 0;
+      instructorIndex =
+        instructorIndexes[assignedSubscriptionCount % instructorIndexes.length];
+      instructorIndexBySubscription.set(
+        candidate.subscriptionRef,
+        instructorIndex,
+      );
+      subscriptionCountByBackground.set(
+        candidate.englishBackground,
+        assignedSubscriptionCount + 1,
+      );
+    }
     const instructorRef = ref("IN", instructorIndex);
     const assignedCount = assignmentCountByInstructor.get(instructorRef) ?? 0;
     const slots = slotsForInstructor(instructorIndex);
@@ -718,10 +732,6 @@ function assignRecurringClasses(
     });
 
     assignmentCountByInstructor.set(instructorRef, assignedCount + 1);
-    assignmentCountByBackground.set(
-      candidate.englishBackground,
-      assignedBackgroundCount + 1,
-    );
   }
 
   return rows;
