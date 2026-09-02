@@ -29,7 +29,7 @@ Date constraints:
 
 ## Optional CLI Parameters
 
-- `--instructors COUNT` defaults to `10`
+- `--instructors COUNT` defaults to `10` and must be at least `2`
 
 ## Fixed Global Rules
 
@@ -42,32 +42,33 @@ Date constraints:
 
 - instructors: configured by `--instructors`
 - customers: `instructors * 10`
-- child distribution:
-  - `instructors * 9` customers with 1 child
-  - `instructors` customers with 2 children
+- every customer has 2 children
 
 Derived totals:
 
-- children: `instructors * 11`
+- children: `instructors * 20`
 - subscriptions: `instructors * 10`
-- recurring classes: `instructors * 11` (see plan mapping below)
+- recurring classes: `instructors * 20` (see plan mapping below)
 
 ## Plan Mapping
 
-Use only two plans:
+Use four plans:
 
-- `Weekly 1` (`weekly_class_times = 1`)
-- `Weekly 2` (`weekly_class_times = 2`)
+- `月2,180円プラン / 2,180 yen/month Plan`: Program Original, weekly 1
+- `月3,180円プラン / 3,180 yen/month Plan`: Program Original, weekly 2
+- `月13,980円プラン / 13,980 yen/month Plan Native A`: Native A, weekly 2
+- `月13,980円プラン / 13,980 yen/month Plan Native B`: Native B, weekly 2
 
 Mapping rule:
 
-- customer with 1 child -> `Weekly 1`
-- customer with 2 children -> `Weekly 2`
+- odd customer index -> Program Original weekly 2
+- even customer index -> Native A weekly 2
 
 English background values:
 
-- `Weekly 1` uses `english_background = 0`
-- `Weekly 2` uses `english_background = 1`
+- Program Original plans use `english_background = 0`
+- Native A uses `english_background = 1`
+- Native B uses `english_background = 2`
 
 Child naming rule:
 
@@ -89,10 +90,10 @@ Instructor `english_background` alternates by index:
 
 Use two fixed patterns:
 
-- Pattern A (Mon-Wed):
-  - times: `16:00`, `16:30`, `17:00`, `17:30`, `18:00`
-- Pattern B (Thu-Sat):
-  - Thu/Fri times: `18:30`, `19:00`, `19:30`, `20:00`, `20:30`
+- Pattern A (Mon-Fri):
+  - times: `16:00`, `16:30`, `17:00`, `17:30`, `18:00`, `18:30`
+- Pattern B (Tue-Sat):
+  - Tue-Fri times: `18:00`, `18:30`, `19:00`, `19:30`, `20:00`, `20:30`
   - Sat times: `09:00`, `09:30`, `10:00`, `10:30`, `11:00`, `11:30`
 
 Assignment:
@@ -118,17 +119,18 @@ Field values:
 
 ## Instructor Assignment for Recurring Classes
 
-Recurring classes must be evenly distributed across instructors.
+Recurring classes must be distributed across instructors with the same English
+background.
 
 Rule:
 
-- Let `R = total recurring classes`.
-- Let `I = total instructors`.
-- Assign exactly `R / I` recurring classes per instructor (this spec currently yields `11` per instructor).
-- Use deterministic ordering:
-  - recurring class candidates sorted by `subscription_ref`, then class sequence index
-  - instructors sorted by `instructor_ref`
-  - assign in contiguous batches or strict round-robin as long as per-instructor count is exactly equal and deterministic
+- Program Original recurring classes use odd-indexed instructors.
+- Native A recurring classes use even-indexed instructors.
+- Within each background pool, assign subscriptions in strict round-robin order.
+- Assign both recurring classes in a subscription to different slots for the same instructor.
+- Candidates are sorted by `subscription_ref`, then class sequence index.
+- Each instructor has 30 unique schedule slots. Never reuse a slot; fail generation if a pool exceeds capacity.
+- With the default 10 instructors, every instructor receives 20 recurring classes and retains 10 open slots for rebooking.
 
 ## Recurring Class Generation
 
@@ -140,10 +142,7 @@ For each subscription:
 
 ## Attendance Rules
 
-- `recurring_class_attendance.csv`:
-
-  - customer with 1 child -> that child attends all recurring classes
-  - customer with 2 children -> both children attend all recurring classes
+- `recurring_class_attendance.csv`: both children attend all recurring classes
 
 - `class_attendance.csv`:
   - expanded from recurring class attendance for each generated class instance

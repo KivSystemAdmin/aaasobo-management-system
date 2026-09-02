@@ -45,7 +45,7 @@ const INSTRUCTOR_FILES: readonly InstructorFileName[] = [
   "instructor_fees.csv",
   "instructor_schedules.csv",
 ];
-const INCREMENTAL_PLAN_NAME = "月5,980円プラン / 5,980 yen/month Plan";
+const INCREMENTAL_PLAN_NAME = "月3,180円プラン / 3,180 yen/month Plan";
 const DEFAULT_START_DATE = "2026-01-01";
 const DEFAULT_COUNT = 5;
 const MAX_COUNT = 99_999;
