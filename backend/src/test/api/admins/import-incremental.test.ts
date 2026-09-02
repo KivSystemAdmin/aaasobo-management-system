@@ -99,7 +99,7 @@ describe("incremental admin imports", () => {
     const admin = await createAdmin();
     const cookie = await generateAuthCookie(admin.id, "admin");
     await createPlan({
-      name: "月5,980円プラン / 5,980 yen/month Plan",
+      name: "月3,180円プラン / 3,180 yen/month Plan",
       description: "Fixture plan",
       weeklyClassTimes: 2,
       englishBackground: 0,
@@ -287,7 +287,7 @@ describe("incremental admin imports", () => {
     const admin = await createAdmin();
     const cookie = await generateAuthCookie(admin.id, "admin");
     await createPlan({
-      name: "月5,980円プラン / 5,980 yen/month Plan",
+      name: "月3,180円プラン / 3,180 yen/month Plan",
       description: "Fixture plan",
       weeklyClassTimes: 2,
       englishBackground: 0,

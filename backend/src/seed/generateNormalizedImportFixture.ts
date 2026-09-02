@@ -13,15 +13,17 @@ const FAKER_SEED = 20250301;
 
 const DEFAULT_INSTRUCTOR_COUNT = 10;
 const CUSTOMERS_PER_INSTRUCTOR = 10;
-const CHILDREN_PER_INSTRUCTOR = 12;
 const DEFAULT_DUMMY_INSTRUCTOR_ICON = "/images/default-user-icon.jpg";
 
 const PATTERN_A_SLOTS: SlotDef[] = buildPatternSlots(
-  [1, 2, 3],
-  ["16:00", "16:30", "17:00", "17:30", "18:00"],
+  [1, 2, 3, 4, 5],
+  ["16:00", "16:30", "17:00", "17:30", "18:00", "18:30"],
 );
 const PATTERN_B_SLOTS: SlotDef[] = [
-  ...buildPatternSlots([4, 5], ["18:30", "19:00", "19:30", "20:00", "20:30"]),
+  ...buildPatternSlots(
+    [2, 3, 4, 5],
+    ["18:00", "18:30", "19:00", "19:30", "20:00", "20:30"],
+  ),
   ...buildPatternSlots(
     [6],
     ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"],
@@ -181,6 +183,7 @@ type RecurringCandidate = {
   customerRef: string;
   childRefs: string[];
   indexWithinSubscription: number;
+  englishBackground: string;
 };
 
 type RecurringAssignment = {
@@ -285,8 +288,8 @@ function parseInstructorCount(value: string | undefined): number {
     usageAndExit(`Invalid --instructors: ${value}`);
   }
   const count = Number(value);
-  if (!Number.isSafeInteger(count) || count < 1) {
-    usageAndExit("--instructors must be a positive integer");
+  if (!Number.isSafeInteger(count) || count < 2) {
+    usageAndExit("--instructors must be an integer of at least 2");
   }
   return count;
 }
@@ -396,18 +399,34 @@ function planRows(): PlanDef[] {
   return [
     {
       plan_ref: ref("PL", 1),
-      name: "月3,180円プラン / 3,180 yen/month Plan",
-      description: "1 classes per week",
+      name: "月2,180円プラン / 2,180 yen/month Plan",
+      description: "1 class per week",
       weekly_class_times: "1",
       english_background: "0",
       termination_at: "",
     },
     {
       plan_ref: ref("PL", 2),
-      name: "月5,980円プラン / 5,980 yen/month Plan",
+      name: "月3,180円プラン / 3,180 yen/month Plan",
+      description: "2 classes per week",
+      weekly_class_times: "2",
+      english_background: "0",
+      termination_at: "",
+    },
+    {
+      plan_ref: ref("PL", 3),
+      name: "月13,980円プラン / 13,980 yen/month Plan Native A",
       description: "2 classes per week",
       weekly_class_times: "2",
       english_background: "1",
+      termination_at: "",
+    },
+    {
+      plan_ref: ref("PL", 4),
+      name: "月13,980円プラン / 13,980 yen/month Plan Native B",
+      description: "2 classes per week",
+      weekly_class_times: "2",
+      english_background: "2",
       termination_at: "",
     },
   ];
@@ -558,11 +577,7 @@ function customerRows(
   return rows;
 }
 
-function childRows(
-  fakerEn: FakerLike,
-  customerCount: number,
-  singleChildCustomerCount: number,
-): ChildDef[] {
+function childRows(fakerEn: FakerLike, customerCount: number): ChildDef[] {
   const rows: ChildDef[] = [];
   let childSeq = 1;
   for (
@@ -571,8 +586,7 @@ function childRows(
     customerIndex += 1
   ) {
     const customerRef = ref("CU", customerIndex);
-    const childCount = customerIndex <= singleChildCustomerCount ? 1 : 2;
-    for (let j = 1; j <= childCount; j += 1) {
+    for (let j = 1; j <= 2; j += 1) {
       rows.push({
         child_ref: ref("CH", childSeq),
         customer_ref: customerRef,
@@ -590,17 +604,14 @@ function childRows(
 function subscriptionRows(
   from: string,
   customerCount: number,
-  singleChildCustomerCount: number,
 ): SubscriptionDef[] {
   const rows: SubscriptionDef[] = [];
   for (let i = 1; i <= customerCount; i += 1) {
     const customerRef = ref("CU", i);
-    const hasTwoChildren = i > singleChildCustomerCount;
     rows.push({
       subscription_ref: ref("SU", i),
       customer_ref: customerRef,
-      // Keep 1-child customers on weekly-1, 2-child customers on weekly-2.
-      plan_ref: hasTwoChildren ? ref("PL", 2) : ref("PL", 1),
+      plan_ref: i % 2 === 1 ? ref("PL", 2) : ref("PL", 3),
       select_type: `https://example.com/subscriptions/${customerRef.toLowerCase()}`,
       start_at: formatDateTime(from, "00:00"),
       end_at: "",
@@ -622,10 +633,16 @@ function buildCustomerChildMap(children: ChildDef[]): Map<string, string[]> {
 function recurringCandidates(
   subscriptions: SubscriptionDef[],
   childRefsByCustomer: Map<string, string[]>,
+  plans: PlanDef[],
 ): RecurringCandidate[] {
   const rows: RecurringCandidate[] = [];
+  const plansByRef = new Map(plans.map((plan) => [plan.plan_ref, plan]));
   for (const sub of subscriptions) {
-    const weekly = sub.plan_ref === ref("PL", 1) ? 1 : 2;
+    const plan = plansByRef.get(sub.plan_ref);
+    if (!plan) {
+      throw new Error(`Subscription ${sub.subscription_ref} has no plan`);
+    }
+    const weekly = Number(plan.weekly_class_times);
     const childRefs = childRefsByCustomer.get(sub.customer_ref) ?? [];
     for (let i = 0; i < weekly; i += 1) {
       rows.push({
@@ -633,6 +650,7 @@ function recurringCandidates(
         customerRef: sub.customer_ref,
         childRefs,
         indexWithinSubscription: i,
+        englishBackground: plan.english_background,
       });
     }
   }
@@ -650,28 +668,44 @@ function assignRecurringClasses(
   from: string,
   instructorCount: number,
 ): RecurringAssignment[] {
-  if (candidates.length % instructorCount !== 0) {
-    throw new Error(
-      `Recurring classes (${candidates.length}) must be divisible by instructor count (${instructorCount})`,
-    );
+  const instructorIndexesByBackground = new Map<string, number[]>();
+  for (let i = 1; i <= instructorCount; i += 1) {
+    const englishBackground = i % 2 === 0 ? "1" : "0";
+    const indexes = instructorIndexesByBackground.get(englishBackground) ?? [];
+    indexes.push(i);
+    instructorIndexesByBackground.set(englishBackground, indexes);
   }
 
-  const perInstructor = candidates.length / instructorCount;
+  const assignmentCountByBackground = new Map<string, number>();
   const assignmentCountByInstructor = new Map<string, number>();
   const rows: RecurringAssignment[] = [];
 
   for (let i = 0; i < candidates.length; i += 1) {
-    const instructorIndex = Math.floor(i / perInstructor) + 1;
+    const candidate = candidates[i];
+    const instructorIndexes =
+      instructorIndexesByBackground.get(candidate.englishBackground) ?? [];
+    if (instructorIndexes.length === 0) {
+      throw new Error(
+        `No instructor for English background ${candidate.englishBackground}`,
+      );
+    }
+    const assignedBackgroundCount =
+      assignmentCountByBackground.get(candidate.englishBackground) ?? 0;
+    const instructorIndex =
+      instructorIndexes[assignedBackgroundCount % instructorIndexes.length];
     const instructorRef = ref("IN", instructorIndex);
     const assignedCount = assignmentCountByInstructor.get(instructorRef) ?? 0;
     const slots = slotsForInstructor(instructorIndex);
-    const slot = slots[assignedCount % slots.length];
+    const slot = slots[assignedCount];
+    if (!slot) {
+      throw new Error(
+        `Instructor ${instructorRef} has insufficient schedule slots for recurring classes`,
+      );
+    }
 
     const firstDate = nextDateOnOrAfter(parseDateOnly(from), slot.weekday);
     const firstDateOnly = formatDateOnly(firstDate);
     const recurringRef = ref("RC", i + 1);
-    const candidate = candidates[i];
-
     rows.push({
       recurringClassRef: recurringRef,
       subscriptionRef: candidate.subscriptionRef,
@@ -684,16 +718,10 @@ function assignRecurringClasses(
     });
 
     assignmentCountByInstructor.set(instructorRef, assignedCount + 1);
-  }
-
-  for (let i = 1; i <= instructorCount; i += 1) {
-    const instructorRef = ref("IN", i);
-    const count = assignmentCountByInstructor.get(instructorRef) ?? 0;
-    if (count !== perInstructor) {
-      throw new Error(
-        `Instructor ${instructorRef} assignment mismatch: expected ${perInstructor}, got ${count}`,
-      );
-    }
+    assignmentCountByBackground.set(
+      candidate.englishBackground,
+      assignedBackgroundCount + 1,
+    );
   }
 
   return rows;
@@ -821,12 +849,10 @@ export async function generateNormalizedImportFixture(
   options: GenerateNormalizedImportFixtureOptions,
 ): Promise<GeneratedNormalizedImportFixture> {
   const instructorCount = options.instructorCount ?? DEFAULT_INSTRUCTOR_COUNT;
-  if (!Number.isSafeInteger(instructorCount) || instructorCount < 1) {
-    throw new Error("instructorCount must be a positive integer");
+  if (!Number.isSafeInteger(instructorCount) || instructorCount < 2) {
+    throw new Error("instructorCount must be an integer of at least 2");
   }
   const customerCount = instructorCount * CUSTOMERS_PER_INSTRUCTOR;
-  const singleChildCustomerCount =
-    customerCount * 2 - instructorCount * CHILDREN_PER_INSTRUCTOR;
 
   const { fakerEN_US, fakerJA } = (await import("@faker-js/faker")) as {
     fakerEN_US: FakerLike;
@@ -838,19 +864,11 @@ export async function generateNormalizedImportFixture(
   const plans = planRows();
   const instructors = instructorRows(fakerEN_US, instructorCount);
   const customers = customerRows(fakerJA, customerCount);
-  const children = childRows(
-    fakerEN_US,
-    customerCount,
-    singleChildCustomerCount,
-  );
-  const subscriptions = subscriptionRows(
-    options.from,
-    customerCount,
-    singleChildCustomerCount,
-  );
+  const children = childRows(fakerEN_US, customerCount);
+  const subscriptions = subscriptionRows(options.from, customerCount);
   const childRefsByCustomer = buildCustomerChildMap(children);
   const recurring = assignRecurringClasses(
-    recurringCandidates(subscriptions, childRefsByCustomer),
+    recurringCandidates(subscriptions, childRefsByCustomer, plans),
     options.from,
     instructorCount,
   );

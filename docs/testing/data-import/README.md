@@ -58,10 +58,16 @@ npm run fixture:generate:normalized-import -- \
   - `--completed-until`
   - `--to`
 - Optional:
-  - `--instructors` (default: `10`; customers are generated at a `1:10` instructor-to-customer ratio)
+  - `--instructors` (default: `10`, minimum: `2`; customers are generated at a `1:10` instructor-to-customer ratio)
   - `--out-dir` (default: `../docs/testing/data-import/generated`)
 
 The generator creates all mandatory normalized CSV files and one deterministic zip file in the output directory.
+
+Every generated customer has two children and two weekly regular classes.
+Odd-numbered customers use the Program Original weekly-2 plan, while
+even-numbered customers use the Native A weekly-2 plan. Every instructor has
+30 schedule slots; the default 10-instructor fixture assigns 20 regular classes
+and leaves 10 rebooking slots per instructor.
 
 It also emits `instructor_fees.csv` with one active fee row per instructor using:
 
@@ -119,11 +125,11 @@ Arguments:
 - `--target` is required and accepts `customers` or `instructors`.
 - `--number` configures the selected target's count and defaults to `5`.
 - `--start-id` defaults to `1` and controls generated reference and credential
-  suffixes, not database primary keys. For example, `--target customers
-  --start-id 25` starts at `CU0025`.
+  suffixes, not database primary keys. For example, customer generation with
+  `--start-id 25` starts at `CU0025`.
 - `--start-instructor-id` and `--end-instructor-id` are optional customer-only
   arguments that must be supplied together. They are inclusive existing
-  database instructor IDs. When supplied, each ¥5,980 subscription receives two
+  database instructor IDs. When supplied, each ¥3,180 subscription receives two
   regular classes.
 - `--start-date` defaults to `2026-01-01`.
 - `--out-dir` defaults to
@@ -134,7 +140,7 @@ required `target` and its corresponding count and start-ID options. It returns
 the selected file map and ZIP buffer for automated tests or other programmatic
 use.
 
-Customer subscriptions use the `月5,980円プラン / 5,980 yen/month Plan`
+Customer subscriptions use the `月3,180円プラン / 3,180 yen/month Plan`
 created by the initial import generator.
 
 Regular classes rotate through the inclusive instructor range before consuming
