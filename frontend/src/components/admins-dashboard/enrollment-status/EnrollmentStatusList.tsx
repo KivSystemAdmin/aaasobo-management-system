@@ -163,14 +163,19 @@ export default function EnrollmentStatusList({
                       subscriptions.map((subscription) =>
                         subscription.recurringClasses.map((item, index) => (
                           <tr className={styles.classRow} key={item.id}>
-                            <td></td>
                             {index === 0 && (
-                              <td
-                                className={styles.planCell}
-                                rowSpan={subscription.recurringClasses.length}
-                              >
-                                {japanesePlanName(subscription.planName)}
-                              </td>
+                              <>
+                                <td
+                                  className={styles.gutterCell}
+                                  rowSpan={subscription.recurringClasses.length}
+                                ></td>
+                                <td
+                                  className={styles.planCell}
+                                  rowSpan={subscription.recurringClasses.length}
+                                >
+                                  {japanesePlanName(subscription.planName)}
+                                </td>
+                              </>
                             )}
                             <td>{item.children.join(", ") || "—"}</td>
                             <td>{item.instructor}</td>
