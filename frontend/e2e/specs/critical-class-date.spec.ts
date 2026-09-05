@@ -142,12 +142,100 @@ function jstDateDaysFromNow(days: number) {
   return result.toISOString().slice(0, 10);
 }
 
+function sundayInMonth(monthOffset: number, position: "first" | "last") {
+  const [year, month] = new Date()
+    .toLocaleDateString("en-CA", { timeZone: "Canada/Eastern" })
+    .split("-")
+    .map(Number);
+
+  if (position === "first") {
+    const date = new Date(Date.UTC(year, month - 1 + monthOffset, 1));
+    date.setUTCDate(date.getUTCDate() + ((7 - date.getUTCDay()) % 7));
+    return date.toISOString().slice(0, 10);
+  }
+
+  const date = new Date(Date.UTC(year, month + monthOffset, 0));
+  date.setUTCDate(date.getUTCDate() - date.getUTCDay());
+  return date.toISOString().slice(0, 10);
+}
+
+async function setNoClassDay(page: Page, date: string) {
+  const result = await page.evaluate(async (dateKey) => {
+    const response = await fetch("/api/proxy", {
+      method: "POST",
+      headers: {
+        "backend-endpoint": "/admins/business-schedule/update",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ startDate: dateKey, eventId: 2 }),
+    });
+    return { ok: response.ok, status: response.status };
+  }, date);
+
+  expect(result.ok, `set no-class event for ${date}: ${result.status}`).toBe(
+    true,
+  );
+}
+
 test.describe("critical class/date workflows", () => {
   test.afterEach(async ({}, testInfo) => {
     expect(
       monitoredErrors.get(testInfo) ?? [],
       "browser console and requests must stay clean",
     ).toEqual([]);
+  });
+
+  test("0. business calendar colors survive adjacent-month navigation", async ({
+    browser,
+  }, testInfo) => {
+    const lastSundayThisMonth = sundayInMonth(0, "last");
+    const firstSundayThirdMonth = sundayInMonth(2, "first");
+
+    const adminContext = await browser.newContext({
+      storageState: ADMIN_STATE,
+      timezoneId: "Canada/Eastern",
+    });
+    const adminPage = await adminContext.newPage();
+    await adminPage.goto("/admins/dashboard");
+    await setNoClassDay(adminPage, lastSundayThisMonth);
+    await setNoClassDay(adminPage, firstSundayThirdMonth);
+    await adminContext.close();
+
+    const context = await browser.newContext({
+      timezoneId: "Canada/Eastern",
+    });
+    const page = await context.newPage();
+    monitor(page, testInfo);
+    await login(page, "customer", 1);
+    const welcomeButton = page.getByRole("button", { name: "Get Started" });
+    if (await welcomeButton.isVisible()) await welcomeButton.click();
+
+    const noClassColor = "rgb(250, 215, 205)";
+    const lastSundayCell = page.locator(
+      `td.fc-daygrid-day[data-date="${lastSundayThisMonth}"]`,
+    );
+    await expect(lastSundayCell).toHaveCSS("background-color", noClassColor);
+
+    await page.getByRole("button", { name: "Next month" }).click();
+    const firstSundayThirdMonthCell = page.locator(
+      `td.fc-daygrid-day[data-date="${firstSundayThirdMonth}"]`,
+    );
+    await expect(firstSundayThirdMonthCell).toHaveCSS(
+      "background-color",
+      noClassColor,
+    );
+
+    await page.getByRole("button", { name: "Next month" }).click();
+    await expect(firstSundayThirdMonthCell).toHaveCSS(
+      "background-color",
+      noClassColor,
+    );
+
+    await page.getByRole("button", { name: "Previous month" }).click();
+    await page.getByRole("button", { name: "Previous month" }).click();
+    await expect(lastSundayCell).toHaveCSS("background-color", noClassColor);
+
+    await context.close();
   });
 
   test("1. regular classes retain recurrence, attendance, deadlines, and conflict protection", async ({
