@@ -132,12 +132,13 @@ const getValidRange = (startDate: string, monthsAhead: number) => {
 
 export const getCurrentMonthValidRange = (monthsAhead: number) => {
   const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const end = new Date(now.getFullYear(), now.getMonth() + monthsAhead, 1);
   const formatMonthStart = (date: Date) =>
     `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-01`;
 
   return {
-    start: formatMonthStart(now),
+    start: formatMonthStart(start),
     end: formatMonthStart(end),
   };
 };
