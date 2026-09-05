@@ -1,7 +1,12 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import type { EventClickArg, EventSourceFuncArg } from "@fullcalendar/core";
+import { useCallback, useRef, useState } from "react";
+import type {
+  DatesSetArg,
+  EventClickArg,
+  EventContentArg,
+  EventSourceFuncArg,
+} from "@fullcalendar/core";
 import Calendar from "@/components/features/calendar/Calendar";
 import InstructorSlotCalendar from "@/components/features/instructorSlotCalendar/InstructorSlotCalendar";
 import MessageBoardPanel from "@/components/features/messageBoardPanel/MessageBoardPanel";
@@ -35,7 +40,6 @@ type EditCalendarEvent = {
   extendedProps: {
     type: "available" | "absence";
     hasPendingChange: boolean;
-    changeType: "toRemove";
   };
 };
 
@@ -52,6 +56,11 @@ export default function AdminInstructorCalendar({
   const [pendingChanges, setPendingChanges] = useState<
     Map<string, AbsenceChange>
   >(new Map());
+  const pendingChangesRef = useRef(pendingChanges);
+  const visibleCalendarDateRef = useRef(new Date());
+  const [editCalendarInitialDate, setEditCalendarInitialDate] = useState(
+    visibleCalendarDateRef.current,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [canceledClasses, setCanceledClasses] = useState<
     AbsenceCanceledClassSummary[]
@@ -97,7 +106,9 @@ export default function AdminInstructorCalendar({
         if ("data" in slotsResponse) {
           events.push(
             ...slotsResponse.data.map((slot) => {
-              const pendingChange = pendingChanges.get(slot.dateTime);
+              const pendingChange = pendingChangesRef.current.get(
+                slot.dateTime,
+              );
 
               return {
                 id: `available-${slot.dateTime}`,
@@ -111,7 +122,6 @@ export default function AdminInstructorCalendar({
                 extendedProps: {
                   type: "available" as const,
                   hasPendingChange: pendingChange?.action === "add",
-                  changeType: "toRemove" as const,
                 },
               };
             }),
@@ -126,7 +136,9 @@ export default function AdminInstructorCalendar({
                 return absenceDate >= info.start && absenceDate < info.end;
               })
               .map((absence: InstructorAbsence) => {
-                const pendingChange = pendingChanges.get(absence.absentAt);
+                const pendingChange = pendingChangesRef.current.get(
+                  absence.absentAt,
+                );
 
                 return {
                   id: `absence-${absence.absentAt}`,
@@ -140,7 +152,6 @@ export default function AdminInstructorCalendar({
                   extendedProps: {
                     type: "absence" as const,
                     hasPendingChange: pendingChange?.action === "remove",
-                    changeType: "toRemove" as const,
                   },
                 };
               }),
@@ -153,34 +164,59 @@ export default function AdminInstructorCalendar({
         return [];
       }
     },
-    [instructorId, pendingChanges],
+    [instructorId],
   );
 
   const handleSlotToggle = useCallback((clickInfo: EventClickArg) => {
     const eventType = clickInfo.event.extendedProps.type;
     const dateTime = clickInfo.event.start!.toISOString();
+    const newChanges = new Map(pendingChangesRef.current);
 
-    setPendingChanges((prev) => {
-      const newChanges = new Map(prev);
+    if (newChanges.has(dateTime)) {
+      newChanges.delete(dateTime);
+    } else if (eventType === "absence") {
+      newChanges.set(dateTime, {
+        dateTime,
+        action: "remove",
+        originalType: "absence",
+      });
+    } else if (eventType === "available") {
+      newChanges.set(dateTime, {
+        dateTime,
+        action: "add",
+        originalType: "available",
+      });
+    }
 
-      if (newChanges.has(dateTime)) {
-        newChanges.delete(dateTime);
-      } else if (eventType === "absence") {
-        newChanges.set(dateTime, {
-          dateTime,
-          action: "remove",
-          originalType: "absence",
-        });
-      } else if (eventType === "available") {
-        newChanges.set(dateTime, {
-          dateTime,
-          action: "add",
-          originalType: "available",
-        });
-      }
+    pendingChangesRef.current = newChanges;
+    setPendingChanges(newChanges);
+    clickInfo.event.setExtendedProp(
+      "hasPendingChange",
+      newChanges.has(dateTime),
+    );
+  }, []);
 
-      return newChanges;
-    });
+  const handleVisibleDatesSet = useCallback((info: DatesSetArg) => {
+    visibleCalendarDateRef.current = new Date(info.view.currentStart);
+  }, []);
+
+  const handleEditEventClassNames = useCallback((info: EventContentArg) => {
+    const { hasPendingChange, type } = info.event.extendedProps;
+
+    if (!hasPendingChange) {
+      return [];
+    }
+
+    return [
+      styles.withBadge,
+      type === "available" ? styles.willBeAbsent : styles.willBeAvailable,
+    ];
+  }, []);
+
+  const clearPendingChanges = useCallback(() => {
+    const emptyChanges = new Map<string, AbsenceChange>();
+    pendingChangesRef.current = emptyChanges;
+    setPendingChanges(emptyChanges);
   }, []);
 
   const handleBatchSubmit = async () => {
@@ -195,7 +231,7 @@ export default function AdminInstructorCalendar({
       const result = await batchUpdateInstructorAbsences(instructorId, changes);
 
       if (result.success) {
-        setPendingChanges(new Map());
+        clearPendingChanges();
         setCanceledClasses(result.canceledClasses);
         refreshCalendars();
         setIsEditModalOpen(false);
@@ -206,7 +242,7 @@ export default function AdminInstructorCalendar({
         result.successCount.add > 0 ||
         result.successCount.remove > 0
       ) {
-        setPendingChanges(new Map());
+        clearPendingChanges();
         setCanceledClasses(result.canceledClasses);
         refreshCalendars();
         setIsEditModalOpen(false);
@@ -241,13 +277,17 @@ export default function AdminInstructorCalendar({
       <InstructorSlotCalendar
         instructorId={instructorId}
         refreshKey={refreshKey}
+        calendarOptions={{ datesSet: handleVisibleDatesSet }}
         getClassDetailUrl={(classId) =>
           `/admins/instructor-list/${instructorId}/class-schedule/${classId}`
         }
         headerRight={
           <ActionButton
             btnText="Edit Absences"
-            onClick={() => setIsEditModalOpen(true)}
+            onClick={() => {
+              setEditCalendarInitialDate(visibleCalendarDateRef.current);
+              setIsEditModalOpen(true);
+            }}
             className="editBtn"
           />
         }
@@ -299,28 +339,9 @@ export default function AdminInstructorCalendar({
               contentHeight="auto"
               events={fetchEditCalendarEvents}
               eventClick={handleSlotToggle}
+              eventClassNames={handleEditEventClassNames}
+              initialDate={editCalendarInitialDate}
               selectable={false}
-              eventDidMount={(info) => {
-                const { hasPendingChange, changeType, type } =
-                  info.event.extendedProps;
-                if (hasPendingChange && changeType === "toRemove") {
-                  const element = info.el;
-                  element.style.position = "relative";
-
-                  const badge = document.createElement("div");
-                  badge.className = styles.eventBadge;
-
-                  if (type === "available") {
-                    badge.classList.add(styles.willBeAbsent);
-                    badge.title = "Will be marked absent";
-                  } else if (type === "absence") {
-                    badge.classList.add(styles.willBeAvailable);
-                    badge.title = "Will be removed";
-                  }
-
-                  element.appendChild(badge);
-                }
-              }}
             />
           </div>
 
@@ -328,7 +349,7 @@ export default function AdminInstructorCalendar({
             <ActionButton
               type="button"
               onClick={() => {
-                setPendingChanges(new Map());
+                clearPendingChanges();
                 setIsEditModalOpen(false);
               }}
               disabled={isSubmitting}
