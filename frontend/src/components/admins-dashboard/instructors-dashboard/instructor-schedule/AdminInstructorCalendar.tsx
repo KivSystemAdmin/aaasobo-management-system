@@ -277,7 +277,10 @@ export default function AdminInstructorCalendar({
       <InstructorSlotCalendar
         instructorId={instructorId}
         refreshKey={refreshKey}
-        calendarOptions={{ datesSet: handleVisibleDatesSet }}
+        calendarOptions={{
+          datesSet: handleVisibleDatesSet,
+          initialDate: visibleCalendarDateRef.current,
+        }}
         getClassDetailUrl={(classId) =>
           `/admins/instructor-list/${instructorId}/class-schedule/${classId}`
         }
