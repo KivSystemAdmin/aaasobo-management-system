@@ -190,8 +190,6 @@ export function getDayCellColorHandler(
   );
 
   return (arg: DayCellMountArg) => {
-    if (arg.isOther) return;
-
     const dateStr = timeZone
       ? formatDateKeyInTimeZone(arg.date, timeZone)
       : new Intl.DateTimeFormat("en-CA", {
@@ -201,9 +199,7 @@ export function getDayCellColorHandler(
         }).format(arg.date);
     const color = dateToColorMap.get(dateStr);
 
-    if (color) {
-      arg.el.style.backgroundColor = color;
-    }
+    arg.el.style.backgroundColor = color ?? "";
   };
 }
 
